@@ -1,0 +1,9 @@
+#!/bin/sh
+
+function git_info() {
+  git rev-parse --is-inside-work-tree &>/dev/null || return
+  branch=$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')
+  dirty=$(git diff --quiet --ignore-submodules HEAD &>/dev/null; [ $? -eq 1 ] && echo -e "*")
+
+  echo " ("$branch$dirty")"
+}

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+function dclean() {
+  exclude_containers=$(docker ps -a -q --filter label=keep=true 2>/dev/null)
+  end_containers=$(docker ps -a -q --filter status=exited --filter status=created 2>/dev/null)
+
+  if [[ ! -z $exclude_containers ]]; then
+    end_containers=$(echo $end_containers | tr " " "\n" | grep -v "$exclude_containers")
+  fi
+  docker rm $end_containers 2>/dev/null
+  docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null
+}

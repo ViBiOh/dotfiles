@@ -1,0 +1,4 @@
+#!/bin/sh
+
+export LS_OPTIONS='--color=auto'
+alias ll='ls $LS_OPTIONS -litra'
