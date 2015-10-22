@@ -1,0 +1,10 @@
+[user]
+	name = Vincent Boutour
+	email = vincent.boutour@gmail.com
+[core]
+	editor = vi
+	autocrlf = input
+[color]
+	ui = true
+[push]
+	default = simple
