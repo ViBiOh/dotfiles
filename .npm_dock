@@ -1,3 +1,4 @@
 #!/bin/sh
 
-alias npm='docker run --rm -v $(pwd):/usr/src -w /usr/src vibioh/node:dev npm' 
+alias npm='docker run -P --rm -v $(pwd):/usr/src -w /usr/src vibioh/node:dev npm' 
+alias node='docker run -P --rm -v $(pwd):/usr/src -w /src/src vibioh/node:dev node'
