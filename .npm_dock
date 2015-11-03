@@ -1,0 +1,3 @@
+#!/bin/sh
+
+alias npm='docker run --rm -v $(pwd):/usr/src -w /usr/src vibioh/node:dev npm' 
