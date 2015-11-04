@@ -10,3 +10,5 @@ function dclean() {
   docker rm $end_containers 2>/dev/null
   docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null
 }
+
+export DOCKER_HOST=tcp://dedibox:2376 DOCKER_TLS_VERIFY=1
