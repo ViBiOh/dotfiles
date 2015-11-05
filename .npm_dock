@@ -1,6 +1,6 @@
 #!/bin/sh
 
 if [[ `which node | wc -l` -eq 0 ]]; then
-  alias npm='docker run -P --rm -v $(pwd):/usr/src -w /usr/src vibioh/node:dev npm' 
-  alias node='docker run -P --rm -v $(pwd):/usr/src -w /src/src vibioh/node:latest node'
+  alias npm='docker run -it -P --rm -v $(pwd):/usr/src -w /usr/src vibioh/node:dev npm' 
+  alias node='docker run -it -P --rm -v $(pwd):/usr/src -w /src/src vibioh/node:latest node'
 fi
