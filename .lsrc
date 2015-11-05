@@ -1,5 +1,9 @@
 #!/bin/sh
 
-export LS_OPTIONS='--color=auto'
-export CLICOLOR=1
+if [[ `uname` == 'Darwin' ]]; then
+  export CLICOLOR=1
+  export LS_OPTIONS=''
+else
+  export LS_OPTIONS='--color=auto'
+fi
 alias ll='ls $LS_OPTIONS -litrah'
