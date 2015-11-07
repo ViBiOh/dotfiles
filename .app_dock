@@ -2,7 +2,7 @@
 
 if [[ `which node 2>/dev/null | wc -l` -eq 0 ]]; then
   alias npm='docker run -it --rm -v /var/node:/usr/node -v $(pwd):/usr/src -w /usr/src vibioh/node:dev npm'
-  alias node='docker run -it --rm -v /var/node:/usr/node -v $(pwd):/usr/src -w /src/src vibioh/node:latest node'
+  alias node='docker run -it --rm -v /var/node:/usr/node -v $(pwd):/usr/src -w /usr/src vibioh/node:latest node'
   export PATH=/var/node/bin:$PATH
 fi
 
