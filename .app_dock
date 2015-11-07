@@ -1,11 +1,11 @@
 #!/bin/sh
 
 if [[ `which node 2>/dev/null | wc -l` -eq 0 ]]; then
-  alias npm='docker run -it --read-only --rm -v /usr/local/node:/usr/node/bin -v $(pwd):/usr/src -w /usr/src vibioh/node:dev npm'
-  alias node='docker run -it --rm -v /usr/local/node:/usr/node/bin -v $(pwd):/usr/src -w /src/src vibioh/node:latest node'
-  export PATH=/usr/local/node:$PATH
+  alias npm='docker run -it --rm -v /var/node:/usr/node -v $(pwd):/usr/src -w /usr/src vibioh/node:dev npm'
+  alias node='docker run -it --rm -v /var/node:/usr/node -v $(pwd):/usr/src -w /src/src vibioh/node:latest node'
+  export PATH=/var/node/bin:$PATH
 fi
 
 if [[ `which mvn 2>/dev/null | wc -l` -eq 0 ]]; then
-  alias mvn='docker run -it --read-only --rm -v $(pwd):/usr/src -w /usr/src vibioh/maven:latest mvn'
+  alias mvn='docker run -it --rm -v $(pwd):/usr/src -w /usr/src vibioh/maven:latest mvn'
 fi
