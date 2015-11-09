@@ -14,7 +14,7 @@ function git_update() {
   for dir in $HOME/code/*; do
     cd $dir
     if [[ `git rev-parse --is-inside-work-tree 2>/dev/null | grep true | wc -l` -eq 1 ]]; then
-      echo $dir && git pull
+      echo $dir && git pull && git push
     fi
   done
 
