@@ -8,3 +8,5 @@
 	ui = true
 [push]
 	default = simple
+[alias]
+	lg = log --pretty=oneline
