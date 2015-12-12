@@ -1,7 +1,11 @@
 #!/bin/sh
 
 function dclean() {
-  exclude_containers=$(docker ps -a -q --filter label=keep=true 2>/dev/null)
+  if [[ $1 == "force" ]]; then
+    exclude_containers=""
+  else
+    exclude_containers=$(docker ps -a -q --filter label=keep=true 2>/dev/null)
+  fi
   end_containers=$(docker ps -a -q --filter status=exited --filter status=created 2>/dev/null)
 
   if [[ ! -z $exclude_containers ]]; then
