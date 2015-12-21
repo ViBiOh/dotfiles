@@ -10,7 +10,7 @@ function dclean() {
     exclude_containers=`docker ps -a -q -f label=keep=true 2>/dev/null`
   fi
 
-  if [[ ! -z $1 && ! forceClean ]]; then
+  if [[ ! -z $1 && $1 != $forceWord ]]; then
     end_containers=`docker ps -a -q -f name=$1 2>/dev/null`
   else
     end_containers=`docker ps -a -q -f status=exited -f status=created 2>/dev/null`
