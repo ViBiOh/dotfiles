@@ -4,6 +4,7 @@
 [core]
 	editor = vi
 	autocrlf = input
+	excludesfile = $HOME/.gitignore_global
 [color]
 	ui = true
 [push]
