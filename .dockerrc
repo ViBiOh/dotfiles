@@ -1,13 +1,16 @@
 #!/bin/sh
 
 function dclean() {
-  if [[ $1 == "force" ]]; then
+  forceWord=force
+  forceClean=`[[ $1 == $forceWord || $2 == $forceWord ]] && echo true || echo false`
+
+  if [[ forceClean ]]; then
     exclude_containers=""
   else
     exclude_containers=`docker ps -a -q -f label=keep=true 2>/dev/null`
   fi
 
-  if [[ ! -z $1 && $1 != "force" ]]; then
+  if [[ ! -z $1 && ! forceClean ]]; then
     end_containers=`docker ps -a -q -f name=$1 2>/dev/null`
   else
     end_containers=`docker ps -a -q -f status=exited -f status=created 2>/dev/null`
