@@ -1,14 +1,23 @@
 #!/bin/sh
 
 function dclean() {
-  exclude_containers=$(docker ps -a -q --filter label=keep=true 2>/dev/null)
-  end_containers=$(docker ps -a -q --filter status=exited --filter status=created 2>/dev/null)
+  if [[ $1 == "force" ]]; then
+    exclude_containers=""
+  else
+    exclude_containers=`docker ps -a -q -f label=keep=true 2>/dev/null`
+  fi
+
+  if [[ ! -z $1 && $1 != "force" ]]; then
+    end_containers=`docker ps -a -q -f name=$1 2>/dev/null`
+  else
+    end_containers=`docker ps -a -q -f status=exited -f status=created 2>/dev/null`
+  fi
 
   if [[ ! -z $exclude_containers ]]; then
-    end_containers=$(echo $end_containers | tr " " "\n" | grep -v "$exclude_containers")
+    end_containers=`echo $end_containers | tr " " "\n" | grep -v "$exclude_containers"`
   fi
-  docker rm $end_containers 2>/dev/null
-  docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null
+  docker rm -f $end_containers 2>/dev/null
+  docker rmi `docker images --filter dangling=true -q 2>/dev/null` 2>/dev/null
 }
 
 if [[ `cat /etc/hosts 2>/dev/null | grep dedibox | grep -v 127.0 | wc -l` -eq 1 ]]; then
