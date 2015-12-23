@@ -3,7 +3,7 @@
 if [[ `which node 2>/dev/null | wc -l` -eq 0 ]]; then
   alias npm='docker run -it --rm -v /var/node:/usr/node -v `realpath ./`:/usr/src -w /usr/src vibioh/node:dev npm'
   alias node='docker run -it --rm -v /var/node:/usr/node -v `realpath ./`:/usr/src -w /usr/src vibioh/node:latest node'
-  export PATH=/var/node/bin:$PATH
+  export PATH=/var/node/bin:${PATH}
 fi
 
 if [[ `which mvn 2>/dev/null | wc -l` -eq 0 ]]; then
