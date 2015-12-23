@@ -7,4 +7,4 @@ BLUE="\[\033[34m\]"
 PURPLE="\[\033[35m\]"
 RESET="\[\033[0m\]"
 
-export PS1="$BLUE\u$RESET@$RED\h$RESET $GREEN\w$RESET$YELLOW\$(git_info)$RESET ツ"
+export PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}${YELLOW}\$(git_info)${RESET} ツ"
