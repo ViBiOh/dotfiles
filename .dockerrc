@@ -4,7 +4,7 @@ function dclean() {
   forceWord=force
   forceClean=`[[ ${1} == ${forceWord} || ${2} == ${forceWord} ]] && echo true || echo false`
 
-  if [[ forceClean ]]; then
+  if [[ forceClean == "true" ]]; then
     exclude_containers=""
   else
     exclude_containers=`docker ps -a -q -f label=keep=true 2>/dev/null`
