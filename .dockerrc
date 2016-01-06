@@ -3,6 +3,11 @@
 function dclean() {
   forceWord=force
 
+  if [[ $# -eq 2 && ${2} != ${forceWord} ]]; then
+    echo Usage: dclean [name prefix] [?force]
+    return
+  fi
+
   if [[ ${1} == ${forceWord} || ${2} == ${forceWord} ]]; then
     exclude_containers=""
   else
