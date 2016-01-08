@@ -5,5 +5,5 @@ for file in ${HOME}/code/dotfiles/.*; do
 done
 
 for file in ${HOME}/code/dotfiles/*; do
-  [[ -r ${file} ]] && [[ -f ${file} ]] && [[ $file != "README.md" ]] && cp ${file} ${HOME}/.`basename ${file}`
+  [[ -r ${file} ]] && [[ -f ${file} ]] && [[ `basename ${file}` != "README.md" ]] && cp ${file} ${HOME}/.`basename ${file}`
 done
