@@ -4,6 +4,14 @@ function dmounts() {
   docker inspect --format='{{range .Mounts}}{{if ne .Driver "local"}}{{.Source}} = {{.Destination}}|{{end}}{{end}}' --type=container ${1} | tr "|" "\n"
 }
 
+function denvs() {
+  docker inspect --format='{{range $p := .Config.Env}}{{$p}}|{{end}}' --type=container ${1} | tr "|" "\n"
+}
+
+function dlinks() {
+  docker inspect --format='{{range $p := .HostConfig.Links}}{{$p}}|{{end}}' --type=container ${1} | tr "|" "\n"
+}
+
 function dclean() {
   forceWord=force
 
