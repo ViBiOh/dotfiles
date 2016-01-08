@@ -1,6 +1,6 @@
 #!/bin/sh
 
-function dmount() {
+function dmounts() {
   docker inspect --format='{{range .Mounts}}{{if ne .Driver "local"}}{{.Source}} = {{.Destination}}|{{end}}{{end}}' --type=container ${1} | tr "|" "\n"
 }
 
