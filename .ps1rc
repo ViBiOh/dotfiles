@@ -7,4 +7,8 @@ BLUE="\[\033[34m\]"
 PURPLE="\[\033[35m\]"
 RESET="\[\033[0m\]"
 
-export PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}${YELLOW}\$(git_info)${RESET} ツ"
+if [[ `which git 2>/dev/null | wc -l` -eq 0 ]]; then
+  export PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET} ツ"
+else
+  export PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}${YELLOW}\$(git_info)${RESET} ツ"
+fi
