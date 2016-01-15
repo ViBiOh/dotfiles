@@ -1,0 +1,10 @@
+#!/bin/sh
+
+function sed_escape_string() {
+  echo ${1} | sed 's|\([\|\.]\)|\\\1|g'
+}
+
+function sed_replace_properties() {
+  sed -i -r "s|^`sed_escape_string ${2}`.*|`sed_escape_string ${4:-${2}}`=`sed_escape_string ${3}`|" ${1}
+}
+
