@@ -21,7 +21,7 @@ function git_browse() {
 
   for dir in ${currentWorkDir}/*; do
     cd ${dir}
-    if [[ `git rev-parse --is-inside-work-tree 2>/dev/null | grep true | wc -l` -eq 1 ]]; then
+    if [ `git rev-parse --is-inside-work-tree 2>/dev/null | grep true | wc -l` -eq 1 ]; then
       echo ${dir} && sh -c "$@"
     fi
   done

@@ -15,30 +15,30 @@ function dlinks() {
 function dclean() {
   forceWord=force
 
-  if [[ $# -eq 2 && ${2} != ${forceWord} ]]; then
+  if [ "${#}" -eq 2 && "${2}" != "${forceWord}" ]; then
     echo Usage: dclean [name prefix] [?force]
     return
   fi
 
-  if [[ ${1} == ${forceWord} || ${2} == ${forceWord} ]]; then
+  if [ "${1}" == "${forceWord}" || "${2}" == "${forceWord}" ]; then
     exclude_containers=""
   else
     exclude_containers=`docker ps -a -q -f label=keep=true 2>/dev/null`
   fi
 
-  if [[ ! -z ${1} && ${1} != ${forceWord} ]]; then
+  if [ ! -z "${1}" && "${1}" != "${forceWord}" ]; then
     end_containers=`docker ps -a -q -f name=${1} 2>/dev/null`
   else
     end_containers=`docker ps -a -q -f status=exited -f status=created 2>/dev/null`
   fi
 
-  if [[ ! -z ${exclude_containers} ]]; then
+  if [ ! -z "${exclude_containers}" ]; then
     end_containers=`echo ${end_containers} | tr " " "\n" | grep -v "${exclude_containers}"`
   fi
   docker rm -f ${end_containers} 2>/dev/null
   docker rmi `docker images --filter dangling=true -q 2>/dev/null` 2>/dev/null
 }
 
-if [[ `cat /etc/hosts 2>/dev/null | grep dedibox | grep -v 127.0 | wc -l` -eq 1 ]]; then
+if [ `cat /etc/hosts 2>/dev/null | grep dedibox | grep -v 127.0 | wc -l` -eq 1 ]; then
   export DOCKER_HOST=tcp://dedibox:2376 DOCKER_TLS_VERIFY=1
 fi
