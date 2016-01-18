@@ -1,5 +1,7 @@
 #!/bin/sh
 
-if [ `uname` == 'Darwin' ]; then
-  sudo find / -name ".DS_Store" -exec rm -f {} \;
-fi
+function os_clean() {
+  if [ `uname` == 'Darwin' ]; then
+    sudo find / -name ".DS_Store" -exec rm -f {} \;
+  fi
+}
