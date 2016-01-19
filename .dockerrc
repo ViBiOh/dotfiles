@@ -12,6 +12,10 @@ function dlinks() {
   docker inspect --format='{{range $p := .HostConfig.Links}}{{$p}}|{{end}}' --type=container ${1} | tr "|" "\n"
 }
 
+function dports() {
+  docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{$p}} -> {{(index $conf 0).HostPort}}|{{end}}' --type=container ${1} | tr "|" "\n"
+}
+
 function dclean() {
   forceWord=force
 
