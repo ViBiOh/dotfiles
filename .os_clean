@@ -3,5 +3,6 @@
 function os_clean() {
   if [ `uname` == 'Darwin' ]; then
     sudo find / -name ".DS_Store" -exec rm -f {} \;
+    sudo find / -name ".localized" -exec rm -f {} \;
   fi
 }
