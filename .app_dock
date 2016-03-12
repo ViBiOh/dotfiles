@@ -2,10 +2,10 @@
 
 if [ `which node 2>/dev/null | wc -l` -eq 0 ]; then
   if [ `uname -p | grep 'arm' | wc -l` -eq 0 ]; then
-    alias npm='docker run -it --rm -v /var/node:/usr/node -v `realpath ./`:/usr/src -w /usr/src vibioh/node:dev npm'
+    alias npm='docker run -P -it --rm -v /var/node:/usr/node -v `realpath ./`:/usr/src -w /usr/src vibioh/node:dev npm'
     alias node='docker run -it --rm -v /var/node:/usr/node -v `realpath ./`:/usr/src -w /usr/src vibioh/node:latest node'
   else
-    alias npm='docker run -it --rm -v /var/node:/usr/node -v `realpath ./`:/usr/src -w /usr/src vibioh/node-arm:dev npm'
+    alias npm='docker run -P -it --rm -v /var/node:/usr/node -v `realpath ./`:/usr/src -w /usr/src vibioh/node-arm:dev npm'
     alias node='docker run -it --rm -v /var/node:/usr/node -v `realpath ./`:/usr/src -w /usr/src vibioh/node-arm:latest node'
   fi
   export PATH=/var/node/bin:${PATH}
