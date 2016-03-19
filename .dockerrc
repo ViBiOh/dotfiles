@@ -43,6 +43,6 @@ function dclean() {
   docker rmi `docker images --filter dangling=true -q 2>/dev/null` 2>/dev/null
 }
 
-if [ `cat /etc/hosts 2>/dev/null | grep dedibox | grep -v 127.0 | wc -l` -eq 1 ]; then
-  export DOCKER_HOST=tcp://dedibox:2376 DOCKER_TLS_VERIFY=1
+if [ `cat /etc/hosts 2>/dev/null | grep docker | grep -v 127.0 | wc -l` -eq 1 ]; then
+  export DOCKER_HOST=tcp://docker:2376 DOCKER_TLS_VERIFY=1
 fi
