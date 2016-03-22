@@ -2,15 +2,15 @@
 
 if [ `which node 2>/dev/null | wc -l` -eq 0 ]; then
   if [ `uname -p | grep 'arm' | wc -l` -eq 0 ]; then
-    alias npm='docker run -it --rm -v /var/node:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node:dev npm'
-    alias node='docker run -it --rm -v /var/node:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node:latest node'
+    alias npm='docker run -it --rm -v ${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node:dev npm'
+    alias node='docker run -it --rm -v /${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node:latest node'
   else
-    alias npm='docker run -it --rm -v /var/node:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node-arm:dev npm'
-    alias node='docker run -it --rm -v /var/node:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node-arm:latest node'
+    alias npm='docker run -it --rm -v ${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node-arm:dev npm'
+    alias node='docker run -it --rm -v ${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node-arm:latest node'
   fi
   export PATH=/var/node/bin:${PATH}
 fi
 
 if [ `which mvn 2>/dev/null | wc -l` -eq 0 ]; then
-  alias mvn='docker run -it --rm -v /var/maven:/home/java/.m2 -v `realpath ./`:/home/node/src -w /home/node/src vibioh/maven:latest mvn'
+  alias mvn='docker run -it --rm -v ${HOME}/.m2:/home/java/.m2 -v `realpath ./`:/home/node/src -w /home/node/src vibioh/maven:latest mvn'
 fi
