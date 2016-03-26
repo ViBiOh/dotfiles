@@ -16,7 +16,7 @@ function dports() {
   docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{$p}} -> {{(index $conf 0).HostPort}}|{{end}}' --type=container ${1} | tr "|" "\n"
 }
 
-function grpw() {
+function nobody_nogroup_write() {
   chmod -R ${1} && chown -R 65534:65533 ${1}
 }
 
