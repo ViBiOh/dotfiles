@@ -8,6 +8,10 @@ function git_info() {
   echo " ("$branch$dirty")"
 }
 
+function git_pull() {
+  git_browse 'git pull'
+}
+
 function git_sync() {
   git_browse 'git pull && git push'
 }
