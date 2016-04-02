@@ -17,8 +17,8 @@ fi
 
 if [ `which go 2>/dev/null | wc -l` -eq 0 ]; then
   if [ -z "$arm" ]; then
-    alias go='docker run -it --rm -v `realpath ./`:/usr/src -w /usr/src golang:1.6 go'
+    alias go='docker run -it --rm -e CGO_ENABLED=0 -e GOGC=off -v `realpath ./`:/usr/src -w /usr/src golang:1.6 go'
   else
-    alias go='docker run -it --rm -v `realpath ./`:/usr/src -w /usr/src vibioh/go-arm:1.6 go'
+    alias go='docker run -it --rm -e CGO_ENABLED=0 -e GOGC=off -v `realpath ./`:/usr/src -w /usr/src vibioh/go-arm:1.6 go'
   fi
 fi
