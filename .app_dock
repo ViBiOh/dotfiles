@@ -16,7 +16,7 @@ if [ `which travis 2>/dev/null | wc -l` -eq 0 ]; then
 fi
 
 if [ `which hugo 2>/dev/null | wc -l` -eq 0 ]; then
-  alias travis='docker run -it --rm -v `realpath ./`:/hugo/ vibioh/hugo${arm:+-arm}:latest'
+  alias hugo='docker run -it --rm -v `realpath ./`:/hugo/ vibioh/hugo${arm:+-arm}:latest'
 fi
 
 if [ `which go 2>/dev/null | wc -l` -eq 0 ]; then
