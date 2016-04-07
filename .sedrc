@@ -5,6 +5,6 @@ function sed_escape_string() {
 }
 
 function sed_replace_properties() {
-  sed -i -r "s|^`sed_escape_string ${2}`.*|`sed_escape_string ${4:-${2}}`=`sed_escape_string ${3}`|" ${1}
+  sed -i '' -e "s|^`sed_escape_string ${2}`.*|`sed_escape_string ${4:-${2}}`=`sed_escape_string ${3}`|" ${1}
 }
 
