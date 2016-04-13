@@ -23,7 +23,7 @@ function nobody_nogroup_write() {
 function docker_arm() {
   if [ -f "docker-compose.yml" ]; then
     sed -i '' -e 's|image: vibioh\/\([^:]*\)|image: vibioh\/\1-arm|g' docker-compose.yml
-    sed -i '' -e 's|image: emilevauge/traefik|image: vibioh\/traefik-arm|g' docker-compose.yml
+    sed -i '' -e 's|image: traefik|image: vibioh\/traefik-arm|g' docker-compose.yml
   fi
 
   if [ -f "Dockerfile" ]; then
