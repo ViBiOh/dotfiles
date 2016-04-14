@@ -3,26 +3,26 @@
 arm=`uname -m | grep 'arm'`
 
 if [ `which node 2>/dev/null | wc -l` -eq 0 ]; then
-  alias npm='docker run -it --rm -v ${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node${arm:+-arm}:dev npm'
-  alias node='docker run -it --rm -v /${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node${arm:+-arm}:latest node'
+  alias npm='docker run -it --rm -v ${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node${arm:+:arm}:dev npm'
+  alias node='docker run -it --rm -v /${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node${arm:+:arm}:latest node'
 fi
 
 if [ `which mvn 2>/dev/null | wc -l` -eq 0 ]; then
-  alias mvn='docker run -it --rm -v ${HOME}/.m2:/home/java/.m2 -v `realpath ./`:/home/node/src -w /home/node/src vibioh/maven${arm:+-arm}:latest mvn'
+  alias mvn='docker run -it --rm -v ${HOME}/.m2:/home/java/.m2 -v `realpath ./`:/home/node/src -w /home/node/src vibioh/maven${arm:+:arm}:latest mvn'
 fi
 
 if [ `which travis 2>/dev/null | wc -l` -eq 0 ]; then
-  alias travis='docker run -it --rm -v `realpath ./`:/usr/src vibioh/travis-cli${arm:+-arm}:latest'
+  alias travis='docker run -it --rm -v `realpath ./`:/usr/src vibioh/travis-cli${arm:+:arm}:latest'
 fi
 
 if [ `which hugo 2>/dev/null | wc -l` -eq 0 ]; then
-  alias hugo='docker run -it --rm -v `realpath ./`:/www/ vibioh/hugo${arm:+-arm}:latest'
+  alias hugo='docker run -it --rm -v `realpath ./`:/www/ vibioh/hugo${arm:+:arm}:latest'
 fi
 
 if [ `which go 2>/dev/null | wc -l` -eq 0 ]; then
   if [ -z "$arm" ]; then
     alias go='docker run -it --rm -e CGO_ENABLED=0 -e GOGC=off -v `realpath ./`:/usr/src -w /usr/src golang:1.6 go'
   else
-    alias go='docker run -it --rm -e CGO_ENABLED=0 -e GOGC=off -v `realpath ./`:/usr/src -w /usr/src vibioh/go-arm:1.6 go'
+    alias go='docker run -it --rm -e CGO_ENABLED=0 -e GOGC=off -v `realpath ./`:/usr/src -w /usr/src vibioh/go:1.6-arm go'
   fi
 fi
