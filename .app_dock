@@ -3,20 +3,20 @@
 arm=`uname -m | grep 'arm'`
 
 if [ `which node 2>/dev/null | wc -l` -eq 0 ]; then
-  alias npm='docker run -it --rm -v ${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node${arm:+:arm}:dev npm'
-  alias node='docker run -it --rm -v /${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node${arm:+:arm}:latest node'
+  alias npm='docker run -it --rm -v ${HOME}/.npm_packages:/root/.npm_packages -v `realpath ./`:/root/src -w /root/src vibioh/node:dev${arm:+-arm} npm'
+  alias node='docker run -it --rm -v /${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node${arm:+:arm} node'
 fi
 
 if [ `which mvn 2>/dev/null | wc -l` -eq 0 ]; then
-  alias mvn='docker run -it --rm -v ${HOME}/.m2:/home/java/.m2 -v `realpath ./`:/home/node/src -w /home/node/src vibioh/maven${arm:+:arm}:latest mvn'
+  alias mvn='docker run -it --rm -v ${HOME}/.m2:/home/java/.m2 -v `realpath ./`:/home/node/src -w /home/node/src vibioh/maven${arm:+:arm} mvn'
 fi
 
 if [ `which travis 2>/dev/null | wc -l` -eq 0 ]; then
-  alias travis='docker run -it --rm -v `realpath ./`:/usr/src vibioh/travis-cli${arm:+:arm}:latest'
+  alias travis='docker run -it --rm -v `realpath ./`:/usr/src vibioh/travis-cli${arm:+:arm}'
 fi
 
 if [ `which hugo 2>/dev/null | wc -l` -eq 0 ]; then
-  alias hugo='docker run -it --rm -v `realpath ./`:/www/ vibioh/hugo${arm:+:arm}:latest'
+  alias hugo='docker run -it --rm -v `realpath ./`:/www/ vibioh/hugo${arm:+:arm}'
 fi
 
 if [ `which go 2>/dev/null | wc -l` -eq 0 ]; then
