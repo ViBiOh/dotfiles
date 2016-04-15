@@ -32,7 +32,7 @@ function docker_arm() {
   fi
 
   if [ -f "Makefile" ]; then
-    sed -i '' -e 's|docker build -t vibioh\/\(.*\)|docker build -t vibioh\/\1-arm|g' Makefile
+    sed -i '' -e 's|docker build -t vibioh\/\(.*?\) |docker build -t vibioh\/\1-arm|g' Makefile
   fi
 }
 
