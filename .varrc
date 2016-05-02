@@ -1,7 +1,9 @@
 #!/bin/sh
 
 function readVariableIfRequired() {
-  if [ -z "${${1}}" ]; then
+  if [ -z "${!1}" ]; then
     read -p "${1}=" $1
+  else
+    echo "${1}="${!1}
   fi
 }
