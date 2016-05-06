@@ -1,19 +1,23 @@
-#!/bin/sh
+#!/bin/bash
 
-function dmounts() {
+function docker-mounts() {
   docker inspect --format='{{range .Mounts}}{{if ne .Driver "local"}}{{.Source}} = {{.Destination}}|{{end}}{{end}}' --type=container ${1} | tr "|" "\n"
 }
 
-function denvs() {
+function docker-envs() {
   docker inspect --format='{{range $p := .Config.Env}}{{$p}}|{{end}}' --type=container ${1} | tr "|" "\n"
 }
 
-function dlinks() {
+function docker-links() {
   docker inspect --format='{{range $p := .HostConfig.Links}}{{$p}}|{{end}}' --type=container ${1} | tr "|" "\n"
 }
 
-function dports() {
+function docker-ports() {
   docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{$p}} -> {{(index $conf 0).HostPort}}|{{end}}' --type=container ${1} | tr "|" "\n"
+}
+
+function docker-ips() {
+  docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' --type=container ${1}
 }
 
 function nobody_nogroup_write() {
@@ -36,7 +40,7 @@ function docker_arm() {
   fi
 }
 
-function dclean() {
+function docker-clean() {
   forceWord=force
 
   if [ "${#}" -eq 2 ] && [ "${2}" != "${forceWord}" ]; then
