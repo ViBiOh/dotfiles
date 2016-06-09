@@ -40,6 +40,10 @@ function docker_arm() {
   fi
 }
 
+function swarm-node() {
+  curl --insecure --cert ${DOCKER_CERT_PATH}/cert.pem --key ${DOCKER_CERT_PATH}/key.pem --silent -X GET https://${DOCKER_HOST}/info | pcregrep -o1 '(?:\["\s\S*?","(.*?)"\].*?)'
+}
+
 function docker-clean() {
   forceWord=force
 
