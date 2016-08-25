@@ -44,6 +44,23 @@ function swarm-node() {
   curl --insecure --cert ${DOCKER_CERT_PATH}/cert.pem --key ${DOCKER_CERT_PATH}/key.pem --silent -X GET https://${DOCKER_HOST}/info | pcregrep -o1 '(?:\["\s\S*?","(.*?)"\].*?)'
 }
 
+function docker-compose-deploy() {
+  DOMAIN=${1}
+  readVariableIfRequired "DOMAIN"
+  
+  PROJECT_NAME=${2}
+  readVariableIfRequired "PROJECT_NAME"
+  
+  export DOMAIN=${DOMAIN}
+  
+  docker-compose -p ${PROJECT_NAME} pull
+  docker-compose -p ${PROJECT_NAME} stop
+  docker-compose -p ${PROJECT_NAME} rm --all -f -v
+  docker-compose -p ${PROJECT_NAME} up -d --force-recreate
+  
+  docker rmi `docker images --filter dangling=true -q 2>/dev/null` 2>/dev/null
+}
+
 function docker-clean() {
   forceWord=force
 
