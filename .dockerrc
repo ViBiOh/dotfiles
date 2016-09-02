@@ -61,6 +61,10 @@ function docker-compose-deploy() {
   docker rmi `docker images --filter dangling=true -q 2>/dev/null` 2>/dev/null
 }
 
+function docker-restart() {
+  docker start `docker ps -a -q -f status=exited -f status=created 2>/dev/null` 2>/dev/null
+}
+
 function docker-clean() {
   forceWord=force
 
