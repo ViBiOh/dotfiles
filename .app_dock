@@ -13,10 +13,6 @@ if [ `which travis 2>/dev/null | wc -l` -eq 0 ]; then
   alias travis='docker run -it --rm -v `realpath ./`:/usr/src vibioh/travis-cli'
 fi
 
-if [ `which hugo 2>/dev/null | wc -l` -eq 0 ]; then
-  alias hugo='docker run -it --rm -v `realpath ./`:/www/ vibioh/hugo'
-fi
-
 if [ `which go 2>/dev/null | wc -l` -eq 0 ]; then
   alias go='docker run -it --rm -e CGO_ENABLED=0 -e GOGC=off -v `realpath ./`:/usr/src -w /usr/src golang:1.6 go'
 fi
