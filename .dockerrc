@@ -45,11 +45,11 @@ function swarm-node() {
 }
 
 function docker-compose-deploy() {
-  DOMAIN=${1}
-  readVariableIfRequired "DOMAIN"
-  
-  PROJECT_NAME=${2}
+  PROJECT_NAME=${1}
   readVariableIfRequired "PROJECT_NAME"
+
+  DOMAIN=${2}
+  readVariableIfRequired "DOMAIN"
   
   export DOMAIN=${DOMAIN}
 
@@ -62,11 +62,11 @@ function docker-compose-deploy() {
 }
 
 function docker-compose-hot-deploy() {
-  DOMAIN=${1}
-  readVariableIfRequired "DOMAIN"
-  
-  PROJECT_NAME=${2}
+  PROJECT_NAME=${1}
   readVariableIfRequired "PROJECT_NAME"
+
+  DOMAIN=${2}
+  readVariableIfRequired "DOMAIN"
   
   SERVICE_NAME=${3}
   readVariableIfRequired "SERVICE_NAME"
