@@ -73,7 +73,7 @@ function docker-compose-hot-deploy() {
   
   export DOMAIN=${DOMAIN}
 
-  existingContainer=`docker-compose -p ${PROJECT_NAME} ps | grep ${SERVICE_NAME}| awk '{print $1}'`
+  existingContainer=`docker-compose -p ${PROJECT_NAME} ps | grep ${SERVICE_NAME} | awk '{print $1}'`
 
   docker-compose -p ${PROJECT_NAME} pull
   docker-compose -p ${PROJECT_NAME} scale ${SERVICE_NAME}=2
