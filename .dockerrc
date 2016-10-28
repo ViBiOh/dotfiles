@@ -90,6 +90,14 @@ function docker-restart() {
   docker start `docker ps -a -q -f status=exited -f status=created 2>/dev/null` 2>/dev/null
 }
 
+function docker-clean-images() {
+  imagesToClean=`docker images --filter dangling=true -q 2>/dev/null`
+
+  if [ ! -z "${imagesToClean}" ]; then
+    docker rmi ${imagesToClean} 
+  fi
+}
+
 function docker-clean() {
   forceWord=force
 
@@ -114,7 +122,7 @@ function docker-clean() {
     end_containers=`echo ${end_containers} | tr " " "\n" | grep -v "${exclude_containers}"`
   fi
   docker rm -vf ${end_containers} 2>/dev/null
-  docker rmi `docker images --filter dangling=true -q 2>/dev/null` 2>/dev/null
+  docker-clean-images
 }
 
 export DOCKER_CONTENT_TRUST=1
