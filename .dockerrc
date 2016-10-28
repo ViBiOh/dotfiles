@@ -70,7 +70,7 @@ function docker-compose-hot-deploy() {
   
   SERVICE_NAME=${3}
   readVariableIfRequired "SERVICE_NAME"
-  
+
   export DOMAIN=${DOMAIN}
 
   existingContainer=`docker-compose -p ${PROJECT_NAME} ps | grep ${SERVICE_NAME} | awk '{print $1}'`
