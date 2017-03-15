@@ -8,6 +8,10 @@ function git_info() {
   echo " ("$branch$dirty")"
 }
 
+function git_prune() {
+  git branch --merged | egrep -v "(^\*|master)" | xargs git branch -d
+}
+
 function git_pull() {
   git_browse 'git pull'
 }
