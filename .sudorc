@@ -1,3 +1,4 @@
 #!/bin/sh
 
 alias fuck='sudo `history -p \!\!`'
+alias code='cd ${HOME}/code/src/github.com/ViBiOh/'
