@@ -2,4 +2,7 @@
 
 alias fuck='sudo `history -p \!\!`'
 alias code='cd ${HOME}/code/src/github.com/ViBiOh/'
-ln -s ${HOME}/code/src/github.com/ViBiOh/ ${HOME}/dev
+
+if [ ! -h ${HOME}/dev ]; then
+  ln -s ${HOME}/code/src/github.com/ViBiOh/ ${HOME}/dev
+fi
