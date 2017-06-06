@@ -15,6 +15,15 @@ Plugin 'vim-airline/vim-airline'
 " GitWrapper
 Plugin 'tpope/vim-fugitive'
 
+" CTRL + P handler
+Plugin 'kien/ctrlp.vim'
+
+" Completion
+Plugin 'valloric/youcompleteme'
+
+" Go tool
+Plugin 'fatih/vim-go'
+
 call vundle#end()
 
 filetype plugin indent on
