@@ -16,13 +16,7 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'tpope/vim-fugitive'
 
 " CTRL + P handler
-Plugin 'kien/ctrlp.vim'
-
-" Completion
-Plugin 'valloric/youcompleteme'
-
-" Go tool
-Plugin 'fatih/vim-go'
+Plugin 'ctrlpvim/ctrlp.vim'
 
 call vundle#end()
 
