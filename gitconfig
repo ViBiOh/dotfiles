@@ -2,7 +2,7 @@
 	name = Vincent Boutour
 	email = bob@vibioh.fr
 [core]
-	editor = vi
+	editor = subl -n -w
 	autocrlf = input
 	excludesfile = /Users/vibioh/.gitignore_global
 [color]
