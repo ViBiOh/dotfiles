@@ -8,4 +8,4 @@ for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/*[!.md]; do
   [ -r "${file}" ] && [ -f "${file}" ] && cp ${file} ${HOME}/.`basename ${file}`
 done
 
-echo Machine is up since `uptime | awk '{print $3 $4}' | sed 's|,$||'`
+echo Machine is `uptime -p`
