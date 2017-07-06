@@ -1,8 +1,9 @@
 #!/bin/sh
 
 alias fuck='sudo `history -p \!\!`'
-alias code='cd ${HOME}/code/src/github.com/ViBiOh/'
+CODE_HOME=${HOME}/code/src/github.com/ViBiOh/
+alias code='cd ${CODE_HOME}'
 
 if [ ! -h ${HOME}/dev ]; then
-  ln -s ${HOME}/code/src/github.com/ViBiOh/ ${HOME}/dev
+  ln -s ${CODE_HOME} ${HOME}/dev
 fi
