@@ -2,6 +2,7 @@ set nocompatible
 filetype plugin indent on
 
 syntax enable
+set number
 set encoding=utf-8
 set showcmd
 
