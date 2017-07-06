@@ -17,6 +17,9 @@ Plugin 'vim-airline/vim-airline'
 " GitWrapper
 Plugin 'tpope/vim-fugitive'
 
+" Git Gutter
+Plugin 'airblade/vim-gitgutter'
+
 " CTRL + P handler
 Plugin 'ctrlpvim/ctrlp.vim'
 
