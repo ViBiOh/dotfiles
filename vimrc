@@ -8,23 +8,20 @@ call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
 
-" File browser
-Plugin 'scrooloose/nerdtree'
-
 " Status bar
 Plugin 'vim-airline/vim-airline'
 
 " Git Gutter
 Plugin 'airblade/vim-gitgutter'
 
-" CTRL + P handler
-Plugin 'ctrlpvim/ctrlp.vim'
-
 " Autocompletion
 Plugin 'valloric/youcompleteme'
 
 " Oceanic Next Theme
 Plugin 'mhartington/oceanic-next'
+
+" Fuzzy File Finder
+Plugin 'junegunn/fzf'
 
 call vundle#end()
 
@@ -73,9 +70,6 @@ set smartcase
 " Activate color scheme
 colorscheme OceanicNext
 
-" File browser - NERDTree config
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-map <C-n> :NERDTreeToggle<CR>
+" Ctrl + P Open fuzzy file finder
+map <C-p> :FZF<CR>
 
