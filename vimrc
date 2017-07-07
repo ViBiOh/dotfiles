@@ -70,6 +70,22 @@ set smartcase
 " Activate color scheme
 colorscheme OceanicNext
 
-" Ctrl + P Open fuzzy file finder
+" FZF Configuration
+" Ctrl+p open fuzzy finder
 map <C-p> :FZF<CR>
+
+" Customize fzf colors to match your color scheme
+let g:fzf_colors =
+  \ { 'fg':    ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
 
