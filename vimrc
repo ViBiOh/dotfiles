@@ -23,6 +23,9 @@ Plugin 'airblade/vim-gitgutter'
 " CTRL + P handler
 Plugin 'ctrlpvim/ctrlp.vim'
 
+" Autocompletion
+Plugin 'valloric/youcompleteme'
+
 call vundle#end()
 
 " /shrug
