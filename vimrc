@@ -23,6 +23,9 @@ Plugin 'ctrlpvim/ctrlp.vim'
 " Autocompletion
 Plugin 'valloric/youcompleteme'
 
+" Oceanic Next Theme
+Plugin 'mhartington/oceanic-next'
+
 call vundle#end()
 
 " /shrug
@@ -66,6 +69,9 @@ set ignorecase
 
 " Search with smart case (if uppercase provided, search is case sensitive)
 set smartcase
+
+" Activate color scheme
+colorscheme OceanicNext
 
 " File browser - NERDTree config
 autocmd StdinReadPre * let s:std_in=1

@@ -14,7 +14,8 @@ cp dotfiles/bashrc ${HOME}/.bashrc
 For MacOS :
 
 ```
-sudo ln -s /Applications/MacVim.app/Contents/bin/vim /usr/local/bin/vim
+brew install vim
+sudo ln -s /usr/local/bin/vim /usr/local/bin/vi
 ```
 
 ### Vundle
