@@ -14,9 +14,6 @@ Plugin 'scrooloose/nerdtree'
 " Status bar
 Plugin 'vim-airline/vim-airline'
 
-" GitWrapper
-Plugin 'tpope/vim-fugitive'
-
 " Git Gutter
 Plugin 'airblade/vim-gitgutter'
 
