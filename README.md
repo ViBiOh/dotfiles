@@ -29,7 +29,7 @@ Install [CMake](https://cmake.org/download/) for compiling YouCompleteMe suggest
 For MacOS :
 
 ```
-sudo ln -s /Applications/CMake.app/Contents/bin/cmake /usr/local/bin/cmake
+brew install cmake
 ```
 
 Then, you can install YCM.
