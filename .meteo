@@ -1,0 +1,4 @@
+#!/bin/sh
+
+alias meteo="curl -4 wttr.in/Paris"
+
