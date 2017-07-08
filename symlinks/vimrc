@@ -21,10 +21,33 @@ Plugin 'mhartington/oceanic-next'
 Plugin 'ervandew/supertab'
 
 " Default completion to OmniCompletion
-let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabDefaultCompletionType = 'context'
+
+" Syntax checking
+Plugin 'vim-syntastic/syntastic'
+
+" Recommanded configuration
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+" Configuration for javascript
+let g:syntastic_javascript_checkers = ['eslint']
+let g:syntastic_javascript_eslint_exe = './node_modules/.bin/eslint'
 
 " Golang completion
 Plugin 'nsf/gocode', {'rtp': 'vim/'}
+
+" Javascript syntax
+Plugin 'pangloss/vim-javascript'
+
+" JSX Syntax
+Plugin 'mxw/vim-jsx'
 
 " Javascript completion
 Plugin 'ternjs/tern_for_vim'
