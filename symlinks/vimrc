@@ -67,6 +67,10 @@ set smartcase
 " Activate color scheme
 colorscheme OceanicNext
 
+" Omni completion
+set completeopt-=preview
+set omnifunc=syntaxcomplete#Complete
+
 " FZF Configuration
 " Ctrl+p open fuzzy finder
 map <C-p> :FZF<CR>
