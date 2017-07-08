@@ -17,6 +17,18 @@ Plugin 'airblade/vim-gitgutter'
 " Oceanic Next Theme
 Plugin 'mhartington/oceanic-next'
 
+" SuperTab for completion
+Plugin 'ervandew/supertab'
+
+" Default completion to OmniCompletion
+let g:SuperTabDefaultCompletionType = "context"
+
+" Golang completion
+Plugin 'nsf/gocode', {'rtp': 'vim/'}
+
+" Javascript completion
+Plugin 'ternjs/tern_for_vim'
+
 " Fuzzy File Finder
 Plugin 'junegunn/fzf'
 
@@ -86,5 +98,5 @@ set smartcase
 colorscheme OceanicNext
 
 " Omni completion
-set completeopt-=preview
+set completeopt=longest,menuone
 set omnifunc=syntaxcomplete#Complete

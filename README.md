@@ -9,13 +9,6 @@ git clone git@github.com:ViBiOh/dotfiles.git
 ./dotfiles/install.sh
 ```
 
-## FZF
-
-```
-brew install fzf
-/usr/local/opt/fzf/install
-```
-
 ## Vim
 
 For MacOS :
@@ -30,5 +23,24 @@ sudo ln -s /usr/local/bin/vim /usr/local/bin/vi
 ```
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
+```
+
+## FZF
+
+```
+brew install fzf
+/usr/local/opt/fzf/install
+```
+
+## GoCode
+
+```
+go get -u github.com/nsf/gocode
+```
+
+## Tern
+
+```
+npm install --prefix ${HOME}/.vim/bundle/tern_for_vim
 ```
 
