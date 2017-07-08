@@ -25,17 +25,3 @@ git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
 ```
 
-Install [CMake](https://cmake.org/download/) for compiling YouCompleteMe suggestions.
-
-For MacOS :
-
-```
-brew install cmake
-```
-
-Then, you can install YCM.
-
-```
-cd ~/.vim/bundle/YouCompleteMe
-./install.py --gocode-completer --tern-completer
-```

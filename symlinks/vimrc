@@ -14,9 +14,6 @@ Plugin 'vim-airline/vim-airline'
 " Git Gutter
 Plugin 'airblade/vim-gitgutter'
 
-" Autocompletion
-Plugin 'valloric/youcompleteme'
-
 " Oceanic Next Theme
 Plugin 'mhartington/oceanic-next'
 
