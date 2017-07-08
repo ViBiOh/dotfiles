@@ -1,10 +1,13 @@
+#!/bin/sh
+
+cat > ${HOME}/.gitconfig <<GITCONFIG
 [user]
 	name = Vincent Boutour
 	email = bob@vibioh.fr
 [core]
 	editor = vi
 	autocrlf = input
-	excludesfile = /Users/vibioh/.gitignore_global
+	excludesfile = ${HOME}/.gitignore_global
 [color]
 	ui = true
 [push]
@@ -18,3 +21,5 @@
 	prune = true
 [pull]
 	rebase = preserve
+GITCONFIG
+
