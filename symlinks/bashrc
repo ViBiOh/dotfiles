@@ -1,6 +1,6 @@
 #!/bin/sh
 
-for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/.*; do
+for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/*; do
   [ -r "${file}" ] && [ -f "${file}" ] && source ${file}
 done
 
