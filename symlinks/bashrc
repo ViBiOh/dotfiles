@@ -5,3 +5,5 @@ for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/*; do
 done
 
 echo Machine is `uptime -p`
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

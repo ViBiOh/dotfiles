@@ -9,6 +9,13 @@ git clone git@github.com:ViBiOh/dotfiles.git
 ./dotfiles/install.sh
 ```
 
+## FZF
+
+```
+brew install fzf
+/usr/local/opt/fzf/install
+```
+
 ## Vim
 
 For MacOS :
