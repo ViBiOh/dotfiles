@@ -63,6 +63,9 @@ Plugin 'mxw/vim-jsx'
 " Javascript completion
 Plugin 'ternjs/tern_for_vim'
 
+au FileType javascript noremap <leader>v :TernDef <CR>
+au FileType javascript noremap <leader>r :TernRename <CR>
+
 " Fuzzy File Finder
 Plugin 'junegunn/fzf'
 
