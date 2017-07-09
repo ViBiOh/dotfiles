@@ -32,10 +32,10 @@ brew install fzf
 /usr/local/opt/fzf/install
 ```
 
-## GoCode
+## Golang
 
 ```
-go get -u github.com/nsf/gocode
+vim +GoInstallBinaries +qall
 ```
 
 ## Tern

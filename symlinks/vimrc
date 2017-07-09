@@ -36,9 +36,22 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
-" Configuration for javascript
+" Configuration of checkers
 let g:syntastic_javascript_checkers = ['eslint']
 let g:syntastic_javascript_eslint_exec = 'eslint_d'
+let g:syntastic_go_checkers = ['go', 'golint', 'errcheck']
+
+" Golang tool
+Plugin 'fatih/vim-go'
+
+" Configuration for Golang
+let g:go_fmt_command = "goimports"
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+au Filetype go nnoremap <leader>v :vsp <CR>:exe "GoDef" <CR>
 
 " Golang completion
 Plugin 'nsf/gocode', {'rtp': 'vim/'}
@@ -126,3 +139,6 @@ set omnifunc=syntaxcomplete#Complete
 
 " Show vertical ruler
 set colorcolumn=100
+
+" Setting <Leader>
+let mapleader = ','
