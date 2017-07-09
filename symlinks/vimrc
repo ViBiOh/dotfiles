@@ -56,12 +56,6 @@ au Filetype go nnoremap <leader>v :vsp <CR>:exe "GoDef" <CR>
 " Golang completion
 Plugin 'nsf/gocode', {'rtp': 'vim/'}
 
-" Javascript syntax
-Plugin 'pangloss/vim-javascript'
-
-" JSX Syntax
-Plugin 'mxw/vim-jsx'
-
 " Javascript completion
 Plugin 'ternjs/tern_for_vim'
 
