@@ -108,6 +108,9 @@ set encoding=utf-8
 " Show current command combination on bottom right
 set showcmd
 
+" Confirm change save
+set confirm
+
 " Wrap lines
 set wrap
 
