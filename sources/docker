@@ -30,44 +30,36 @@ function docker-compose-deploy() {
 
   DOMAIN=${2}
   readVariableIfRequired "DOMAIN"
-  
   export DOMAIN=${DOMAIN}
 
-  docker-compose -p ${PROJECT_NAME} pull
-  docker-compose -p ${PROJECT_NAME} stop
-  docker-compose -p ${PROJECT_NAME} rm -f -v
-  docker-compose -p ${PROJECT_NAME} up -d --force-recreate
-  
-  docker rmi `docker images --filter dangling=true -q 2>/dev/null` 2>/dev/null
-}
+  PROJECT_FULLNAME_SEPARATOR="uuu"
+  PROJECT_FULLNAME=${PROJECT_NAME}${PROJECT_FULLNAME_SEPARATOR}`git rev-parse --short HEAD`
 
-function docker-compose-hot-deploy() {
-  PROJECT_NAME=${1}
-  readVariableIfRequired "PROJECT_NAME"
+  oldServices=`docker ps -f name=${PROJECT_NAME}${PROJECT_FULLNAME_SEPARATOR}* -q`
 
-  DOMAIN=${2}
-  readVariableIfRequired "DOMAIN"
-  export DOMAIN=${DOMAIN}
+  docker-compose -p ${PROJECT_FULLNAME} up -d
+  servicesCount=`docker-compose -p ${PROJECT_FULLNAME} ps | awk '{if (NR > 2) {print $1}}' | wc -l`
 
-  services=`docker-compose -p ${PROJECT_NAME} ps | awk '{if (NR > 2) {print $1}}'`
+  echo "Waiting 45 seconds for containers to start..."
+  timeout=`date --date="45 seconds" +%s`
+  healthyCount=$(docker events --until ${timeout} -f event="health_status: healthy" -f name=${PROJECT_NAME}${PROJECT_FULLNAME_SEPARATOR} | wc -l)
 
-  docker-compose -p ${PROJECT_NAME} pull
-  matchPattern=${PROJECT_NAME}'_(.*?)_[0-9]+'
+  if [ "${servicesCount}" != "${healthyCount}" ]; then
+    echo "Containers didn't start, reverting..."
 
-  for service in ${services}; do
-    if [[ ${service} =~ ${matchPattern} ]]; then
-      docker-compose -p ${PROJECT_NAME} scale ${BASH_REMATCH[1]}=2
-    fi
-  done
+    docker-compose -p ${PROJECT_FULLNAME} rm --force --stop -v
 
-  docker-compose -p ${PROJECT_NAME} up -d
+    return 1
+  fi
 
-  echo "Waiting 5 seconds to start..."
-  sleep 5
+  echo Containers started, stopping old containers if presents
 
-  if [ ! -z "${services}" ]; then
-    docker stop ${services}
-    docker rm -f -v ${services}
+  if [ ! -z "${oldServices}" ]; then
+    docker stop --time 180 ${oldServices}
+  fi
+
+  if [ ! -z "${oldServices}" ]; then
+    docker rm -f -v ${oldServices}
   fi
   
   docker-clean
