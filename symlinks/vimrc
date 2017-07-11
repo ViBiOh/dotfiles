@@ -11,9 +11,6 @@ Plugin 'VundleVim/Vundle.vim'
 " Status bar
 Plugin 'vim-airline/vim-airline'
 
-" Git Gutter
-Plugin 'airblade/vim-gitgutter'
-
 " Oceanic Next Theme
 Plugin 'mhartington/oceanic-next'
 
@@ -26,7 +23,6 @@ let g:SuperTabDefaultCompletionType = 'context'
 " Syntax checking
 Plugin 'vim-syntastic/syntastic'
 
-" Recommanded configuration
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
@@ -36,7 +32,6 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
-" Configuration of checkers
 let g:syntastic_javascript_checkers = ['eslint']
 let g:syntastic_javascript_eslint_exec = 'eslint_d'
 let g:syntastic_go_checkers = ['go', 'golint', 'errcheck']
@@ -44,14 +39,16 @@ let g:syntastic_go_checkers = ['go', 'golint', 'errcheck']
 " Golang tool
 Plugin 'fatih/vim-go'
 
-" Configuration for Golang
 let g:go_fmt_command = "goimports"
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
+
+" GoTo Def is <leader>v
 au Filetype go nnoremap <leader>v :vsp <CR>:GoDef <CR>
+" Rename is <leader>r
 au Filetype go nnoremap <leader>r :GoRename <CR>
 
 " Golang completion
@@ -64,7 +61,9 @@ Plugin 'mxw/vim-jsx'
 " Javascript completion
 Plugin 'ternjs/tern_for_vim'
 
+" GoTo Def is <leader>v
 au FileType javascript noremap <leader>v :TernDef <CR>
+" Rename is <leader>r
 au FileType javascript noremap <leader>r :TernRename <CR>
 
 " Fuzzy File Finder
