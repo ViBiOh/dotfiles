@@ -88,6 +88,11 @@ let g:fzf_colors =
   \ 'spinner': ['fg', 'Label'],
   \ 'header':  ['fg', 'Comment'] }
 
+" Snippets tools
+Plugin 'MarcWeber/vim-addon-mw-utils'
+Plugin 'tomtom/tlib_vim'
+Plugin 'garbas/vim-snipmate'
+
 call vundle#end()
 
 " /shrug
@@ -144,6 +149,9 @@ set omnifunc=syntaxcomplete#Complete
 
 " Show vertical ruler
 set colorcolumn=100
+
+" Disable folding
+set nofoldenable
 
 " Setting <Leader>
 let mapleader = ','

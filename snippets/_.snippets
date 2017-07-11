@@ -1,0 +1,37 @@
+# React: class component
+snippet rcc
+	import React, { Component } from 'react';
+	import PropTypes from 'prop-types';
+
+	export default class ${1:ComponentName} extends Component {
+		static propTypes = {
+		};
+
+		constructor(props) {
+				super(props);
+		}
+
+		render() {
+			return (
+				${2:<div></div>}
+			);
+		}
+	}
+
+# React: functional component
+snippet rfc
+	import React from 'react';
+	import PropTypes from 'prop-types';
+
+	const ${1:ComponentName} = ({}) => {
+		return (
+			${2:<div></div>}
+		);
+	}
+
+	$1.displayName = '$1';
+
+	$1.propTypes = {
+	};
+
+	export default $1;
