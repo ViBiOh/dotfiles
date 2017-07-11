@@ -32,6 +32,12 @@ brew install fzf
 /usr/local/opt/fzf/install
 ```
 
+## ag
+
+```
+brew install the_silver_searcher
+```
+
 ## Golang
 
 ```
