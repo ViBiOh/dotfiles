@@ -147,3 +147,22 @@ set colorcolumn=100
 
 " Setting <Leader>
 let mapleader = ','
+
+" ag search https://gist.github.com/manasthakur/5afd3166a14bbadc1dc0f42d070bd746
+if executable('ag')
+  set grepprg=ag\ --nogroup\ --nocolor
+endif
+
+function! MySearch()
+  let grep_term = input("Enter search term: ")
+  if !empty(grep_term)
+    execute 'silent grep' grep_term | copen
+  else
+    echo "Empty search term"
+  endif
+  redraw!
+endfunction
+
+command! Search call MySearch()
+nnoremap <leader>s :Search<CR>
+nnoremap <leader>* :silent grep <cword> \| copen<CR><C-l>
