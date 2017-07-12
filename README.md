@@ -25,6 +25,13 @@ git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
 ```
 
+## Tmux
+
+```
+brew install tmux
+brew install reattach-to-user-namespace
+```
+
 ## FZF
 
 ```
