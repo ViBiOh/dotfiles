@@ -1,15 +1,39 @@
 " Turnoff vi backward compatibility
 set nocompatible
 
+" Show status line
+set laststatus=2
+
+function! GitBranch()
+  return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
+endfunction
+
+function! StatuslineGit()
+  let l:branchname = GitBranch()
+  return strlen(l:branchname) > 0 ?'  '.l:branchname.' ':''
+endfunction
+
+set statusline=
+set statusline+=\%q " Quickfix or Location List
+set statusline+=%#PmenuSel#
+set statusline+=%{StatuslineGit()}
+set statusline+=%#LineNr#
+set statusline+=%* " Highlight current window
+set statusline+=\%f " Filename
+set statusline+=\%R " Read-Only indicator
+set statusline+=%=
+set statusline+=\%y " Type of file
+set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
+set statusline+=\[%{&fileformat}\]
+set statusline+=\ %p%% " Percentage of the file
+set statusline+=\ %l:%c " Line Number and Total Line
+
 " Vundle Configuration
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
-
-" Status bar
-Plugin 'vim-airline/vim-airline'
 
 " Oceanic Next Theme
 Plugin 'mhartington/oceanic-next'
