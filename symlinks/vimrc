@@ -9,6 +9,11 @@ function! StatuslineGit()
   return strlen(l:branchname) > 0 ? '  ' . l:branchname . ' '  : ''
 endfunction
 
+function! ChangedFile()
+  let l:result = system("cd " . expand('%:p:h') . " && git diff --quiet --ignore-submodules " . expand('%:p') . " 2>/dev/null")
+  return v:shell_error ? '*' : ''
+endfunction
+
 set statusline=
 set statusline+=\%q " Quickfix or Location List
 set statusline+=%#PmenuSel#
@@ -16,6 +21,8 @@ set statusline+=%{StatuslineGit()}
 set statusline+=%#LineNr#
 set statusline+=%* " Highlight current window
 set statusline+=\%f " Filename
+set statusline+=%{ChangedFile()} " Changed file indicator
+set statusline+=\%m " Modified
 set statusline+=\%R " Read-Only indicator
 set statusline+=%=
 set statusline+=\%y " Type of file
