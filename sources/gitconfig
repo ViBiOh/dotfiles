@@ -8,6 +8,10 @@ cat > ${HOME}/.gitconfig <<GITCONFIG
 	editor = vi
 	autocrlf = input
 	excludesfile = ${HOME}/.gitignore_global
+[merge]
+  tool = vimdiff
+  conflictstyle = diff3
+  prompt = false
 [color]
 	ui = true
 [push]
