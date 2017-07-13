@@ -10,7 +10,6 @@ function! StatuslineGit()
 endfunction
 
 set statusline=
-set statusline+=\%q " Quickfix or Location List
 set statusline+=%#PmenuSel#
 set statusline+=%{StatuslineGit()}
 set statusline+=%#LineNr#
@@ -179,6 +178,9 @@ let mapleader = ','
 
 " Auto reload file
 set autoread
+
+" Enable mouse support
+set mouse=a
 
 " ag search https://gist.github.com/manasthakur/5afd3166a14bbadc1dc0f42d070bd746
 if executable('ag')
