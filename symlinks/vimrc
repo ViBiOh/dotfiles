@@ -187,7 +187,7 @@ endif
 function! MySearch()
   let grep_term = input("Enter search term: ")
   if !empty(grep_term)
-    execute 'silent grep' grep_term | copen
+    execute 'silent grep!' grep_term | copen
   else
     echo "Empty search term"
   endif
