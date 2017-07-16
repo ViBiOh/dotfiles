@@ -133,6 +133,12 @@ snippet ptoft
 
 # React Redux: reducer
 snippet rrr
+	/**
+	 * ${4:}'s reducer.
+	 * @param {String} state  Existing $4's state
+	 * @param {Object} action Action dispatched
+	 * @return {Object} New state
+	 */
 	export default (state = ${1:initialState}, action) => {
 		switch (action.type) {
 			case ${2:actionName}:
