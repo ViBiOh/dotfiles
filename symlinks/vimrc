@@ -121,8 +121,9 @@ filetype plugin indent on
 " Syntax highlighting
 syntax enable
 
-" Line highlight
+" Line and column highlight
 set cursorline
+set cursorcolumn
 
 " Show line numbers
 set number
