@@ -63,9 +63,6 @@ set ignorecase
 " Search with smart case (if uppercase provided, search is case sensitive)
 set smartcase
 
-" Activate color scheme
-colorscheme OceanicNext
-
 " Omni completion
 set completeopt=longest,menuone
 set omnifunc=syntaxcomplete#Complete
