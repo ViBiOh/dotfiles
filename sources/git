@@ -20,6 +20,13 @@ function git_sync() {
   git_browse 'git pull && git push'
 }
 
+function watch_sync() {
+  fswatch ${1} | while read event
+  do
+    git status --porcelain | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${2}:~/${3}/\1|"
+  done
+}
+
 function git_checkout() {
   git_browse 'git checkout ${1}'
 }
