@@ -3,10 +3,10 @@ snippet rcc
 	import React, { Component } from 'react';
 	import PropTypes from 'prop-types';
 
+	/**
+	 * Component $1
+	 */
 	export default class ${1:ComponentName} extends Component {
-		static propTypes = {
-		};
-
 		constructor(props) {
 				super(props);
 		}
@@ -17,6 +17,9 @@ snippet rcc
 			);
 		}
 	}
+
+	$1.propTypes = {
+	};
 
 # React: functional component
 snippet rfc
@@ -34,6 +37,9 @@ snippet rfc
 	$1.propTypes = {
 	};
 
+	/**
+	 * Functional component $1
+	 */
 	export default $1;
 
 # React: class component with Redux
@@ -50,12 +56,10 @@ snippet rcr
 		${4:stateAction}: () => dispatch({ type: 'action' }),
 	});
 
-	export class ${1:ComponentName} extends Component {
-		static propTypes = {
-			$3: PropTypes.string,
-			$4: PropTypes.func,
-		};
-
+	/**
+	 * $1 Component for handling React lifecycle
+	 */
+	export class ${1:ComponentName}Component extends Component {
 		constructor(props) {
 			super(props);
 		}
@@ -66,7 +70,15 @@ snippet rcr
 			);
 		}
 	}
+	
+	$1.propTypes = {
+	  $3: PropTypes.string.isRequired,
+		$4: PropTypes.func.isRequired,
+	};
 
+	/**
+	 * Connected version of $1
+	 */
 	export default connect(mapStateToProps, mapDispatchToProps)($1);
 
 # React: componentDidMount() {…}
