@@ -23,7 +23,7 @@ function git_sync() {
 function watch_sync() {
   fswatch ${1} | while read event
   do
-    git status --porcelain | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${2}:~/${3}/\1|"
+    git status --porcelain | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${2}:~/${3}/\1|" | sh
   done
 }
 

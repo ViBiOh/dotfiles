@@ -70,11 +70,5 @@ set omnifunc=syntaxcomplete#Complete
 " Show vertical ruler
 set colorcolumn=100
 
-" Disable folding
-set nofoldenable
-
-" Setting <Leader>
-let mapleader = ','
-
 " Auto reload file
 set autoread
