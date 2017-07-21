@@ -5,11 +5,7 @@
 	editor = vi
 	autocrlf = input
 	excludesfile = ~/.gitignore_global
-  ignorecase = false
-[merge]
-  tool = vimdiff
-  conflictstyle = diff3
-  prompt = false
+	ignorecase = false
 [color]
 	ui = true
 [push]
