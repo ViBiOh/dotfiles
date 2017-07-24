@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function docker-mounts() {
   docker inspect --format='{{range .Mounts}}{{if ne .Driver "local"}}{{.Source}} = {{.Destination}}|{{end}}{{end}}' --type=container ${1} | tr "|" "\n"

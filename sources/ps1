@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 RED="\e[1m\[\033[31m\]"
 GREEN="\e[1m\[\033[32m\]"

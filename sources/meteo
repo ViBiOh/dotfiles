@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 alias meteo="curl -4 wttr.in/Paris"
 

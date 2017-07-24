@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function readVariableIfRequired() {
   if [ -z "${!1}" ]; then

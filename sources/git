@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 function git_info() {
   git rev-parse --is-inside-work-tree &>/dev/null || return
