@@ -21,7 +21,7 @@ function git_sync() {
 }
 
 function watch_sync() {
-  if [ ${#} -le 3 ]; then
+  if [ ${#} -lt 3 ]; then
     echo Usage: watch_sync [WATCHED_DIR] [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
     return
   fi
