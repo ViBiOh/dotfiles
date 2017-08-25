@@ -21,14 +21,11 @@ function git_sync() {
 }
 
 function watch_sync() {
-  if [ ${#} -lt 3 ]; then
-    echo Usage: watch_sync [WATCHED_DIR] [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
-    return
-  fi
+  echo Usage: watch_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
 
-  fswatch ${1} | while read event
+  fswatch -0 --exclude=.git/ . | while read -d "" event
   do
-    git status --porcelain | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${2}:~/${3}/\1|" | sh
+    git status --porcelain | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
   done
 }
 
