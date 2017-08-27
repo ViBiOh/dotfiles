@@ -16,6 +16,16 @@ brew install fzf
 /usr/local/opt/fzf/install
 ```
 
+## Golang
+
+### go-torch
+
+```
+go get -u github.com/uber/go-torch
+cd $GOPATH/src/github.com/uber/go-torch
+git clone https://github.com/brendangregg/FlameGraph.git
+```
+
 ## Vim
 
 For MacOS :
