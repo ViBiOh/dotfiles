@@ -1,9 +1,6 @@
 #!/usr/bin/env sh
 
 alias fuck='sudo `history -p \!\!`'
+
 CODE_HOME=${HOME}/code/src/github.com/ViBiOh/
 alias code='cd ${CODE_HOME}'
-
-if [ ! -h ${HOME}/dev ]; then
-  ln -s ${CODE_HOME} ${HOME}/dev
-fi

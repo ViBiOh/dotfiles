@@ -79,3 +79,6 @@ nbactions.xml
 *.stTheme.cache
 *.sublime-workspace
 sftp-config.json
+
+# VisualStudioCode
+.vscode/
