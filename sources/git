@@ -23,7 +23,7 @@ function git_sync() {
 function watch_sync() {
   echo Usage: watch_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
 
-  fswatch -0 --exclude=.git/ . | while read -d "" event
+  fswatch -0 -o --exclude=.git/ . | while read -d "" event
   do
     git status --porcelain | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
   done
