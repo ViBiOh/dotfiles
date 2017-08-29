@@ -3,4 +3,4 @@
 alias fuck='sudo `history -p \!\!`'
 
 CODE_HOME=${HOME}/code/src/github.com/ViBiOh/
-alias code='cd ${CODE_HOME}'
+alias dev='cd ${CODE_HOME}'
