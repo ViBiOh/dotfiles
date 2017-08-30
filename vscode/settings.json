@@ -1,22 +1,22 @@
 {
-    "window.title": "${activeEditorMedium}${separator}${rootName}",
-    "workbench.startupEditor": "none",
-    "editor.renderWhitespace": "all",
-    "editor.wordWrap": "on",
-    "editor.folding": false,
-    "editor.dragAndDrop": false,
-    "files.exclude": {
-        "**/node_modules": true,
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true
-    },
-    "editor.rulers": [
-        100
-    ],
-    "editor.snippetSuggestions": "top",
-    "editor.tabCompletion": true,
-    "window.newWindowDimensions": "maximized"
+  "window.title": "${activeEditorMedium}${separator}${rootName}",
+  "workbench.startupEditor": "none",
+  "editor.renderWhitespace": "all",
+  "editor.wordWrap": "on",
+  "editor.folding": false,
+  "editor.dragAndDrop": false,
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true
+  },
+  "editor.rulers": [100],
+  "editor.snippetSuggestions": "top",
+  "editor.tabCompletion": true,
+  "window.newWindowDimensions": "maximized",
+  "prettier.eslintIntegration": true,
+  "editor.formatOnSave": true
 }
