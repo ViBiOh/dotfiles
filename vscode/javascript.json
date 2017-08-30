@@ -1,0 +1,121 @@
+{
+	"ES6 Import": {
+		"prefix": "imp",
+		"body": [
+			"import $1 from '$1';"
+		],
+		"description": "ES6 Import"
+	},
+	"React Class Component": {
+		"prefix": "rcc",
+		"body": [
+			"import React, { Component } from 'react';",
+			"import PropTypes from 'prop-types';",
+			"",
+			"/**",
+			" * ${1:ComponentName} Component.",
+			" */",
+			"export default class ${1:ComponentName} extends Component {",
+			"\tconstructor(props) {",
+			"\t\t\tsuper(props);",
+			"\t}",
+			"",
+			"\trender() {",
+			"\t\treturn (",
+			"\t\t\t${2}",
+			"\t\t);",
+			"\t}",
+			"}",
+			"",
+			"${1:ComponentName}.propTypes = {",
+			"};"
+		],
+		"description": "React Class Component"
+	},
+	"React Redux Component": {
+		"prefix": "rrc",
+		"body": [
+			"import React, { Component } from 'react';",
+			"import { connect } from 'react-redux';",
+			"import PropTypes from 'prop-types';",
+			"",
+			"const mapStateToProps = state => ({",
+			"\t${3:stateProp}: state.${3:stateProp},",
+			"});",
+			"",
+			"const mapDispatchToProps = dispatch => ({",
+			"\t${4:stateAction}: () => dispatch({ type: 'action' }),",
+			"});",
+			"",
+			"/**",
+			" * ${1:ComponentName} Component.",
+			" */",
+			"export class ${1:ComponentName}Component extends Component {",
+			"\tconstructor(props) {",
+			"\t\tsuper(props);",
+			"\t}",
+			"",
+			"\trender() {",
+			"\t\treturn (",
+			"\t\t\t${2}",
+			"\t\t);",
+			"\t}",
+			"}",
+			"",
+			"${1:ComponentName}Component.propTypes = {",
+			"\t${3:stateProp}: PropTypes.string,",
+			"\t${4:stateAction}: PropTypes.func,",
+			"};",
+			"",
+			"/**",
+			" * ${1:ComponentName}Component connected.",
+			" */",
+			"export default connect(mapStateToProps, mapDispatchToProps)(${1:ComponentName}Component);"
+		],
+		"description": "React Class Component with Redux"
+	},
+	"React Functional Component": {
+		"prefix": "rfc",
+		"body": [
+			"import React from 'react';",
+			"import PropTypes from 'prop-types';",
+			"",
+			"const ${1:ComponentName} = ({}) => {",
+			"\treturn (",
+			"\t\t${2}",
+			"\t);",
+			"}",
+			"",
+			"${1:ComponentName}.displayName = '${1:ComponentName}';",
+			"",
+			"${1:ComponentName}.propTypes = {",
+			"};",
+			"",
+			"/**",
+			" * ${1:ComponentName} Functional Component.",
+			" */",
+			"export default ${1:ComponentName};"
+		],
+		"description": "React Functional Component"
+	},
+	"Redux reducer": {
+		"prefix": "rdr",
+		"body": [
+			"/**",
+			" * ${3:ReducerName}'s reducer.",
+			" * @param {String} state  Existing ${3:ReducerName}'s state",
+			" * @param {Object} action Action dispatched",
+			" * @return {Object} New state",
+			" */",
+			" export default (state = ${1:defaultState}, action) => {",
+			"\tswitch (action.type) {",
+			"\t\tcase ${2:actionName}:",
+			"\t\t\treturn ${4};",
+			"\t\tdefault:",
+			"\t\t\treturn state;",
+			"\t}",
+			"};"
+		],
+		"description": "Redux reducer"
+	}
+}
