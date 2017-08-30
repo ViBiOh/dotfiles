@@ -17,5 +17,6 @@
         100
     ],
     "editor.snippetSuggestions": "top",
-    "editor.tabCompletion": true
+    "editor.tabCompletion": true,
+    "window.newWindowDimensions": "maximized"
 }
