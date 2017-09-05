@@ -82,6 +82,7 @@ sftp-config.json
 
 # VisualStudioCode
 .vscode/
+jsconfig.json
 
 # Golang
 torch.svg
