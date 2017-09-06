@@ -17,6 +17,7 @@
   "editor.snippetSuggestions": "top",
   "editor.tabCompletion": true,
   "window.newWindowDimensions": "maximized",
+  "editor.formatOnSave": true,
   "prettier.eslintIntegration": true,
-  "editor.formatOnSave": true
+  "prettier.cssEnable": ["css", "less"]
 }
