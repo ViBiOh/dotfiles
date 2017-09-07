@@ -12,6 +12,7 @@
       "\t\ttrue,",
       "\t\t},",
       "\t}",
+      "",
       "\tfor _, testCase := range cases {",
       "\t\tif result := ${2:FuncName}(testCase.input); result != testCase.want {",
       "\t\t\tt.Errorf(`${2:FuncName}(%v) = %v, want %v`, testCase.input, result, testCase.want)",
@@ -36,7 +37,9 @@
       "\t\tfmt.Errorf(`Error while testing`),",
       "\t\t},",
       "\t}",
+      "",
       "\tvar failed bool",
+      "",
       "\tfor _, testCase := range cases {",
       "\t\tresult, err := ${1:FuncName}(testCase.input)",
       "\t\tfailed = false",
@@ -49,11 +52,12 @@
       "\t\t} else if result != testCase.want {",
       "\t\tfailed = true",
       "\t\t}",
+      "",
       "\t\tif failed {",
       "\t\tt.Errorf(`${1:FuncName}(%v) = (%v, %v), want (%v, %v)`, testCase.input, result, err, testCase.want, testCase.wantErr)",
       "\t\t}",
       "\t}",
-      "\t}"
+      "}"
     ],
     "description": "Golang test w/ Error"
   }
