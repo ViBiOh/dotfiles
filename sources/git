@@ -25,7 +25,8 @@ function watch_sync() {
 
   fswatch -0 -o --exclude=.git/ . | while read -d "" event
   do
-    git status --porcelain | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
+    git status --porcelain | grep -v -e "^\s*D" | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
+    git status --porcelain | grep -e "^\s*D" | awk '{print $2}' |sed "s|\(.*\)|ssh ${1} \"rm ~/${2}/\1\"|" | sh
   done
 }
 
