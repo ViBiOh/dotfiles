@@ -1,0 +1,22 @@
+<snippet>
+		<content><![CDATA[
+/**
+ * ${2:ReducerName}'s reducer.
+ * @param {String} state  Existing ${2:ReducerName}'s state
+ * @param {Object} action Action dispatched
+ * @return {Object} New state
+ */
+ export default (state = ${1:initialState}, action) => {
+  switch (action.type) {
+    case ${3:actionType}:
+      return ;
+    default:
+      return state;
+  }
+};
+
+]]></content>
+		<tabTrigger>rrr</tabTrigger>
+		<scope>source.js</scope>
+		<description>Redux ReduceR</description>
+</snippet>

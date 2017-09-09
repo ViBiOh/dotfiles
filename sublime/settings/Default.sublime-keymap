@@ -1,0 +1,4 @@
+[
+  { "keys": ["super+left"], "command": "jump_back" },
+  { "keys": ["super+right"], "command": "goto_definition" }
+]

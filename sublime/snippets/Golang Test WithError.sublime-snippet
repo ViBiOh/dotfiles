@@ -1,0 +1,41 @@
+<snippet>
+    <content><![CDATA[
+func Test${1:FuncName}(t *testing.T) {
+  var cases = []struct {
+    input   string
+    want    bool
+    wantErr error
+  }{
+    {
+    `test`,
+    false,
+    fmt.Errorf(`Error while testing`),
+    },
+  }
+
+  var failed bool
+
+  for _, testCase := range cases {
+    result, err := ${1:FuncName}(testCase.input)
+    failed = false
+    if err == nil && testCase.wantErr != nil {
+    failed = true
+    } else if err != nil && testCase.wantErr == nil {
+    failed = true
+    } else if err != nil && err.Error() != testCase.wantErr.Error() {
+    failed = true
+    } else if result != testCase.want {
+    failed = true
+    }
+
+    if failed {
+    t.Errorf(`${1:FuncName}(%v) = (%v, %v), want (%v, %v)`, testCase.input, result, err, testCase.want, testCase.wantErr)
+    }
+  }
+}
+
+]]></content>
+    <tabTrigger>gte</tabTrigger>
+    <scope>source.go -(meta)</scope>
+    <description>Golang Test with Error</description>
+</snippet>

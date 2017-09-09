@@ -1,0 +1,26 @@
+<snippet>
+		<content><![CDATA[
+import React from 'react';
+import PropTypes from 'prop-types';
+
+const ${1:${TM_FILENAME/(.+)\..+|.*/$1/:ComponentName}} = ({}) => {
+  return (
+    
+  );
+}
+
+${1:ComponentName}.displayName = '${1:ComponentName}';
+
+${1:ComponentName}.propTypes = {
+};
+
+/**
+ * ${1:ComponentName} Functional Component.
+ */
+export default ${1:ComponentName};
+
+]]></content>
+		<tabTrigger>rfc</tabTrigger>
+		<scope>source.js -(meta)</scope>
+		<description>React Functional Component</description>
+</snippet>
