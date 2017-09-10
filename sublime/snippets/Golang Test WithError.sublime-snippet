@@ -17,19 +17,21 @@ func Test${1:FuncName}(t *testing.T) {
 
   for _, testCase := range cases {
     result, err := ${1:FuncName}(testCase.input)
+
     failed = false
+
     if err == nil && testCase.wantErr != nil {
-    failed = true
+        failed = true
     } else if err != nil && testCase.wantErr == nil {
-    failed = true
+        failed = true
     } else if err != nil && err.Error() != testCase.wantErr.Error() {
-    failed = true
+        failed = true
     } else if result != testCase.want {
-    failed = true
+        failed = true
     }
 
     if failed {
-    t.Errorf(`${1:FuncName}(%v) = (%v, %v), want (%v, %v)`, testCase.input, result, err, testCase.want, testCase.wantErr)
+        t.Errorf(`${1:FuncName}(%v) = (%v, %v), want (%v, %v)`, testCase.input, result, err, testCase.want, testCase.wantErr)
     }
   }
 }
