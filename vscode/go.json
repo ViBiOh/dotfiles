@@ -62,5 +62,38 @@
       "}"
     ],
     "description": "Golang test w/ Error"
+  },
+  "Golang Test w/ HTTP": {
+    "prefix": "gth",
+    "body": [
+      "func TestFuncName(t *testing.T) {",
+      "\tvar cases = []struct {",
+      "\t\trequest    *http.Request",
+      "\t\twant       string",
+      "\t\twantStatus int",
+      "\t}{",
+      "\t\t{",
+      "\t\t\thttptest.NewRequest(http.MethodGet, `/`, nil),",
+      "\t\t\t``,",
+      "\t\t\thttp.StatusOK,",
+      "\t\t},",
+      "\t}",
+      "",
+      "\tfor _, testCase := range cases {",
+      "\t\twriter := httptest.NewRecorder()",
+      "",
+      "\t\tFuncName(writer, testCase.request)",
+      "",
+      "\t\tif result := writer.Code; result != testCase.wantStatus {",
+      "\t\t\tt.Errorf(`FuncName(%v) = %v, want %v`, testCase.request, result, testCase.wantStatus)",
+      "\t\t}",
+      "",
+      "\t\tif result, _ := httputils.ReadBody(writer.Result().Body); string(result) != testCase.want {",
+      "\t\t\tt.Errorf(`FuncName(%v) = %v, want %v`, testCase.request, string(result), testCase.want)",
+      "\t\t}",
+      "\t}",
+      "}"
+    ],
+    "description": "Golang test w/ HTTP"
   }
 }
