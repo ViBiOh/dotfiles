@@ -132,5 +132,23 @@
       "};"
     ],
     "description": "Redux reducer"
+  },
+  "React Ava Test": {
+    "prefix": "rat",
+    "body": [
+      "import test from 'ava';",
+      "import React from 'react';",
+      "import { shallow } from 'enzyme';",
+      "import ${1:ComponentName} from './';",
+      "",
+      "function defaultProps() {",
+      "  return {};",
+      "}",
+      "",
+      "test('should always render as a div', (t) => {",
+      "  t.is(shallow(<${1:ComponentName} {...defaultProps()} />).type(), 'div');",
+      "});"
+    ],
+    "description": "Redux Ava Test"
   }
 }
