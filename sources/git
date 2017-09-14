@@ -20,13 +20,17 @@ function git_sync() {
   git_browse 'git pull && git push'
 }
 
+function ssh_sync() {
+  git status --porcelain | grep -v -e "^\s*D" | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
+  git status --porcelain | grep -e "^\s*D" | awk '{print $2}' |sed "s|\(.*\)|ssh ${1} \"rm ~/${2}/\1\"|" | sh
+}
+
 function watch_sync() {
   echo Usage: watch_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
 
   fswatch -0 -o --exclude=.git/ . | while read -d "" event
   do
-    git status --porcelain | grep -v -e "^\s*D" | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
-    git status --porcelain | grep -e "^\s*D" | awk '{print $2}' |sed "s|\(.*\)|ssh ${1} \"rm ~/${2}/\1\"|" | sh
+    ssh_sync
   done
 }
 
