@@ -17,10 +17,6 @@ function git_pull() {
 }
 
 function git_sync() {
-  git_browse 'git pull && git push'
-}
-
-function ssh_sync() {
   git status --porcelain | grep -v -e "^\s*D" | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
   git status --porcelain | grep -e "^\s*D" | awk '{print $2}' |sed "s|\(.*\)|ssh ${1} \"rm ~/${2}/\1\"|" | sh
 }
@@ -30,12 +26,8 @@ function watch_sync() {
 
   fswatch -0 -o --exclude=.git/ . | while read -d "" event
   do
-    ssh_sync
+    git_sync "${@}"
   done
-}
-
-function git_checkout() {
-  git_browse 'git checkout ${1}'
 }
 
 function git_browse() {

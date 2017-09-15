@@ -1,25 +1,5 @@
 #!/usr/bin/env bash
 
-function docker-mounts() {
-  docker inspect --format='{{range .Mounts}}{{if ne .Driver "local"}}{{.Source}} = {{.Destination}}|{{end}}{{end}}' --type=container ${1} | tr "|" "\n"
-}
-
-function docker-envs() {
-  docker inspect --format='{{range $p := .Config.Env}}{{$p}}|{{end}}' --type=container ${1} | tr "|" "\n"
-}
-
-function docker-links() {
-  docker inspect --format='{{range $p := .HostConfig.Links}}{{$p}}|{{end}}' --type=container ${1} | tr "|" "\n"
-}
-
-function docker-ports() {
-  docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{$p}} -> {{(index $conf 0).HostPort}}|{{end}}' --type=container ${1} | tr "|" "\n"
-}
-
-function docker-ips() {
-  docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' --type=container ${1}
-}
-
 function nobody_nogroup_write() {
   sudo chmod -R g+w ${1} && sudo chown -R 65534:65533 ${1}
 }
