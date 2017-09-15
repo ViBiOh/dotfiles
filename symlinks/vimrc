@@ -17,12 +17,6 @@ set statusline+=\ %p%% " Percentage of the file
 set statusline+=\ %l:%c " Line Number and Total Line
 set statusline+=\  " Empty space at end
 
-" /shrug
-filetype plugin indent on
-
-" Syntax highlighting
-syntax enable
-
 " Line and column highlight
 set cursorline
 set cursorcolumn
