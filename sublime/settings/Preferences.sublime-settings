@@ -8,9 +8,23 @@
 	"fold_buttons": false,
 	"highlight_line": true,
 	"highlight_modified_tabs": true,
-	"ignored_packages": ["Vintage"],
+	"ignored_packages":
+	[
+		"Vintage"
+	],
+	"index_exclude_patterns":
+	[
+		"*.log",
+		"node_modules/*",
+		"dist/*",
+		"coverage/*",
+		"doc/*"
+	],
 	"overlay_scroll_bars": "enabled",
-	"rulers": [100],
+	"rulers":
+	[
+		100
+	],
 	"show_encoding": true,
 	"show_full_path": true,
 	"show_line_endings": true,
@@ -20,5 +34,8 @@
 	"theme": "Oceanic Next.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"word_wrap": true,
-	"index_exclude_patterns": ["*.log", "node_modules/*", "dist/*", "coverage/*", "doc/*"]
+	"auto_complete_triggers": [
+		{"selector": "text.html", "characters": "<"},
+		{"characters": ".", "selector": "source.js" }
+	],
 }
