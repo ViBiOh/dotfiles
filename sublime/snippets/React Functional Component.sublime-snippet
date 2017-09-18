@@ -3,6 +3,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+/**
+ * ${1:ComponentName}.
+ * @return {ReactComponent} React component.
+ */
 const ${1:ComponentName} = ({}) => {
   return (
     ${2:<div />}

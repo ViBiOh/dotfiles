@@ -1,5 +1,10 @@
 <snippet>
     <content><![CDATA[
+/**
+ * React lifecycle.
+ * @param  {Object} prevProps Previous props
+ * @param  {Object} prevState Previous state
+ */
 componentDidUpdate(prevProps, prevState) {
 	${0}
 }

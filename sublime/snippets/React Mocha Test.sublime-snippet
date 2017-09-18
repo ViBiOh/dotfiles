@@ -5,6 +5,10 @@ import expect from 'expect';
 import { shallow } from 'enzyme';
 import ${1:ComponentName} from './';
 
+/**
+ * Default props of tested component.
+ * @return {Object} Default props
+ */
 function defaultProps() {
   return {};
 }

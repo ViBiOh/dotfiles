@@ -1,5 +1,10 @@
 <snippet>
     <content><![CDATA[
+/**
+ * React lifecycle.
+ * @param  {Object} nextProps Next props
+ * @param  {Object} nextState Next state
+ */
 componentWillUpdate(nextProps, nextState) {
 	${0}
 }
