@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 /**
- * ${1:${TM_FILENAME/(.+)\..+|.*/$1/:ComponentName}} Component.
+ * ${1:ComponentName} Component.
  */
 export default class ${1:ComponentName} extends Component {
   /**
@@ -17,10 +17,11 @@ export default class ${1:ComponentName} extends Component {
 
   /**
    * React lifecycle.
+   * @return {ReactComponent} Node
    */
   render() {
     return (
-      
+      ${2:<div />}
     );
   }
 }

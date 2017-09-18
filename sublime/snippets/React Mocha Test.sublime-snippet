@@ -1,0 +1,23 @@
+<snippet>
+    <content><![CDATA[
+import React from 'react';
+import expect from 'expect';
+import { shallow } from 'enzyme';
+import ${1:ComponentName} from './';
+
+function defaultProps() {
+  return {};
+}
+
+describe('<${1:ComponentName} />', () => {
+  it('should always render as a type', (t) => {
+    const wrapper = shallow(<${1:ComponentName} {...defaultProps()} />);
+    expect(wrapper.type()).to.equal('type');
+  });
+});
+
+]]></content>
+    <tabTrigger>rmt</tabTrigger>
+    <scope>source.js -(meta)</scope>
+    <description>React Mocha Test</description>
+</snippet>

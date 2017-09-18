@@ -17,6 +17,7 @@ func Test${1:FuncName}(t *testing.T) {
     }
   }
 }
+
 ]]></content>
     <tabTrigger>gt</tabTrigger>
     <scope>source.go -(meta)</scope>

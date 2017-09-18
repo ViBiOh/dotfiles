@@ -1,0 +1,35 @@
+<snippet>
+    <content><![CDATA[
+func Test${1:FuncName}(t *testing.T) {
+  var cases = []struct {
+    request    *http.Request
+    want       string
+    wantStatus int
+  }{
+    {
+      httptest.NewRequest(http.MethodGet, `/`, nil),
+      ``,
+      http.StatusOK,
+    },
+  }
+
+  for _, testCase := range cases {
+    writer := httptest.NewRecorder()
+
+    ${1:FuncName}(writer, testCase.request)
+
+    if result := writer.Code; result != testCase.wantStatus {
+      t.Errorf(`${1:FuncName}(%v) = %v, want %v`, testCase.request, result, testCase.wantStatus)
+    }
+
+    if result, _ := httputils.ReadBody(writer.Result().Body); string(result) != testCase.want {
+      t.Errorf(`${1:FuncName}(%v) = %v, want %v`, testCase.request, string(result), testCase.want)
+    }
+  }
+}
+
+]]></content>
+    <tabTrigger>gth</tabTrigger>
+    <scope>source.go -(meta)</scope>
+    <description>Golang Test with HTTP</description>
+</snippet>

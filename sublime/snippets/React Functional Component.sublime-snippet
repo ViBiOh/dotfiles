@@ -3,9 +3,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const ${1:${TM_FILENAME/(.+)\..+|.*/$1/:ComponentName}} = ({}) => {
+const ${1:ComponentName} = ({}) => {
   return (
-    
+    ${2:<div />}
   );
 }
 
