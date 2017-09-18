@@ -86,3 +86,6 @@ jsconfig.json
 
 # Golang
 torch.svg
+
+# Tern
+.tern-project*
