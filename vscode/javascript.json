@@ -164,7 +164,7 @@
       "}",
       "",
       "describe('<${1:ComponentName} />', () => {",
-      "  it('should always render as a ${2:type}', (t) => {",
+      "  it('should always render as a ${2:type}', () => {",
       "    const wrapper = shallow(<${1:ComponentName} {...defaultProps()} />);",
       "    expect(wrapper.type()).to.equal('${2:type}');",
       "  });",
