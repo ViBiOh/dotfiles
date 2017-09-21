@@ -18,9 +18,7 @@
     "**/.nyc_output/": true,
     "**/reports/screenshots/": true
   },
-  "editor.rulers": [
-    100
-  ],
+  "editor.rulers": [100],
   "editor.snippetSuggestions": "top",
   "editor.tabCompletion": true,
   "window.newWindowDimensions": "maximized",
