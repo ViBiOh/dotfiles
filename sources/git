@@ -17,6 +17,7 @@ function git_pull() {
 }
 
 function git_sync() {
+  ssh ${1} "cd ~/${2}/ && git checkout -- ."
   git status --porcelain | grep -v -e "^\s*D" | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
   git status --porcelain | grep -e "^\s*D" | awk '{print $2}' |sed "s|\(.*\)|ssh ${1} \"rm ~/${2}/\1\"|" | sh
 }
