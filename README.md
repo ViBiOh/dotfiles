@@ -22,6 +22,12 @@ brew install fzf
 /usr/local/opt/fzf/install
 ```
 
+## Node
+
+### Binary
+
+[Install latest version](https://nodejs.org/en/download/)
+
 ## Golang
 
 ### Binary
