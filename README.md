@@ -28,11 +28,25 @@ brew install fzf
 
 [Install latest version](https://nodejs.org/en/download/)
 
+### Node tools
+
+```
+npm i -g npm
+npm i -g n
+sudo n latest
+```
+
 ## Golang
 
 ### Binary
 
 [Install latest version](https://golang.org/dl/)
+
+### delve
+
+```
+brew install go-delve/delve/delve
+```
 
 ### go-torch
 
