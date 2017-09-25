@@ -3,13 +3,13 @@
 ## Extensions
 
 ```
-dbaeumer.vscode-eslint
-donjayamanne.githistory
-dzannotti.vscode-babel-coloring
-esbenp.prettier-vscode
-joelday.docthis
-lukehoban.go
-ms-vscode.sublime-keybindings
-msjsdiag.debugger-for-chrome
-PeterJausovec.vscode-docker
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension donjayamanne.githistory
+code --install-extension dzannotti.vscode-babel-coloring
+code --install-extension esbenp.prettier-vscode
+code --install-extension joelday.docthis
+code --install-extension lukehoban.go
+code --install-extension ms-vscode.sublime-keybindings
+code --install-extension msjsdiag.debugger-for-chrome
+code --install-extension PeterJausovec.vscode-docker
 ```

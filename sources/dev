@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+CODE_HOME=${HOME}/code/src/github.com/ViBiOh/
+alias dev='cd ${CODE_HOME}'

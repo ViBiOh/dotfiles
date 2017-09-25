@@ -61,8 +61,5 @@ set smartcase
 set completeopt=longest,menuone
 set omnifunc=syntaxcomplete#Complete
 
-" Show vertical ruler
-set colorcolumn=100
-
 " Auto reload file
 set autoread

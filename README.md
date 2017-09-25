@@ -9,6 +9,12 @@ git clone git@github.com:ViBiOh/dotfiles.git
 ./dotfiles/install.sh
 ```
 
+## Brew
+
+```
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
 ## FZF
 
 ```
@@ -17,6 +23,10 @@ brew install fzf
 ```
 
 ## Golang
+
+### Binary
+
+[Install latest version](https://golang.org/dl/)
 
 ### go-torch
 
