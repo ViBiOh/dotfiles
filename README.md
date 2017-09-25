@@ -45,7 +45,7 @@ sudo n latest
 ### delve
 
 ```
-brew install go-delve/delve/delve
+go get -u github.com/derekparker/delve/cmd/dlv
 ```
 
 ### go-torch
