@@ -1,3 +1,9 @@
 #!/usr/bin/env bash
 
-alias netstat="sudo lsof -PiTCP -sTCP:LISTEN"
+function open_ports() {
+    if [ `which netstat 2>/dev/null | wc -l` -eq 1 ]; then
+        sudo netstat -pluton
+    else
+        sudo lsof -PniTCP -sTCP:LISTEN
+    fi
+}
