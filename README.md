@@ -55,3 +55,11 @@ go get -u github.com/uber/go-torch
 cd $GOPATH/src/github.com/uber/go-torch
 git clone https://github.com/brendangregg/FlameGraph.git
 ```
+
+## vim
+
+Install Vundle
+
+```
+git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+```

@@ -1,6 +1,102 @@
 " Turnoff vi backward compatibility
 set nocompatible
 
+" Vundle Configuration
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+Plugin 'VundleVim/Vundle.vim'
+
+" Oceanic Next Theme
+Plugin 'mhartington/oceanic-next'
+
+" SuperTab for completion
+Plugin 'ervandew/supertab'
+
+" Default completion to OmniCompletion
+let g:SuperTabDefaultCompletionType = 'context'
+
+" Syntax checking
+Plugin 'vim-syntastic/syntastic'
+
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+let g:syntastic_javascript_checkers = ['eslint']
+let g:syntastic_javascript_eslint_exec = 'eslint_d'
+let g:syntastic_javascript_eslint_args = ['--fix']
+let g:syntastic_go_checkers = ['go', 'golint', 'errcheck']
+
+" Golang tool
+Plugin 'fatih/vim-go'
+
+let g:go_fmt_command = "goimports"
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+
+" GoTo Def is <leader>v
+au Filetype go nnoremap <leader>v :vsp <CR>:GoDef <CR>
+" Rename is <leader>r
+au Filetype go nnoremap <leader>r :GoRename <CR>
+
+" Golang completion
+Plugin 'nsf/gocode', {'rtp': 'vim/'}
+
+" Javascript syntax
+Plugin 'pangloss/vim-javascript'
+Plugin 'mxw/vim-jsx'
+
+" Javascript completion
+Plugin 'ternjs/tern_for_vim'
+
+" GoTo Def is <leader>v
+au FileType javascript noremap <leader>v :TernDef <CR>
+" Rename is <leader>r
+au FileType javascript noremap <leader>r :TernRename <CR>
+
+" Fuzzy File Finder
+Plugin 'junegunn/fzf'
+
+" Ctrl+p open fuzzy finder
+map <C-p> :FZF<CR>
+
+" Customize fzf colors to match color scheme
+let g:fzf_colors =
+  \ { 'fg':    ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
+" Snippets tools
+Plugin 'MarcWeber/vim-addon-mw-utils'
+Plugin 'tomtom/tlib_vim'
+Plugin 'garbas/vim-snipmate'
+
+call vundle#end()
+
+" /shrug
+filetype plugin indent on
+
+" Activate color scheme
+colorscheme OceanicNext
+
 " Show status line
 set laststatus=2
 
@@ -19,7 +115,9 @@ set statusline+=\  " Empty space at end
 
 " Line and column highlight
 set cursorline
-set cursorcolumn
+
+" Color syntax
+syntax on
 
 " Show line numbers
 set number
@@ -63,3 +161,9 @@ set omnifunc=syntaxcomplete#Complete
 
 " Auto reload file
 set autoread
+
+" Disable folding
+set nofoldenable
+
+" Setting <Leader>
+let mapleader = ','
