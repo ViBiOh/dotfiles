@@ -20,9 +20,6 @@ set statusline+=\  " Empty space at end
 " Line and column highlight
 set cursorline
 
-" Color syntax
-syntax on
-
 " Show line numbers
 set number
 
@@ -69,5 +66,3 @@ set autoread
 " Disable folding
 set nofoldenable
 
-" Setting <Leader>
-let mapleader = ','
