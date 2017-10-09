@@ -2,7 +2,7 @@
   "Golang Test": {
     "prefix": "gt",
     "body": [
-      "func Test${2:FuncName}(t *testing.T) {",
+      "func Test_${2:FuncName}(t *testing.T) {",
       "\tvar cases = []struct {",
       "\t\tintention string",
       "\t\tinput     string",
@@ -27,7 +27,7 @@
   "Golang Test w/ Error": {
     "prefix": "gte",
     "body": [
-      "func Test${1:FuncName}(t *testing.T) {",
+      "func Test_${1:FuncName}(t *testing.T) {",
       "\tvar cases = []struct {",
       "\t\tintention string",
       "\t\tinput   string",
@@ -70,7 +70,7 @@
   "Golang Test w/ HTTP": {
     "prefix": "gth",
     "body": [
-      "func Test${1:FuncName}(t *testing.T) {",
+      "func Test_${1:FuncName}(t *testing.T) {",
       "\tvar cases = []struct {",
       "\t\tintention string",
       "\t\trequest    *http.Request",
