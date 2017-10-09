@@ -10,7 +10,7 @@ RESET="\[\033[0m\]"
 PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
 
 if [ `which git 2>/dev/null | wc -l` -eq 0 ] || [ `type -t git_info` ]; then
-  PS1="${PS1}${YELLOW}\$(git_info)${RESET} "
+  PS1="${PS1}${YELLOW}\$(git_info)${RESET}"
 fi
 
 export PS1="${PS1}> "
