@@ -52,7 +52,7 @@ go get -u github.com/derekparker/delve/cmd/dlv
 
 ```
 go get -u github.com/uber/go-torch
-cd $GOPATH/src/github.com/uber/go-torch
+cd ${GOPATH}/src/github.com/uber/go-torch
 git clone https://github.com/brendangregg/FlameGraph.git
 ```
 
