@@ -56,6 +56,12 @@ cd $GOPATH/src/github.com/uber/go-torch
 git clone https://github.com/brendangregg/FlameGraph.git
 ```
 
+### wuzz
+
+```
+go get -u github.com/asciimoo/wuzz
+```
+
 ## vim
 
 Install Vundle
