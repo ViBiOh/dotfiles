@@ -9,6 +9,15 @@ git clone git@github.com:ViBiOh/dotfiles.git
 ./dotfiles/install.sh
 ```
 
+## SSH
+
+### Generate key and deploy key
+
+```
+ssh-keygen -t ed25519
+ssh-copy-id -i ~/.ssh/id_ed25519.pub docker
+```
+
 ## Brew
 
 ```
