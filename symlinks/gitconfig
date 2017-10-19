@@ -8,11 +8,18 @@
 	ignorecase = false
 [color]
 	ui = true
+[color "branch"]
+	upstream = cyan
+[diff]
+	mnemonicPrefix = true
+	renames = true
 [push]
 	default = simple
 [alias]
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	tidy = rebase -i @{u}
+[log]
+	abbrevCommit = true
 [credential]
 	helper = cache --timeout=28800
 [fetch]
