@@ -5,7 +5,12 @@ function os_clean() {
     sudo find / -name ".DS_Store" -exec rm -f {} \;
     sudo find / -name ".localized" -exec rm -f {} \;
   fi
-  if [ `uname` == 'Linux' ]; then
-    sudo sync; echo 3 > /proc/sys/vm/drop_caches
+
+  if [ `uname -r | grep coreos | wc -l` == 1 ]; then
+    sudo sysctl vm.drop_caches=3
+  else
+    if [ `uname` == 'Linux' ]; then
+      sudo sync; echo 3 > /proc/sys/vm/drop_caches
+    fi
   fi
 }
