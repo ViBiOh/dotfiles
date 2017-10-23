@@ -16,6 +16,7 @@ git clone git@github.com:ViBiOh/dotfiles.git
 ```
 ssh-keygen -t ed25519
 ssh-copy-id -i ~/.ssh/id_ed25519.pub docker
+eval "$(ssh-agent -s)"
 ssh-add -K ~/.ssh/id_ed25519
 ```
 
