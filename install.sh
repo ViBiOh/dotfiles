@@ -7,5 +7,7 @@ for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks/*; do
 done
 
 echo 'Host *
+    AddKeysToAgent yes
+    UseKeychain yes
     ServerAliveInterval 300
-    ServerAliveCountMax 2' > ${HOME}/.ssh/config
+    ServerAliveCountMax 2' >> ${HOME}/.ssh/config
