@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+function ssh_agent_user() {
+  eval "$(ssh-agent -s)"
+  ssh-add -k ${HOME}/.ssh/id_ed25519
+}
