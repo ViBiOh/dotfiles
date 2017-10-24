@@ -26,6 +26,26 @@ ssh-add -k ~/.ssh/id_ed25519
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
+## Bash
+
+```
+brew install bash
+```
+
+Then change default bash for root
+
+```
+sudo -s
+echo /usr/local/bin/bash >> /etc/shells
+chsh -s /usr/local/bin/bash
+```
+
+And also for current user
+
+```
+chsh -s /usr/local/bin/bash
+```
+
 ## FZF
 
 ```
