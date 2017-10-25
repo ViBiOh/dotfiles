@@ -24,6 +24,13 @@ ssh-copy-id -i ~/.ssh/id_ed25519.pub docker
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
+## CoreOS
+
+```
+toolbox dnf -y install htop bash-completion
+toolbox cp /usr/share/bash-completion /media/root/var/ -R
+```
+
 ## Bash
 
 ```
