@@ -27,7 +27,7 @@ ssh-copy-id -i ~/.ssh/id_ed25519.pub docker
 ## Bash
 
 ```
-brew install bash
+brew install bash bash-completion
 ```
 
 Then change default bash for root
