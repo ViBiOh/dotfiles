@@ -3,7 +3,7 @@
 if [ `which brew 2>/dev/null | wc -l` -eq 1 ]; then
     source `brew --prefix`/etc/bash_completion
 else
-    if [ -e /var/bash-completion/bash_completion ] then
+    if [ -e /var/bash-completion/bash_completion ]; then
         source /var/bash-completion/bash_completion
     fi
 fi
