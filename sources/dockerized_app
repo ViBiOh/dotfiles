@@ -1,10 +1,5 @@
 #!/usr/bin/env sh
 
-if [ `which node 2>/dev/null | wc -l` -eq 0 ]; then
-  alias npm='docker run -it --rm -v ${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node:dev npm'
-  alias node='docker run -it --rm -v /${HOME}/.npm_packages:/home/node/.npm_packages -v `realpath ./`:/home/node/src -w /home/node/src vibioh/node node'
-fi
-
 if [ `which travis 2>/dev/null | wc -l` -eq 0 ]; then
   alias travis='docker run -it --rm -v `realpath ./`:/usr/src vibioh/travis-cli'
 fi
