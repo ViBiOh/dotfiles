@@ -1,16 +1,18 @@
 #!/usr/bin/env sh
 
-RED="\e[1m\[\033[31m\]"
-GREEN="\e[1m\[\033[32m\]"
-YELLOW="\e[1m\[\033[33m\]"
-BLUE="\e[1m\[\033[34m\]"
-PURPLE="\e[1m\[\033[35m\]"
+RED="\[\033[31m\]"
+GREEN="\[\033[32m\]"
+YELLOW="\[\033[33m\]"
+BLUE="\[\033[34m\]"
+PURPLE="\[\033[35m\]"
 RESET="\[\033[0m\]"
 
-PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
+PS1="\[${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
 
 if [ `which git 2>/dev/null | wc -l` -eq 0 ] || [ `type -t git_info` ]; then
   PS1="${PS1}${YELLOW}\$(git_info)${RESET}"
 fi
+
+PS1="${PS1}\]"
 
 export PS1="${PS1} "
