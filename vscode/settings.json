@@ -24,7 +24,10 @@
   "editor.tabCompletion": true,
   "window.newWindowDimensions": "maximized",
   "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
   "prettier.eslintIntegration": true,
   "prettier.cssEnable": [],
-  "prettier.jsonEnable": []
+  "prettier.jsonEnable": [],
+  "sublimeTextKeymap.promptV3Features": true,
+  "editor.multiCursorModifier": "ctrlCmd"
 }
