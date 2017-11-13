@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-alias selenium-chrome="open vnc://localhost:secret@localhost:5900"
-alias selenium-firefox="open vnc://localhost:secret@localhost:5901"

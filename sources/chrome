@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --ignore-certificate-errors --remote-debugging-port=9222 > /dev/null 2>&1 &"
