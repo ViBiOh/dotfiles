@@ -1,10 +1,8 @@
 #!/usr/bin/env sh
 
 function os_clean() {
-  if [ `uname` == 'Darwin' ]; then
-    sudo find / -name ".DS_Store" -exec rm -f {} \;
-    sudo find / -name ".localized" -exec rm -f {} \;
-  fi
+  sudo find / -name ".DS_Store" -exec rm -f {} \;
+  sudo find / -name ".localized" -exec rm -f {} \;
 
   if [ `uname -r | grep coreos | wc -l` == 1 ]; then
     sudo sysctl vm.drop_caches=3
