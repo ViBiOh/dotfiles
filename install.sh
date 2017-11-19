@@ -8,6 +8,5 @@ done
 
 echo 'Host *
     AddKeysToAgent yes
-    UseKeychain yes
     ServerAliveInterval 300
     ServerAliveCountMax 2' >> ${HOME}/.ssh/config
