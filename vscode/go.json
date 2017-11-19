@@ -17,7 +17,7 @@
       "",
       "\tfor _, testCase := range cases {",
       "\t\tif result := ${2:FuncName}(testCase.input); result != testCase.want {",
-      "\t\t\tt.Errorf(\"%v\\n${2:FuncName}(%+v) = %+v, want %+v\", testCase.intention, testCase.input, result, testCase.want)",
+      "\t\t\tt.Errorf(\"%s\\n${2:FuncName}(%+v) = %+v, want %+v\", testCase.intention, testCase.input, result, testCase.want)",
       "\t\t}",
       "\t}",
       "}"
@@ -60,7 +60,7 @@
       "\t\t}",
       "",
       "\t\tif failed {",
-      "\t\t\tt.Errorf(\"%v\\n${1:FuncName}(%+v) = (%+v, %+v), want (%+v, %+v)\", testCase.intention, testCase.input, result, err, testCase.want, testCase.wantErr)",
+      "\t\t\tt.Errorf(\"%s\\n${1:FuncName}(%+v) = (%+v, %+v), want (%+v, %+v)\", testCase.intention, testCase.input, result, err, testCase.want, testCase.wantErr)",
       "\t\t}",
       "\t}",
       "}"
@@ -95,7 +95,7 @@
       "\t\t}",
       "",
       "\t\tif result, _ := httputils.ReadBody(writer.Result().Body); string(result) != testCase.want {",
-      "\t\t\tt.Errorf(\"%v\\n${1:FuncName}(%+v) = %+v, want %+v\", testCase.intention, testCase.request, string(result), testCase.want)",
+      "\t\t\tt.Errorf(\"%s\\n${1:FuncName}(%+v) = %+v, want %+v\", testCase.intention, testCase.request, string(result), testCase.want)",
       "\t\t}",
       "\t}",
       "}"

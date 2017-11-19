@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+alias rsync="rsync --human-readable --progress"

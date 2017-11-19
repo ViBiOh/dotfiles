@@ -12,22 +12,16 @@
     "**/.hg": true,
     "**/CVS": true,
     "**/.DS_Store": true,
-    "**/esdoc/": true,
-    "**/dist/": true,
-    "**/.nyc_output/": true,
-    "**/reports/screenshots/": true
+    "esdoc/": true,
+    "dist/": true,
+    ".nyc_output/": true
   },
-  "editor.rulers": [
-    100
-  ],
+  "editor.rulers": [100],
   "editor.snippetSuggestions": "top",
   "editor.tabCompletion": true,
   "window.newWindowDimensions": "maximized",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "prettier.eslintIntegration": true,
-  "prettier.cssEnable": [],
-  "prettier.jsonEnable": [],
-  "sublimeTextKeymap.promptV3Features": true,
-  "editor.multiCursorModifier": "ctrlCmd"
+  "prettier.cssEnable": []
 }

@@ -4,7 +4,3 @@ if [ `which go 2>/dev/null | wc -l` -eq 1 ]; then
   export GOPATH=${HOME}/code
   export PATH=${PATH}:${GOPATH}/bin
 fi
-
-if [ `ls ${GOPATH}/bin/go-torch 2>/dev/null | wc -l` -eq 1 ]; then
-  export PATH=${GOPATH}/src/github.com/uber/go-torch/FlameGraph:${PATH}
-fi
