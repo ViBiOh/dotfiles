@@ -23,5 +23,6 @@
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "prettier.eslintIntegration": true,
-  "prettier.cssEnable": []
+  "prettier.cssEnable": [],
+  "sublimeTextKeymap.promptV3Features": true
 }
