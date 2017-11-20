@@ -9,4 +9,9 @@ done
 echo 'Host *
     AddKeysToAgent yes
     ServerAliveInterval 300
-    ServerAliveCountMax 2' >> ${HOME}/.ssh/config
+    ServerAliveCountMax 2
+
+Host example
+    HostName example.domain
+    User vibioh
+' >> ${HOME}/.ssh/config
