@@ -38,7 +38,7 @@
       "\t\t\t`should work with given params`,",
       "\t\t\t`test`,",
       "\t\t\tfalse,",
-      "\t\t\tfmt.Errorf(`Error while testing`),",
+      "\t\t\terrors.New(`Error while testing`),",
       "\t\t},",
       "\t}",
       "",

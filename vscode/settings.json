@@ -5,18 +5,14 @@
   "editor.wordWrap": "on",
   "editor.folding": false,
   "editor.dragAndDrop": false,
-  "files.exclude": {
-    "**/node_modules": true,
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
+  "search.exclude": {
     "esdoc/": true,
     "dist/": true,
     ".nyc_output/": true
   },
-  "editor.rulers": [100],
+  "editor.rulers": [
+    100
+  ],
   "editor.snippetSuggestions": "top",
   "editor.tabCompletion": true,
   "window.newWindowDimensions": "maximized",
