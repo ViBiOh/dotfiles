@@ -21,7 +21,6 @@ Installed with [PackageControl](https://packagecontrol.io/installation)
 * GoSublime
 * JsPrettier
 * MarkdownPreview
-* Oceanic Next Color Scheme
 * SideBarEnhancements
 * SublimeLinter
 * SublimeLinter-contrib-eslint

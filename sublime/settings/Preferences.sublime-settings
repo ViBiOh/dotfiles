@@ -1,6 +1,7 @@
 {
   "animation_enabled": false,
-  "auto_complete_triggers": [
+  "auto_complete_triggers":
+  [
     {
       "characters": "<",
       "selector": "text.html"
@@ -15,7 +16,7 @@
     }
   ],
   "close_windows_when_empty": false,
-  "color_scheme": "Packages/User/SublimeLinter/Oceanic Next (SL).tmTheme",
+  "color_scheme": "Packages/User/SublimeLinter/Mariana (SL).tmTheme",
   "default_line_ending": "unix",
   "drag_text": false,
   "draw_white_space": "all",
@@ -23,22 +24,29 @@
   "fold_buttons": false,
   "highlight_line": true,
   "highlight_modified_tabs": true,
-  "ignored_packages": ["Vintage"],
-  "index_exclude_patterns": [
+  "ignored_packages":
+  [
+    "Vintage"
+  ],
+  "index_exclude_patterns":
+  [
     "*.log",
     "node_modules/*",
     "dist/*",
     "coverage/*",
-    "esdoc/*"
+    "doc/*",
+    "bin/*"
   ],
   "overlay_scroll_bars": "enabled",
-  "rulers": [100],
+  "rulers":
+  [
+    100
+  ],
   "show_encoding": true,
   "show_line_endings": true,
   "show_tab_close_buttons": true,
   "tab_size": 2,
-  "tabs_small": true,
-  "theme": "Oceanic Next.sublime-theme",
+  "theme": "Adaptive.sublime-theme",
   "translate_tabs_to_spaces": true,
   "word_wrap": true
 }
