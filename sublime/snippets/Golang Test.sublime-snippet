@@ -1,25 +1,27 @@
 <snippet>
-    <content><![CDATA[
-func Test${1:FuncName}(t *testing.T) {
-  var cases = []struct {
-    input string
-    want  bool
-  }{
-    {
-    `test`,
-    true,
-    },
-  }
+		<content><![CDATA[
+func Test_${2:FuncName}(t *testing.T) {
+	var cases = []struct {
+		intention string
+		input     string
+		want      bool
+	}{
+		{
+			`should work with given params`,
+			`test`,
+			true,
+		},
+	}
 
-  for _, testCase := range cases {
-    if result := ${1:FuncName}(testCase.input); result != testCase.want {
-      t.Errorf(`${1:FuncName}(%v) = %v, want %v`, testCase.input, result, testCase.want)
-    }
-  }
+	for _, testCase := range cases {
+		if result := ${2:FuncName}(testCase.input); result != testCase.want {
+			t.Errorf("%s\n${2:FuncName}(%+v) = %+v, want %+v", testCase.intention, testCase.input, result, testCase.want)
+		}
+	}
 }
 
 ]]></content>
-    <tabTrigger>gt</tabTrigger>
-    <scope>source.go -(meta)</scope>
-    <description>Golang Test</description>
+		<tabTrigger>gt</tabTrigger>
+		<scope>source.go -(meta)</scope>
+		<description>Golang Test</description>
 </snippet>

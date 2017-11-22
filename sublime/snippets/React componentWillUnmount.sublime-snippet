@@ -4,7 +4,7 @@
  * React lifecycle.
  */
 componentWillUnmount() {
-	${0}
+  ${0}
 }
 ]]></content>
     <tabTrigger>cwun</tabTrigger>
