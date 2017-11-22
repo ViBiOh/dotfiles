@@ -14,7 +14,6 @@ cp settings/* "${PKG_USER}"
 
 Installed with [PackageControl](https://packagecontrol.io/installation)
 
-* AllAutocomplete
 * Babel
 * DocBlockr
 * Git
