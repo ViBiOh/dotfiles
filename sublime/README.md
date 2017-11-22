@@ -25,5 +25,4 @@ Installed with [PackageControl](https://packagecontrol.io/installation)
 * SublimeLinter
 * SublimeLinter-contrib-eslint
 * SublimeLinter-contrib-stylelint
-* Theme - Spacegray
 * Color Highlighter
