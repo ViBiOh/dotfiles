@@ -12,9 +12,9 @@ cp settings/* "${PKG_USER}"
 
 ## Plugins
 
-Installed with [PackageControl](https://packagecontrol.io/installation)
-
+* Agila Theme
 * Babel
+* Color Highlighter
 * DocBlockr
 * Git
 * GitGutter
@@ -25,4 +25,3 @@ Installed with [PackageControl](https://packagecontrol.io/installation)
 * SublimeLinter
 * SublimeLinter-contrib-eslint
 * SublimeLinter-contrib-stylelint
-* Color Highlighter
