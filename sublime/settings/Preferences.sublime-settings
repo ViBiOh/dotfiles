@@ -34,7 +34,6 @@
   "overlay_scroll_bars": "enabled",
   "rulers": [100],
   "show_encoding": true,
-  "show_full_path": true,
   "show_line_endings": true,
   "show_tab_close_buttons": true,
   "tab_size": 2,
