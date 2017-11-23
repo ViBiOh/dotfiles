@@ -17,11 +17,10 @@ export default class ${1:ComponentName} extends Component {
 
   /**
    * React lifecycle.
-   * @return {ReactComponent} Node
    */
   render() {
     return (
-      ${2:<div />}
+      ${2}
     );
   }
 }

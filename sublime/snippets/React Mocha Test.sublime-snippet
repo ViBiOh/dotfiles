@@ -5,18 +5,14 @@ import expect from 'expect';
 import { shallow } from 'enzyme';
 import ${1:ComponentName} from './';
 
-/**
- * Default props of tested component.
- * @return {Object} Default props
- */
 function defaultProps() {
   return {};
 }
 
 describe('<${1:ComponentName} />', () => {
-  it('should always render as a type', (t) => {
+  it('should always render as a ${2:type}', () => {
     const wrapper = shallow(<${1:ComponentName} {...defaultProps()} />);
-    expect(wrapper.type()).to.equal('type');
+    expect(wrapper.type()).to.equal('${2:type}');
   });
 });
 

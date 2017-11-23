@@ -5,6 +5,22 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 /**
+ * Select props from Redux state.
+ * @param {Object} state Current state
+ */
+const mapStateToProps = state => ({
+  ${3:stateProp}: state.${3:stateProp},
+});
+
+/**
+ * Provide dispatch functions in props.
+ * @param {Function} dispatch Redux dispatch function
+ */
+const mapDispatchToProps = dispatch => ({
+  ${4:stateAction}: () => dispatch({ type: 'action' }),
+});
+
+/**
  * ${1:ComponentName} Component.
  */
 export class ${1:ComponentName}Component extends Component {
@@ -18,35 +34,18 @@ export class ${1:ComponentName}Component extends Component {
 
   /**
    * React lifecycle.
-   * @return {ReactComponent} Node
    */
   render() {
     return (
-      ${2:<div />}
+      ${2}
     );
   }
 }
 
 ${1:ComponentName}Component.propTypes = {
-  stateProp: PropTypes.string,
-  stateAction: PropTypes.func,
+  ${3:stateProp}: PropTypes.string,
+  ${4:stateAction}: PropTypes.func,
 };
-
-/**
- * Select props from Redux state.
- * @param {Object} state Current state
- */
-const mapStateToProps = state => ({
-  stateProp: state.stateProp,
-});
-
-/**
- * Provide dispatch functions in props.
- * @param {Function} dispatch Redux dispatch function
- */
-const mapDispatchToProps = dispatch => ({
-  stateAction: () => dispatch({ type: 'action' }),
-});
 
 /**
  * ${1:ComponentName}Component connected.
