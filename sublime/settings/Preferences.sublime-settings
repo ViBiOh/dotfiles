@@ -26,11 +26,11 @@
 	"ignored_packages": ["Vintage"],
 	"index_exclude_patterns": [
 		"*.log",
-		"**/bin/*",
-		"**/dist/*",
-		"**/coverage/*",
-		"**/node_modules/*",
-		"**/esdoc/*"
+		"bin/*",
+		"dist/*",
+		"coverage/*",
+		"node_modules/*",
+		"esdoc/*"
 	],
 	"overlay_scroll_bars": "enabled",
 	"rulers": [100],
