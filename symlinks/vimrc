@@ -38,6 +38,9 @@ set wrap
 " Spaces tab's width and indent size
 set tabstop=2 shiftwidth=2
 
+" Show matching parenthesis
+set showmatch
+
 " Insert spaces instead of tabs
 set expandtab
 
@@ -66,3 +69,9 @@ set autoread
 " Disable folding
 set nofoldenable
 
+" Disable backup files
+set nobackup
+set noswapfile
+
+" Change map leader
+let mapleader=","
