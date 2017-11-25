@@ -64,6 +64,13 @@ brew install fzf
 /usr/local/opt/fzf/install
 ```
 
+### Linux
+
+```bash
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
+```
+
 ## Node
 
 ### Binary
@@ -83,12 +90,6 @@ sudo n latest
 ### Binary
 
 [Install latest version](https://golang.org/dl/)
-
-### delve
-
-```bash
-go get -u github.com/derekparker/delve/cmd/dlv
-```
 
 ### wuzz
 
