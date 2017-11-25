@@ -72,6 +72,3 @@ set nofoldenable
 " Disable backup files
 set nobackup
 set noswapfile
-
-" Change map leader
-let mapleader=","
