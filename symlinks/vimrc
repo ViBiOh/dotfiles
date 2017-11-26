@@ -72,3 +72,13 @@ set nofoldenable
 " Disable backup files
 set nobackup
 set noswapfile
+
+" Enable syntax color if exist
+if exists(":syntax")
+  syntax on
+endif
+
+" Change map leader if possible
+if exists(":let")
+  let mapleader=","
+endif
