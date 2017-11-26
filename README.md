@@ -64,7 +64,7 @@ brew install fzf
 /usr/local/opt/fzf/install
 ```
 
-### Linux
+### on Linux
 
 ```bash
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
