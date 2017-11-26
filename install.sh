@@ -17,7 +17,7 @@ Host example
 ' >> ${HOME}/.ssh/config
 
 
-if [ `uname` == 'Darwin' && `which brew 2>/dev/null | wc -l` -eq 0 ]; then
+if [ `uname` == 'Darwin' ] && [ `which brew 2>/dev/null | wc -l` -eq 0 ]; then
   echo Installing brew
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
