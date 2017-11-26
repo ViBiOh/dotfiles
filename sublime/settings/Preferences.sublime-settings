@@ -32,6 +32,7 @@
 		"bin/*",
 		"dist/*",
 		"coverage/*",
+		".nyc_output/*",
 		"node_modules/*",
 		"esdoc/*"
 	],
