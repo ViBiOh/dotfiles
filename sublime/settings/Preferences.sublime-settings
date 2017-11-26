@@ -14,6 +14,27 @@
 			"selector": "source.go"
 		}
 	],
+	"binary_file_patterns": [
+		"*.jpg",
+		"*.jpeg",
+		"*.png",
+		"*.gif",
+		"*.ttf",
+		"*.tga",
+		"*.dds",
+		"*.ico",
+		"*.eot",
+		"*.pdf",
+		"*.swf",
+		"*.jar",
+		"*.zip",
+		".git/*",
+		"bin/*",
+		"dist/*",
+		"coverage/*",
+		"node_modules/*",
+		"esdoc/*"
+	],
 	"close_windows_when_empty": false,
 	"color_scheme": "Packages/User/SublimeLinter/Agila Oceanic Next (SL).tmTheme",
 	"default_line_ending": "unix",
@@ -24,13 +45,6 @@
 	"highlight_line": true,
 	"highlight_modified_tabs": true,
 	"ignored_packages": ["Vintage"],
-	"binary_file_patterns": [
-		"bin/*",
-		"dist/*",
-		"coverage/*",
-		"node_modules/*",
-		"esdoc/*"
-	],
 	"overlay_scroll_bars": "enabled",
 	"rulers": [100],
 	"show_encoding": true,
@@ -38,11 +52,11 @@
 	"show_tab_close_buttons": true,
 	"tab_size": 2,
 	"theme": "Agila.sublime-theme",
+	"theme_agila_compact_sidebar": true,
 	"theme_agila_modified_tab_marker_lightblue": true,
 	"theme_agila_sidebar_font_xsmall": true,
-	"theme_agila_sidebar_small": true,
 	"theme_agila_sidebar_light_icons": true,
-	"theme_agila_compact_sidebar": true,
+	"theme_agila_sidebar_small": true,
 	"translate_tabs_to_spaces": true,
 	"word_wrap": true
 }
