@@ -91,6 +91,14 @@ sudo n latest
 
 [Install latest version](https://golang.org/dl/)
 
+### tools
+
+```bash
+go get -u github.com/golang/lint/golint
+go get -u golang.org/x/tools/cmd/goimports
+go get -u github.com/nsf/gocode
+```
+
 ### wuzz
 
 ```bash

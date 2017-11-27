@@ -2,7 +2,7 @@
 
 ## Snippets
 
-```
+```bash
 ln -s /Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl /usr/local/bin/subl
 PKG_USER="/Users/`whoami`/Library/Application Support/Sublime Text 3/Packages/User/"
 mkdir -p "${PKG_USER}"
@@ -25,11 +25,3 @@ cp settings/* "${PKG_USER}"
 * SublimeLinter
 * SublimeLinter-contrib-eslint
 * SublimeLinter-contrib-stylelint
-
-## GoSublime Tools
-
-```bash
-go get -u github.com/golang/lint/golint
-go get -u golang.org/x/tools/cmd/goimports
-go get -u github.com/nsf/gocode
-```
