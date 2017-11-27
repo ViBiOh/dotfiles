@@ -34,7 +34,8 @@
 		"coverage/*",
 		".nyc_output/*",
 		"node_modules/*",
-		"esdoc/*"
+		"esdoc/*",
+		"vendors/*"
 	],
 	"close_windows_when_empty": false,
 	"color_scheme": "Packages/User/SublimeLinter/Agila Oceanic Next (SL).tmTheme",
