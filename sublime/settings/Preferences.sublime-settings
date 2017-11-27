@@ -35,6 +35,7 @@
 		".nyc_output/*",
 		"node_modules/*",
 		"esdoc/*",
+		"vendor/*",
 		"vendors/*"
 	],
 	"close_windows_when_empty": false,
