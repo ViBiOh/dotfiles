@@ -51,6 +51,12 @@ And also for current user
 chsh -s /usr/local/bin/bash
 ```
 
+## Git with fswatch
+
+```bash
+brew install fswatch
+```
+
 ## TL;DR
 
 ```bash
