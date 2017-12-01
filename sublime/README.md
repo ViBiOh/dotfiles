@@ -20,8 +20,10 @@ cp settings/* "${PKG_USER}"
 * GitGutter
 * GoSublime
 * JsPrettier
-* MarkdownPreview
+* Markdown Preview
 * SideBarEnhancements
 * SublimeLinter
 * SublimeLinter-contrib-eslint
 * SublimeLinter-contrib-stylelint
+* tern_for_sublime
+
