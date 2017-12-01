@@ -107,8 +107,3 @@ go get -u github.com/golang/dep/cmd/dep
 go get -u github.com/derekparker/delve/cmd/dlv
 ```
 
-### wuzz
-
-```bash
-go get -u github.com/asciimoo/wuzz
-```
