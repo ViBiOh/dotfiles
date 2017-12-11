@@ -26,4 +26,4 @@ cp settings/* "${PKG_USER}"
 * SublimeLinter-contrib-eslint
 * SublimeLinter-contrib-stylelint
 * tern_for_sublime
-
+* Sublimerge 3
