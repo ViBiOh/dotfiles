@@ -1,28 +1,45 @@
 [user]
 	name = Vincent Boutour
 	email = bob@vibioh.fr
+
 [core]
 	editor = vi
 	autocrlf = input
 	excludesfile = ~/.gitignore_global
 	ignorecase = false
+
 [color]
 	ui = true
+
 [color "branch"]
 	upstream = cyan
+
 [diff]
 	mnemonicPrefix = true
 	renames = true
+
 [push]
 	default = simple
+
 [alias]
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	tidy = rebase -i @{u}
+
 [log]
 	abbrevCommit = true
+
 [credential]
 	helper = cache --timeout=28800
+
 [fetch]
 	prune = true
+
 [pull]
 	rebase = preserve
+
+[merge]
+	tool = sublimerge
+
+[mergetool "sublimerge"]
+	cmd = subl -n --wait \"$REMOTE\" \"$BASE\" \"$LOCAL\" \"$MERGED\" --command \"sublimerge_diff_views\"
+	trustExitCode = false
