@@ -14,7 +14,6 @@ cp settings/* "${PKG_USER}"
 
 * Agila Theme
 * Babel
-* Color Highlighter
 * DocBlockr
 * Git
 * GitGutter
