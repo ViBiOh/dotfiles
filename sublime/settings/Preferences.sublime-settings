@@ -39,7 +39,7 @@
 		"vendors/*"
 	],
 	"close_windows_when_empty": false,
-	"color_scheme": "Packages/User/SublimeLinter/Agila Oceanic Next (SL).tmTheme",
+	"color_scheme": "Packages/User/SublimeLinter/Monokai (SL).tmTheme",
 	"default_line_ending": "unix",
 	"drag_text": false,
 	"draw_white_space": "all",
@@ -54,12 +54,6 @@
 	"show_line_endings": true,
 	"show_tab_close_buttons": true,
 	"tab_size": 2,
-	"theme": "Agila.sublime-theme",
-	"theme_agila_compact_sidebar": true,
-	"theme_agila_modified_tab_marker_lightblue": true,
-	"theme_agila_sidebar_font_xsmall": true,
-	"theme_agila_sidebar_light_icons": true,
-	"theme_agila_sidebar_small": true,
 	"translate_tabs_to_spaces": true,
 	"word_wrap": true
 }
