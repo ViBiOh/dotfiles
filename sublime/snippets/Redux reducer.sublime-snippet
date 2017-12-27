@@ -1,14 +1,22 @@
 <snippet>
 		<content><![CDATA[
 /**
- * ${3:ReducerName}'s reducer.
+ * ${1:ReducerName}' reducer initial state.
+ * @type {Object}
+ */
+export const initialState = {
+  ${2:defaultState}
+};
+
+/**
+ * ${1:ReducerName}'s reducer.
  * @param {String} state  Existing ${3:ReducerName}'s state
  * @param {Object} action Action dispatched
  * @return {Object} New state
  */
-export default (state = ${1:defaultState}, action) => {
+export default (state = initialState, action) => {
   switch (action.type) {
-    case ${2:actionName}:
+    case ${3:actionName}:
       return ${4};
     default:
       return state;
