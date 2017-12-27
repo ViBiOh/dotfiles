@@ -12,17 +12,16 @@ cp settings/* "${PKG_USER}"
 
 ## Plugins
 
-* Agila Theme
-* Babel
-* DocBlockr
-* Git
-* GitGutter
-* GoSublime
-* JsPrettier
-* Markdown Preview
-* SideBarEnhancements
-* SublimeLinter
-* SublimeLinter-contrib-eslint
-* SublimeLinter-contrib-stylelint
-* tern_for_sublime
-* Sublimerge 3
+* `Babel`
+* `DocBlockr`
+* `Git`
+* `GitGutter`
+* `GoSublime`
+* `JsPrettier`
+* `Markdown Preview`
+* `SideBarEnhancements`
+* `SublimeLinter`
+* `SublimeLinter-contrib-eslint`
+* `SublimeLinter-contrib-stylelint`
+* `tern_for_sublime`
+* `Sublimerge 3`
