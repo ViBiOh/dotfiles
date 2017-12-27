@@ -10,7 +10,7 @@ export const initialState = {
 
 /**
  * ${1:ReducerName}'s reducer.
- * @param {String} state  Existing ${3:ReducerName}'s state
+ * @param {String} state  Existing ${1:ReducerName}'s state
  * @param {Object} action Action dispatched
  * @return {Object} New state
  */
