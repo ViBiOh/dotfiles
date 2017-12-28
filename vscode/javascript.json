@@ -133,11 +133,37 @@
     ],
     "description": "Redux reducer"
   },
+  "Redux Ava Test": {
+    "prefix": "rdr",
+    "body": [
+      "import test from 'ava';",
+      "import reducer, { initialState } from './${1:ReducerName}';",
+      "",
+      "test('should return initial state', (t) => {",
+      "  t.deepEqual(reducer(undefined, { type: '' }), initialState);",
+      "});",
+    ],
+    "description": "Redux reducer"
+  },
+  "Redux Mocha Test": {
+    "prefix": "rdr",
+    "body": [
+      "import expect from 'expect';",
+      "import reducer, { initialState } from './${1:ReducerName}';",
+      "",
+      "describe('${1:ReducerName} reducer', () => {",
+      "  it('should return initial state', () => {",
+      "    expect(reducer(undefined, { type: '' })).to.deep.equal(initialState);",
+      "  });",
+      "});",
+    ],
+    "description": "Redux reducer"
+  },
   "React Ava Test": {
     "prefix": "rat",
     "body": [
-      "import test from 'ava';",
       "import React from 'react';",
+      "import test from 'ava';",
       "import { shallow } from 'enzyme';",
       "import ${1:ComponentName} from './';",
       "",
@@ -145,8 +171,10 @@
       "  return {};",
       "}",
       "",
-      "test('should always render as a div', (t) => {",
-      "  t.is(shallow(<${1:ComponentName} {...defaultProps()} />).type(), 'div');",
+      "test('should always render as a ${2:Type}', (t) => {",
+      "  const props = defaultProps();",
+      "  const wrapper = shallow(<${1:ComponentName} {...props} />);",
+      "  t.is(wrapper.type(), '${2:Type}');",
       "});"
     ],
     "description": "Redux Ava Test"
@@ -164,9 +192,10 @@
       "}",
       "",
       "describe('<${1:ComponentName} />', () => {",
-      "  it('should always render as a ${2:type}', () => {",
-      "    const wrapper = shallow(<${1:ComponentName} {...defaultProps()} />);",
-      "    expect(wrapper.type()).to.equal('${2:type}');",
+      "  it('should always render as a ${2:Type}', () => {",
+      "    const props = defaultProps();",
+      "    const wrapper = shallow(<${1:ComponentName} {...props} />);",
+      "    expect(wrapper.type()).to.equal('${2:Type}');",
       "  });",
       "});"
     ],

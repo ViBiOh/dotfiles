@@ -2,7 +2,7 @@
     <content><![CDATA[
 /**
  * React lifecycle.
- * @param  {Object} nextProps Next props
+ * @param {Object} nextProps Next props
  */
 componentWillReceiveProps(nextProps) {
   ${0}

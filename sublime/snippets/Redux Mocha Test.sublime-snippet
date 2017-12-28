@@ -10,7 +10,7 @@ describe('${1:ReducerName} reducer', () => {
 });
 
 ]]></content>
-    <tabTrigger>rrt</tabTrigger>
+    <tabTrigger>rmt</tabTrigger>
     <scope>source.js</scope>
-    <description>Redux Reducer Test</description>
+    <description>Redux Mocha Test</description>
 </snippet>

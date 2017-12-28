@@ -1,0 +1,16 @@
+<snippet>
+    <content><![CDATA[
+import test from 'ava';
+import reducer, { initialState } from './${1:ReducerName}';
+
+test('should return initial state', (t) => {
+  t.deepEqual(reducer(undefined, { type: '' }), initialState);
+});
+
+]]></content>
+    <tabTrigger>rat</tabTrigger>
+    <scope>source.js</scope>
+    <description>Redux Mocha Test</description>
+</snippet>
+
+
