@@ -1,0 +1,16 @@
+<snippet>
+    <content><![CDATA[
+import expect from 'expect';
+import reducer, { initialState } from './${1:ReducerName}';
+
+describe('${1:ReducerName} reducer', () => {
+  it('should return initial state', () => {
+    expect(reducer(undefined, { type: '' })).to.deep.equal(initialState);
+  });
+});
+
+]]></content>
+    <tabTrigger>rrt</tabTrigger>
+    <scope>source.js</scope>
+    <description>Redux Reducer Test</description>
+</snippet>
