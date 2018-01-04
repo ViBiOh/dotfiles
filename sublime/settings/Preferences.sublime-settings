@@ -1,6 +1,7 @@
 {
 	"animation_enabled": false,
-	"auto_complete_triggers": [
+	"auto_complete_triggers":
+	[
 		{
 			"characters": "<",
 			"selector": "text.html"
@@ -14,7 +15,8 @@
 			"selector": "source.go"
 		}
 	],
-	"binary_file_patterns": [
+	"binary_file_patterns":
+	[
 		"*.jpg",
 		"*.jpeg",
 		"*.png",
@@ -46,10 +48,17 @@
 	"fold_buttons": false,
 	"highlight_line": true,
 	"highlight_modified_tabs": true,
-	"ignored_packages": ["Vintage"],
+	"ignored_packages":
+	[
+		"Vintage"
+	],
 	"overlay_scroll_bars": "enabled",
-	"rulers": [100],
+	"rulers":
+	[
+		100
+	],
 	"show_encoding": true,
+	"show_full_path": true,
 	"show_line_endings": true,
 	"show_tab_close_buttons": true,
 	"tab_size": 2,
