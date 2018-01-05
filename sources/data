@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-
-alias fibr_sync="rsync -r ${HOME}/Documents/* docker:~/data"
