@@ -41,46 +41,11 @@ function docker-compose-deploy() {
 
   echo Deploy succeed!
 
-  docker-clean
+  docker system prune -f
 }
 
 function docker-restart() {
   docker start `docker ps -a -q -f status=exited -f status=created 2>/dev/null` 2>/dev/null
-}
-
-function docker-clean-images() {
-  imagesToClean=`docker images --filter dangling=true -q 2>/dev/null`
-
-  if [ ! -z "${imagesToClean}" ]; then
-    docker rmi ${imagesToClean} 
-  fi
-}
-
-function docker-clean() {
-  forceWord=force
-
-  if [ "${#}" -eq 2 ] && [ "${2}" != "${forceWord}" ]; then
-    echo Usage: dclean [name prefix] [?force]
-    return
-  fi
-
-  if [ "${1}" == "${forceWord}" ] || [ "${2}" == "${forceWord}" ]; then
-    exclude_containers=""
-  else
-    exclude_containers=`docker ps -a -q -f label=keep=true 2>/dev/null`
-  fi
-
-  if [ ! -z "${1}" ] && [ "${1}" != "${forceWord}" ]; then
-    end_containers=`docker ps -a -q -f name=${1} 2>/dev/null`
-  else
-    end_containers=`docker ps -a -q -f status=exited -f status=created 2>/dev/null`
-  fi
-
-  if [ ! -z "${exclude_containers}" ]; then
-    end_containers=`echo ${end_containers} | tr " " "\n" | grep -v "${exclude_containers}"`
-  fi
-  docker rm -vf ${end_containers} 2>/dev/null
-  docker-clean-images
 }
 
 export DOCKER_CONTENT_TRUST=1
