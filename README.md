@@ -65,9 +65,15 @@ brew install tldr
 
 ## tmux
 
-```
+```bash
 brew install tmux
 brew install reattach-to-user-namespace
+```
+
+### on Linux
+
+```bash
+sudo apt-get install -y tmux
 ```
 
 ## FZF
