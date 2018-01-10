@@ -3,3 +3,7 @@
 if [ `which travis 2>/dev/null | wc -l` -eq 0 ]; then
   alias travis='docker run -it --rm -v `realpath ./`:/usr/src vibioh/travis-cli'
 fi
+
+if [ `which mvn_work 2>/dev/null | wc -l` -eq 0 ]; then
+  alias mvn_work='docker run -it --rm -p 8080:8080/tcp -v `pwd`:/usr/src/project -w /usr/src/project maven:3-jdk-8-alpine /bin/sh'
+fi
