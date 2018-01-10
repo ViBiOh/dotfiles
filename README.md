@@ -63,6 +63,13 @@ brew install fswatch
 brew install tldr
 ```
 
+## tmux
+
+```
+brew install tmux
+brew install reattach-to-user-namespace
+```
+
 ## FZF
 
 ```bash
