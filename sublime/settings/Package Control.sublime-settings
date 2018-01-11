@@ -1,0 +1,22 @@
+{
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"Babel",
+		"DocBlockr",
+		"Git",
+		"GitGutter",
+		"GoSublime",
+		"JsPrettier",
+		"Markdown Preview",
+		"Package Control",
+		"SideBarEnhancements",
+		"SublimeLinter",
+		"SublimeLinter-contrib-stylelint",
+		"Sublimerge 3",
+		"SublimeLinter-eslint"
+	]
+}
