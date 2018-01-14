@@ -65,5 +65,6 @@
 	"tab_size": 2,
 	"theme": "Adaptive.sublime-theme",
 	"translate_tabs_to_spaces": true,
+	"tree_animation_enabled": false,
 	"word_wrap": true
 }
