@@ -1,14 +1,12 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 function os_clean() {
   sudo find / -name ".DS_Store" -exec rm -f {} \;
   sudo find / -name ".localized" -exec rm -f {} \;
 
-  if [ `uname -r | grep coreos | wc -l` == 1 ]; then
+  if command -v sysctl > /dev/null 2>&1; then
     sudo sysctl vm.drop_caches=3
   else
-    if [ `uname` == 'Linux' ]; then
-      sudo sync; echo 3 > /proc/sys/vm/drop_caches
-    fi
+    sudo sync; echo 3 > /proc/sys/vm/drop_caches
   fi
 }
