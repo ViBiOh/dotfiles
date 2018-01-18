@@ -2,3 +2,4 @@
 
 alias meteo="curl -4 wttr.in/Paris"
 alias now="date '+%Y-%m-%d %H:%M:%S'"
+alias json="python -m json.tool"
