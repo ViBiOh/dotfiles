@@ -4,7 +4,7 @@ function os_clean() {
   sudo find / -name ".DS_Store" -exec rm -f {} \;
   sudo find / -name ".localized" -exec rm -f {} \;
 
-  if command -v sysctl > /dev/null 2>&1; then
+  if [ command -v sysctl > /dev/null 2>&1 ]; then
     sudo sysctl vm.drop_caches=3
   else
     sudo sync; echo 3 > /proc/sys/vm/drop_caches
