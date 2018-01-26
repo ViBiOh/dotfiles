@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+MA_HOME=${HOME}/code/src/github.com/MeilleursAgents/
+alias ma='cd ${MA_HOME}'
+
+if [ -e "${HOME}/ma/MA-Infra/tools/gssh/gssh.sh" ]; then
+  source ${HOME}/ma/MA-Infra/tools/gssh/gssh.sh
+fi
+
+alias selenium-chrome="open vnc://localhost:secret@localhost:5900"
+alias selenium-firefox="open vnc://localhost:secret@localhost:5901"

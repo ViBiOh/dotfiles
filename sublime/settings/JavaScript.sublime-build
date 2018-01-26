@@ -1,5 +1,5 @@
 {
-  "shell_cmd": "npm run test $file",
+  "shell_cmd": "yarn run test:file $file",
   "selector": "source.js",
   "file_patterns": ["*.test.js"],
   "quiet": true
