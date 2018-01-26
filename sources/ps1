@@ -9,7 +9,7 @@ RESET="\[\033[0m\]"
 
 PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
 
-if [ comand -v git > /dev/null 2>&1 ] || [ `type -t git_info` ]; then
+if command -v git > /dev/null 2>&1 && [ `type -t git_info` ]; then
   PS1="${PS1}${YELLOW}\$(git_info)${RESET}"
 fi
 
