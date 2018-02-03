@@ -41,7 +41,6 @@
 		"vendors/*"
 	],
 	"close_windows_when_empty": false,
-	"color_scheme": "Packages/User/SublimeLinter/Mariana (SL).tmTheme",
 	"default_line_ending": "unix",
 	"drag_text": false,
 	"draw_white_space": "all",
