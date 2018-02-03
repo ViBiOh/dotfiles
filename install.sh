@@ -37,7 +37,8 @@ if [ `uname` == 'Darwin' ] && ! command -v brew > /dev/null 2>&1; then
     tldr \
     fzf \
     openssl \
-    gnupg
+    gnupg \
+    golang
 
   echo
   echo Installing curl with right option
