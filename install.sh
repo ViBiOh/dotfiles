@@ -34,10 +34,14 @@ if [ `uname` == 'Darwin' ] && ! command -v brew > /dev/null 2>&1; then
   brew install \
     bash \
     bash-completion \
+    fswatch \
     tldr \
     fzf \
     openssl \
     gnupg \
+    tmux \
+    reattach-to-user-namespace \
+    pass \
     golang
 
   echo
