@@ -22,7 +22,7 @@ echo "Host *
 Host vibioh
     HostName vibioh.fr
     User vibioh
-" >> ${HOME}/.ssh/config
+" > ${HOME}/.ssh/config
 
 
 if [ `uname` == 'Darwin' ] && ! command -v brew > /dev/null 2>&1; then
