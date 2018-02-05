@@ -13,4 +13,6 @@ if command -v git > /dev/null 2>&1 && [ `type -t git_info` ]; then
   PS1="${PS1}${YELLOW}\$(git_info)${RESET}"
 fi
 
+PROMPT_DIRTRIM=3
+
 export PS1="${PS1} "
