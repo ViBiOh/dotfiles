@@ -42,7 +42,8 @@ if [ `uname` == 'Darwin' ] && ! command -v brew > /dev/null 2>&1; then
     tmux \
     reattach-to-user-namespace \
     pass \
-    golang
+    golang \
+    graphviz
 
   echo
   echo Installing curl with right option
