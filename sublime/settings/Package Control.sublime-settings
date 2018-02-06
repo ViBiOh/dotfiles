@@ -15,8 +15,10 @@
 		"Package Control",
 		"SideBarEnhancements",
 		"SublimeLinter",
+		"SublimeLinter-contrib-golint",
+		"SublimeLinter-contrib-govet",
 		"SublimeLinter-contrib-stylelint",
-		"Sublimerge 3",
-		"SublimeLinter-eslint"
+		"SublimeLinter-eslint",
+		"Sublimerge 3"
 	]
 }

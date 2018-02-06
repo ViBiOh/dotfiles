@@ -13,4 +13,6 @@
 * `SublimeLinter`
 * `SublimeLinter-contrib-eslint`
 * `SublimeLinter-contrib-stylelint`
+* `SublimeLinter-contrib-govet`
+* `SublimeLinter-contrib-golint`
 * `Sublimerge 3`
