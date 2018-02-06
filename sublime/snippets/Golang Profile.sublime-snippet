@@ -1,0 +1,23 @@
+<snippet>
+    <content><![CDATA[
+if strings.HasPrefix(r.URL.Path, `/debug/pprof`) {
+  if strings.HasPrefix(r.URL.Path, "/debug/pprof/cmdline") {
+    pprof.Cmdline(w, r)
+  } else if strings.HasPrefix(r.URL.Path, "/debug/pprof/profile") {
+    pprof.Profile(w, r)
+  } else if strings.HasPrefix(r.URL.Path, "/debug/pprof/symbol") {
+    pprof.Symbol(w, r)
+  } else if strings.HasPrefix(r.URL.Path, "/debug/pprof/trace") {
+    pprof.Trace(w, r)
+  } else if strings.HasPrefix(r.URL.Path, "/debug/pprof/") {
+    pprof.Index(w, r)
+  }
+
+  return
+}
+
+]]></content>
+    <tabTrigger>gph</tabTrigger>
+    <scope>source.go -(meta)</scope>
+    <description>Golang Pprof Handler</description>
+</snippet>

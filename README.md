@@ -111,6 +111,7 @@ sudo n latest
 brew install golang
 go get -u github.com/golang/dep/cmd/dep
 go get -u github.com/golang/lint/golint
+go get -u github.com/google/pprof
 go get -u github.com/kisielk/errcheck
 go get -u github.com/nsf/gocode
 go get -u golang.org/x/tools/cmd/goimports
