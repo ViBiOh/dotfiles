@@ -30,7 +30,6 @@ git clone git@github.com:ViBiOh/mars-rover.git
 git clone git@github.com:ViBiOh/docker-wordpress.git
 git clone git@github.com:ViBiOh/docker-nginx.git
 git clone git@github.com:ViBiOh/docker-mariadb.git
-git clone git@github.com:ViBiOh/docker-restart.git
 git clone git@github.com:ViBiOh/docker-ftp.git
 git clone git@github.com:ViBiOh/angular-bp.git
 git clone git@github.com:ViBiOh/docker-selenium.git
