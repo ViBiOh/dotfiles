@@ -116,5 +116,6 @@ go get -u github.com/kisielk/errcheck
 go get -u github.com/nsf/gocode
 go get -u golang.org/x/tools/cmd/goimports
 go get -u github.com/rakyll/hey
+go get -u github.com/asciimoo/wuzz
 ```
 
