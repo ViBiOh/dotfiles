@@ -6,7 +6,7 @@ type App struct {
 }
 
 // NewApp creates new App from Flags' config
-func NewApp(config map[string]*string, renderer provider.Renderer) *App {
+func NewApp(config map[string]*string) *App {
   return &App{
     {1:FlagName}: *config[`{1:FlagName}`],
   }
