@@ -36,5 +36,6 @@
   "editor.formatOnPaste": true,
   "prettier.eslintIntegration": true,
   "workbench.colorTheme": "Monokai",
-  "sublimeTextKeymap.promptV3Features": true
+  "sublimeTextKeymap.promptV3Features": true,
+  "files.insertFinalNewline": true
 }
