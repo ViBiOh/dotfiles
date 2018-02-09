@@ -85,7 +85,7 @@ sftp-config.json
 jsconfig.json
 
 # Golang
-torch.svg
+debug.test
 
 # Tern
 .tern-project*
