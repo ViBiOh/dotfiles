@@ -39,6 +39,7 @@ if [ `uname` == 'Darwin' ] && ! command -v brew > /dev/null 2>&1; then
     fzf \
     openssl \
     gnupg \
+    htop \
     tmux \
     reattach-to-user-namespace \
     pass \
