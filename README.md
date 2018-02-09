@@ -108,7 +108,7 @@ sudo n latest
 ## Golang
 
 ```bash
-brew install golang
+brew install golang go-delve/delve/delve
 go get -u github.com/golang/dep/cmd/dep
 go get -u github.com/golang/lint/golint
 go get -u github.com/google/pprof
@@ -118,4 +118,3 @@ go get -u golang.org/x/tools/cmd/goimports
 go get -u github.com/rakyll/hey
 go get -u github.com/asciimoo/wuzz
 ```
-
