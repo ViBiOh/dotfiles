@@ -1,0 +1,26 @@
+<snippet>
+    <content><![CDATA[
+// App stores informations
+type App struct {
+  {1:FlagName} string
+}
+
+// NewApp creates new App from Flags' config
+func NewApp(config map[string]*string, renderer provider.Renderer) *App {
+  return &App{
+    {1:FlagName}: *config[`{1:FlagName}`],
+  }
+}
+
+// Flags adds flags for given prefix
+func Flags(prefix string) map[string]*string {
+  return map[string]*string{
+    `{1:FlagName}`: flag.String(tools.ToCamel(fmt.Sprintf(`%s{2:FlagValue}`, prefix)), ``, `{3:FlagDesc}`),
+  }
+}
+
+]]></content>
+    <tabTrigger>gap</tabTrigger>
+    <scope>source.go -(meta)</scope>
+    <description>Golang App Pattern</description>
+</snippet>
