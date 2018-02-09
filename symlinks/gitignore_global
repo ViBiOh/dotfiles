@@ -85,6 +85,7 @@ sftp-config.json
 jsconfig.json
 
 # Golang
+debug
 debug.test
 
 # Tern
