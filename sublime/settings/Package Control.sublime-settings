@@ -1,10 +1,7 @@
 {
 	"bootstrapped": true,
-	"in_process_packages":
-	[
-	],
-	"installed_packages":
-	[
+	"in_process_packages": [],
+	"installed_packages": [
 		"Babel",
 		"DocBlockr",
 		"Git",
@@ -15,9 +12,6 @@
 		"Package Control",
 		"SideBarEnhancements",
 		"SublimeLinter",
-		"SublimeLinter-contrib-golint",
-		"SublimeLinter-contrib-govet",
-		"SublimeLinter-contrib-stylelint",
 		"SublimeLinter-eslint",
 		"Sublimerge 3"
 	]
