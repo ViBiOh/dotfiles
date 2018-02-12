@@ -44,7 +44,8 @@ if [ `uname` == 'Darwin' ] && ! command -v brew > /dev/null 2>&1; then
     reattach-to-user-namespace \
     pass \
     golang \
-    graphviz
+    graphviz \
+    pgcli
 
   echo
   echo Installing curl with right option

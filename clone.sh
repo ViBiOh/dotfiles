@@ -31,17 +31,14 @@ git clone git@github.com:ViBiOh/docker-wordpress.git
 git clone git@github.com:ViBiOh/docker-nginx.git
 git clone git@github.com:ViBiOh/docker-mariadb.git
 git clone git@github.com:ViBiOh/docker-ftp.git
-git clone git@github.com:ViBiOh/angular-bp.git
 git clone git@github.com:ViBiOh/docker-selenium.git
 git clone git@github.com:ViBiOh/js-break-sync.git
-git clone git@github.com:ViBiOh/angular-commons.git
 git clone git@github.com:ViBiOh/node-logger.git
 git clone git@github.com:ViBiOh/node-bp.git
 git clone git@github.com:ViBiOh/js-utils.git
 git clone git@github.com:ViBiOh/js-dichotomic.git
 git clone git@github.com:ViBiOh/docker-tools.git
 git clone git@github.com:ViBiOh/docker-php.git
-git clone git@github.com:ViBiOh/angular-i18n.git
 git clone git@github.com:ViBiOh/postman-to-gatling.git
 git clone git@github.com:ViBiOh/docker-phpmyadmin.git
 git clone git@gitlab.com:ViBiOh/l3-2017.git
