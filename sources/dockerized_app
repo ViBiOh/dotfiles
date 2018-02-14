@@ -1,9 +1,11 @@
 #!/usr/bin/env sh
 
-if ! command -v travis > /dev/null 2>&1; then
-  alias travis='docker run -it --rm -v `realpath ./`:/usr/src vibioh/travis-cli'
-fi
+if command -v docker > /dev/null 2>&1; then
+  if ! command -v travis > /dev/null 2>&1; then
+    alias travis='docker run -it --rm -v `realpath ./`:/usr/src vibioh/travis-cli'
+  fi
 
-if ! command -v mvn_work > /dev/null 2>&1; then
-  alias mvn_work='docker run -it --rm -p 8080:8080/tcp -v `pwd`:/usr/src/project -w /usr/src/project maven:3-jdk-8-alpine /bin/sh'
+  if ! command -v mvn_work > /dev/null 2>&1; then
+    alias mvn_work='docker run -it --rm -p 8080:8080/tcp -v `pwd`:/usr/src/project -w /usr/src/project maven:3-jdk-8-alpine /bin/sh'
+  fi
 fi

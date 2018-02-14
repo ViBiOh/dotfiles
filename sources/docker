@@ -1,51 +1,53 @@
 #!/usr/bin/env bash
 
-function docker-compose-deploy() {
-  PROJECT_NAME=${1}
-  readVariableIfRequired "PROJECT_NAME"
+if command -v docker > /dev/null 2>&1; then
+  function docker-compose-deploy() {
+    PROJECT_NAME=${1}
+    readVariableIfRequired "PROJECT_NAME"
 
-  oldServices=`docker ps -f name=${PROJECT_NAME}* -q`
+    oldServices=`docker ps -f name=${PROJECT_NAME}* -q`
 
-  PROJECT_FULLNAME=${PROJECT_NAME}`git rev-parse --short HEAD`
+    PROJECT_FULLNAME=${PROJECT_NAME}`git rev-parse --short HEAD`
 
-  docker-compose -p ${PROJECT_FULLNAME} config -q
-  docker-compose -p ${PROJECT_FULLNAME} pull
-  docker-compose -p ${PROJECT_FULLNAME} up -d
-  servicesCount=`docker-compose -p ${PROJECT_FULLNAME} ps -q | wc -l`
+    docker-compose -p ${PROJECT_FULLNAME} config -q
+    docker-compose -p ${PROJECT_FULLNAME} pull
+    docker-compose -p ${PROJECT_FULLNAME} up -d
+    servicesCount=`docker-compose -p ${PROJECT_FULLNAME} ps -q | wc -l`
 
-  echo "Waiting 45 seconds for containers to start..."
-  timeout=`date --date="45 seconds" +%s`
-  healthyCount=$(docker events --until ${timeout} -f event="health_status: healthy" -f name=${PROJECT_FULLNAME} | wc -l)
+    echo "Waiting 45 seconds for containers to start..."
+    timeout=`date --date="45 seconds" +%s`
+    healthyCount=$(docker events --until ${timeout} -f event="health_status: healthy" -f name=${PROJECT_FULLNAME} | wc -l)
 
-  if [ "${servicesCount}" != "${healthyCount}" ]; then
-    echo "Containers didn't start, reverting..."
+    if [ "${servicesCount}" != "${healthyCount}" ]; then
+      echo "Containers didn't start, reverting..."
 
-    docker-compose -p ${PROJECT_FULLNAME} logs || true
-    docker-compose -p ${PROJECT_FULLNAME} ps -q | xargs docker inspect --format='{{ .Name }}{{ "\n" }}{{range .State.Health.Log }}code={{ .ExitCode }}, log={{ .Output }}{{ end }}' || true
-    docker-compose -p ${PROJECT_FULLNAME} rm --force --stop -v || true
-    return 1
-  fi
+      docker-compose -p ${PROJECT_FULLNAME} logs || true
+      docker-compose -p ${PROJECT_FULLNAME} ps -q | xargs docker inspect --format='{{ .Name }}{{ "\n" }}{{range .State.Health.Log }}code={{ .ExitCode }}, log={{ .Output }}{{ end }}' || true
+      docker-compose -p ${PROJECT_FULLNAME} rm --force --stop -v || true
+      return 1
+    fi
 
-  if [ ! -z "${oldServices}" ]; then
-    echo Stopping old containers
-    docker stop --time=180 ${oldServices} || true
-  fi
+    if [ ! -z "${oldServices}" ]; then
+      echo Stopping old containers
+      docker stop --time=180 ${oldServices} || true
+    fi
 
-  if [ ! -z "${oldServices}" ]; then
-    echo Removing old containers
-    docker rm -f -v ${oldServices} || true
-  fi
+    if [ ! -z "${oldServices}" ]; then
+      echo Removing old containers
+      docker rm -f -v ${oldServices} || true
+    fi
 
-  echo Renaming containers
-  docker-compose -p ${PROJECT_FULLNAME} ps -q | xargs docker inspect --format='{{ .Name }}' | sed "s|^/||" | awk "{o=\$1; gsub(\"${PROJECT_FULLNAME}\", \"${PROJECT_NAME}\", o); print \$0 \" \" o}" | xargs -n 2 docker rename
+    echo Renaming containers
+    docker-compose -p ${PROJECT_FULLNAME} ps -q | xargs docker inspect --format='{{ .Name }}' | sed "s|^/||" | awk "{o=\$1; gsub(\"${PROJECT_FULLNAME}\", \"${PROJECT_NAME}\", o); print \$0 \" \" o}" | xargs -n 2 docker rename
 
-  echo Deploy succeed!
+    echo Deploy succeed!
 
-  docker system prune -f
-}
+    docker system prune -f
+  }
 
-function docker-restart() {
-  docker start `docker ps -a -q -f status=exited -f status=created 2>/dev/null` 2>/dev/null
-}
+  function docker-restart() {
+    docker start `docker ps -a -q -f status=exited -f status=created 2>/dev/null` 2>/dev/null
+  }
 
-export DOCKER_CONTENT_TRUST=1
+  export DOCKER_CONTENT_TRUST=1
+fi

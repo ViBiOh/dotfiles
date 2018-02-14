@@ -1,7 +1,10 @@
 #!/usr/bin/env sh
 
 alias now="date '+%Y-%m-%d %H:%M:%S'"
-alias json="python -m json.tool"
+
+if command -v python > /dev/null 2>&1; then
+  alias json="python -m json.tool"
+fi
 
 function meteo() {
   curl -4 wttr.in/${1:-Paris}
