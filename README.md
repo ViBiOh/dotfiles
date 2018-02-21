@@ -58,6 +58,12 @@ chsh -s /usr/local/bin/bash
 brew install fswatch
 ```
 
+## jq
+
+```bash
+brew install jq
+```
+
 ## TL;DR
 
 ```bash

@@ -45,6 +45,7 @@ if [ `uname` == 'Darwin' ] && ! command -v brew > /dev/null 2>&1; then
     pass \
     golang \
     graphviz \
+    jq \
     pgcli
 
   echo
