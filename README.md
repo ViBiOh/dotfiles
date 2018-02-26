@@ -103,24 +103,9 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 brew install pgcli
 ```
 
-## Node
-
-### Binary
-
-[Install latest version](https://nodejs.org/en/download/)
-
-### Node tools
-
-```bash
-npm i -g npm
-npm i -g n
-sudo n latest
-```
-
 ## Golang
 
 ```bash
-brew install golang go-delve/delve/delve
 go get -u github.com/golang/dep/cmd/dep
 go get -u github.com/golang/lint/golint
 go get -u github.com/google/pprof
