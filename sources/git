@@ -27,12 +27,12 @@ function git_sync() {
 
   if [ -n "${toUpdate}" ]; then
     echo ${toUpdate}
-    echo ${toUpdate} | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
+    git status --porcelain | grep -v -e "^\s*D" | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
   fi
 
   if [ -n "${toDelete}" ]; then
     echo ${toDelete}
-    echo ${toDelete} | sed "s|\(.*\)|ssh ${1} \"rm ~/${2}/\1\"|" | sh
+    git status --porcelain | grep -e "^\s*D" | awk '{print $2}' | sed "s|\(.*\)|ssh ${1} \"rm ~/${2}/\1\"|" | sh
   fi
 
   echo
