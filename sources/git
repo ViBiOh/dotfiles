@@ -22,18 +22,25 @@ function git_sync() {
 
   echo Syncing files...
 
-  toUpdate=`git status --porcelain | grep -v -e "^\s*D" | awk '{print $2}'`
-  toDelete=`git status --porcelain | grep -e "^\s*D" | awk '{print $2}'`
+  IFS=$'\n'
+  for gitFile in `git status --porcelain`; do
+    syncedFile="${gitFile##* }"
 
-  if [ -n "${toUpdate}" ]; then
-    echo ${toUpdate}
-    git status --porcelain | grep -v -e "^\s*D" | awk '{print $2}' | sed "s|\(.*\)|rsync -ca \1 ${1}:~/${2}/\1|" | sh
-  fi
+    echo $syncedFile
 
-  if [ -n "${toDelete}" ]; then
-    echo ${toDelete}
-    git status --porcelain | grep -e "^\s*D" | awk '{print $2}' | sed "s|\(.*\)|ssh ${1} \"rm ~/${2}/\1\"|" | sh
-  fi
+    case "${gitFile:0:2}" in
+      " M" | "A " | "??" | "U " | "R ")
+        rsync -ca \1 "${1}:~/${2}/${syncedFile}"
+        ;;
+
+      "D ")
+        ssh ${1} "rm ~/${2}/${syncedFile}"
+        ;;
+
+      *)
+        echo "¯\_(ツ)_/¯ Don't know how to handle ${gitFile}"
+    esac
+  done
 
   echo
 }
