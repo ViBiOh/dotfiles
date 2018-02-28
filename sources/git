@@ -30,7 +30,7 @@ function git_sync() {
 
     case "${gitFile:0:2}" in
       " M" | "A " | "??" | "U " | "R ")
-        rsync -ca \1 "${1}:~/${2}/${syncedFile}"
+        rsync -ca "${syncedFile}" "${1}:~/${2}/${syncedFile}"
         ;;
 
       "D ")
