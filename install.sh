@@ -34,18 +34,19 @@ if [ `uname` == 'Darwin' ]; then
     echo Installing common brew tools
     brew install \
       bash \
+      git \
       bash-completion \
       fswatch \
       tldr \
       fzf \
-      openssl \
-      gnupg \
       htop \
       tmux \
       reattach-to-user-namespace \
+      openssl \
+      gnupg \
       pass \
-      golang \
       node \
+      golang \
       graphviz \
       jq \
       pgcli
