@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 if command -v docker > /dev/null 2>&1; then
   if ! command -v travis > /dev/null 2>&1; then

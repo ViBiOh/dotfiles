@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 function sed_escape_string() {
   echo ${1} | sed 's|\([\|\.]\)|\\\1|g'

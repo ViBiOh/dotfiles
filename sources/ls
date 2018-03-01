@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 if [ `uname` == 'Darwin' ]; then
   export CLICOLOR=1

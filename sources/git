@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 function git_info() {
   git rev-parse --is-inside-work-tree &>/dev/null || return
@@ -18,30 +18,36 @@ function git_pull() {
 }
 
 function git_sync() {
-  ssh ${1} "cd ~/${2}/ && git checkout -- ."
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  RESET='\033[0m'
 
-  echo Syncing files...
+  echo -e "${BLUE}Syncing files...${RESET}"
+
+  ssh "${1}" "cd ~/${2}/ && git checkout -- ."
 
   IFS=$'\n'
   for gitFile in `git status --porcelain`; do
     syncedFile="${gitFile##* }"
 
-    echo $syncedFile
-
     case "${gitFile:0:2}" in
       " M" | "A " | "??" | "U " | "R ")
-        rsync -ca "${syncedFile}" "${1}:~/${2}/${syncedFile}"
+        rsync -a "${syncedFile}" "${1}:~/${2}/${syncedFile}"
+        echo -e "${GREEN} + ${syncedFile}${RESET}"
         ;;
 
       "D ")
-        ssh ${1} "rm ~/${2}/${syncedFile}"
+        ssh "${1}" "rm ~/${2}/${syncedFile}"
+        echo -e "${RED} - ${syncedFile}${RESET}"
         ;;
 
       *)
-        echo "¯\_(ツ)_/¯ Don't know how to handle ${gitFile}"
+        echo -e "${BLUE} ¯\_(ツ)_/¯ Don't know how to handle ${gitFile}${RESET}"
     esac
   done
 
+  echo -e "${BLUE}Done!${RESET}"
   echo
 }
 
