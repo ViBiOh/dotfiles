@@ -32,7 +32,7 @@ function git_sync() {
     syncedFile="${gitFile##* }"
 
     case "${gitFile:0:2}" in
-      " M" | "M " | "MM" | "A " | "AM" | "??" | "U " | "R " | "RM")
+      " M" | "M " | "MM" | "A " | "AM" | "??" | "U " | "UU" | "R " | "RM")
         rsync -a "${syncedFile}" "${1}:~/${2}/${syncedFile}"
         echo -e "${GREEN} + ${syncedFile}${RESET}"
         ;;
