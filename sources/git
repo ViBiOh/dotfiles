@@ -18,6 +18,11 @@ function git_pull() {
 }
 
 function git_sync() {
+  if [ "${#}" -ne 2 ]; then
+    echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
+    return 1
+  fi
+
   RED='\033[0;31m'
   GREEN='\033[0;32m'
   BLUE='\033[0;34m'
@@ -52,8 +57,6 @@ function git_sync() {
 }
 
 function watch_sync() {
-  echo Usage: watch_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
-
   git_sync "${@}"
 
   fswatch -0 -o --exclude=.git/ . | while read -d "" event
