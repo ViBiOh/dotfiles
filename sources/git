@@ -17,6 +17,16 @@ function git_pull() {
   git_browse 'git pull'
 }
 
+function head_sync() {
+  if [ "${#}" -ne 2 ]; then
+    echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
+    return 1
+  fi
+
+  branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
+  ssh "${1}" "PS1=sync source ~/.bashrc && cd ~/${2}/ && git clean -f && git checkout -- . && git fetch && git checkout ${branch} && git pull"
+}
+
 function git_sync() {
   if [ "${#}" -ne 2 ]; then
     echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
@@ -30,7 +40,7 @@ function git_sync() {
 
   echo -e "${BLUE}Syncing files...${RESET}"
 
-  ssh "${1}" "cd ~/${2}/ && git checkout -- ."
+  ssh "${1}" "cd ~/${2}/ && git clean -f && git checkout -- ."
 
   IFS=$'\n'
   for gitFile in `git status --porcelain`; do
