@@ -45,7 +45,7 @@ function git_sync() {
   IFS=$'\n'
   for gitFile in `git status --porcelain`; do
 
-    case "${gitFile:0:1}" in
+    case `echo -n "${gitFile}" | awk '{print substr($1, 0, 1)}'` in
       "M" | "A" | "?")
         updatedFile="${gitFile:3}"
         rsync -a "${updatedFile}" "${1}:~/${2}/${updatedFile}"
