@@ -47,7 +47,7 @@ function git_sync() {
     syncedFile="${gitFile##* }"
 
     case `trim "${gitFile:0:2}"` in
-      "M" | "MM" | "A" | "AM" | "??" | "U" | "UU" | "R" | "RM")
+      "M" | "MM" | "A" | "AM" | "??" | "U" | "UU" | "R" | "RM")
         rsync -a "${syncedFile}" "${1}:~/${2}/${syncedFile}"
         echo -e "${GREEN} + ${syncedFile}${RESET}"
         ;;
