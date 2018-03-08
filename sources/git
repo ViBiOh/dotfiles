@@ -44,22 +44,35 @@ function git_sync() {
 
   IFS=$'\n'
   for gitFile in `git status --porcelain`; do
-    syncedFile="${gitFile##* }"
 
-    case `trim "${gitFile:0:2}"` in
-      "M" | "MM" | "A" | "AM" | "??" | "U" | "UU" | "R" | "RM")
-        rsync -a "${syncedFile}" "${1}:~/${2}/${syncedFile}"
-        echo -e "${GREEN} + ${syncedFile}${RESET}"
+    case "${gitFile:0:1}" in
+      "M" | "A" | "?")
+        updatedFile="${gitFile:3}"
+        rsync -a "${updatedFile}" "${1}:~/${2}/${updatedFile}"
+        echo -e "${GREEN} + ${updatedFile}${RESET}"
         ;;
 
-      "D" | "DM")
-        ssh "${1}" "rm ~/${2}/${syncedFile}"
-        echo -e "${RED} - ${syncedFile}${RESET}"
+      "D")
+        deletedFile="${gitFile:3}"
+        ssh "${1}" "rm ~/${2}/${deletedFile}"
+        echo -e "${RED} - ${deletedFile}${RESET}"
+        ;;
+
+      "R")
+        originFile=`echo -n "${gitFile}" | awk '{print $2}'`
+        destinationFile=`echo -n "${gitFile}" | awk '{print $4}'`
+
+        ssh "${1}" "rm ~/${2}/${originFile}"
+        echo -e "${RED} - ${originFile}${RESET}"
+
+        rsync -a "${destinationFile}" "${1}:~/${2}/${destinationFile}"
+        echo -e "${GREEN} + ${destinationFile}${RESET}"
         ;;
 
       *)
         echo -e "${BLUE} ¯\_(ツ)_/¯ Don't know how to handle ${gitFile}${RESET}"
     esac
+
   done
 
   echo -e "${BLUE}Done!${RESET}"
