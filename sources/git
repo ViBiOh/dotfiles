@@ -46,13 +46,13 @@ function git_sync() {
   for gitFile in `git status --porcelain`; do
     syncedFile="${gitFile##* }"
 
-    case "${gitFile:0:2}" in
-      " M" | "M " | "MM" | "A " | "AM" | "??" | "U " | "UU" | "R " | "RM")
+    case `trim "${gitFile:0:2}"` in
+      "M" | "MM" | "A" | "AM" | "??" | "U" | "UU" | "R" | "RM")
         rsync -a "${syncedFile}" "${1}:~/${2}/${syncedFile}"
         echo -e "${GREEN} + ${syncedFile}${RESET}"
         ;;
 
-      "D " | " D" |"DM")
+      "D" | "DM")
         ssh "${1}" "rm ~/${2}/${syncedFile}"
         echo -e "${RED} - ${syncedFile}${RESET}"
         ;;
