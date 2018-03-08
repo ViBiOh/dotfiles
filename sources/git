@@ -28,14 +28,9 @@ function head_sync() {
 }
 
 function git_sync() {
-  if [ "${#}" -lt 2 ]; then
+  if [ "${#}" -ne 2 ]; then
     echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
     return 1
-  fi
-
-  trace=false
-  if [ "${3}" == "trace" ]; then
-    trace=true
   fi
 
   RED='\033[0;31m'
@@ -45,11 +40,7 @@ function git_sync() {
   BLUE='\033[0;34m'
   RESET='\033[0m'
 
-  if $trace; then
-    echo -e "${BLUE}Syncing files...${RESET}"
-  else
-    echo -ne "\r${BG_YELLOW}🏃 ${1}:~/${2}/${RESET} "
-  fi
+  echo -e "${BLUE}Syncing files...${RESET}"
 
   ssh "${1}" "cd ~/${2}/ && git clean -f && git checkout -- ."
 
@@ -59,20 +50,18 @@ function git_sync() {
     case `echo -n "${gitFile}" | awk '{print substr($1, 0, 1)}'` in
       "M" | "A" | "?")
         updatedFile="${gitFile:3}"
-        rsync -a "${updatedFile}" "${1}:~/${2}/${updatedFile}"
 
-        if $trace; then
-          echo -e "${GREEN} + ${updatedFile}${RESET}"
-        fi
+        rsync -a "${updatedFile}" "${1}:~/${2}/${updatedFile}"
+        echo -e "${GREEN} + ${updatedFile}${RESET}"
+
         ;;
 
       "D")
         deletedFile="${gitFile:3}"
-        ssh "${1}" "rm ~/${2}/${deletedFile}"
 
-        if $trace; then
-          echo -e "${RED} - ${deletedFile}${RESET}"
-        fi
+        ssh "${1}" "rm ~/${2}/${deletedFile}"
+        echo -e "${RED} - ${deletedFile}${RESET}"
+
         ;;
 
       "R")
@@ -80,28 +69,21 @@ function git_sync() {
         destinationFile=`echo -n "${gitFile}" | awk '{print $4}'`
 
         ssh "${1}" "rm ~/${2}/${originFile}"
-        rsync -a "${destinationFile}" "${1}:~/${2}/${destinationFile}"
+        echo -e "${RED} - ${originFile}${RESET}"
 
-        if $trace; then
-          echo -e "${RED} - ${originFile}${RESET}"
-          echo -e "${GREEN} + ${destinationFile}${RESET}"
-        fi
+        rsync -a "${destinationFile}" "${1}:~/${2}/${destinationFile}"
+        echo -e "${GREEN} + ${destinationFile}${RESET}"
+
         ;;
 
       *)
-        if $trace; then
-          echo -e "${BLUE} ¯\_(ツ)_/¯ Don't know how to handle ${gitFile}${RESET}"
-        fi
+        echo -e "${BLUE} ¯\_(ツ)_/¯ Don't know how to handle ${gitFile}${RESET}"
     esac
 
   done
 
-  if $trace; then
-    echo -e "${BLUE}Done!${RESET}"
-    echo
-  else
-    echo -ne "\r${BG_GREEN}👍 ${1}:~/${2}/${RESET} "
-  fi
+  echo -e "${BLUE}Done!${RESET}"
+  echo
 }
 
 function watch_sync() {
