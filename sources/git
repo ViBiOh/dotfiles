@@ -28,17 +28,28 @@ function head_sync() {
 }
 
 function git_sync() {
-  if [ "${#}" -ne 2 ]; then
+  if [ "${#}" -lt 2 ]; then
     echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
     return 1
   fi
 
+  trace=false
+  if [ "${3}" == "trace" ]; then
+    trace=true
+  fi
+
   RED='\033[0;31m'
   GREEN='\033[0;32m'
+  BG_GREEN='\033[0;42m'
+  BG_YELLOW='\033[0;43m'
   BLUE='\033[0;34m'
   RESET='\033[0m'
 
-  echo -e "${BLUE}Syncing files...${RESET}"
+  if $trace; then
+    echo -e "${BLUE}Syncing files...${RESET}"
+  else
+    echo -ne "\r${BG_YELLOW}🏃 ${1}:~/${2}/${RESET} "
+  fi
 
   ssh "${1}" "cd ~/${2}/ && git clean -f && git checkout -- ."
 
@@ -49,13 +60,19 @@ function git_sync() {
       "M" | "A" | "?")
         updatedFile="${gitFile:3}"
         rsync -a "${updatedFile}" "${1}:~/${2}/${updatedFile}"
-        echo -e "${GREEN} + ${updatedFile}${RESET}"
+
+        if $trace; then
+          echo -e "${GREEN} + ${updatedFile}${RESET}"
+        fi
         ;;
 
       "D")
         deletedFile="${gitFile:3}"
         ssh "${1}" "rm ~/${2}/${deletedFile}"
-        echo -e "${RED} - ${deletedFile}${RESET}"
+
+        if $trace; then
+          echo -e "${RED} - ${deletedFile}${RESET}"
+        fi
         ;;
 
       "R")
@@ -63,20 +80,28 @@ function git_sync() {
         destinationFile=`echo -n "${gitFile}" | awk '{print $4}'`
 
         ssh "${1}" "rm ~/${2}/${originFile}"
-        echo -e "${RED} - ${originFile}${RESET}"
-
         rsync -a "${destinationFile}" "${1}:~/${2}/${destinationFile}"
-        echo -e "${GREEN} + ${destinationFile}${RESET}"
+
+        if $trace; then
+          echo -e "${RED} - ${originFile}${RESET}"
+          echo -e "${GREEN} + ${destinationFile}${RESET}"
+        fi
         ;;
 
       *)
-        echo -e "${BLUE} ¯\_(ツ)_/¯ Don't know how to handle ${gitFile}${RESET}"
+        if $trace; then
+          echo -e "${BLUE} ¯\_(ツ)_/¯ Don't know how to handle ${gitFile}${RESET}"
+        fi
     esac
 
   done
 
-  echo -e "${BLUE}Done!${RESET}"
-  echo
+  if $trace; then
+    echo -e "${BLUE}Done!${RESET}"
+    echo
+  else
+    echo -ne "\r${BG_GREEN}👍 ${1}:~/${2}/${RESET} "
+  fi
 }
 
 function watch_sync() {
