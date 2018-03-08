@@ -19,12 +19,12 @@ function git_pull() {
 
 function head_sync() {
   if [ "${#}" -ne 2 ]; then
-    echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
+    echo Usage: head_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
     return 1
   fi
 
   branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
-  ssh "${1}" "PS1=sync source ~/.bashrc && cd ~/${2}/ && git clean -f && git checkout -- . && git fetch && git checkout ${branch} && git pull"
+  ssh "${1}" "PS1=$ source ~/.bashrc && cd ~/${2}/ && git reset HEAD . && git clean -f && git checkout -- . && git fetch && git checkout ${branch} && git pull"
 }
 
 function git_sync() {
