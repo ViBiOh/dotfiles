@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 function open_ports() {
-    if [ `uname` == 'Darwin' ]; then
+    if [ `uname` == "Darwin" ]; then
         sudo lsof -PniTCP -sTCP:LISTEN
     fi
-    if [ `uname` == 'Linux' ]; then
+    if [ `uname` == "Linux" ]; then
         sudo netstat -pluton
     fi
 }

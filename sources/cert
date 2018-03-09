@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
 function cert_create_ca() {
-    if [ ${#} -eq 0 ]; then
+    if [ "${#}" -eq 0 ]; then
         echo Usage cert_create_ca [CN_NAME] [CERT_PASSWORD]
     fi
 
-    CN_NAME=${1}
+    local CN_NAME="${1}"
     readVariableIfRequired "CN_NAME"
 
-    CERT_PASSWORD=${2}
+    local CERT_PASSWORD="${2}"
     readVariableIfRequired "CERT_PASSWORD"
 
-    DIRECTORY=./CA
-    mkdir -p ${DIRECTORY}
+    local DIRECTORY="./CA"
+    mkdir -p "${DIRECTORY}"
 
     CA=${DIRECTORY}/ca.pem
     CA_PK=${DIRECTORY}/ca-private-key
@@ -21,43 +21,43 @@ function cert_create_ca() {
     openssl genrsa -aes256 -out ${CA_PK} -passout pass:${CERT_PASSWORD} 4096
     openssl req -subj "/CN=${CN_NAME}" -new -x509 -days 365 -key ${CA_PK} -sha256 -out ${CA} -passin pass:${CERT_PASSWORD}
 
-    chmod -v 0400 ${CA_PK}
-    chmod -v 0444 ${CA}
+    chmod -v 0400 "${CA_PK}"
+    chmod -v 0444 "${CA}"
 }
 
 function cert_create_cert() {
-    if [ ${#} -eq 0 ]; then
+    if [ "${#}" -eq 0 ]; then
         echo Usage cert_create_cert [NAME] [HOST_IP] [CA_PRIVATE_KEY_PASSWORD]
     fi
 
-    NAME=${1}
+    local NAME="${1}"
     readVariableIfRequired "NAME"
 
-    HOST_IP=${2}
+    local HOST_IP="${2}"
     readVariableIfRequired "HOST_IP"
 
-    CA_PRIVATE_KEY_PASSWORD=${3}
+    local CA_PRIVATE_KEY_PASSWORD="${3}"
     readVariableIfRequired "CA_PRIVATE_KEY_PASSWORD"
 
-    DIRECTORY=./${NAME}-cert
-    CA_DIRECTORY=./CA
-    mkdir -p ${DIRECTORY}
-    cp ${CA_DIRECTORY}/ca.pem ${DIRECTORY}/ca.pem
+    local DIRECTORY="./${NAME}-cert"
+    local CA_DIRECTORY="./CA"
+    mkdir -p "${DIRECTORY}"
+    cp "${CA_DIRECTORY}/ca.pem" "${DIRECTORY}/ca.pem"
 
-    CSR=${DIRECTORY}/${NAME}.csr
-    EXT=${DIRECTORY}/extfile.cnf
-    CERT=${DIRECTORY}/cert.pem
-    KEY=${DIRECTORY}/key.pem
-    CA=${DIRECTORY}/ca.pem
-    CA_PK=${CA_DIRECTORY}/ca-private-key
+    local CSR="${DIRECTORY}/${NAME}.csr"
+    local EXT="${DIRECTORY}/extfile.cnf"
+    local CERT="${DIRECTORY}/cert.pem"
+    local KEY="${DIRECTORY}/key.pem"
+    local CA="${DIRECTORY}/ca.pem"
+    local CA_PK="${CA_DIRECTORY}/ca-private-key"
 
     echo Creating private key and Certificate
-    openssl genrsa -out ${KEY} 4096
-    openssl req -subj "/CN=${NAME}" -sha256 -new -key ${KEY} -out ${CSR}
-    echo subjectAltName = IP:${HOST_IP},IP:127.0.0.1 > ${EXT}
-    openssl x509 -req -days 365 -sha256 -in ${CSR} -CA ${CA} -CAkey ${CA_PK} -CAcreateserial -out ${CERT} -extfile ${EXT} -passin pass:${CA_PRIVATE_KEY_PASSWORD}
+    openssl genrsa -out "${KEY}" 4096
+    openssl req -subj "/CN=${NAME}" -sha256 -new -key "${KEY}" -out "${CSR}"
+    echo subjectAltName = IP:${HOST_IP},IP:127.0.0.1 > "${EXT}"
+    openssl x509 -req -days 365 -sha256 -in "${CSR}" -CA "${CA}" -CAkey "${CA_PK}" -CAcreateserial -out "${CERT}" -extfile "${EXT}" -passin "pass:${CA_PRIVATE_KEY_PASSWORD}"
 
-    rm -f ${CSR} ${EXT} .srl
-    chmod -v 0400 ${KEY}
-    chmod -v 0444 ${CERT}
+    rm -f "${CSR}" "${EXT}" .srl
+    chmod -v 0400 "${KEY}"
+    chmod -v 0444 "${CERT}"
 }

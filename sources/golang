@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 if command -v go > /dev/null 2>&1; then
-  export GOPATH=${HOME}/code
-  export PATH=${GOPATH}/bin:${PATH}
+  export GOPATH="${HOME}/code"
+  export PATH="${GOPATH}/bin:${PATH}"
 
   alias pprof_memory="pprof -http=:8080 -sample_index=alloc_space"
 fi
