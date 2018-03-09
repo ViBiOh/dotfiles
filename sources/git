@@ -2,8 +2,8 @@
 
 function git_info() {
   git rev-parse --is-inside-work-tree &>/dev/null || return
-  branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
-  dirty=`git diff --quiet --ignore-submodules HEAD &>/dev/null; [ $? -eq 1 ] && echo -e "*"`
+  local branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
+  local dirty=`git diff --quiet --ignore-submodules HEAD &>/dev/null; [ $? -eq 1 ] && echo -e "*"`
 
   echo " ($branch$dirty)"
 }
@@ -23,7 +23,7 @@ function head_sync() {
     return 1
   fi
 
-  branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
+  local branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
   ssh "${1}" "PS1=$ source ~/.bashrc && cd ~/${2}/ && git reset HEAD . && git clean -f && git checkout -- . && git fetch && git checkout ${branch} && git pull"
 }
 
@@ -33,12 +33,12 @@ function git_sync() {
     return 1
   fi
 
-  RED='\033[0;31m'
-  GREEN='\033[0;32m'
-  BG_GREEN='\033[0;42m'
-  BG_YELLOW='\033[0;43m'
-  BLUE='\033[0;34m'
-  RESET='\033[0m'
+  local RED='\033[0;31m'
+  local GREEN='\033[0;32m'
+  local BG_GREEN='\033[0;42m'
+  local BG_YELLOW='\033[0;43m'
+  local BLUE='\033[0;34m'
+  local RESET='\033[0m'
 
   echo -e "${BLUE}Syncing files...${RESET}"
 
@@ -46,10 +46,12 @@ function git_sync() {
 
   IFS=$'\n'
   for gitFile in `git status --porcelain`; do
+    local prefix="${gitFile:0:2}"
+    local trimmedPrefix="${prefix#[[:space:]]}"
 
-    case `echo -n "${gitFile}" | awk '{print substr($1, 0, 1)}'` in
+    case "${trimmedPrefix:0:1}" in
       "M" | "A" | "?")
-        updatedFile="${gitFile:3}"
+        local updatedFile="${gitFile:3}"
 
         rsync -ra "${updatedFile}" "${1}:~/${2}/${updatedFile}"
         echo -e "${GREEN} + ${updatedFile}${RESET}"
@@ -57,7 +59,7 @@ function git_sync() {
         ;;
 
       "D")
-        deletedFile="${gitFile:3}"
+        local deletedFile="${gitFile:3}"
 
         ssh "${1}" "rm ~/${2}/${deletedFile}"
         echo -e "${RED} - ${deletedFile}${RESET}"
@@ -65,8 +67,8 @@ function git_sync() {
         ;;
 
       "R")
-        originFile=`echo -n "${gitFile}" | awk '{print $2}'`
-        destinationFile=`echo -n "${gitFile}" | awk '{print $4}'`
+        local originFile=`echo -n "${gitFile}" | awk '{print $2}'`
+        local destinationFile=`echo -n "${gitFile}" | awk '{print $4}'`
 
         ssh "${1}" "rm ~/${2}/${originFile}"
         echo -e "${RED} - ${originFile}${RESET}"
@@ -96,7 +98,7 @@ function watch_sync() {
 }
 
 function git_browse() {
-  currentWorkDir=`pwd`
+  local currentWorkDir=`pwd`
 
   for dir in ${currentWorkDir}/*; do
     cd ${dir}
