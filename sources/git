@@ -51,7 +51,7 @@ function git_sync() {
       "M" | "A" | "?")
         updatedFile="${gitFile:3}"
 
-        rsync -a "${updatedFile}" "${1}:~/${2}/${updatedFile}"
+        rsync -ra "${updatedFile}" "${1}:~/${2}/${updatedFile}"
         echo -e "${GREEN} + ${updatedFile}${RESET}"
 
         ;;
@@ -71,7 +71,7 @@ function git_sync() {
         ssh "${1}" "rm ~/${2}/${originFile}"
         echo -e "${RED} - ${originFile}${RESET}"
 
-        rsync -a "${destinationFile}" "${1}:~/${2}/${destinationFile}"
+        rsync -ra "${destinationFile}" "${1}:~/${2}/${destinationFile}"
         echo -e "${GREEN} + ${destinationFile}${RESET}"
 
         ;;
