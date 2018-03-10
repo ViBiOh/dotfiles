@@ -28,8 +28,8 @@ function head_sync() {
 }
 
 function git_sync() {
-  if [ "${#}" -ne 2 ]; then
-    echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
+  if [ "${#}" -lt 2 ]; then
+    echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME] [DRY]?
     return 1
   fi
 
@@ -40,9 +40,14 @@ function git_sync() {
   local BLUE='\033[0;34m'
   local RESET='\033[0m'
 
+  local dry=false
+  if [ "${3,,}" == "dry" ]; then
+    dry=true
+  fi
+
   echo -e "${BLUE}Syncing files...${RESET}"
 
-  ssh "${1}" "cd ~/${2}/ && git clean -f && git checkout -- ."
+  ! ${dry} && ssh "${1}" "cd ~/${2}/ && git clean -f && git checkout -- ."
 
   IFS=$'\n'
   for gitFile in `git status --porcelain`; do
@@ -53,7 +58,7 @@ function git_sync() {
       "M" | "A" | "?")
         local updatedFile="${gitFile:3}"
 
-        rsync -ra "${updatedFile}" "${1}:~/${2}/${updatedFile}"
+        ! ${dry} && rsync -ra "${updatedFile}" "${1}:~/${2}/${updatedFile}"
         echo -e "${GREEN} + ${updatedFile}${RESET}"
 
         ;;
@@ -70,10 +75,10 @@ function git_sync() {
         local originFile=`echo -n "${gitFile}" | awk '{print $2}'`
         local destinationFile=`echo -n "${gitFile}" | awk '{print $4}'`
 
-        ssh "${1}" "rm ~/${2}/${originFile}"
+        ! ${dry} && ssh "${1}" "rm ~/${2}/${originFile}"
         echo -e "${RED} - ${originFile}${RESET}"
 
-        rsync -ra "${destinationFile}" "${1}:~/${2}/${destinationFile}"
+        ! ${dry} && rsync -ra "${destinationFile}" "${1}:~/${2}/${destinationFile}"
         echo -e "${GREEN} + ${destinationFile}${RESET}"
 
         ;;
