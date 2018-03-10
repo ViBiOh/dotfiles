@@ -13,6 +13,19 @@ function git_prune() {
   git branch --merged | egrep -v "(^\*|master)" | xargs git branch -d
 }
 
+function git_browse() {
+  local currentWorkDir=`pwd`
+
+  for dir in ${currentWorkDir}/*; do
+    cd ${dir}
+    if [ `git rev-parse --is-inside-work-tree 2>/dev/null | grep true | wc -l` -eq 1 ]; then
+      echo ${dir} && sh -c "$@"
+    fi
+  done
+
+  cd ${currentWorkDir}
+}
+
 function git_pull() {
   git_browse 'git pull'
 }
@@ -100,17 +113,4 @@ function watch_sync() {
   do
     git_sync "${@}"
   done
-}
-
-function git_browse() {
-  local currentWorkDir=`pwd`
-
-  for dir in ${currentWorkDir}/*; do
-    cd ${dir}
-    if [ `git rev-parse --is-inside-work-tree 2>/dev/null | grep true | wc -l` -eq 1 ]; then
-      echo ${dir} && sh -c "$@"
-    fi
-  done
-
-  cd ${currentWorkDir}
 }

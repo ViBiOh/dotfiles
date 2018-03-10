@@ -41,5 +41,4 @@ git clone git@github.com:ViBiOh/docker-tools.git
 git clone git@github.com:ViBiOh/docker-php.git
 git clone git@github.com:ViBiOh/postman-to-gatling.git
 git clone git@github.com:ViBiOh/docker-phpmyadmin.git
-git clone git@gitlab.com:ViBiOh/l3-2017.git
 git clone git@gitlab.com:ViBiOh/coreos-cloudinit.git
