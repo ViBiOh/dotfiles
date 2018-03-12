@@ -5,23 +5,23 @@ SSH_ENV="${HOME}/.ssh/environment"
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 
 function start_ssh_agent() {
-    if [ -f "${SSH_KEY}" ]; then
-        echo "Initializing new SSH agent..."
+  if [ -f "${SSH_KEY}" ]; then
+    echo "Initializing new SSH agent..."
 
-        touch "${SSH_ENV}"
-        chmod 600 "${SSH_ENV}"
+    touch "${SSH_ENV}"
+    chmod 600 "${SSH_ENV}"
 
-        /usr/bin/ssh-agent | sed 's/^echo/#echo/' >> "${SSH_ENV}"
-        . "${SSH_ENV}" > /dev/null
-        /usr/bin/ssh-add -k "${SSH_KEY}"
-    fi
+    /usr/bin/ssh-agent | sed 's/^echo/#echo/' >> "${SSH_ENV}"
+    source "${SSH_ENV}" > /dev/null
+    /usr/bin/ssh-add -k "${SSH_KEY}"
+  fi
 }
 
 if [ -f "${SSH_ENV}" ]; then
-    source "${SSH_ENV}" > /dev/null
-    kill -0 "${SSH_AGENT_PID}" 2>/dev/null || {
-        start_ssh_agent
-    }
+  source "${SSH_ENV}" > /dev/null
+  kill -0 "${SSH_AGENT_PID}" 2>/dev/null || {
+    start_ssh_agent
+  }
 else
     start_ssh_agent
 fi
