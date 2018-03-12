@@ -53,14 +53,10 @@ function git_sync() {
   local BLUE='\033[0;34m'
   local RESET='\033[0m'
 
-  local dry=false
-  if [ "${3,,}" == "dry" ]; then
-    dry=true
-  fi
-
   echo -e "${BLUE}Syncing files...${RESET}"
 
-  ! ${dry} && ssh "${1}" "cd ~/${2}/ && git clean -f && git checkout -- ."
+  local toSync=()
+  local toDelete=()
 
   IFS=$'\n'
   for gitFile in `git status --porcelain`; do
@@ -69,38 +65,38 @@ function git_sync() {
 
     case "${trimmedPrefix:0:1}" in
       "M" | "A" | "?")
-        local updatedFile="${gitFile:3}"
-
-        ! ${dry} && rsync -ra "${updatedFile}" "${1}:~/${2}/${updatedFile}"
-        echo -e "${GREEN} + ${updatedFile}${RESET}"
-
+        toSync=("${toSync[@]}" "${gitFile:3}")
         ;;
 
       "D")
-        local deletedFile="${gitFile:3}"
-
-        ssh "${1}" "rm ~/${2}/${deletedFile}"
-        echo -e "${RED} - ${deletedFile}${RESET}"
-
+        toDelete=("${toDelete[@]}" "~/${2}/${gitFile:3}")
         ;;
 
       "R")
         local originFile=`echo -n "${gitFile}" | awk '{print $2}'`
         local destinationFile=`echo -n "${gitFile}" | awk '{print $4}'`
 
-        ! ${dry} && ssh "${1}" "rm ~/${2}/${originFile}"
-        echo -e "${RED} - ${originFile}${RESET}"
-
-        ! ${dry} && rsync -ra "${destinationFile}" "${1}:~/${2}/${destinationFile}"
-        echo -e "${GREEN} + ${destinationFile}${RESET}"
-
+        toDelete=("${toDelete[@]}" "~/${2}/${originFile}")
+        toSync=("${toSync[@]}" "${destinationFile}")
         ;;
 
       *)
         echo -e "${BLUE} ¯\_(ツ)_/¯ Don't know how to handle ${gitFile}${RESET}"
     esac
-
   done
+
+  if [ ! "${3,,}" == "dry" ]; then
+    ssh "${1}" "cd ~/${2}/ && git clean -f && git checkout -- ."
+    rsync -raR "${toSync[@]}" "${1}:~/${2}/"
+    ssh "${1}" "rm -rf ${toDelete[@]}"
+  fi
+
+  if [ "${#toDelete[@]}" -ne 0 ]; then
+    echo -e "${RED} - ${toDelete[@]}${RESET}"
+  fi
+  if [ "${#toSync[@]}" -ne 0 ]; then
+    echo -e "${GREEN} + ${toSync[@]}${RESET}"
+  fi
 
   echo -e "${BLUE}Done!${RESET}"
   echo
