@@ -48,12 +48,20 @@ function git_sync() {
 
   local RED='\033[0;31m'
   local GREEN='\033[0;32m'
-  local BG_GREEN='\033[0;42m'
-  local BG_YELLOW='\033[0;43m'
+  local YELLOW='\033[0;33m'
   local BLUE='\033[0;34m'
   local RESET='\033[0m'
 
-  echo -e "${BLUE}Syncing files...${RESET}\n"
+  local dry=false
+  if [ "${3,,}" == "dry" ]; then
+    dry=true
+  fi
+
+  if ${dry}; then
+    echo -e "${BLUE}Dry run of syncing files...${RESET}\n"
+  else
+    echo -e "${BLUE}Syncing files...${RESET}\n"
+  fi
 
   local toSync=()
   local toDelete=()
@@ -85,16 +93,18 @@ function git_sync() {
     esac
   done
 
-  if [ ! "${3,,}" == "dry" ]; then
+  if ! ${dry}; then
+    echo -e "${YELLOW}Cleaning remote${RESET}\n"
     ssh "${1}" "cd ~/${2}/ && git clean -f && git checkout -- ."
-    rsync -raR "${toSync[@]}" "${1}:~/${2}/"
-    ssh "${1}" "rm -rf ${toDelete[@]}"
   fi
 
   if [ "${#toDelete[@]}" -ne 0 ]; then
+    ! ${dry} && ssh "${1}" "rm -rf ${toDelete[@]}"
     echo -e "${RED} - Deleted\n${toDelete[*]}${RESET}\n"
   fi
+
   if [ "${#toSync[@]}" -ne 0 ]; then
+    ! ${dry} && rsync -raR "${toSync[@]}" "${1}:~/${2}/"
     echo -e "${GREEN} + Copied\n${toSync[*]}${RESET}\n"
   fi
 
