@@ -53,12 +53,12 @@ function git_sync() {
   local BLUE='\033[0;34m'
   local RESET='\033[0m'
 
-  echo -e "${BLUE}Syncing files...${RESET}"
+  echo -e "${BLUE}Syncing files...${RESET}\n"
 
   local toSync=()
   local toDelete=()
 
-  IFS=$'\n'
+  local IFS=$'\n'
   for gitFile in `git status --porcelain`; do
     local prefix="${gitFile:0:2}"
     local trimmedPrefix="${prefix#[[:space:]]}"
@@ -92,10 +92,10 @@ function git_sync() {
   fi
 
   if [ "${#toDelete[@]}" -ne 0 ]; then
-    echo -e "${RED} - ${toDelete[@]}${RESET}"
+    echo -e "${RED} - Deleted\n${toDelete[*]}${RESET}\n"
   fi
   if [ "${#toSync[@]}" -ne 0 ]; then
-    echo -e "${GREEN} + ${toSync[@]}${RESET}"
+    echo -e "${GREEN} + Copied\n${toSync[*]}${RESET}\n"
   fi
 
   echo -e "${BLUE}Done!${RESET}"
