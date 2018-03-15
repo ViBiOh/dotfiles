@@ -2,7 +2,7 @@
 
 if command -v docker > /dev/null 2>&1; then
   if ! command -v travis > /dev/null 2>&1; then
-    alias travis='docker run -it --rm -v `realpath ./`:/usr/src vibioh/travis-cli'
+    alias travis='docker run -it --rm -v `pwd`:/usr/src vibioh/travis-cli'
   fi
 
   if ! command -v mvn_work > /dev/null 2>&1; then

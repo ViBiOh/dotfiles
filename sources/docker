@@ -5,19 +5,19 @@ if command -v docker > /dev/null 2>&1; then
     local PROJECT_NAME="${1}"
     readVariableIfRequired "PROJECT_NAME"
 
-    local oldServices=`docker ps -f name=${PROJECT_NAME}* -q`
+    local oldServices=`docker ps -f name="${PROJECT_NAME}*" -q`
     local PROJECT_FULLNAME=${PROJECT_NAME}`git rev-parse --short HEAD`
 
     docker-compose -p ${PROJECT_FULLNAME} config -q
     docker-compose -p ${PROJECT_FULLNAME} pull
     docker-compose -p ${PROJECT_FULLNAME} up -d
-    local servicesCount=`docker-compose -p ${PROJECT_FULLNAME} ps -q | wc -l`
+    local servicesCount=`docker-compose -p "${PROJECT_FULLNAME}" ps -q | wc -l`
 
     echo "Waiting 45 seconds for containers to start..."
     timeout=`date --date="45 seconds" +%s`
-    local healthyCount=`docker events --until ${timeout} -f event='health_status: healthy' -f name=${PROJECT_FULLNAME} | wc -l`
+    local healthyCount=`docker events --until "${timeout}" -f event="health_status: healthy" -f name="${PROJECT_FULLNAME}" | wc -l`
 
-    if [ "${servicesCount}" != "${healthyCount}" ]; then
+    if [ "${servicesCount}" -gt "${healthyCount}" ]; then
       echo "Containers didn't start, reverting..."
 
       docker-compose -p "${PROJECT_FULLNAME}" logs || true
@@ -37,7 +37,9 @@ if command -v docker > /dev/null 2>&1; then
     fi
 
     echo Renaming containers
-    docker-compose -p "${PROJECT_FULLNAME}" ps -q | xargs docker inspect --format='{{ .Name }}' | sed "s|^/||" | awk "{o=\$1; gsub(\"${PROJECT_FULLNAME}\", \"${PROJECT_NAME}\", o); print \$0 \" \" o}" | xargs -n 2 docker rename
+    for service in `docker-compose -p "${PROJECT_FULLNAME}" ps --services`; do
+      docker rename "${PROJECT_FULLNAME}_${service}_1" "${PROJECT_NAME}_${service}"
+    done
 
     echo Deploy succeed!
 
