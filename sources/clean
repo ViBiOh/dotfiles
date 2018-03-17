@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
 function os_clean() {
-  sudo find / -name ".DS_Store" -exec rm -f {} \;
-  sudo find / -name ".localized" -exec rm -f {} \;
+  sudo find / \( -name ".DS_Store" -o -name ".localized" \) -exec rm -f {} \;
 
-  if command -v sysctl > /dev/null 2>&1; then
-    sudo sysctl vm.drop_caches=3
+  if [ `uname -s` == "Darwin" ]; then
+    sudo sync && sudo purge
   else
-    sudo sync; echo 3 > /proc/sys/vm/drop_caches
+    if command -v sysctl > /dev/null 2>&1 && [ `sudo sysctl -a | grep vm.drop_caches | wc -l` -ne 0 ]; then
+      sudo sysctl vm.drop_caches=3
+    else
+      sudo sync; echo 3 > /proc/sys/vm/drop_caches
+    fi
   fi
 }
