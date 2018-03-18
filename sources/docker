@@ -22,18 +22,18 @@ if command -v docker > /dev/null 2>&1; then
 
       docker-compose -p "${PROJECT_FULLNAME}" logs || true
       docker-compose -p "${PROJECT_FULLNAME}" ps -q | xargs docker inspect --format='{{ .Name }}{{ "\n" }}{{range .State.Health.Log }}code={{ .ExitCode }}, log={{ .Output }}{{ end }}' || true
-      docker-compose -p "${PROJECT_FULLNAME}" rm --force --stop -v || true
+      docker-compose -p "${PROJECT_FULLNAME}" rm --force --stop -v
       return 1
     fi
 
     if [ ! -z "${oldServices}" ]; then
-      echo Stopping old containers
-      docker stop --time=180 "${oldServices}" || true
+      echo "Stopping old containers ${oldServices}"
+      docker stop --time=180 ${oldServices}
     fi
 
     if [ ! -z "${oldServices}" ]; then
-      echo Removing old containers
-      docker rm -f -v "${oldServices}" || true
+      echo "Removing old containers ${oldServices}"
+      docker rm -f -v ${oldServices}
     fi
 
     echo Renaming containers
@@ -43,7 +43,7 @@ if command -v docker > /dev/null 2>&1; then
 
     echo Deploy succeed!
 
-    docker system prune -f
+    docker system prune -f || true
   }
 
   function docker-restart() {
