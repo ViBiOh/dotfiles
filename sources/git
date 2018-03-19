@@ -51,16 +51,27 @@ function git_sync() {
     return 1
   fi
 
-  local REMOTE_PATH_PREFIX="~/${2}"
-  if [ "${2:0:1}" == "/" ]; then
-    REMOTE_PATH_PREFIX="${2}"
-  fi
-
   local RED='\033[0;31m'
   local GREEN='\033[0;32m'
   local YELLOW='\033[0;33m'
   local BLUE='\033[0;34m'
   local RESET='\033[0m'
+
+  if ! `git rev-parse --is-inside-work-tree 2>/dev/null`; then
+    echo -e "${RED}You're not inside a git folder${RESET}"
+    return 1
+  else
+    gitRootDir=`git rev-parse --show-cdup`
+
+    if [ -n "${gitRootDir}" ]; then
+      cd "${gitRootDir}"
+    fi
+  fi
+
+  local REMOTE_PATH_PREFIX="~/${2}"
+  if [ "${2:0:1}" == "/" ]; then
+    REMOTE_PATH_PREFIX="${2}"
+  fi
 
   local dry=false
   if [ "${3,,}" == "dry" ]; then
