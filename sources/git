@@ -32,7 +32,7 @@ function git_pull() {
 
 function head_sync() {
   if [ "${#}" -ne 2 ]; then
-    echo Usage: head_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME]
+    echo Usage: head_sync [REMOTE_SERVER] [REMOTE_PATH]
     return 1
   fi
 
@@ -47,7 +47,7 @@ function head_sync() {
 
 function git_sync() {
   if [ "${#}" -lt 2 ]; then
-    echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH_FROM_HOME] [DRY]?
+    echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH] [DRY]?
     return 1
   fi
 
