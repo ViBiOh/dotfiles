@@ -61,7 +61,7 @@ function git_sync() {
     echo -e "${RED}You're not inside a git folder${RESET}"
     return 1
   else
-    gitRootDir=`git rev-parse --show-cdup`
+    local gitRootDir=`git rev-parse --show-cdup`
 
     if [ -n "${gitRootDir}" ]; then
       cd "${gitRootDir}"
