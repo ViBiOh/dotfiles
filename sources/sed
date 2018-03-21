@@ -7,3 +7,11 @@ function sed_escape_string() {
 function sed_replace_properties() {
   sed -i '' -e "s|^`sed_escape_string ${2}`.*|`sed_escape_string ${4:-${2}}`=`sed_escape_string ${3}`|" "${1}"
 }
+
+function sed_inplace() {
+  if [ `uname -s` == "Darwin" ]; then
+    sed -i '' "$@"
+  else
+    sed -i "$@"
+  fi
+}
