@@ -47,6 +47,7 @@ if [ `uname` == 'Darwin' ]; then
       pass \
       node \
       golang \
+      ruby \
       graphviz \
       jq \
       pgcli

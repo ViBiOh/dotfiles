@@ -103,6 +103,12 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 brew install pgcli
 ```
 
+## Travis CLI
+
+```
+gem install travis -v 1.8.8 --no-rdoc --no-ri
+```
+
 ## Golang
 
 ```bash
