@@ -38,7 +38,8 @@
 		"node_modules/*",
 		"esdoc/*",
 		"vendor/*",
-		"vendors/*"
+		"vendors/*",
+		"*.js.map"
 	],
 	"close_windows_when_empty": false,
 	"default_line_ending": "unix",
