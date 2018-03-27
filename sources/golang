@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if command -v go > /dev/null 2>&1; then
-  export GOPATH="${HOME}/code"
+  export GOPATH="~/code"
   export PATH="${GOPATH}/bin:${PATH}"
 
   alias gocode_update="go install ./vendor/..."

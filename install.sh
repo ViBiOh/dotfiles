@@ -2,8 +2,8 @@
 
 set -e
 
-for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks/*; do
-  [ -r "${file}" ] && [ -f "${file}" ] && rm -f ${HOME}/.`basename ${file}` && ln -s ${file} ${HOME}/.`basename ${file}`
+for file in ~/code/src/github.com/ViBiOh/dotfiles/symlinks/*; do
+  [ -r "${file}" ] && [ -f "${file}" ] && rm -f ~/.`basename ${file}` && ln -s ${file} ~/.`basename ${file}`
 done
 
 MAC_OS_SSH_CONFIG=""
@@ -22,7 +22,7 @@ echo "Host *
 Host vibioh
     HostName vibioh.fr
     User vibioh
-" > ${HOME}/.ssh/config
+" > ~/.ssh/config
 
 
 if [ `uname` == 'Darwin' ]; then

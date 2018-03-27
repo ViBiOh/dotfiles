@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 
-CODE_HOME="${HOME}/code/src/github.com/ViBiOh/"
+CODE_HOME="~/code/src/github.com/ViBiOh/"
 alias dev='cd "${CODE_HOME}"'
+
+if [ -f "~/.local.bash" ]; then
+  source "~/.local.bash"
+fi

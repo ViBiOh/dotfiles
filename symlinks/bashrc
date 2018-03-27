@@ -2,6 +2,6 @@
 
 [ -z "$PS1" ] && return
 
-for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/*; do
+for file in ~/code/src/github.com/ViBiOh/dotfiles/sources/*; do
   [ -r "${file}" ] && [ -f "${file}" ] && source "${file}"
 done
