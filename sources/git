@@ -8,6 +8,18 @@ function git_info() {
   echo " ($branch$dirty)"
 }
 
+function git_root() {
+  if ! `git rev-parse --is-inside-work-tree 2>/dev/null`; then
+    return 1
+  else
+    local gitRootDir=`git rev-parse --show-cdup`
+
+    if [ -n "${gitRootDir}" ]; then
+      cd "${gitRootDir}"
+    fi
+  fi
+}
+
 function git_prune() {
   git prune
   git branch --merged | egrep -v "(^\*|master)" | xargs git branch -d
