@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Set up ssh-agent
-SSH_ENV="~/.ssh/environment"
-SSH_KEY="~/.ssh/id_ed25519"
+SSH_ENV="${HOME}/.ssh/environment"
+SSH_KEY="${HOME}/.ssh/id_ed25519"
 
 function start_ssh_agent() {
   if [ -f "${SSH_KEY}" ]; then

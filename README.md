@@ -3,8 +3,8 @@
 ## Installation
 
 ```
-mkdir -p ~/code/src/github.com/ViBiOh/
-cd ~/code/src/github.com/ViBiOh/
+mkdir -p ${HOME}/code/src/github.com/ViBiOh/
+cd ${HOME}/code/src/github.com/ViBiOh/
 git clone https://github.com/ViBiOh/dotfiles.git
 ./dotfiles/install.sh
 ./dotfiles/clone.sh
@@ -16,7 +16,7 @@ git clone https://github.com/ViBiOh/dotfiles.git
 
 ```bash
 ssh-keygen -t ed25519
-ssh-copy-id -i ~/.ssh/id_ed25519.pub docker
+ssh-copy-id -i ${HOME}/.ssh/id_ed25519.pub docker
 ```
 
 ## Brew
@@ -93,8 +93,8 @@ brew install fzf
 ### on Linux
 
 ```bash
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
+git clone --depth 1 https://github.com/junegunn/fzf.git ${HOME}/.fzf
+${HOME}/.fzf/install
 ```
 
 ## Pgcli
