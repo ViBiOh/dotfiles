@@ -7,7 +7,3 @@ alias flip_table="echo '(╯°□°）╯︵ ┻━┻'"
 function meteo() {
   curl -4 "wttr.in/${1:-France}"
 }
-
-if [ `uname -s` == "Darwin" ]; then
-  alias dodo="pmset sleepnow"
-fi
