@@ -69,6 +69,8 @@ function git_sync() {
   local BLUE='\033[0;34m'
   local RESET='\033[0m'
 
+  local currentWorkDir=`pwd`
+
   git_root
   isGit=$?
   if [ ${isGit} -ne 0 ]; then
@@ -135,6 +137,8 @@ function git_sync() {
     ! ${dry} && rsync -raR "${toSync[@]}" "${1}:${REMOTE_PATH_PREFIX}/"
     echo -e "${GREEN} + Copied\n${toSync[*]}${RESET}\n"
   fi
+
+  cd "${currentWorkDir}"
 
   echo -e "${BLUE}Done!${RESET}"
   echo
