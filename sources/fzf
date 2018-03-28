@@ -2,4 +2,6 @@
 
 if [ -f "${HOME}/.fzf.bash" ]; then
   source "${HOME}/.fzf.bash"
+
+  alias gitco="git branch | fzf | xargs git checkout"
 fi
