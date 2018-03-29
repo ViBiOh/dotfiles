@@ -3,4 +3,8 @@
 if command -v node > /dev/null 2>&1; then
   export PATH="${HOME}/.npm_packages/bin:${PATH}"
   alias npmi="npm install --ignore-scripts"
+
+  if command -v jq > /dev/null 2>&1 && command -v fzf > /dev/null 2>&1; then
+    alias npmr="jq '.scripts | paths | add' package.json | fzf | xargs npm run"
+  fi
 fi
