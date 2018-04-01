@@ -7,7 +7,6 @@
 * `Git`
 * `GitGutter`
 * `GoSublime`
-* `JsPrettier`
 * `Markdown Preview`
 * `SideBarEnhancements`
 * `SublimeLinter`
