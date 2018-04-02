@@ -1,5 +1,6 @@
 {
   "env": {
+    "GOROOT": "/usr/local/Cellar/go/1.10.1/libexec",
     "GOPATH": "${HOME}/code",
     "PATH": "${GOPATH}/bin:${PATH}"
   },
