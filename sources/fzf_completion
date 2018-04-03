@@ -6,6 +6,10 @@ fi
 
 if command -v node > /dev/null 2>&1 && command -v jq > /dev/null 2>&1; then
   _fzf_complete_npm() {
+    if [ ! -e "package.json" ]; then
+      return
+    fi
+
     local entries=`jq --raw-output '.scripts | paths | add' package.json`
 
     if [ "${3}" == 'run' ]; then

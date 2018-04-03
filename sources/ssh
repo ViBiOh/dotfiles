@@ -5,7 +5,7 @@ SSH_ENV="${HOME}/.ssh/environment"
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 
 function start_ssh_agent() {
-  if [ -f "${SSH_KEY}" ]; then
+  if [ -e "${SSH_KEY}" ]; then
     echo "Initializing new SSH agent..."
 
     touch "${SSH_ENV}"
