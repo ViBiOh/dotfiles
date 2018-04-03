@@ -8,6 +8,7 @@
 * `GitGutter`
 * `GoSublime`
 * `Markdown Preview`
+* `Pretty JSON`
 * `SideBarEnhancements`
 * `SublimeLinter`
 * `SublimeLinter-contrib-eslint`

@@ -1,17 +1,18 @@
 {
-	"bootstrapped": true,
-	"in_process_packages": [],
-	"installed_packages": [
-		"Babel",
-		"DocBlockr",
-		"Git",
-		"GitGutter",
-		"GoSublime",
-		"Markdown Preview",
-		"Package Control",
-		"SideBarEnhancements",
-		"SublimeLinter",
-		"SublimeLinter-eslint",
-		"Sublimerge 3"
-	]
+  "bootstrapped": true,
+  "in_process_packages": [],
+  "installed_packages": [
+    "Babel",
+    "DocBlockr",
+    "Git",
+    "GitGutter",
+    "GoSublime",
+    "Markdown Preview",
+    "Package Control",
+    "Pretty JSON",
+    "SideBarEnhancements",
+    "SublimeLinter",
+    "SublimeLinter-eslint",
+    "Sublimerge 3"
+  ]
 }
