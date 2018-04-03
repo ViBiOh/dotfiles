@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+if ! command -v fzf > /dev/null 2>&1; then
+  return
+fi
+
+if command -v node > /dev/null 2>&1 && command -v jq > /dev/null 2>&1; then
+  _fzf_complete_npm() {
+    local entries=`jq --raw-output '.scripts | paths | add' package.json`
+
+    if [ "${3}" == 'run' ]; then
+      _fzf_complete '--reverse' "$@" < <(
+        echo "${entries}"
+      )
+    fi
+  }
+
+  [ -n "$BASH" ] && complete -F _fzf_complete_npm -o default -o bashdefault npm
+fi
+
+if command -v pass > /dev/null 2>&1; then
+  _fzf_complete_pass() {
+    local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
+    local entries=`find "$PASS_DIR" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"`
+
+    _fzf_complete '--reverse' "$@" < <(
+      echo "${entries}"
+    )
+  }
+
+  [ -n "$BASH" ] && complete -F _fzf_complete_pass -o default -o bashdefault pass
+fi

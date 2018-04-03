@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 if [ -f "${HOME}/.fzf.bash" ]; then
+  export FZF_COMPLETION_TRIGGER=''
   source "${HOME}/.fzf.bash"
 
   alias gitco="git branch | fzf | xargs git checkout"
