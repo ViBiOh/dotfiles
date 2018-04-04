@@ -3,6 +3,6 @@
 CODE_HOME="${HOME}/code/src/github.com/ViBiOh/"
 alias dev='cd "${CODE_HOME}"'
 
-if [ -f "${HOME}/.local.bash" ]; then
+if [ -e "${HOME}/.local.bash" ]; then
   source "${HOME}/.local.bash"
 fi

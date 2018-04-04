@@ -3,7 +3,7 @@
 set -e
 
 for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks/*; do
-  [ -r "${file}" ] && [ -f "${file}" ] && rm -f ${HOME}/.`basename ${file}` && ln -s ${file} ${HOME}/.`basename ${file}`
+  [ -r "${file}" ] && [ -e "${file}" ] && rm -f ${HOME}/.`basename ${file}` && ln -s ${file} ${HOME}/.`basename ${file}`
 done
 
 MAC_OS_SSH_CONFIG=""
@@ -37,7 +37,6 @@ if [ `uname` == 'Darwin' ]; then
       git \
       bash-completion \
       fswatch \
-      tldr \
       fzf \
       htop \
       tmux \
@@ -47,7 +46,6 @@ if [ `uname` == 'Darwin' ]; then
       pass \
       node \
       golang \
-      ruby \
       graphviz \
       jq \
       pgcli
@@ -77,14 +75,14 @@ if command -v go > /dev/null 2>&1; then
   echo
   echo Updating golang packages
 
-  go get -u github.com/golang/dep/cmd/dep
-  go get -u github.com/golang/lint/golint
-  go get -u github.com/google/pprof
-  go get -u github.com/kisielk/errcheck
-  go get -u github.com/nsf/gocode
-  go get -u golang.org/x/tools/cmd/goimports
-  go get -u github.com/rakyll/hey
-  go get -u github.com/asciimoo/wuzz
+  go get -v -u github.com/golang/dep/cmd/dep
+  go get -v -u github.com/golang/lint/golint
+  go get -v -u github.com/google/pprof
+  go get -v -u github.com/kisielk/errcheck
+  go get -v -u github.com/nsf/gocode
+  go get -v -u golang.org/x/tools/cmd/goimports
+  go get -v -u github.com/rakyll/hey
+  go get -v -u github.com/asciimoo/wuzz
 fi
 
 if command -v npm > /dev/null 2>&1; then

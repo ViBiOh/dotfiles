@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-if [ -f /Users/vibioh/.travis/travis.sh ]; then
-  source /Users/vibioh/.travis/travis.sh
-fi

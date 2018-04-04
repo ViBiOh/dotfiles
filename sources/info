@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 alias now="date '+%Y-%m-%d %H:%M:%S'"
-alias shrug="echo '¯\_(ツ)_/¯'"
-alias flip_table="echo '(╯°□°）╯︵ ┻━┻'"
 
 function meteo() {
   curl -4 "wttr.in/${1:-France}"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-if [ -f "${HOME}/.fzf.bash" ]; then
+if [ -e "${HOME}/.fzf.bash" ]; then
   source "${HOME}/.fzf.bash"
 fi
