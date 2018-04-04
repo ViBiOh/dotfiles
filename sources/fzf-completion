@@ -15,10 +15,9 @@ fi
 if command -v pass > /dev/null 2>&1; then
   _fzf_complete_pass() {
     local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
-    local entries=`find "$PASS_DIR" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"`
 
     _fzf_complete '--reverse' "$@" < <(
-      echo "${entries}"
+      find "${PASS_DIR}" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"
     )
   }
 
