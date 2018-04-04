@@ -19,12 +19,6 @@ ssh-keygen -t ed25519
 ssh-copy-id -i ${HOME}/.ssh/id_ed25519.pub docker
 ```
 
-## Brew
-
-```bash
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-```
-
 ## CoreOS
 
 ```bash
@@ -52,37 +46,6 @@ And also for current user
 chsh -s /usr/local/bin/bash
 ```
 
-## Git with fswatch
-
-```bash
-brew install fswatch
-```
-
-## jq
-
-```bash
-brew install jq
-```
-
-## TL;DR
-
-```bash
-brew install tldr
-```
-
-## tmux
-
-```bash
-brew install tmux
-brew install reattach-to-user-namespace
-```
-
-### on Linux
-
-```bash
-sudo apt-get install -y tmux
-```
-
 ## FZF
 
 ```bash
@@ -95,12 +58,6 @@ brew install fzf
 ```bash
 git clone --depth 1 https://github.com/junegunn/fzf.git ${HOME}/.fzf
 ${HOME}/.fzf/install
-```
-
-## Pgcli
-
-```bash
-brew install pgcli
 ```
 
 ## Golang
