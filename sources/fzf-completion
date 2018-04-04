@@ -5,11 +5,11 @@ if ! command -v fzf > /dev/null 2>&1; then
 fi
 
 if command -v node > /dev/null 2>&1 && command -v jq > /dev/null 2>&1; then
-  alias npmr="jq --raw-output '.scripts | paths | add' package.json | fzf | xargs git checkout"
+  alias npmr="jq --raw-output '.scripts | paths | add' package.json | fzf --reverse | xargs npm run"
 fi
 
 if command -v git > /dev/null 2>&1; then
-  alias gitco="git branch -vv | fzf | awk '{print $1}' | xargs git checkout"
+  alias gitco="git branch | fzf --reverse | xargs git checkout"
 fi
 
 if command -v pass > /dev/null 2>&1; then
