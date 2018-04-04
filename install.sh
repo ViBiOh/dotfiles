@@ -38,6 +38,7 @@ if [ `uname` == 'Darwin' ]; then
       bash-completion \
       fswatch \
       fzf \
+      fd \
       htop \
       tmux \
       reattach-to-user-namespace \
