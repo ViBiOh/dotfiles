@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+if ! command -v fzf > /dev/null 2>&1; then
+  return
+fi
+
+if command -v node > /dev/null 2>&1 && command -v jq > /dev/null 2>&1; then
+  alias npmr="jq --raw-output '.scripts | paths | add' package.json | fzf | xargs git checkout"
+fi
+
+if command -v git > /dev/null 2>&1; then
+  alias gitco="git branch -vv | fzf | awk '{print $1}' | xargs git checkout"
+fi
+
+if command -v pass > /dev/null 2>&1; then
+  _fzf_complete_pass() {
+    local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
+    local entries=`find "$PASS_DIR" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"`
+
+    _fzf_complete '--reverse' "$@" < <(
+      echo "${entries}"
+    )
+  }
+
+  [ -n "$BASH" ] && complete -F _fzf_complete_pass -o default -o bashdefault pass
+fi
