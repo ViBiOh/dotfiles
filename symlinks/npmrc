@@ -1,1 +1,1 @@
-prefix = ${HOME}/.npm_packages
+prefix=~/.npm_packages
