@@ -14,5 +14,7 @@
     "cells": [
       [ 0, 0, 1, 1 ], [ 1, 0, 2, 1 ]
     ]}
-  }
+  },
+  { "keys": ["super+:"], "command": "focus_group", "args": { "group": 0 } },
+  { "keys": ["super+="], "command": "move_to_group", "args": { "group": 1 } }
 ]
