@@ -7,7 +7,7 @@ const ${1:ComponentName} = ({}) => {
   return (
     ${2}
   );
-}
+};
 
 ${1:ComponentName}.displayName = '${1:ComponentName}';
 
