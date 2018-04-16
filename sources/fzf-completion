@@ -9,10 +9,13 @@ if command -v node > /dev/null 2>&1 && command -v jq > /dev/null 2>&1; then
 fi
 
 if command -v git > /dev/null 2>&1; then
-  alias gitco="git branch | fzf --reverse | xargs git checkout"
+  function gitco() {
+    local branch=`git branch -vv --all | fzf --ansi --reverse`
+    git checkout `echo ${branch} | awk '{print $1}' | sed 's|^remotes/origin/||'`
+  }
 
   function gitlg() {
-    git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' | fzf --ansi --reverse --tiebreak=index --no-sort --bind=ctrl-s:toggle-sort --preview 'f() { set -- $(echo -- "$@" | grep -o "[a-f0-9]\{7\}"); [ $# -eq 0 ] || git show --color=always $1; }; f {}'
+    git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' | fzf --ansi --reverse --tiebreak=index --no-sort --preview 'f() { set -- $(echo -- "$@" | grep -o "[a-f0-9]\{7\}"); [ $# -eq 0 ] || git show --color=always $1; }; f {}'
   }
 fi
 
