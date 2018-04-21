@@ -19,18 +19,7 @@ ssh-keygen -t ed25519
 ssh-copy-id -i ${HOME}/.ssh/id_ed25519.pub docker
 ```
 
-## CoreOS
-
-```bash
-toolbox dnf -y install htop bash-completion
-toolbox cp /usr/share/bash-completion /media/root/var/ -R
-```
-
 ## Bash
-
-```bash
-brew install bash bash-completion
-```
 
 Then change default bash for root
 
@@ -44,31 +33,4 @@ And also for current user
 
 ```bash
 chsh -s /usr/local/bin/bash
-```
-
-## FZF
-
-```bash
-brew install fzf
-/usr/local/opt/fzf/install
-```
-
-### on Linux
-
-```bash
-git clone --depth 1 https://github.com/junegunn/fzf.git ${HOME}/.fzf
-${HOME}/.fzf/install
-```
-
-## Golang
-
-```bash
-go get -u github.com/golang/dep/cmd/dep
-go get -u github.com/golang/lint/golint
-go get -u github.com/google/pprof
-go get -u github.com/kisielk/errcheck
-go get -u github.com/nsf/gocode
-go get -u golang.org/x/tools/cmd/goimports
-go get -u github.com/rakyll/hey
-go get -u github.com/asciimoo/wuzz
 ```

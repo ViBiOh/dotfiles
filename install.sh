@@ -24,7 +24,6 @@ Host vibioh
     User vibioh
 " > ${HOME}/.ssh/config
 
-
 if [ `uname` == 'Darwin' ]; then
   if ! command -v brew > /dev/null 2>&1; then
     echo Installing brew
@@ -52,6 +51,10 @@ if [ `uname` == 'Darwin' ]; then
       pgcli
 
     echo
+    echo Configuring FZF
+    /usr/local/opt/fzf/install
+
+    echo
     echo Installing curl with right option
     brew install curl --with-openssl
     brew link --force curl
@@ -69,6 +72,14 @@ if [ `uname` == 'Darwin' ]; then
     brew update
     brew upgrade
     brew cleanup
+  fi
+elif [ `uname` == "Linux" ]; then
+  if [ ! -d "${HOME}/.fzf" ]; then
+    echo
+    echo Installing FZF
+
+    git clone --depth 1 https://github.com/junegunn/fzf.git ${HOME}/.fzf
+    ${HOME}/.fzf/install
   fi
 fi
 
@@ -90,6 +101,6 @@ if command -v npm > /dev/null 2>&1; then
   echo
   echo Updating npm packages
 
-  npm update -g
+  npm install -g npm
 fi
 
