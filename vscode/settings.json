@@ -43,5 +43,6 @@
   },
   "gitlens.historyExplorer.enabled": true,
   "gitlens.codeLens.scopes": ["document", "containers"],
-  "gitlens.statusBar.reduceFlicker": true
+  "gitlens.statusBar.reduceFlicker": true,
+  "gitlens.codeLens.enabled": false
 }
