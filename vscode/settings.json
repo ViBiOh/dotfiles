@@ -9,32 +9,39 @@
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
     "**/node_modules/**": true,
-    "**/bin/": true,
-    "**/vendor/": true,
-    "**/vendors/": true,
-    "**/esdoc/": true,
-    "**/dist/": true,
-    "**/coverage/": true,
-    "**/.nyc_output/": true
+    "**/bin/**": true,
+    "**/vendor/**": true,
+    "**/vendors/**": true,
+    "**/esdoc/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true,
+    "**/.nyc_output/**": true
   },
   "search.exclude": {
     "**/node_modules": true,
     "**/bower_components": true,
-    "**/bin/": true,
-    "**/vendor/": true,
-    "**/vendors/": true,
-    "**/esdoc/": true,
-    "**/dist/": true,
-    "**/coverage/": true,
-    "**/.nyc_output/": true
+    "**/bin": true,
+    "**/vendor": true,
+    "**/vendors": true,
+    "**/esdoc": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/.nyc_output": true
   },
-  "editor.rulers": [100],
   "editor.snippetSuggestions": "top",
   "editor.tabCompletion": true,
   "window.newWindowDimensions": "maximized",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "prettier.eslintIntegration": true,
-  "workbench.colorTheme": "Monokai",
-  "files.insertFinalNewline": true
+  "files.insertFinalNewline": true,
+  "workbench.sideBar.location": "left",
+  "html.format.enable": false,
+  "gitlens.advanced.messages": {
+    "suppressResultsExplorerNotice": true,
+    "suppressShowKeyBindingsNotice": true
+  },
+  "gitlens.historyExplorer.enabled": true,
+  "gitlens.codeLens.scopes": ["document", "containers"],
+  "gitlens.statusBar.reduceFlicker": true
 }

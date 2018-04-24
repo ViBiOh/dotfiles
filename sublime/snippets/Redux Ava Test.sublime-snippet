@@ -10,7 +10,7 @@ test('should return initial state', (t) => {
 ]]></content>
     <tabTrigger>rat</tabTrigger>
     <scope>source.js</scope>
-    <description>Redux Mocha Test</description>
+    <description>Redux Ava Test</description>
 </snippet>
 
 
