@@ -38,7 +38,6 @@ if [ `uname` == 'Darwin' ]; then
       fswatch \
       fzf \
       fd \
-      htop \
       tmux \
       reattach-to-user-namespace \
       openssl \
@@ -47,7 +46,6 @@ if [ `uname` == 'Darwin' ]; then
       node \
       golang \
       graphviz \
-      jq \
       pgcli
 
     echo
@@ -62,6 +60,11 @@ if [ `uname` == 'Darwin' ]; then
     echo
     echo Configuring FZF
     /usr/local/opt/fzf/install
+
+    echo
+    echo Configuring pgcli
+    mkdir -p "${HOME}/.config/pgcli"
+    ln -s "${HOME}/.pgclirc" "${HOME}/.config/pgcli/config"
 
     echo
     echo Follow instruction in README for configuring bash
