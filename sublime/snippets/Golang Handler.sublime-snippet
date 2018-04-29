@@ -1,0 +1,13 @@
+<snippet>
+    <content><![CDATA[
+// Handler for request. Should be use with net/http
+func (a *App) Handler() http.Handler {
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+  })
+}
+
+]]></content>
+    <tabTrigger>gh</tabTrigger>
+    <scope>source.go -(meta)</scope>
+    <description>Golang Handler</description>
+</snippet>
