@@ -98,6 +98,7 @@ if command -v go > /dev/null 2>&1; then
   go get -v -u golang.org/x/tools/cmd/goimports
   go get -v -u github.com/rakyll/hey
   go get -v -u github.com/asciimoo/wuzz
+  go get -u github.com/derekparker/delve/cmd/dlv
 fi
 
 if command -v npm > /dev/null 2>&1; then
