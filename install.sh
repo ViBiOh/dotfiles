@@ -90,20 +90,19 @@ if command -v go > /dev/null 2>&1; then
   echo
   echo Updating golang packages
 
+  go get -v -u github.com/alecthomas/gometalinter
   go get -v -u github.com/asciimoo/wuzz
   go get -v -u github.com/golang/dep/cmd/dep
-  go get -v -u github.com/golang/lint/golint
   go get -v -u github.com/google/pprof
-  go get -v -u github.com/gordonklaus/ineffassign
-  go get -v -u github.com/jgautheron/goconst/cmd/goconst
-  go get -v -u github.com/jgautheron/usedexports
-  go get -v -u github.com/kisielk/errcheck
   go get -v -u github.com/nsf/gocode
   go get -v -u github.com/nsf/gocode
   go get -v -u github.com/rakyll/hey
   go get -v -u golang.org/x/tools/cmd/goimports
-  go get -v -u golang.org/x/tools/cmd/gotype
   go get -v -u golang.org/x/tools/cmd/guru
+
+  echo
+  echo Updating metalinter
+  gometalinter --install
 fi
 
 if command -v npm > /dev/null 2>&1; then

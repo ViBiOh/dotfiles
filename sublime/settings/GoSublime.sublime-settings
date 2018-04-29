@@ -8,11 +8,5 @@
   "fmt_cmd": ["goimports", "-srcdir", "$_dir"],
   "comp_lint_enabled": true,
   "autocomplete_suggest_imports": true,
-  "comp_lint_commands": [
-    { "cmd": [ "goconst $_dir"], "shell": true },
-    { "cmd": [ "usedexports $_dir"], "shell": true },
-    { "cmd": [ "ineffassign $_fn"], "shell": true },
-    { "cmd": [ "go", "install"] }
-  ],
   "on_save": [{ "cmd": "gs_comp_lint" }]
 }

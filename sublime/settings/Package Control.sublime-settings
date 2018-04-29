@@ -14,9 +14,7 @@
     "SideBarEnhancements",
     "SublimeLinter",
     "SublimeLinter-eslint",
-    "SublimeLinter-golint",
-    "SublimeLinter-gotype",
-    "SublimeLinter-govet",
+    "SublimeLinter-contrib-gometalinter",
     "Sublimerge 3"
   ]
 }
