@@ -20,5 +20,13 @@
   {
     "key": "f5",
     "command": "editor.action.sortLinesAscending"
+  },
+  {
+    "key": "cmd+left",
+    "command": "workbench.action.navigateBack"
+  },
+  {
+    "key": "ctrl+-",
+    "command": "-workbench.action.navigateBack"
   }
 ]
