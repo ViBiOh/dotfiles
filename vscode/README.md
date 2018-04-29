@@ -12,4 +12,5 @@ code --install-extension eamodio.gitlens
 code --install-extension esbenp.prettier-vscode
 code --install-extension joelday.docthis
 code --install-extension lukehoban.go
+code --install-extension PeterJausovec.vscode-docker
 ```
