@@ -23,6 +23,17 @@
     ],
     "description": "Golang App Pattern"
   },
+  "Golang Handler": {
+    "prefix": "gh",
+    "body": [
+      "// Handler for request. Should be use with net/http",
+      "func (a *App) Handler() http.Handler {",
+      "\treturn http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {",
+      "\t})",
+      "}"
+    ],
+    "description": "Golang Handler"
+  },
   "Golang Pprof Handler": {
     "prefix": "gph",
     "body": [
