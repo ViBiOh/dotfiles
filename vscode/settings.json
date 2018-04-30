@@ -39,6 +39,7 @@
   "workbench.sideBar.location": "left",
   "html.format.enable": false,
   "docker.showExplorer": false,
+  "telemetry.enableTelemetry": false,
   "gitlens.advanced.messages": {
     "suppressResultsExplorerNotice": true,
     "suppressShowKeyBindingsNotice": true
