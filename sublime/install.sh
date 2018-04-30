@@ -12,4 +12,18 @@ rm -rf "${PKG_USER}/*"
 cp snippets/* "${PKG_USER}/"
 cp settings/* "${PKG_USER}/"
 
+
+if command -v go > /dev/null 2>&1; then
+  echo
+  echo Updating golang packages
+
+  go get -v -u github.com/alecthomas/gometalinter
+  go get -v -u golang.org/x/tools/cmd/guru
+  go get -v -u github.com/nsf/gocode
+
+  echo
+  echo Updating metalinter
+  gometalinter --install
+fi
+
 echo Success!

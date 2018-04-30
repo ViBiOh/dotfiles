@@ -35,6 +35,7 @@
   "editor.formatOnPaste": true,
   "prettier.eslintIntegration": true,
   "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
   "workbench.sideBar.location": "left",
   "html.format.enable": false,
   "gitlens.advanced.messages": {
