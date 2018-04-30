@@ -42,8 +42,15 @@
     "suppressResultsExplorerNotice": true,
     "suppressShowKeyBindingsNotice": true
   },
-  "gitlens.historyExplorer.enabled": true,
   "gitlens.codeLens.scopes": ["document", "containers"],
   "gitlens.statusBar.reduceFlicker": true,
-  "gitlens.codeLens.enabled": false
+  "gitlens.currentLine.enabled": false,
+  "gitlens.gitExplorer.enabled": false,
+  "gitlens.historyExplorer.enabled": false,
+  "gitlens.codeLens.enabled": false,
+  "gitlens.blame.avatars": false,
+  "gitlens.blame.highlight.locations": ["gutter", "line", "overview"],
+  "gitlens.hovers.currentLine.enabled": false,
+  "gitlens.statusBar.enabled": false,
+  "gitlens.recentChanges.highlight.locations": ["line", "overview", "gutter"]
 }
