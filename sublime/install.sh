@@ -24,6 +24,15 @@ if command -v go > /dev/null 2>&1; then
   echo
   echo Updating metalinter
   gometalinter --install
+  gometalinter --disable-all
+  gometalinter \
+    --enable=gocyclo \
+    --enable=gas \
+    --enable=gotype \
+    --enable=ineffassign \
+    --enable=golint \
+    --enable=goconst \
+    --enable=gotype
 fi
 
 echo Success!
