@@ -38,6 +38,7 @@
   "files.trimFinalNewlines": true,
   "workbench.sideBar.location": "left",
   "html.format.enable": false,
+  "docker.showExplorer": false,
   "gitlens.advanced.messages": {
     "suppressResultsExplorerNotice": true,
     "suppressShowKeyBindingsNotice": true
