@@ -17,22 +17,8 @@ if command -v go > /dev/null 2>&1; then
   echo
   echo Updating golang packages
 
-  go get -v -u github.com/alecthomas/gometalinter
   go get -v -u golang.org/x/tools/cmd/guru
   go get -v -u github.com/nsf/gocode
-
-  echo
-  echo Updating metalinter
-  gometalinter --install
-  gometalinter --disable-all
-  gometalinter \
-    --enable=gocyclo \
-    --enable=gas \
-    --enable=gotype \
-    --enable=ineffassign \
-    --enable=golint \
-    --enable=goconst \
-    --enable=gotype
 fi
 
 echo Success!
