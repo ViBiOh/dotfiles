@@ -96,6 +96,11 @@ fi
 
 if command -v go > /dev/null 2>&1; then
   echo
+  echo Cleaning golang
+  rm -rf ${GOPATH}/bin/* ${GOPATH}/pkg/* ${GOPATH}/src/golang.org
+  ls $GOPATH/src/github.com | grep -v ViBiOh | xargs rm -rf
+
+  echo
   echo Updating golang packages
 
   go get -v -u github.com/asciimoo/wuzz

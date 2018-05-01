@@ -82,3 +82,6 @@ endif
 if exists(":let")
   let mapleader=","
 endif
+
+" Disabling viminfo
+set viminfo=""

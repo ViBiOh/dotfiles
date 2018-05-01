@@ -17,9 +17,9 @@ if command -v go > /dev/null 2>&1; then
   echo
   echo Updating golang packages
 
-  go get -v -u golang.org/x/tools/cmd/guru
   go get -v -u github.com/nsf/gocode
   go get -v -u golang.org/x/tools/cmd/gotype
+  go get -v -u golang.org/x/tools/cmd/guru
 fi
 
 echo Success!
