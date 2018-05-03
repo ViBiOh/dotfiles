@@ -4,10 +4,6 @@ if ! command -v fzf > /dev/null 2>&1; then
   return
 fi
 
-if command -v node > /dev/null 2>&1 && command -v jq > /dev/null 2>&1; then
-  alias npmr="jq --raw-output '.scripts | paths | add' package.json | fzf --reverse | xargs npm run"
-fi
-
 if command -v git > /dev/null 2>&1; then
   function gitco() {
     local branch=`git branch -vv --all | fzf --ansi --reverse`
