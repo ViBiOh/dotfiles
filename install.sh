@@ -6,6 +6,13 @@ for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks/*; do
   [ -r "${file}" ] && [ -e "${file}" ] && rm -f ${HOME}/.`basename ${file}` && ln -s ${file} ${HOME}/.`basename ${file}`
 done
 
+if [ ! -e "${HOME}/.gnupg/gpg-agent.conf" ]; then
+  echo
+  echo Symlinking gpg-agent conf
+  mkdir -p "${HOME}/.gnupg"
+  ln -s "${HOME}/.gpg-agent.conf" "${HOME}/.gnupg/gpg-agent.conf"
+fi
+
 MAC_OS_SSH_CONFIG=""
 if [ `uname` == 'Darwin' ]; then
   MAC_OS_SSH_CONFIG="
@@ -38,8 +45,6 @@ if [ `uname` == 'Darwin' ]; then
       fswatch \
       fzf \
       fd \
-      tmux \
-      reattach-to-user-namespace \
       openssl \
       gnupg \
       pass \
@@ -83,15 +88,13 @@ elif [ `uname` == "Linux" ]; then
 
     git clone --depth 1 https://github.com/junegunn/fzf.git ${HOME}/.fzf
     ${HOME}/.fzf/install
+  else
+    echo
+    echo Updating FZF
+
+    cd ${HOME}/.fzf
+    git pull
   fi
-fi
-
-if [ -d "${HOME}/.fzf" ]; then
-  echo
-  echo Updating FZF
-
-  cd ${HOME}/.fzf
-  git pull
 fi
 
 if command -v go > /dev/null 2>&1; then
