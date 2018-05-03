@@ -1,6 +1,7 @@
 [user]
 	name = ViBiOh
 	email = vibioh@localhost
+	signingkey = 49265F2EFEC291A90810F6416896D5F3CC06440D
 
 [core]
 	editor = vi
@@ -44,3 +45,6 @@
 [mergetool "sublimerge"]
 	cmd = subl -n --wait \"$REMOTE\" \"$BASE\" \"$LOCAL\" \"$MERGED\" --command \"sublimerge_diff_views\"
 	trustExitCode = false
+
+[commit]
+	gpgsign = true
