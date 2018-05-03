@@ -6,7 +6,7 @@ function os_clean() {
   if [ `uname -s` == "Darwin" ]; then
     sudo sync && sudo purge
   else
-    if [ `sudo which sysctl | wc -l` -ne 0 ] && [ `sudo sysctl -a | grep vm.drop_caches | wc -l` -ne 0 ]; then
+    if [ `sudo which sysctl | wc -l` -ne 0 ] && [ `sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l` -ne 0 ]; then
       sudo sysctl vm.drop_caches=3
     else
       sudo sync; echo 3 > /proc/sys/vm/drop_caches
