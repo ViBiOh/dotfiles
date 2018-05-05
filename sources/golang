@@ -5,5 +5,5 @@ if command -v go > /dev/null 2>&1; then
   export PATH="${GOPATH}/bin:${PATH}"
 
   alias gocode_update="go install ./vendor/..."
-  alias pprof_memory="pprof -http=:8080 -sample_index=alloc_space"
+  alias pprof_memory="pprof -http=:8080 -sample_index=alloc_space http://localhost:1080/debug/pprof/profile/heap"
 fi

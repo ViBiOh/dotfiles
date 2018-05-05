@@ -42,9 +42,12 @@ if [ `uname` == 'Darwin' ]; then
       bash \
       git \
       bash-completion \
+      tmux \
+      reattach-to-user-namespace \
       fswatch \
       fzf \
       fd \
+      htop \
       openssl \
       gnupg \
       pass \
