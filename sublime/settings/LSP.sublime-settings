@@ -1,0 +1,7 @@
+{
+  "clients": {
+    "jsts": {
+      "enabled": true
+    }
+  }
+}
