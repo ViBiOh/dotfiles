@@ -1,65 +1,66 @@
 {
-	"animation_enabled": false,
-	"auto_complete_triggers":
-	[
-		{
-			"characters": "<",
-			"selector": "text.html"
-		},
-		{
-			"characters": ".",
-			"selector": "source.js"
-		},
-		{
-			"characters": ".",
-			"selector": "source.go"
-		}
-	],
-	"binary_file_patterns":
-	[
-		"*.jpg",
-		"*.jpeg",
-		"*.png",
-		"*.gif",
-		"*.ttf",
-		"*.tga",
-		"*.dds",
-		"*.ico",
-		"*.eot",
-		"*.pdf",
-		"*.swf",
-		"*.jar",
-		"*.zip",
-		".git/*",
-		"bin/*",
-		"dist/*",
-		"coverage/*",
-		".nyc_output/*",
-		"node_modules/*",
-		"esdoc/*",
-		"vendor/*",
-		"vendors/*",
-		"*.js.map"
-	],
-	"close_windows_when_empty": false,
-	"default_line_ending": "unix",
-	"drag_text": false,
-	"draw_white_space": "all",
-	"enable_tab_scrolling": false,
-	"fold_buttons": false,
-	"highlight_line": true,
-	"highlight_modified_tabs": true,
-	"ignored_packages":
-	[
-		"Vintage"
-	],
-	"overlay_scroll_bars": "enabled",
-	"show_encoding": true,
-	"show_full_path": true,
-	"show_line_endings": true,
-	"tab_size": 2,
-	"theme": "Adaptive.sublime-theme",
-	"translate_tabs_to_spaces": true,
-	"tree_animation_enabled": false,
-	"word_wrap": true
+  "animation_enabled": false,
+  "auto_complete_triggers": [
+    {
+      "characters": "<",
+      "selector": "text.html"
+    },
+    {
+      "characters": ".",
+      "selector": "source.js"
+    },
+    {
+      "characters": ".",
+      "selector": "source.go"
+    },
+    {
+      "characters": ".",
+      "selector": "source.python"
+    }
+  ],
+  "binary_file_patterns": [
+    "*.jpg",
+    "*.jpeg",
+    "*.png",
+    "*.gif",
+    "*.ttf",
+    "*.tga",
+    "*.dds",
+    "*.ico",
+    "*.eot",
+    "*.pdf",
+    "*.swf",
+    "*.jar",
+    "*.zip",
+    ".git/*",
+    "bin/*",
+    "dist/*",
+    "coverage/*",
+    ".nyc_output/*",
+    "node_modules/*",
+    "esdoc/*",
+    "vendor/*",
+    "vendors/*",
+    "*.js.map"
+  ],
+  "close_windows_when_empty": false,
+  "default_line_ending": "unix",
+  "drag_text": false,
+  "draw_white_space": "all",
+  "enable_tab_scrolling": false,
+  "fold_buttons": false,
+  "highlight_line": true,
+  "highlight_modified_tabs": true,
+  "ignored_packages": [
+    "Vintage"
+  ],
+  "overlay_scroll_bars": "enabled",
+  "show_encoding": true,
+  "show_full_path": true,
+  "show_line_endings": true,
+  "tab_size": 2,
+  "theme": "Adaptive.sublime-theme",
+  "translate_tabs_to_spaces": true,
+  "tree_animation_enabled": false,
+  "word_wrap": true
 }

@@ -2,6 +2,9 @@
   "clients": {
     "jsts": {
       "enabled": true
+    },
+    "pyls": {
+      "enabled": true
     }
   }
 }

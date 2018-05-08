@@ -4,9 +4,22 @@
     "GOPATH": "${HOME}/code",
     "PATH": "${GOPATH}/bin:${PATH}"
   },
-  "shell": ["/bin/bash", "--login", "-c", "$CMD"],
-  "fmt_cmd": ["goimports", "-srcdir", "$_dir"],
+  "shell": [
+    "/bin/bash",
+    "--login",
+    "-c",
+    "$CMD"
+  ],
+  "fmt_cmd": [
+    "goimports",
+    "-srcdir",
+    "$_dir"
+  ],
   "comp_lint_enabled": true,
   "autocomplete_suggest_imports": true,
-  "on_save": [{ "cmd": "gs_comp_lint" }]
+  "on_save": [
+    {
+      "cmd": "gs_comp_lint"
+    }
+  ]
 }

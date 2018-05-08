@@ -1,14 +1,28 @@
 [
-  { "modifiers": [ "super" ], "button": "button1", "press_command": "drag_select",
+  {
+    "modifiers": [
+      "super"
+    ],
+    "button": "button1",
+    "press_command": "drag_select",
     "command": "goto_definition"
   },
-  { "modifiers": [ "super" ], "button": "button1", "press_command": "drag_select",
+  {
+    "modifiers": [
+      "super"
+    ],
+    "button": "button1",
+    "press_command": "drag_select",
     "command": "go_guru_goto_definition",
-    "args": { "output": false },
-    "context": [ {
+    "args": {
+      "output": false
+    },
+    "context": [
+      {
         "key": "selector",
         "operator": "equal",
         "operand": "source.go"
-    }]
+      }
+    ]
   }
 ]

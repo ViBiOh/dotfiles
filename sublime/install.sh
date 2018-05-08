@@ -22,6 +22,10 @@ if command -v go > /dev/null 2>&1; then
   go get -v -u golang.org/x/tools/cmd/guru
 fi
 
+if command -v python > /dev/null 2>&1; then
+  pip install python-language-server pycodestyle
+fi
+
 if command -v npm > /dev/null 2>&1; then
   npm install -g javascript-typescript-langserver
 fi
