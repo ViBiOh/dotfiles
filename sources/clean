@@ -3,6 +3,9 @@
 function os_clean() {
   sudo find / \( -name ".DS_Store" -o -name ".localized" \) -exec rm -f {} \;
 
+  kill "${SSH_AGENT_PID}"
+  ps aux | grep gpg-agent | awk '{print $2}' | xargs kill
+
   if [ `uname -s` == "Darwin" ]; then
     sudo sync && sudo purge
   else
