@@ -1,0 +1,8 @@
+{
+  "shell_cmd": "go test -run $file -cover",
+  "selector": "source.go",
+  "file_patterns": [
+    "*_test.go"
+  ],
+  "quiet": true
+}
