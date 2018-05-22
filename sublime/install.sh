@@ -18,8 +18,8 @@ if command -v go > /dev/null 2>&1; then
   echo Updating golang packages
 
   go get -v -u github.com/nsf/gocode
+  go get -v -u github.com/sourcegraph/go-langserver
   go get -v -u golang.org/x/tools/cmd/gotype
-  go get -v -u golang.org/x/tools/cmd/guru
 fi
 
 if command -v python > /dev/null 2>&1; then

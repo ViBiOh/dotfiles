@@ -1,5 +1,12 @@
 {
   "clients": {
+    "golsp": {
+      "enabled": true,
+      "command": [
+        "go-langserver",
+        "-gocodecompletion"
+      ]
+    },
     "jsts": {
       "enabled": true
     },

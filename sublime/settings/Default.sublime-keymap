@@ -15,15 +15,12 @@
     "keys": [
       "super+right"
     ],
-    "command": "go_guru_goto_definition",
-    "args": {
-      "output": false
-    },
+    "command": "lsp_symbol_definition",
     "context": [
       {
         "key": "selector",
         "operator": "equal",
-        "operand": "source.go"
+        "operand": "source.js,source.py,source.go"
       }
     ]
   },

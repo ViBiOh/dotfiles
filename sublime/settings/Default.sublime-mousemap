@@ -13,15 +13,12 @@
     ],
     "button": "button1",
     "press_command": "drag_select",
-    "command": "go_guru_goto_definition",
-    "args": {
-      "output": false
-    },
+    "command": "lsp_symbol_definition",
     "context": [
       {
         "key": "selector",
         "operator": "equal",
-        "operand": "source.go"
+        "operand": "source.js,source.py,source.go"
       }
     ]
   }
