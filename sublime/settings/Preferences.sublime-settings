@@ -33,6 +33,7 @@
     "*.jar",
     "*.zip",
     ".git/*",
+    ".cache/*",
     "bin/*",
     "dist/*",
     "coverage/*",
