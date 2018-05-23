@@ -20,7 +20,7 @@
       {
         "key": "selector",
         "operator": "equal",
-        "operand": "source.js,source.py,source.go"
+        "operand": "source.js,source.python,source.go"
       }
     ]
   },
