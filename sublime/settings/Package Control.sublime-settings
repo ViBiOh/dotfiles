@@ -14,7 +14,6 @@
     "SublimeLinter",
     "SublimeLinter-eslint",
     "SublimeLinter-golint",
-    "SublimeLinter-govet",
-    "Sublimerge 3"
+    "SublimeLinter-govet"
   ]
 }
