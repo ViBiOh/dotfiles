@@ -37,12 +37,5 @@
 [pull]
 	rebase = preserve
 
-[merge]
-	tool = sublimerge
-
-[mergetool "sublimerge"]
-	cmd = subl -n --wait \"$REMOTE\" \"$BASE\" \"$LOCAL\" \"$MERGED\" --command \"sublimerge_diff_views\"
-	trustExitCode = false
-
 [commit]
 	gpgsign = true
