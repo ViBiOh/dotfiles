@@ -55,6 +55,7 @@ if [ `uname` == 'Darwin' ]; then
       golang \
       graphviz \
       pgcli \
+      jq \
       python
 
     echo
