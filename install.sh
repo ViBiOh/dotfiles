@@ -54,9 +54,7 @@ if [ `uname` == 'Darwin' ]; then
       node \
       golang \
       graphviz \
-      pgcli \
-      jq \
-      python
+      pgcli
 
     echo
     echo Installing curl with right option
@@ -66,13 +64,6 @@ if [ `uname` == 'Darwin' ]; then
     echo
     echo Configuring FZF
     /usr/local/opt/fzf/install
-
-    echo
-    echo Configuring Python
-    unlink /usr/local/bin/python
-    ln -s /usr/local/bin/python3 /usr/local/bin/python
-    unlink /usr/local/bin/pip
-    ln -s /usr/local/bin/pip3 /usr/local/bin/pip
 
     echo
     echo Configuring pgcli
