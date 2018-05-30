@@ -12,10 +12,6 @@
     {
       "characters": ".",
       "selector": "source.go"
-    },
-    {
-      "characters": ".",
-      "selector": "source.python"
     }
   ],
   "binary_file_patterns": [

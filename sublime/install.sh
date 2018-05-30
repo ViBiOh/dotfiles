@@ -12,7 +12,6 @@ rm -rf "${PKG_USER}/*"
 cp snippets/* "${PKG_USER}/"
 cp settings/* "${PKG_USER}/"
 
-
 if command -v go > /dev/null 2>&1; then
   echo
   echo Updating golang packages
