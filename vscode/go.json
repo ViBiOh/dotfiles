@@ -27,7 +27,7 @@
     "prefix": "gh",
     "body": [
       "// Handler for request. Should be use with net/http",
-      "func (a *App) Handler() http.Handler {",
+      "func (a App) Handler() http.Handler {",
       "\treturn http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {",
       "\t})",
       "}"
