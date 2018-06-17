@@ -17,7 +17,7 @@ set statusline+=\ %p%% " Percentage of the file
 set statusline+=\ %l:%c " Line Number and Total Line
 set statusline+=\  " Empty space at end
 
-" Line and column highlight
+" Line highlight
 set cursorline
 
 " Show line numbers
@@ -49,6 +49,10 @@ set backspace=indent,eol,start
 
 " Hightlight search
 set hlsearch
+
+" Clear highligh when pressing escape
+nnoremap <esc> :noh<return><esc>
+nnoremap <esc>^[ <esc>^[
 
 " Search as you type character
 set incsearch
@@ -85,3 +89,20 @@ endif
 
 " Disabling viminfo
 set viminfo=""
+
+" vim-plug
+call plug#begin()
+
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+Plug 'natebosch/vim-lsc'
+
+call plug#end()
+
+" Search using ctrl-p
+noremap <C-p> :Files<return>
+
+" Setting Language Server Protocol
+if exists(":let")
+  let g:lsc_server_commands = {'go': 'go-langserver', 'javascript': 'javascript-typescript-stdio'}
+endif

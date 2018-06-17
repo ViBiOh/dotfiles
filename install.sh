@@ -13,6 +13,10 @@ if [ ! -e "${HOME}/.gnupg/gpg-agent.conf" ]; then
   ln -s "${HOME}/.gpg-agent.conf" "${HOME}/.gnupg/gpg-agent.conf"
 fi
 
+if [ ! -e "${HOME}/.vim/autoload/plug.vim" ]; then
+  curl -fLo "${HOME}/.vim/autoload/plug.vim" --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
 MAC_OS_SSH_CONFIG=""
 if [ `uname` == 'Darwin' ]; then
   MAC_OS_SSH_CONFIG="
