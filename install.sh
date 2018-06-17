@@ -51,6 +51,8 @@ if [ `uname` == 'Darwin' ]; then
       openssl \
       gnupg \
       pass \
+      oath-toolkit \
+      zbar \
       node \
       golang \
       graphviz \
@@ -69,6 +71,12 @@ if [ `uname` == 'Darwin' ]; then
     echo Configuring pgcli
     mkdir -p "${HOME}/.config/pgcli"
     ln -s "${HOME}/.pgclirc" "${HOME}/.config/pgcli/config"
+
+    echo
+    echo Configuration pass-otp
+    git clone https://github.com/tadfisher/pass-otp
+    cd pass-otp
+    make install PREFIX=/usr/local
 
     echo
     echo Follow instruction in README for configuring bash
