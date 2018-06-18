@@ -95,7 +95,6 @@ call plug#begin()
 
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-Plug 'natebosch/vim-lsc'
 Plug 'pangloss/vim-javascript'
 Plug 'ErichDonGubler/vim-sublime-monokai'
 
@@ -108,9 +107,6 @@ noremap <C-p> :Files<return>
 colorscheme sublimemonokai
 
 if exists(":let")
-  " Setting Language Server Protocol
-  let g:lsc_server_commands = {'go': 'go-langserver', 'javascript': 'javascript-typescript-stdio'}
-
    " Enable JSDoc highlight
   let g:javascript_plugin_jsdoc = 1
 endif
