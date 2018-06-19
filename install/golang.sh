@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "${GREEN}Golang${RESET}"
+echo -e "${GREEN}Golang${RESET}"
 
 if [ `uname` == 'Darwin' ]; then
   brew reinstall golang graphviz

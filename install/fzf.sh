@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "${GREEN}FZF${RESET}"
+echo -e "${GREEN}FZF${RESET}"
 
 FZF_INSTALL=`brew --prefix`/opt/fzf/install
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "${GREEN}Brew${RESET}"
+echo -e "${GREEN}Brew${RESET}"
 
 if [ `uname` == 'Darwin' ]; then
   if ! command -v brew > /dev/null 2>&1; then

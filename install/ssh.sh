@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "${GREEN}SSH${RESET}"
+echo -e "${GREEN}SSH${RESET}"
 
 MAC_OS_SSH_CONFIG=""
 if [ `uname` == 'Darwin' ]; then

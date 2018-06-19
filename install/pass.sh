@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "${GREEN}Pass${RESET}"
+echo -e "${GREEN}Pass${RESET}"
 
 if [ `uname` == 'Darwin' ]; then
   brew reinstall pass oath-toolkit zbar

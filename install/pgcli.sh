@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "${GREEN}Pgcli${RESET}"
+echo -e "${GREEN}Pgcli${RESET}"
 
 if [ `uname` == 'Darwin' ]; then
   brew reinstall pgcli
