@@ -18,5 +18,5 @@ else
 fi
 
 if [ ! -e "${HOME}/.fzf.bash" ]; then
-  FZF_INSTALL
+  FZF_INSTALL --key-bindings --completion --no-update-rc
 fi
