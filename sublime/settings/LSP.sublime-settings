@@ -10,8 +10,8 @@
     "jsts": {
       "enabled": true,
       "command": ["javascript-typescript-stdio"],
-      "scopes": ["source.ts", "source.tsx", "source.js", "source.jsx"],
-      "syntaxes": ["Packages/TypeScript-TmLanguage/TypeScript.tmLanguage", "Packages/TypeScript-TmLanguage/TypeScriptReact.tmLanguage", "Packages/Babel/JavaScript (Babel).sublime-syntax", "Packages/JavaScript/JavaScript.sublime-syntax"],
+      "scopes": ["source.js", "source.jsx"],
+      "syntaxes": ["Packages/Babel/JavaScript (Babel).sublime-syntax", "Packages/JavaScript/JavaScript.sublime-syntax"],
       "languageId": "typescript"
     },
   }

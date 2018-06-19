@@ -16,9 +16,9 @@ if command -v go > /dev/null 2>&1; then
   echo
   echo Updating golang packages
 
-  go get -v -u github.com/nsf/gocode
-  go get -v -u github.com/sourcegraph/go-langserver
-  go get -v -u golang.org/x/tools/cmd/gotype
+  go get -u github.com/nsf/gocode
+  go get -u github.com/sourcegraph/go-langserver
+  go get -u golang.org/x/tools/cmd/gotype
 fi
 
 if command -v npm > /dev/null 2>&1; then
