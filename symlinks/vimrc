@@ -90,23 +90,6 @@ endif
 " Disabling viminfo
 set viminfo=""
 
-" vim-plug
-call plug#begin()
-
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-Plug 'pangloss/vim-javascript'
-Plug 'ErichDonGubler/vim-sublime-monokai'
-
-call plug#end()
-
-" Search using ctrl-p
-noremap <C-p> :Files<return>
-
-" Enable sublime-monokai colorscheme
-colorscheme sublimemonokai
-
-if exists(":let")
-   " Enable JSDoc highlight
-  let g:javascript_plugin_jsdoc = 1
-endif
+" Search using ctrl-p and fzf
+set rtp+=~/.fzf
+noremap <C-p> :FZF<return>
