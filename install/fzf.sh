@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "----------"
-echo "- FZF"
+echo "- FZF    -"
 echo "----------"
 
 if [ ! -d "${HOME}/.fzf" ]; then

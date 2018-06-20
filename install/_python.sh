@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "----------"
-echo "- Python"
+echo "- Python -"
 echo "----------"
 
 if [ `uname` == 'Darwin' ]; then
@@ -14,5 +14,7 @@ if [ `uname` == 'Darwin' ]; then
   unlink ${BREW_PREFIX}/bin/pip
   ln -s ${BREW_PREFIX}/bin/pip3 /usr/local/bin/pip
 else
-  sudo apt-get install python-pip
+  sudo apt-get install -y -qq python python-pip
 fi
+
+sudo pip install --upgrade pip

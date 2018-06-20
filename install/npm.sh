@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "----------"
-echo "- Npm"
+echo "- NPM    -"
 echo "----------"
 
 if [ `uname` == 'Darwin' ]; then

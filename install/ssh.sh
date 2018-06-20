@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "----------"
-echo "- SSH"
+echo "- SSH    -"
 echo "----------"
 
 MAC_OS_SSH_CONFIG=""

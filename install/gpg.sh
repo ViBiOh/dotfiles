@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "----------"
-echo "- GPG"
+echo "- GPG    -"
 echo "----------"
 
 if command -v gpg > /dev/null 2>&1; then

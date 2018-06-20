@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "----------"
-echo "- Common"
+echo "- Common -"
 echo "----------"
 
 if [ `uname` == 'Darwin' ]; then
@@ -22,7 +22,7 @@ if [ `uname` == 'Darwin' ]; then
     gnupg \
     fd
 else
-  sudo apt-get install \
+  sudo apt-get install -y -qq \
     bash \
     bash-completion \
     htop \

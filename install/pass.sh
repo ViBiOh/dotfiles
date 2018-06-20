@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 echo "----------"
-echo "- Pass"
+echo "- Pass   -"
 echo "----------"
 
 if [ `uname` == 'Darwin' ]; then
   brew reinstall pass oath-toolkit zbar
 else
-  sudo apt-get install pass
+  sudo apt-get install -y -qq pass
 fi
 
 if command -v git > /dev/null 2>&1; then

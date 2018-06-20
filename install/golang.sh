@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "----------"
-echo "- Golang"
+echo "- Golang -"
 echo "----------"
 
 if [ `uname` == 'Darwin' ]; then
