@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-echo -e "${GREEN}Npm${RESET}"
+echo "----------"
+echo "- Npm"
+echo "----------"
 
 if [ `uname` == 'Darwin' ]; then
   brew reinstall node

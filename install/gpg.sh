@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-echo -e "${GREEN}GPG${RESET}"
+echo "----------"
+echo "- GPG"
+echo "----------"
 
 if command -v gpg > /dev/null 2>&1; then
   if [ ! -e "${HOME}/.gnupg/gpg-agent.conf" ]; then
