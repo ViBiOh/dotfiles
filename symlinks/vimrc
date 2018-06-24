@@ -37,6 +37,7 @@ set wrap
 
 " Spaces tab's width and indent size
 set tabstop=2 shiftwidth=2
+filetype indent on
 
 " Show matching parenthesis
 set showmatch
