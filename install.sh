@@ -4,7 +4,7 @@ for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks/*; do
   [ -r "${file}" ] && [ -e "${file}" ] && rm -f ${HOME}/.`basename ${file}` && ln -s ${file} ${HOME}/.`basename ${file}`
 done
 
-for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/install/*; do
+for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/init/*; do
   [ -r "${file}" ] && [ -e "${file}" ] && "${file}"
 done
 

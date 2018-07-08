@@ -6,7 +6,7 @@
 mkdir -p ${HOME}/code/src/github.com/ViBiOh/
 cd ${HOME}/code/src/github.com/ViBiOh/
 git clone https://github.com/ViBiOh/dotfiles.git
-./dotfiles/build.sh
+./dotfiles/install.sh
 ```
 
 ## SSH
