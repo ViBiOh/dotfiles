@@ -1,6 +1,6 @@
 <snippet>
 		<content><![CDATA[
-if strings.HasPrefix(r.URL.Path, `/debug/pprof`) {
+if strings.HasPrefix(r.URL.Path, "/debug/pprof") {
 	if strings.HasPrefix(r.URL.Path, "/debug/pprof/cmdline") {
 		pprof.Cmdline(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/debug/pprof/profile") {

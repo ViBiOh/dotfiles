@@ -8,14 +8,14 @@ type App struct {
 // NewApp creates new App from Flags' config
 func NewApp(config map[string]*string) *App {
 	return &App{
-		${1:FlagName}: *config[`${1:FlagName}`],
+		${1:FlagName}: *config["${1:FlagName}"],
 	}
 }
 
 // Flags adds flags for given prefix
 func Flags(prefix string) map[string]*string {
 	return map[string]*string{
-		`${1:FlagName}`: flag.String(tools.ToCamel(fmt.Sprintf(`%s${2:FlagValue}`, prefix)), ``, `${3:FlagDesc}`),
+		"${1:FlagName}": flag.String(tools.ToCamel(fmt.Sprintf("%s${2:FlagValue}", prefix)), "", "${3:FlagDesc}"),
 	}
 }
 

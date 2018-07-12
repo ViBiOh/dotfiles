@@ -8,10 +8,10 @@ func Test_${1:FuncName}(t *testing.T) {
 		wantErr error
 	}{
 		{
-			`should work with given params`,
-			`test`,
+			"should work with given params",
+			"test",
 			false,
-			errors.New(`Error while testing`),
+			errors.New("Error while testing"),
 		},
 	}
 
@@ -33,7 +33,7 @@ func Test_${1:FuncName}(t *testing.T) {
 		}
 
 		if failed {
-			t.Errorf("%s\n${1:FuncName}(%+v) = (%+v, %+v), want (%+v, %+v)", testCase.intention, testCase.input, result, err, testCase.want, testCase.wantErr)
+			t.Errorf("%s\n${1:FuncName}(`%s`) = (%+v, %+v), want (%+v, %+v)", testCase.intention, testCase.input, result, err, testCase.want, testCase.wantErr)
 		}
 	}
 }

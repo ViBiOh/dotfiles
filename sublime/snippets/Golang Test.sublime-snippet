@@ -7,15 +7,15 @@ func Test_${2:FuncName}(t *testing.T) {
 		want      bool
 	}{
 		{
-			`should work with given params`,
-			`test`,
+			"should work with given params",
+			"test",
 			true,
 		},
 	}
 
 	for _, testCase := range cases {
 		if result := ${2:FuncName}(testCase.input); result != testCase.want {
-			t.Errorf("%s\n${2:FuncName}(%+v) = %+v, want %+v", testCase.intention, testCase.input, result, testCase.want)
+			t.Errorf("%s\n${2:FuncName}(`%s`) = %+v, want %+v", testCase.intention, testCase.input, result, testCase.want)
 		}
 	}
 }

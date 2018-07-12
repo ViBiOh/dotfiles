@@ -8,9 +8,9 @@ func Test_${1:FuncName}(t *testing.T) {
 		wantStatus int
 	}{
 		{
-			`should work with given params`,
-			httptest.NewRequest(http.MethodGet, `/`, nil),
-			``,
+			"should work with given params",
+			httptest.NewRequest(http.MethodGet, "/", nil),
+			"",
 			http.StatusOK,
 		},
 	}
@@ -21,11 +21,11 @@ func Test_${1:FuncName}(t *testing.T) {
 			${1:FuncName}(writer, testCase.request)
 
 			if result := writer.Code; result != testCase.wantStatus {
-				t.Errorf("%s\n${1:FuncName}(%+v) = %+v, want status %+v", testCase.intention, testCase.request, result, testCase.wantStatus)
+				t.Errorf("%s\n${1:FuncName}(%+v) = %d, want status %d", testCase.intention, testCase.request, result, testCase.wantStatus)
 			}
 
 			if result, _ := request.ReadBody(writer.Result().Body); string(result) != testCase.want {
-				t.Errorf("%s\n${1:FuncName}(%+v) = %+v, want %+v", testCase.intention, testCase.request, string(result), testCase.want)
+				t.Errorf("%s\n${1:FuncName}(%+v) = `%s`, want `%s`", testCase.intention, testCase.request, string(result), testCase.want)
 			}
 	}
 }
