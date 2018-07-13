@@ -7,8 +7,8 @@ func Test_${2:FuncName}(t *testing.T) {
 		want      bool
 	}{
 		{
-			"should work with given params",
-			"test",
+			`should work with given params`,
+			`test`,
 			true,
 		},
 	}

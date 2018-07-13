@@ -8,9 +8,9 @@ func Test_${1:FuncName}(t *testing.T) {
 		wantStatus int
 	}{
 		{
-			"should work with given params",
-			httptest.NewRequest(http.MethodGet, "/", nil),
-			"",
+			`should work with given params`,
+			httptest.NewRequest(http.MethodGet, `/`, nil),
+			``,
 			http.StatusOK,
 		},
 	}
