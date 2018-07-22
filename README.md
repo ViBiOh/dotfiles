@@ -32,3 +32,12 @@ And also for current user
 ```bash
 chsh -s /usr/local/bin/bash
 ```
+
+## Brew
+
+Fix it with following command when it's broken.
+
+```bash
+sudo chown -R `whoami` `brew --prefix`/*
+brew doctor
+```

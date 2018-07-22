@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -e
+set -u
+
 mkdir -p projects
 
 for project in ${HOME}/code/src/github.com/ViBiOh/*; do
