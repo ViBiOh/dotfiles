@@ -2,7 +2,7 @@
   "bootstrapped": true,
   "in_process_packages": [],
   "installed_packages": [
-		"A File Icon",
+    "A File Icon",
     "Babel",
     "DocBlockr",
     "Git",
@@ -11,6 +11,7 @@
     "Markdown Preview",
     "Package Control",
     "Pretty JSON",
+    "JsPrettier",
     "SideBarEnhancements",
     "SublimeLinter",
     "SublimeLinter-eslint",

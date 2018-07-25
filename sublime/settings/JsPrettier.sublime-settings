@@ -1,0 +1,8 @@
+{
+  "allow_inline_formatting": true,
+  "prettier_options": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 100
+  }
+}

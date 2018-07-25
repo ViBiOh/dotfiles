@@ -26,6 +26,12 @@
   },
   {
     "keys": [
+      "super+alt+f"
+    ],
+    "command": "js_prettier"
+  },
+  {
+    "keys": [
       "super+m"
     ],
     "command": "set_layout",
