@@ -26,7 +26,7 @@
   },
   {
     "keys": [
-      "super+alt+f"
+      "super+option+f"
     ],
     "command": "js_prettier"
   },
