@@ -94,3 +94,6 @@ set viminfo=""
 " Search using ctrl-p and fzf
 set rtp+=~/.fzf
 noremap <C-p> :FZF<return>
+
+" Save file with sudo permission
+command W :execute ':silent w !sudo tee % > /dev/null' | :edit!
