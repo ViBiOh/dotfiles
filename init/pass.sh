@@ -16,6 +16,6 @@ fi
 if command -v git > /dev/null 2>&1; then
   git clone https://github.com/tadfisher/pass-otp "${HOME}/pass-otp"
   cd "${HOME}/pass-otp"
-  make install PREFIX=/usr/local
+  sudo make install PREFIX=/usr/local
   rm -rf "${HOME}/pass-otp"
 fi

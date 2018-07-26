@@ -13,5 +13,5 @@ fi
 
 if command -v pgcli > /dev/null 2>&1; then
   mkdir -p "${HOME}/.config/pgcli"
-  ln -s "${HOME}/.pgclirc" "${HOME}/.config/pgcli/config"
+  ln -s -f "${HOME}/.pgclirc" "${HOME}/.config/pgcli/config"
 fi
