@@ -13,7 +13,7 @@ for folder in github.com/ViBiOh; do
     cat > "${fileName}" <<DELIM
 {
   "folders": [{
-      "path": "/Users/vibioh/code/src/${folder}/${projectName}"
+      "path": "${project}"
   }]
 }
 DELIM
