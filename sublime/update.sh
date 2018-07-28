@@ -23,7 +23,7 @@ if command -v go > /dev/null 2>&1; then
 fi
 
 if command -v npm > /dev/null 2>&1; then
-  npm install -g prettier javascript-typescript-langserver
+  npm install --ignore-scripts -g prettier javascript-typescript-langserver
 fi
 
 echo Success!
