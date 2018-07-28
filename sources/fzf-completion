@@ -6,8 +6,11 @@ fi
 
 if command -v git > /dev/null 2>&1; then
   function gitco() {
-    local branch=`git branch -vv --all | fzf --ansi --reverse`
-    git checkout `echo ${branch} | awk '{print $1}' | sed 's|^remotes/origin/||'`
+    local branch=`git branch -vv --all | fzf --ansi --reverse -q "${1}" -1`
+
+    if [ -n "${branch}" ]; then
+      git checkout `echo ${branch} | awk '{print $1}' | sed 's|^remotes/origin/||'`
+    fi
   }
 
   function gitlg() {
@@ -19,12 +22,18 @@ if command -v pass > /dev/null 2>&1; then
   function passfor() {
     local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
     local file=`find "${PASS_DIR}" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|" | fzf --reverse -q "${1}" -1`
-    pass -c "${file}"
+
+    if [ -n "${file}" ]; then
+      pass -c "${file}"
+    fi
   }
 
   function otpfor() {
     local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
     local file=`find "${PASS_DIR}" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|" | fzf --reverse -q "${1}" -1`
-    pass otp -c "${file}"
+
+    if [ -n "${file}" ]; then
+      pass otp -c "${file}"
+    fi
   }
 fi
