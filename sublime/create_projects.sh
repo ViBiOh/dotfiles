@@ -5,12 +5,11 @@ set -u
 
 mkdir -p projects
 
-for folder in github.com/ViBiOh; do
-  for project in ${HOME}/code/src/${folder}/*; do
-    projectName=`basename ${project}`
-    fileName="./projects/${projectName}.sublime-project"
+for project in ${HOME}/code/src/github.com/ViBiOh/*; do
+  projectName=`basename ${project}`
+  fileName="./projects/${projectName}.sublime-project"
 
-    cat > "${fileName}" <<DELIM
+  cat > "${fileName}" <<DELIM
 {
   "folders": [{
       "path": "${project}"
@@ -18,7 +17,6 @@ for folder in github.com/ViBiOh; do
 }
 DELIM
 
-    subl --project "${fileName}"
+  subl --project "${fileName}"
 
-  done
 done
