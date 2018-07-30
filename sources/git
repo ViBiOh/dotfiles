@@ -20,6 +20,8 @@ function git_root() {
   fi
 }
 
+alias ...='git_root'
+
 function git_prune() {
   git prune
   git branch --merged | egrep -v "(^\*|master)" | xargs git branch -d
