@@ -25,6 +25,7 @@
 [alias]
 	branches = branch --list -r
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+	pushf = push --force-with-lease
 
 [log]
 	abbrevCommit = true
