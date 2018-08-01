@@ -13,8 +13,8 @@ if command -v git > /dev/null 2>&1; then
     fi
   }
 
-  function gitlg() {
-    git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' "${@}" | fzf --ansi --reverse --tiebreak=index --no-sort --preview 'f() { set -- $(echo -- "$@" | grep -o "[a-f0-9]\{7\}"); [ $# -eq 0 ] || git show --color=always $1; }; f {}'
+  function git_lg_preview() {
+    fzf --ansi --reverse --tiebreak=index --no-sort --preview 'f() { set -- $(echo -- "$@" | grep -o "[a-f0-9]\{7\}"); [ $# -eq 0 ] || git show --color=always $1; }; f {}'
   }
 fi
 
