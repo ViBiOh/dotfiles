@@ -438,7 +438,7 @@
 		</dict>
 	</dict>
 	<key>Default Arrangement Name</key>
-	<string>Dev</string>
+	<string>VM</string>
 	<key>Default Bookmark Guid</key>
 	<string>05680B20-DCE6-4363-9D00-F08C8F3A962D</string>
 	<key>DimBackgroundWindows</key>
@@ -501,7 +501,7 @@
 	<key>NSWindow Frame SharedPreferences</key>
 	<string>670 536 796 473 0 0 1920 1058 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 606 570 452 0 0 1920 1058 </string>
+	<string>0 0 1920 1058 0 0 1920 1058 </string>
 	<key>NeverWarnAboutShortLivedSessions_05680B20-DCE6-4363-9D00-F08C8F3A962D</key>
 	<true/>
 	<key>NeverWarnAboutShortLivedSessions_05680B20-DCE6-4363-9D00-F08C8F3A962D_selection</key>
@@ -1166,6 +1166,8 @@
 		<string>000</string>
 	</array>
 	<key>OpenArrangementAtStartup</key>
+	<true/>
+	<key>OpenBookmark</key>
 	<false/>
 	<key>OpenNoWindowsAtStartup</key>
 	<false/>
@@ -1215,7 +1217,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2018-08-01T06:21:08Z</date>
+	<date>2018-08-02T06:31:09Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>ShowPaneTitles</key>
