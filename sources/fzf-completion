@@ -25,15 +25,14 @@ if command -v pass > /dev/null 2>&1; then
 
     if [ -n "${file}" ]; then
       pass -c "${file}"
-    fi
-  }
 
-  function otpfor() {
-    local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
-    local file=`find "${PASS_DIR}" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|" | fzf --reverse -q "${1}" -1`
+      local hasOtp=`pass show "${file}" | grep '^otpauth:' | wc -l`
+      if [ "${hasOtp}" -eq 1 ]; then
+        read -s -p "  Press enter for otp"
+        echo ""
 
-    if [ -n "${file}" ]; then
-      pass otp -c "${file}"
+        pass otp -c "${file}"
+      fi
     fi
   }
 fi
