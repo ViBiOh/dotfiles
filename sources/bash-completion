@@ -2,8 +2,6 @@
 
 if command -v brew > /dev/null 2>&1 && [ -e "`brew --prefix`/etc/bash_completion" ]; then
     source `brew --prefix`/etc/bash_completion
-else
-    if [ -e /var/bash-completion/bash_completion ]; then
-        source /var/bash-completion/bash_completion
-    fi
+elif [ -e /var/bash-completion/bash_completion ]; then
+    source /var/bash-completion/bash_completion
 fi
