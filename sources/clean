@@ -7,15 +7,13 @@ function os_clean() {
     kill "${SSH_AGENT_PID}"
   fi
 
-  ps aux | grep gpg-agent | awk '{print $2}' | xargs kill
+  gpgconf --kill gpg-agent
 
   if [ `uname -s` == "Darwin" ]; then
     sudo sync && sudo purge
+  elif [ `sudo which sysctl | wc -l` -ne 0 ] && [ `sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l` -ne 0 ]; then
+    sudo sysctl vm.drop_caches=3
   else
-    if [ `sudo which sysctl | wc -l` -ne 0 ] && [ `sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l` -ne 0 ]; then
-      sudo sysctl vm.drop_caches=3
-    else
-      sudo sync; echo 3 > /proc/sys/vm/drop_caches
-    fi
+    sudo sync; echo 3 > /proc/sys/vm/drop_caches
   fi
 }
