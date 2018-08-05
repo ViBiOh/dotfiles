@@ -8,7 +8,7 @@ echo "- Golang -"
 echo "----------"
 
 if [ `uname -s` == 'Darwin' ]; then
-  brew reinstall golang graphviz
+  brew reinstall golang
 fi
 
 if command -v go > /dev/null 2>&1; then
