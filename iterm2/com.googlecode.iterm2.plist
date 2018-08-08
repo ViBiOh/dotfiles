@@ -501,9 +501,9 @@
 	<key>NSTableView Supports v2 KeyBingingTable</key>
 	<true/>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>671 539 796 473 0 0 1920 1058 </string>
+	<string>671 560 796 473 0 0 1920 1058 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 34 1920 1024 0 0 1920 1058 </string>
+	<string>0 -10 1920 1058 0 0 1920 1058 </string>
 	<key>NeverWarnAboutShortLivedSessions_05680B20-DCE6-4363-9D00-F08C8F3A962D</key>
 	<true/>
 	<key>NeverWarnAboutShortLivedSessions_05680B20-DCE6-4363-9D00-F08C8F3A962D_selection</key>
@@ -1142,7 +1142,7 @@
 			<key>Visual Bell</key>
 			<false/>
 			<key>Window Type</key>
-			<integer>12</integer>
+			<integer>0</integer>
 			<key>Working Directory</key>
 			<string>/Users/vboutour</string>
 		</dict>
