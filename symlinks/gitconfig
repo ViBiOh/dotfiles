@@ -23,6 +23,7 @@
 	default = current
 
 [alias]
+	sweep = "!f() { git prune && git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d; }; f"
 	branches = branch --list -r
 	pushu = push -u
 	pushf = push --force-with-lease
