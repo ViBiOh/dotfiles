@@ -40,6 +40,7 @@ else
 
   if [ -e "fd_${FD_VERSION}_${architecture}" ]; then
     sudo dpkg -i fd_${FD_VERSION}_${architecture}.deb
-    rm -rf fd_${FD_VERSION}_${architecture}.deb
   fi
+
+  rm -rf fd_${FD_VERSION}_${architecture}.deb
 fi
