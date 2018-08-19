@@ -93,7 +93,6 @@ set viminfo=""
 
 " Showing space and tabs
 set listchars=space:␣,tab:>-
-set list
 
 " Search using ctrl-p and fzf
 set rtp+=~/.fzf

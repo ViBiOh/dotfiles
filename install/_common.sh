@@ -22,7 +22,6 @@ if [ `uname` == 'Darwin' ]; then
     git \
     fswatch \
     openssl \
-    gnupg \
     fd
 else
   sudo apt-get install -y -qq \
@@ -30,8 +29,7 @@ else
     bash-completion \
     htop \
     git \
-    openssl \
-    gnupg
+    openssl
 
   # FD
   architecture=`dpkg --print-architecture`

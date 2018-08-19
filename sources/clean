@@ -17,3 +17,8 @@ function os_clean() {
     sudo sync; echo 3 > /proc/sys/vm/drop_caches
   fi
 }
+
+function brew_clean_all() {
+  brew remove --force `brew list` --ignore-dependencies
+  brew cleanup
+}
