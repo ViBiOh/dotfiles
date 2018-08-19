@@ -12,7 +12,7 @@ if ! command -v git > /dev/null 2>&1; then
 fi
 
 if command -v brew > /dev/null 2>&1; then
-  brew reinstall gnu-getopt tree
+  brew reinstall gnu-getopt tree oath-toolkit
 else
   sudo apt-get install -y -qq tree
 fi
