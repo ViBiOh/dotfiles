@@ -5,3 +5,7 @@
 for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/*; do
   [ -r "${file}" ] && [ -f "${file}" ] && source "${file}"
 done
+
+if [ -e "${HOME}/.localrc" ]; then
+  source "${HOME}/.localrc"
+fi
