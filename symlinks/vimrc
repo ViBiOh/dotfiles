@@ -97,9 +97,6 @@ noremap <Right> <Nop>
 " Disabling viminfo
 set viminfo=""
 
-" Showing space and tabs
-set listchars=space:␣,tab:>-
-
 " Search using ctrl-p and fzf
 set rtp+=~/.fzf
 noremap <C-p> :FZF<return>
