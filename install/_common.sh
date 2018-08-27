@@ -20,7 +20,7 @@ if [ `uname` == 'Darwin' ]; then
     git \
     fswatch \
     openssl
-else
+elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get install -y -qq \
     bash \
     bash-completion \

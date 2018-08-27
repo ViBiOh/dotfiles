@@ -9,6 +9,6 @@ echo "-----------"
 
 if [ `uname -s` == 'Darwin' ]; then
   brew reinstall ripgrep
-else
+elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get install ripgrep
 fi

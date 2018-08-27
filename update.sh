@@ -13,7 +13,7 @@ done
 
 if [ `uname` == 'Darwin' ]; then
   brew cleanup
-else
+elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get autoremove -y
   sudo apt-get clean all
 fi

@@ -11,7 +11,7 @@ if [ `uname` == 'Darwin' ]; then
   brew reinstall \
     tmux \
     reattach-to-user-namespace
-else
+elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get install -y -qq \
     tmux
 fi
