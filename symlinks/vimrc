@@ -109,6 +109,10 @@ if executable("rg")
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 
+" Opening quickfix automatically
+autocmd QuickFixCmdPost [^l]* nested cwindow
+autocmd QuickFixCmdPost    l* nested lwindow
+
 " Save file with sudo permission
 if exists(':execute')
   command W :execute ':silent w !sudo tee % > /dev/null' | :edit!
