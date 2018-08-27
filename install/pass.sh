@@ -11,6 +11,10 @@ if ! command -v git > /dev/null 2>&1; then
   return
 fi
 
+if ! command -v make > /dev/null 2>&1; then
+  return
+fi
+
 if command -v brew > /dev/null 2>&1; then
   brew reinstall gnu-getopt tree oath-toolkit
 elif command -v apt-get > /dev/null 2>&1; then
