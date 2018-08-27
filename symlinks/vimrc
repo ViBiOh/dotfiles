@@ -37,7 +37,9 @@ set wrap
 
 " Spaces tab's width and indent size
 set tabstop=2 shiftwidth=2
-filetype indent on
+if exists(':filetype')
+  filetype indent on
+endif
 
 " Show matching parenthesis
 set showmatch
@@ -108,5 +110,6 @@ if executable("rg")
 endif
 
 " Save file with sudo permission
-command W :execute ':silent w !sudo tee % > /dev/null' | :edit!
-
+if exists(':execute')
+  command W :execute ':silent w !sudo tee % > /dev/null' | :edit!
+endif
