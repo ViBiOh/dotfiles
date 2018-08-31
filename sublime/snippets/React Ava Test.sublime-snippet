@@ -17,6 +17,6 @@ test('should always render as a ${2:Type}', (t) => {
 
 ]]></content>
     <tabTrigger>rat</tabTrigger>
-    <scope>source.js -(meta)</scope>
+    <scope>source.js</scope>
     <description>React Ava Test</description>
 </snippet>

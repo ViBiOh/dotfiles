@@ -3,6 +3,6 @@
 console.log('${1:var}', typeof ${1}, ${1});
 ]]></content>
     <tabTrigger>csl</tabTrigger>
-    <scope>source.js -(meta)</scope>
+    <scope>source.js</scope>
     <description>console.log</description>
 </snippet>

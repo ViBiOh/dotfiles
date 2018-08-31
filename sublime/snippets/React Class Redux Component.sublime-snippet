@@ -54,6 +54,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(${1:ComponentName}Co
 
 ]]></content>
 		<tabTrigger>rcr</tabTrigger>
-		<scope>source.js -(meta)</scope>
+		<scope>source.js</scope>
 		<description>React Class component with Redux</description>
 </snippet>

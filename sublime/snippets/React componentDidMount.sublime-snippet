@@ -9,6 +9,6 @@ componentDidMount() {
 
 ]]></content>
     <tabTrigger>cdm</tabTrigger>
-    <scope>source.js meta.class.js -(meta meta)</scope>
+    <scope>source.js</scope>
     <description>React: componentDidMount() {…}</description>
 </snippet>

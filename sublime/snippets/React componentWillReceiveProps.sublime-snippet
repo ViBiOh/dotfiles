@@ -10,6 +10,6 @@ componentWillReceiveProps(nextProps) {
 
 ]]></content>
     <tabTrigger>cwr</tabTrigger>
-    <scope>source.js meta.class.js -(meta meta)</scope>
+    <scope>source.js</scope>
     <description>React: componentWillReceiveProps(np) {…}</description>
 </snippet>

@@ -19,6 +19,6 @@ describe('<${1:ComponentName} />', () => {
 
 ]]></content>
     <tabTrigger>rmt</tabTrigger>
-    <scope>source.js -(meta)</scope>
+    <scope>source.js</scope>
     <description>React Mocha Test</description>
 </snippet>

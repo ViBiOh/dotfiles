@@ -11,6 +11,6 @@ componentWillUpdate(nextProps, nextState) {
 
 ]]></content>
     <tabTrigger>cwup</tabTrigger>
-    <scope>source.js meta.class.js -(meta meta)</scope>
+    <scope>source.js</scope>
     <description>React: componentWillUpdate(np, ns) {…}</description>
 </snippet>

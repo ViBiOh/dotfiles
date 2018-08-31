@@ -30,6 +30,6 @@ ${1:ComponentName}.propTypes = {
 
 ]]></content>
 		<tabTrigger>rcc</tabTrigger>
-		<scope>source.js -(meta)</scope>
+		<scope>source.js</scope>
 		<description>React Class Component</description>
 </snippet>
