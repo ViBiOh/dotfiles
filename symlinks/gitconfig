@@ -8,7 +8,6 @@
 	autocrlf = input
 	excludesfile = ~/.gitignore_global
 	ignorecase = false
-	pager = diff-so-fancy | less --tabs=4 -RFX
 
 [color]
 	ui = true

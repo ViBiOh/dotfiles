@@ -144,4 +144,8 @@ function watch_sync() {
   done
 }
 
+if command -v diff-so-fancy > /dev/null 2>&1; then
+  export GIT_PAGER='diff-so-fancy | less --tabs=4 -RFX'
+fi
+
 alias ...='git_root'
