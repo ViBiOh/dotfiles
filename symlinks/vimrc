@@ -90,12 +90,6 @@ if exists(":let")
   let mapleader=","
 endif
 
-" Disabling arrow keys
-noremap <Up> <Nop>
-noremap <Down> <Nop>
-noremap <Left> <Nop>
-noremap <Right> <Nop>
-
 " Disabling viminfo
 set viminfo=""
 
