@@ -13,8 +13,6 @@
     "JsPrettier",
     "SideBarEnhancements",
     "SublimeLinter",
-    "SublimeLinter-eslint",
-    "SublimeLinter-golint",
-    "SublimeLinter-govet"
+    "SublimeLinter-eslint"
   ]
 }

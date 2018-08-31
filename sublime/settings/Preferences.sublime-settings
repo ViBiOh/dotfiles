@@ -48,9 +48,7 @@
   "fold_buttons": false,
   "highlight_line": true,
   "highlight_modified_tabs": true,
-  "ignored_packages": [
-    "Vintage"
-  ],
+  "ignored_packages": ["Vintage"],
   "overlay_scroll_bars": "enabled",
   "show_encoding": true,
   "show_full_path": true,

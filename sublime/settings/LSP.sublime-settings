@@ -2,17 +2,17 @@
   "clients": {
     "golsp": {
       "enabled": true,
-      "command": [
-        "go-langserver",
-        "-gocodecompletion"
-      ]
+      "command": ["go-langserver", "-gocodecompletion"]
     },
     "jsts": {
       "enabled": true,
       "command": ["javascript-typescript-stdio"],
       "scopes": ["source.js", "source.jsx"],
-      "syntaxes": ["Packages/Babel/JavaScript (Babel).sublime-syntax", "Packages/JavaScript/JavaScript.sublime-syntax"],
+      "syntaxes": [
+        "Packages/Babel/JavaScript (Babel).sublime-syntax",
+        "Packages/JavaScript/JavaScript.sublime-syntax"
+      ],
       "languageId": "typescript"
-    },
+    }
   }
 }

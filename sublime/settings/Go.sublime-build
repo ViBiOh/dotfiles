@@ -1,8 +1,6 @@
 {
   "shell_cmd": "goimports -w $file && gofmt -s -w $file",
   "selector": "source.go",
-  "file_patterns": [
-    "*.go"
-  ],
+  "file_patterns": ["*.go"],
   "quiet": true
 }
