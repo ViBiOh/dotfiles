@@ -104,8 +104,10 @@ if executable("rg")
 endif
 
 " Opening quickfix automatically
-autocmd QuickFixCmdPost [^l]* nested cwindow
-autocmd QuickFixCmdPost    l* nested lwindow
+if exists(':autocmd')
+  autocmd QuickFixCmdPost [^l]* nested cwindow
+  autocmd QuickFixCmdPost    l* nested lwindow
+endif
 
 " Save file with sudo permission
 if exists(':execute')
