@@ -3,7 +3,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const ${1:ComponentName} = ({}) => {
+/**
+ * ${1:ComponentName} Functional Component.
+ */
+export default function ${1:ComponentName}({}) {
   return (
     ${2}
   );
@@ -13,11 +16,6 @@ ${1:ComponentName}.displayName = '${1:ComponentName}';
 
 ${1:ComponentName}.propTypes = {
 };
-
-/**
- * ${1:ComponentName} Functional Component.
- */
-export default ${1:ComponentName};
 
 ]]></content>
 		<tabTrigger>rfc</tabTrigger>
