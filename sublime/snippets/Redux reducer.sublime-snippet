@@ -14,7 +14,7 @@ export const initialState = {
  * @param {Object} action Action dispatched
  * @return {Object} New state
  */
-export default (state = initialState, action) => {
+export default function (state = initialState, action) {
   switch (action.type) {
     case ${3:actionName}:
       return ${4};

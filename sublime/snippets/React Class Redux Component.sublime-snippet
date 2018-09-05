@@ -8,17 +8,21 @@ import PropTypes from 'prop-types';
  * Select props from Redux state.
  * @param {Object} state Current state
  */
-const mapStateToProps = state => ({
-  ${3:stateProp}: state.${3:stateProp},
-});
+function mapStateToProps(state) {
+  return {
+    ${3:stateProp}: state.${3:stateProp},
+  };
+}
 
 /**
  * Provide dispatch functions in props.
  * @param {Function} dispatch Redux dispatch function
  */
-const mapDispatchToProps = dispatch => ({
-  ${4:stateAction}: () => dispatch({ type: 'action' }),
-});
+function mapDispatchToProps(dispatch) {
+  return {
+    ${4:stateAction}: () => dispatch({ type: 'action' }),
+  };
+}
 
 /**
  * ${1:ComponentName} Component.
