@@ -1,18 +1,24 @@
 {
   "clients": {
-    "golsp": {
+    "go": {
       "enabled": true,
-      "command": ["go-langserver", "-gocodecompletion"]
+      "command": ["go-langserver"],
+      "scopes": ["source.go"],
+      "syntaxes": ["Packages/Go/Go.sublime-syntax"],
+      "languageId": "go",
+      "initializationOptions": {
+        "gocodeCompletionEnabled": true
+      }
     },
-    "jsts": {
+    "js": {
       "enabled": true,
-      "command": ["javascript-typescript-stdio"],
-      "scopes": ["source.js", "source.jsx"],
+      "command": ["lsp-tsserver"],
+      "scopes": ["source.js"],
       "syntaxes": [
-        "Packages/Babel/JavaScript (Babel).sublime-syntax",
-        "Packages/JavaScript/JavaScript.sublime-syntax"
+        "Packages/JavaScript/JavaScript.sublime-syntax",
+        "Packages/Babel/JavaScript (Babel).sublime-syntax"
       ],
-      "languageId": "typescript"
+      "languageId": "javascript"
     }
   }
 }

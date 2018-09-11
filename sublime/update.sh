@@ -17,13 +17,13 @@ if command -v go > /dev/null 2>&1; then
   echo
   echo Updating golang packages
 
-  go get -u github.com/nsf/gocode
+  go get -u github.com/mdempsky/gocode
   go get -u github.com/sourcegraph/go-langserver
   go get -u golang.org/x/tools/cmd/gotype
 fi
 
 if command -v npm > /dev/null 2>&1; then
-  npm install --ignore-scripts -g prettier javascript-typescript-langserver
+  npm install -g prettier lsp-tsserver
 fi
 
 echo Success!
