@@ -1,6 +1,6 @@
 {
   "clients": {
-    "go": {
+    "lsp-go": {
       "enabled": true,
       "command": ["go-langserver"],
       "scopes": ["source.go"],
@@ -10,9 +10,9 @@
         "gocodeCompletionEnabled": true
       }
     },
-    "js": {
+    "lsp-js": {
       "enabled": true,
-      "command": ["lsp-tsserver"],
+      "command": ["javascript-typescript-langserver"],
       "scopes": ["source.js"],
       "syntaxes": [
         "Packages/JavaScript/JavaScript.sublime-syntax",
