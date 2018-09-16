@@ -6,10 +6,14 @@ set -u
 rm -rf /usr/local/bin/subl
 ln -f -s /Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl /usr/local/bin/subl
 
-PKG_USER="${HOME}/Library/Application Support/Sublime Text 3/Packages/User"
+PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
+GOCODE_PKG="${PKG}/gocode"
+PKG_USER="${PKG}/User"
+
 mkdir -p "${PKG_USER}"
 
-rm -rf "${PKG_USER}/*"
+rm -rf "${GOCODE_PKG}" "${PKG_USER}/*"
+cp -r gocode "${GOCODE_PKG}"
 cp snippets/* "${PKG_USER}/"
 cp settings/* "${PKG_USER}/"
 

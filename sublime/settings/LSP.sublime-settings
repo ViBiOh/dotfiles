@@ -5,10 +5,7 @@
       "command": ["go-langserver"],
       "scopes": ["source.go"],
       "syntaxes": ["Packages/Go/Go.sublime-syntax"],
-      "languageId": "go",
-      "initializationOptions": {
-        "gocodeCompletionEnabled": true
-      }
+      "languageId": "go"
     },
     "lsp-js": {
       "enabled": true,
