@@ -40,6 +40,6 @@ func Test_${1:FuncName}(t *testing.T) {
 
 ]]></content>
 		<tabTrigger>gte</tabTrigger>
-		<scope>source.go -(meta)</scope>
+		<scope>source.go</scope>
 		<description>Golang Test with Error</description>
 </snippet>

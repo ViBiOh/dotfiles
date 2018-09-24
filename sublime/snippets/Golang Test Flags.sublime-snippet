@@ -28,6 +28,6 @@ func Test_Flags(t *testing.T) {
 
 ]]></content>
     <tabTrigger>gtf</tabTrigger>
-    <scope>source.go -(meta)</scope>
+    <scope>source.go</scope>
     <description>Golang Test Flags</description>
 </snippet>

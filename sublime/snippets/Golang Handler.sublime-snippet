@@ -8,6 +8,6 @@ func (a App) Handler() http.Handler {
 
 ]]></content>
     <tabTrigger>gh</tabTrigger>
-    <scope>source.go -(meta)</scope>
+    <scope>source.go</scope>
     <description>Golang Handler</description>
 </snippet>

@@ -32,6 +32,6 @@ func Test_${1:FuncName}(t *testing.T) {
 
 ]]></content>
 		<tabTrigger>gth</tabTrigger>
-		<scope>source.go -(meta)</scope>
+		<scope>source.go</scope>
 		<description>Golang Test with HTTP</description>
 </snippet>

@@ -6,6 +6,6 @@ shouldComponentUpdate(nextProps, nextState) {
 
 ]]></content>
     <tabTrigger>scu</tabTrigger>
-    <scope>source.js</scope>
+    <scope>source.js meta.class.js</scope>
     <description>React: shouldComponentUpdate(np, ns) {…}</description>
 </snippet>

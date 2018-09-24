@@ -22,6 +22,6 @@ func Test_${2:FuncName}(t *testing.T) {
 
 ]]></content>
 		<tabTrigger>gt</tabTrigger>
-		<scope>source.go -(meta)</scope>
+		<scope>source.go</scope>
 		<description>Golang Test</description>
 </snippet>

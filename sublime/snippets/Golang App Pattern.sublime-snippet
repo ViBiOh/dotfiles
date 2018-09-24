@@ -21,6 +21,6 @@ func Flags(prefix string) map[string]*string {
 
 ]]></content>
 		<tabTrigger>gap</tabTrigger>
-		<scope>source.go -(meta)</scope>
+		<scope>source.go</scope>
 		<description>Golang App Pattern</description>
 </snippet>
