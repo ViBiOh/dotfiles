@@ -16,6 +16,7 @@ fi
 echo "Host *
     PasswordAuthentication no
     ChallengeResponseAuthentication no
+    VisualHostKey yes
     HashKnownHosts yes${MAC_OS_SSH_CONFIG}
     ServerAliveInterval 300
     ServerAliveCountMax 2
