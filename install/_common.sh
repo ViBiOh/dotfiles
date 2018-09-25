@@ -9,8 +9,8 @@ echo "----------"
 
 if [ `uname` == 'Darwin' ]; then
   if ! command -v brew > /dev/null 2>&1; then
-    mkdir "~/homebrew" && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "~/homebrew"
-    export PATH="$PATH:~/homebrew/sbin:~/homebrew/bin"
+    mkdir "${HOME}/homebrew" && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "${HOME}/homebrew"
+    export PATH="${HOME}/homebrew/sbin:${HOME}/homebrew/bin:${PATH}"
   fi
 
   brew update
