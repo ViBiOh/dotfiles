@@ -10,7 +10,7 @@ echo "----------"
 rm -rf "${HOME}/.npm" "${HOME}/.npm_packages"
 
 if [ `uname` == 'Darwin' ]; then
-  brew reinstall node
+  brew install node
 fi
 
 if command -v npm > /dev/null 2>&1; then

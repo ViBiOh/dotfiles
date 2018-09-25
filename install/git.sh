@@ -8,5 +8,5 @@ echo "- git    -"
 echo "----------"
 
 if [ `uname -s` == 'Darwin' ]; then
-  brew reinstall diff-so-fancy
+  brew install diff-so-fancy
 fi

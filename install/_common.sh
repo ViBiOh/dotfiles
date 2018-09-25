@@ -14,7 +14,8 @@ if [ `uname` == 'Darwin' ]; then
   fi
 
   brew update
-  brew reinstall \
+  brew upgrade
+  brew install \
     bash \
     bash-completion \
     htop \

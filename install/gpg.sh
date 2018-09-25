@@ -8,7 +8,7 @@ echo "- GPG    -"
 echo "----------"
 
 if [ `uname` == 'Darwin' ]; then
-  brew reinstall gnupg
+  brew install gnupg
 elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get install -y -qq gnupg
 fi

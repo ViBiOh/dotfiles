@@ -16,7 +16,7 @@ if ! command -v make > /dev/null 2>&1; then
 fi
 
 if command -v brew > /dev/null 2>&1; then
-  brew reinstall gnu-getopt tree oath-toolkit
+  brew install gnu-getopt tree oath-toolkit
 elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get install -y -qq tree
 fi
