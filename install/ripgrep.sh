@@ -8,7 +8,8 @@ echo "- ripgrep -"
 echo "-----------"
 
 if [ `uname -s` == 'Darwin' ]; then
-  brew install ripgrep
+  brew tap burntsushi/ripgrep https://github.com/BurntSushi/ripgrep.git
+  brew install ripgrep-bin
 elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get install ripgrep
 fi
