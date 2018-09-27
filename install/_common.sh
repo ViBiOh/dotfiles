@@ -22,7 +22,15 @@ if [ `uname` == 'Darwin' ]; then
     git \
     fswatch \
     openssl
+
+  brew cask install \
+    firefox \
+    sublime-text
 elif command -v apt-get > /dev/null 2>&1; then
+  sudo apt-get update
+  sudo apt-get install -y -qq \
+    apt-transport-https
+
   sudo apt-get install -y -qq \
     bash \
     bash-completion \
