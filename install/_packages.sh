@@ -3,9 +3,9 @@
 set -e
 set -u
 
-echo "----------"
-echo "- Common -"
-echo "----------"
+echo "------------"
+echo "- Packages -"
+echo "------------"
 
 if [ `uname` == 'Darwin' ]; then
   if ! command -v brew > /dev/null 2>&1; then
@@ -24,7 +24,6 @@ if [ `uname` == 'Darwin' ]; then
     openssl
 
   brew cask install \
-    firefox \
     sublime-text
 elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get update
