@@ -3,8 +3,15 @@
 function open_ports() {
   if [ `uname` == "Darwin" ]; then
     sudo lsof -PniTCP -sTCP:LISTEN
-  fi
-  if [ `uname` == "Linux" ]; then
+  elif [ `uname` == "Linux" ]; then
     sudo netstat -pluton
+  fi
+}
+
+function dnsFlushCache() {
+  if [ `uname` == "Darwin" ]; then
+    sudo dscacheutil -flushcache;sudo killall -HUP mDNSResponder
+  elif [ `uname` == "Linux" ]; then
+    sudo service network-manager restart
   fi
 }

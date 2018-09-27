@@ -3,7 +3,16 @@
 set -e
 set -u
 
-sudo curl -o /etc/hosts https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts
+sudo sh -c "curl https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts \
+  | grep -v '0.0.0.0 rollbar.com' \
+  | grep -v '0.0.0.0 www.rollbar.com' \
+  | grep -v '0.0.0.0 api.rollbar.com' \
+  | grep -v '0.0.0.0 cdn.rollbar.com' \
+  | grep -v '0.0.0.0 docs.rollbar.com' \
+  | grep -v '0.0.0.0 help.rollbar.com' \
+  | grep -v '0.0.0.0 reddit.com' \
+  | grep -v '0.0.0.0 www.reddit.com' \
+  > /etc/hosts"
 
 if [ `uname` == 'Darwin' ]; then
   if command -v pip > /dev/null 2>&1; then
