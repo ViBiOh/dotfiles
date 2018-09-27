@@ -3,7 +3,7 @@
 ## Installation
 
 ```
-mkdir -p ${HOME}/code/src/github.com/ViBiOh/
+mkdir -p ${HOME}/code/src/github.com/ViBiOh/ ${HOME}/code/bin/
 cd ${HOME}/code/src/github.com/ViBiOh/
 git clone https://github.com/ViBiOh/dotfiles.git
 ./dotfiles/update.sh

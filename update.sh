@@ -8,7 +8,7 @@ for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks/*; do
 done
 
 for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/install/*; do
-  [ -r "${file}" ] && [ -e "${file}" ] && "${file}"
+  [ -r "${file}" ] && [ -x "${file}" ] && "${file}"
 done
 
 if [ `uname` == 'Darwin' ]; then
