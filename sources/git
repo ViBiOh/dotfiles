@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if command -v diff-so-fancy > /dev/null 2>&1; then
+  export GIT_PAGER='diff-so-fancy | less --tabs=4 -RFX'
+fi
+
+alias ...='git_root'
+
 function git_info() {
   git rev-parse --is-inside-work-tree &>/dev/null || return
   local branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
@@ -143,9 +149,3 @@ function watch_sync() {
     git_sync "${@}"
   done
 }
-
-if command -v diff-so-fancy > /dev/null 2>&1; then
-  export GIT_PAGER='diff-so-fancy | less --tabs=4 -RFX'
-fi
-
-alias ...='git_root'

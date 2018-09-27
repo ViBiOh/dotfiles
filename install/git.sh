@@ -7,6 +7,5 @@ echo "----------"
 echo "- git    -"
 echo "----------"
 
-if [ `uname -s` == 'Darwin' ]; then
-  brew install diff-so-fancy
-fi
+curl -o "~/code/bin/diff-so-fancy" https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy
+chmod +x "~/code/bin/diff-so-fancy"
