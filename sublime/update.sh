@@ -3,9 +3,6 @@
 set -e
 set -u
 
-rm -rf /usr/local/bin/subl
-ln -f -s /Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl /usr/local/bin/subl
-
 PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
 GOCODE_PKG="${PKG}/gocode"
 PKG_USER="${PKG}/User"
