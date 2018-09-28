@@ -4,6 +4,8 @@ set -e
 set -u
 
 sudo sh -c "curl https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts \
+  | grep -v '0.0.0.0 twitter.com' \
+  | grep -v '0.0.0.0 www.twitter.com' \
   | grep -v '0.0.0.0 rollbar.com' \
   | grep -v '0.0.0.0 www.rollbar.com' \
   | grep -v '0.0.0.0 api.rollbar.com' \
