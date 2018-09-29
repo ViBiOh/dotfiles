@@ -3,9 +3,9 @@
 set -e
 set -u
 
-echo "----------"
-echo "- Pass   -"
-echo "----------"
+echo "--------"
+echo "- Pass -"
+echo "--------"
 
 if ! command -v git > /dev/null 2>&1; then
   exit

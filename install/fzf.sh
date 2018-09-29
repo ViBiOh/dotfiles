@@ -3,9 +3,9 @@
 set -e
 set -u
 
-echo "----------"
-echo "- FZF    -"
-echo "----------"
+echo "-------"
+echo "- FZF -"
+echo "-------"
 
 if [ ! -d "${HOME}/.fzf" ]; then
   git clone --depth 1 https://github.com/junegunn/fzf.git "${HOME}/.fzf"

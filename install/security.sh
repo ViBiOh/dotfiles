@@ -3,6 +3,10 @@
 set -e
 set -u
 
+echo '------------'
+echo '- Security -'
+echo '------------'
+
 sudo sh -c "curl https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts \
   | grep -v '0.0.0.0 twitter.com' \
   | grep -v '0.0.0.0 www.twitter.com' \
@@ -19,9 +23,8 @@ sudo sh -c "curl https://raw.githubusercontent.com/StevenBlack/hosts/master/alte
   > /etc/hosts"
 
 if [ `uname` == 'Darwin' ]; then
-  if command -v pip > /dev/null 2>&1; then
-    pip install stronghold
-  fi
+  curl -o "${HOME}/code/bin/stronghold" https://raw.githubusercontent.com/alichtman/stronghold/master/stronghold-script.sh
+  chmod +x "${HOME}/code/bin/stronghold"
 
   defaults write com.apple.screensaver askForPassword -int 1
   defaults write com.apple.screensaver askForPasswordDelay -int 0

@@ -3,9 +3,9 @@
 set -e
 set -u
 
-echo "----------"
-echo "- NPM    -"
-echo "----------"
+echo "--------"
+echo "- Node -"
+echo "--------"
 
 rm -rf "${HOME}/.npm" "${HOME}/.npm_packages"
 

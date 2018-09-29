@@ -3,9 +3,9 @@
 set -e
 set -u
 
-echo "----------"
-echo "- SSH    -"
-echo "----------"
+echo "-------"
+echo "- SSH -"
+echo "-------"
 
 MAC_OS_SSH_CONFIG=""
 if [ `uname` == 'Darwin' ]; then

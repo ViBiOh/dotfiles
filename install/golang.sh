@@ -12,8 +12,10 @@ if [ `uname -s` == 'Darwin' ]; then
 fi
 
 if command -v go > /dev/null 2>&1; then
+  source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/golang"
+
   rm -rf ${GOPATH}/bin/* ${GOPATH}/pkg/* ${GOPATH}/src/golang.org
-  ls $GOPATH/src/github.com | grep -v ViBiOh | xargs rm -rf
+  ls "${GOPATH}/src/github.com" | grep -v ViBiOh | xargs rm -rf
 
   if [ `uname -m` == 'x86_64' ]; then
     go get -u github.com/derekparker/delve/cmd/dlv

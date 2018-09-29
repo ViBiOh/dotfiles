@@ -3,9 +3,9 @@
 set -e
 set -u
 
-echo "----------"
-echo "- tmux   -"
-echo "----------"
+echo "--------"
+echo "- tmux -"
+echo "--------"
 
 if [ `uname` == 'Darwin' ]; then
   brew install \
