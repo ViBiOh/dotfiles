@@ -23,14 +23,14 @@ Then change default bash for root
 
 ```bash
 sudo -s
-echo /usr/local/bin/bash >> /etc/shells
-chsh -s /usr/local/bin/bash
+echo `brew --prefix`/bin/bash >> /etc/shells
+chsh -s `brew --prefix`/bin/bash
 ```
 
 And also for current user
 
 ```bash
-chsh -s /usr/local/bin/bash
+chsh -s `brew --prefix`/bin/bash
 ```
 
 ## Brew
