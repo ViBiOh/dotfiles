@@ -1,0 +1,4 @@
+[main]
+multi_line = True
+auto_expand = True
+row_limit = 100
