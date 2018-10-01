@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ -x "${HOME}/code/bin/diff-so-fancy" ]; then
+if command -v perl > /dev/null 2>&1 && [ -x "${HOME}/code/bin/diff-so-fancy" ]; then
   export GIT_PAGER="${HOME}/code/bin/diff-so-fancy | less --tabs=4 -RFX"
 fi
 
