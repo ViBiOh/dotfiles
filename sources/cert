@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+function random() {
+    openssl rand -base64 "${1:-30}"
+}
+
 function cert_create_ca() {
     if [ "${#}" -eq 0 ]; then
         echo Usage cert_create_ca [CN_NAME] [CERT_PASSWORD]
