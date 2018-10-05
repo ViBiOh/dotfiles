@@ -23,14 +23,7 @@
 	default = current
 
 [alias]
-	sweep = "!f() { \
-			git prune ;\
-			lobal mergedBranches=`git branch --merged | egrep -v '(^\\*|master)'` ;\
-			if [ -z "${mergedBranches}" ]; then \
-				echo "${mergedBranches}" | xargs git branch -d ;\
-			fi ;\
-			git gc --aggressive --prune ;\
-	}; f"
+	sweep = "!f() { git prune && git gc && git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d; }; f"
 	branches = branch --list -r
 	pushu = push -u
 	pushf = push --force-with-lease
