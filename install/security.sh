@@ -24,6 +24,12 @@ sudo sh -c "curl https://raw.githubusercontent.com/StevenBlack/hosts/master/alte
   | grep -v '0.0.0.0 www.reddit.com' \
   > /etc/hosts"
 
+sudo sh -c 'cat >> /etc/hosts <<DELIM
+0.0.0.0 cdn-eu.realytics.net
+0.0.0.0 i.realytics.io
+0.0.0.0 api.realytics.io
+DELIM'
+
 if [ `uname` == 'Darwin' ]; then
   curl -o "${HOME}/code/bin/stronghold" https://raw.githubusercontent.com/alichtman/stronghold/master/stronghold-script.sh
   chmod +x "${HOME}/code/bin/stronghold"
@@ -36,6 +42,16 @@ if [ `uname` == 'Darwin' ]; then
   defaults write com.apple.CrashReporter DialogType none
   sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool YES
   sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
+
+  sudo scutil --set ComputerName macbook
+  sudo scutil --set LocalHostName macbook
+
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsigned off
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsignedapp off
+  sudo pkill -HUP socketfilterfw
 
   chflags nohidden ~/Library
 
