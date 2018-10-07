@@ -13,6 +13,7 @@ cat \
   <(echo "0.0.0.0 cdn-eu.realytics.net") \
   <(echo "0.0.0.0 i.realytics.io") \
   <(echo "0.0.0.0 api.realytics.io") \
+  <(echo "127.0.0.1 `hostname`") \
   | egrep -v '^\s*#' \
   | egrep -v '^$' \
   | sort \
