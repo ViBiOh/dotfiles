@@ -7,7 +7,16 @@ echo '------------'
 echo '- Security -'
 echo '------------'
 
-sudo sh -c "curl https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts \
+cat \
+  <(curl "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
+  <(curl "https://someonewhocares.org/hosts/zero/hosts") \
+  <(echo "0.0.0.0 cdn-eu.realytics.net") \
+  <(echo "0.0.0.0 i.realytics.io") \
+  <(echo "0.0.0.0 api.realytics.io") \
+  | egrep -v '^\s*#' \
+  | egrep -v '^$' \
+  | sort \
+  | uniq \
   | grep -v '0.0.0.0 twitter.com' \
   | grep -v '0.0.0.0 www.twitter.com' \
   | grep -v '0.0.0.0 abs.twimg.com' \
@@ -22,13 +31,7 @@ sudo sh -c "curl https://raw.githubusercontent.com/StevenBlack/hosts/master/alte
   | grep -v '0.0.0.0 help.rollbar.com' \
   | grep -v '0.0.0.0 reddit.com' \
   | grep -v '0.0.0.0 www.reddit.com' \
-  > /etc/hosts"
-
-sudo sh -c 'cat >> /etc/hosts <<DELIM
-0.0.0.0 cdn-eu.realytics.net
-0.0.0.0 i.realytics.io
-0.0.0.0 api.realytics.io
-DELIM'
+  | sudo tee /etc/hosts > /dev/null
 
 if [ `uname` == 'Darwin' ]; then
   curl -o "${HOME}/code/bin/stronghold" https://raw.githubusercontent.com/alichtman/stronghold/master/stronghold-script.sh
