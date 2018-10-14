@@ -10,10 +10,10 @@ if command -v git > /dev/null 2>&1; then
   }
 fi
 
-if command -v pass > /dev/null 2>&1; then
+if command -v pass > /dev/null 2>&1 && command -v rg > /dev/null 2>&1; then
   function passfor() {
     local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
-    local file=`find "${PASS_DIR}" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|" | fzf --reverse -q "${1:-''}" -1`
+    local file=`rg --files --glob '*.gpg' "${PASS_DIR}" | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|" | fzf --reverse -q "${1:-}" -1`
 
     if [ -n "${file}" ]; then
       pass -c "${file}"
