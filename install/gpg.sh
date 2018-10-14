@@ -3,9 +3,9 @@
 set -e
 set -u
 
-echo "----------"
-echo "- GPG    -"
-echo "----------"
+echo "-------"
+echo "- GPG -"
+echo "-------"
 
 if [ `uname` == 'Darwin' ]; then
   brew install gnupg
