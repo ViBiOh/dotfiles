@@ -11,6 +11,14 @@ if command -v git > /dev/null 2>&1; then
 fi
 
 if command -v pass > /dev/null 2>&1 && command -v rg > /dev/null 2>&1; then
+  _fzf_complete_pass() {
+    FZF_COMPLETION_TRIGGER='' _fzf_complete '' "$@" < <(
+      local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
+      rg --files --glob '*.gpg' "${PASS_DIR}" | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"
+    )
+  }
+  [ -n "${BASH}" ] && complete -F _fzf_complete_pass -o default -o bashdefault pass
+
   function passfor() {
     local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
     local file=`rg --files --glob '*.gpg' "${PASS_DIR}" | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|" | fzf --reverse -q "${1:-}" -1`
@@ -27,4 +35,18 @@ if command -v pass > /dev/null 2>&1 && command -v rg > /dev/null 2>&1; then
       fi
     fi
   }
+fi
+
+if command -v make > /dev/null 2>&1; then
+  _fzf_complete_make() {
+    FZF_COMPLETION_TRIGGER='' _fzf_complete '' "${@}" < <(make -rpn | sed -n -e '/^$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$// ; p ; } ; }')
+  }
+  [ -n "${BASH}" ] && complete -F _fzf_complete_make -o default -o bashdefault make
+fi
+
+if command -v ssh > /dev/null 2>&1; then
+  _fzf_complete_ssh_notrigger() {
+    FZF_COMPLETION_TRIGGER='' _fzf_complete_ssh
+  }
+  [ -n "${BASH}" ] && complete -F _fzf_complete_ssh_notrigger -o default -o bashdefault ssh
 fi
