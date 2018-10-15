@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 
 if command -v brew > /dev/null 2>&1; then
-    if [ -e "`brew --prefix`/etc/bash_completion" ]; then
-       source `brew --prefix`/etc/bash_completion
-    fi
-
-   if [ -d "`brew --prefix`/etc/bash_completion.d" ]; then
-       source `brew --prefix`/etc/bash_completion.d/*
-   fi
+  if [ -e "`brew --prefix`/etc/bash_completion" ]; then
+    source `brew --prefix`/etc/bash_completion
+  fi
 fi
 
 if [ -d "/usr/local/share/bash-completion/completions" ]; then
