@@ -7,6 +7,8 @@ echo "---------"
 echo "- Clean -"
 echo "---------"
 
+source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/golang"
+
 ls "${GOPATH}/pkg/" | xargs rm -rf
 ls "${GOPATH}/bin/" | xargs rm -rf
 ls "${GOPATH}/src" | grep -v 'github.com' | xargs rm -rf
