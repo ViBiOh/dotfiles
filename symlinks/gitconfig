@@ -27,10 +27,8 @@
 	co = "!f() { git checkout `git branch -vv --all | fzf --ansi --reverse -q "${1:-''}" -1 | awk '{print $1}' | sed 's|^remotes/origin/||'`; }; f"
 	pushu = push -u
 	pushf = push --force-with-lease
-	st = status
-	di = diff -w
-	a = add
-	c = commit
+	s = status
+	d = diff -w
 	unstage = reset HEAD --
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 	filehistory = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --
