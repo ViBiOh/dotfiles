@@ -20,21 +20,16 @@ if command -v pass > /dev/null 2>&1 && command -v rg > /dev/null 2>&1; then
   [ -n "${BASH}" ] && complete -F _fzf_complete_pass -o default -o bashdefault pass
 
   function passfor() {
-    local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
-    local file=`rg --files --glob '*.gpg' "${PASS_DIR}" | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|" | fzf --reverse -q "${1:-}" -1`
+    pass -c "${1}"
 
-    if [ -n "${file}" ]; then
-      pass -c "${file}"
+    if [ `pass show "${1}" | grep '^otpauth:' | wc -l` -eq 1 ]; then
+      read -s -p "  Press enter for otp"
+      echo ""
 
-      local hasOtp=`pass show "${file}" | grep '^otpauth:' | wc -l`
-      if [ "${hasOtp}" -eq 1 ]; then
-        read -s -p "  Press enter for otp"
-        echo ""
-
-        pass otp -c "${file}"
-      fi
+      pass otp -c "${1}"
     fi
   }
+  [ -n "${BASH}" ] && complete -F _fzf_complete_pass -o default -o bashdefault passfor
 fi
 
 if command -v make > /dev/null 2>&1; then
