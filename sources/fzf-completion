@@ -12,7 +12,7 @@ fi
 
 if command -v pass > /dev/null 2>&1 && command -v rg > /dev/null 2>&1; then
   _fzf_complete_pass() {
-    FZF_COMPLETION_TRIGGER='' _fzf_complete '' "$@" < <(
+    FZF_COMPLETION_TRIGGER='' _fzf_complete '-1' "$@" < <(
       local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
       rg --files --glob '*.gpg' "${PASS_DIR}" | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"
     )
@@ -39,7 +39,7 @@ fi
 
 if command -v make > /dev/null 2>&1; then
   _fzf_complete_make() {
-    FZF_COMPLETION_TRIGGER='' _fzf_complete '' "${@}" < <(make -rpn | sed -n -e '/^$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$// ; p ; } ; }')
+    FZF_COMPLETION_TRIGGER='' _fzf_complete '-1' "${@}" < <(make -rpn | sed -n -e '/^$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$// ; p ; } ; }')
   }
   [ -n "${BASH}" ] && complete -F _fzf_complete_make -o default -o bashdefault make
 fi
