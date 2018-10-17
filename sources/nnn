@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+export NNN_USE_EDITOR=1
+export NNN_TMPFILE="/tmp/nnn"
+
+function n() {
+  nnn "$@"
+
+  if [ -f "${NNN_TMPFILE}" ]; then
+    . "${NNN_TMPFILE}"
+    rm -f "${NNN_TMPFILE}" > /dev/null
+  fi
+}

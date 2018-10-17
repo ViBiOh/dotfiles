@@ -21,7 +21,8 @@ if [ `uname` == 'Darwin' ]; then
     htop \
     git \
     fswatch \
-    openssl
+    openssl \
+    nnn
 elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get update
   sudo apt-get upgrade -y -qq
@@ -33,5 +34,6 @@ elif command -v apt-get > /dev/null 2>&1; then
     bash-completion \
     htop \
     git \
-    openssl
+    openssl \
+    nnn
 fi
