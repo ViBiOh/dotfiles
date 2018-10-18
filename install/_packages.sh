@@ -34,6 +34,13 @@ elif command -v apt-get > /dev/null 2>&1; then
     bash-completion \
     htop \
     git \
-    openssl \
-    nnn
+    openssl
+
+  set +e
+  sudo apt-cache show nnn > /dev/null 2>&1
+  nnn=$?
+  set -e
+  if [ "${nnn}" -eq 0 ]; then
+    sudo apt-get install -y -qq nnn
+  fi
 fi
