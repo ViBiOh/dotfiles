@@ -25,8 +25,9 @@ cat \
   | grep -v '0.0.0.0 www.twitter.com' \
   | grep -v '0.0.0.0 abs.twimg.com' \
   | grep -v '0.0.0.0 pbs.twimg.com' \
-  | grep -v '0.0.0.0 static.licdn.com' \
   | grep -v '0.0.0.0 www.linkedin.com' \
+  | grep -v '0.0.0.0 static.licdn.com' \
+  | grep -v '0.0.0.0 media.licdn.com' \
   | grep -v '0.0.0.0 rollbar.com' \
   | grep -v '0.0.0.0 www.rollbar.com' \
   | grep -v '0.0.0.0 api.rollbar.com' \
@@ -36,6 +37,10 @@ cat \
   | grep -v '0.0.0.0 reddit.com' \
   | grep -v '0.0.0.0 www.reddit.com' \
   | sudo tee /etc/hosts > /dev/null
+
+if command -v dnsFlushCache > /dev/null 2>&1; then
+  dnsFlushCache
+fi
 
 if [ `uname` == 'Darwin' ]; then
   curl -o "${HOME}/code/bin/stronghold" https://raw.githubusercontent.com/alichtman/stronghold/master/stronghold-script.sh
