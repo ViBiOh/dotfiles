@@ -5,7 +5,3 @@ if command -v brew > /dev/null 2>&1; then
     source `brew --prefix`/etc/bash_completion
   fi
 fi
-
-if [ -d "/usr/local/share/bash-completion/completions" ]; then
-  source /usr/local/share/bash-completion/completions/*
-fi
