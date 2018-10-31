@@ -12,7 +12,7 @@
       "command": ["javascript-typescript-stdio"],
       "scopes": ["source.js"],
       "syntaxes": [
-        "Packages/Babel/JavaScript (Babel).sublime-syntax",
+        "Packages/Naomi/syntaxes/naomi.fjsx15.sublime-syntax",
         "Packages/JavaScript/JavaScript.sublime-syntax"
       ],
       "languageId": "javascript"

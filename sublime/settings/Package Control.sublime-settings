@@ -2,14 +2,14 @@
   "bootstrapped": true,
   "in_process_packages": [],
   "installed_packages": [
-    "Babel",
     "DocBlockr",
     "Git",
     "GitGutter",
+    "JsPrettier",
     "LSP",
+    "Naomi",
     "Package Control",
     "Pretty JSON",
-    "JsPrettier",
     "SideBarEnhancements",
     "SublimeLinter",
     "SublimeLinter-eslint"

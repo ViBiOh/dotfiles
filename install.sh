@@ -19,5 +19,5 @@ elif command -v apt-get > /dev/null 2>&1; then
 fi
 
 if command -v subl > /dev/null 2>&1; then
-  cd sublime && ./update.sh
+  cd sublime && ./install.sh
 fi
