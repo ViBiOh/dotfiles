@@ -1,7 +1,7 @@
 <snippet>
 		<content><![CDATA[
 /**
- * ${1:ReducerName}' reducer initial state.
+ * ${1:ReducerName} reducer initial state.
  * @type {Object}
  */
 export const initialState = {
@@ -9,8 +9,8 @@ export const initialState = {
 };
 
 /**
- * ${1:ReducerName}'s reducer.
- * @param {String} state  Existing ${1:ReducerName}'s state
+ * ${1:ReducerName} reducer.
+ * @param {String} state  Existing ${1:ReducerName} state
  * @param {Object} action Action dispatched
  * @return {Object} New state
  */
