@@ -1,0 +1,10 @@
+<snippet>
+  <content><![CDATA[
+if (${1:true}) {
+  ${0:$TM_SELECTED_TEXT}
+}
+]]></content>
+  <tabTrigger>wrapif</tabTrigger>
+  <scope>source.js,source.go</scope>
+  <description>Wraps selection inside an if</description>
+</snippet>
