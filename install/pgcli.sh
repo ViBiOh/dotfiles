@@ -13,5 +13,11 @@ fi
 
 if command -v pgcli > /dev/null 2>&1; then
   mkdir -p "${HOME}/.config/pgcli"
-  ln -s -f "${HOME}/.pgclirc" "${HOME}/.config/pgcli/config"
+
+  cat > "${HOME}/.config/pgcli/config" << EOF
+[main]
+multi_line = True
+auto_expand = True
+row_limit = 100
+EOF
 fi
