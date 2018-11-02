@@ -14,5 +14,5 @@ if [ `uname` == 'Darwin' ]; then
 fi
 
 if command -v npm > /dev/null 2>&1; then
-  npm install --ignore-scripts -g npm
+  npm install --ignore-scripts -g npm npm-check-updates
 fi
