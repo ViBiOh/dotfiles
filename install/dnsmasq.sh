@@ -7,11 +7,16 @@ echo "-----------"
 echo "- dnsmasq -"
 echo "-----------"
 
+DNSMASQ_CONF='/etc/dnsmasq.conf'
+
 if [ `uname` == 'Darwin' ]; then
   brew install dnsmasq --with-dnssec
+  DNSMASQ_CONF=`brew --prefix`/etc/dnsmasq.conf
+elif command -v apt-get > /dev/null 2>&1; then
+  sudo apt-get install -y dnsmasq
+fi
 
-  echo > `brew --prefix`/etc/dnsmasq.conf << EOF
-# Forward queries to DNSCrypt on localhost port 5355
+echo '# Forward queries to DNSCrypt on localhost port 5355
 server=127.0.0.1#5355
 
 # Uncomment to forward queries to Google Public DNS, if DNSCrypt is not used
@@ -38,11 +43,13 @@ cache-size=8192
 # Optional logging directives
 log-async
 log-dhcp
-log-facility=/var/log/dnsmasq.log
-EOF
+log-facility=/var/log/dnsmasq.log' | sudo tee "${DNSMASQ_CONF}"
 
+if [ `uname` == 'Darwin' ]; then
   sudo brew services start dnsmasq
   sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
   scutil --dns
   networksetup -getdnsservers "Wi-Fi"
+elif command -v apt-get > /dev/null 2>&1; then
+  sudo /etc/init.d/dnsmasq restart
 fi
