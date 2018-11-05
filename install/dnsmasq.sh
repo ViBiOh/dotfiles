@@ -21,8 +21,8 @@ server=127.0.0.1#5355
 
 # Uncomment to forward queries to Google Public DNS, if DNSCrypt is not used
 # You may also use your own DNS server or other public DNS server you trust
-server=8.8.8.8
-server=8.8.4.4
+server=1.1.1.1
+server=1.0.0.1
 
 # Never forward plain (local) names
 domain-needed
