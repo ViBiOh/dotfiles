@@ -9,8 +9,8 @@ echo "---------"
 
 source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/golang"
 
-ls "${GOPATH}/pkg/" | xargs rm -rf
-ls "${GOPATH}/bin/" | xargs rm -rf
+rm -rf "${GOPATH}/pkg/" "${GOPATH}/bin/"
+mkdir -p "${GOPATH}/pkg/" "${GOPATH}/bin/"
 ls "${GOPATH}/src" | grep -v 'github.com' | xargs rm -rf
 ls "${GOPATH}/src/github.com" | grep -v 'ViBiOh' | xargs rm -rf
 
