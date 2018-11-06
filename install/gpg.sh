@@ -17,14 +17,11 @@ if command -v gpg > /dev/null 2>&1; then
   mkdir -p "${HOME}/.gnupg"
   chmod 700 "${HOME}/.gnupg/"
 
-  cat > "${HOME}/.gnupg/gpg-agent.conf" << EOF
-enable-ssh-support
+  echo 'enable-ssh-support
 default-cache-ttl 43200
-max-cache-ttl 43200
-EOF
+max-cache-ttl 43200' > "${HOME}/.gnupg/gpg-agent.conf"
 
-  cat > "${HOME}/.gnupg/gpg.conf" << EOF
-personal-cipher-preferences AES256 AES192 AES CAST5
+  echo 'personal-cipher-preferences AES256 AES192 AES CAST5
 personal-digest-preferences SHA512 SHA384 SHA256 SHA224
 default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed
 cert-digest-algo SHA512
@@ -39,6 +36,5 @@ list-options show-uid-validity
 verify-options show-uid-validity
 with-fingerprint
 require-cross-certification
-use-agent
-EOF
+use-agent' > "${HOME}/.gnupg/gpg.conf"
 fi

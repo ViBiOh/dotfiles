@@ -21,14 +21,12 @@ if [ `uname` == 'Darwin' ]; then
     htop \
     git \
     fswatch \
-    openssl \
-    nnn
+    openssl
   brew install curl --with-openssl
 elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get update
   sudo apt-get upgrade -y -qq
-  sudo apt-get install -y -qq \
-    apt-transport-https
+  sudo apt-get install -y -qq apt-transport-https
 
   sudo apt-get install -y -qq \
     bash \
@@ -36,12 +34,4 @@ elif command -v apt-get > /dev/null 2>&1; then
     htop \
     git \
     openssl
-
-  set +e
-  sudo apt-cache show nnn > /dev/null 2>&1
-  nnn=$?
-  set -e
-  if [ "${nnn}" -eq 0 ]; then
-    sudo apt-get install -y -qq nnn
-  fi
 fi

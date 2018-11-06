@@ -12,6 +12,5 @@ if [ `uname` == 'Darwin' ]; then
     tmux \
     reattach-to-user-namespace
 elif command -v apt-get > /dev/null 2>&1; then
-  sudo apt-get install -y -qq \
-    tmux
+  sudo apt-get install -y -qq tmux
 fi

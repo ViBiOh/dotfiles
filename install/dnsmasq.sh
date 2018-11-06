@@ -13,7 +13,7 @@ if [ `uname` == 'Darwin' ]; then
   brew install dnsmasq --with-dnssec
   DNSMASQ_CONF=`brew --prefix`/etc/dnsmasq.conf
 elif command -v apt-get > /dev/null 2>&1; then
-  sudo apt-get install -y dnsmasq
+  sudo apt-get install -y -qq dnsmasq
 fi
 
 echo '# Forward queries to DNSCrypt on localhost port 5355
@@ -46,7 +46,7 @@ log-dhcp
 log-facility=/var/log/dnsmasq.log' | sudo tee "${DNSMASQ_CONF}" > /dev/null
 
 if [ `uname` == 'Darwin' ]; then
-  sudo brew services start dnsmasq
+  sudo brew services restart dnsmasq
   sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
   scutil --dns
   networksetup -getdnsservers "Wi-Fi"

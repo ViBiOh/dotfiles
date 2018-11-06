@@ -7,7 +7,11 @@ echo "--------"
 echo "- node -"
 echo "--------"
 
-rm -rf "${HOME}/.npm" "${HOME}/.npm_packages"
+rm -rf "${HOME}/.npm" "${HOME}/.npm_packages" "${HOME}/.v8flags*" "${HOME}/.babel.json" "${HOME}/.node_repl_history"
+
+if ! command -v git > /dev/null 2>&1; then
+  exit
+fi
 
 if ! command -v make > /dev/null 2>&1; then
   exit
@@ -15,7 +19,7 @@ fi
 
 git clone --depth 1 https://github.com/tj/n.git "${HOME}/n"
 cd "${HOME}/n"
-sudo PREFIX=/usr/local make install
+PREFIX="${HOME}/opt" make install
 cd "${HOME}"
 rm -rf "${HOME}/n"
 

@@ -22,7 +22,7 @@ if command -v pass > /dev/null 2>&1; then
   function passfor() {
     pass -c "${1}"
 
-    if [ `pass show "${1}" | grep '^otpauth:' | wc -l` -eq 1 ]; then
+    if [ $? -eq 0 ] && [ `pass show "${1}" | grep '^otpauth:' | wc -l` -eq 1 ]; then
       read -s -p "  Press enter for otp"
       echo ""
 
@@ -49,7 +49,7 @@ fi
 if command -v pgcli > /dev/null 2>&1; then
   function _fzf_complete_pgcli() {
     FZF_COMPLETION_TRIGGER='' _fzf_complete '-1' "${@}" < <(
-      cat "${PGPASS-${HOME}/.pgpass}" | egrep -v '^\s*#' | egrep -v '^$' | awk '{split($0,parts,":"); print "host: " parts[1] " user: " parts[4] " db: " parts[3]}'
+      cat "${PGPASSFILE-${HOME}/.pgpass}" | egrep -v '^\s*#' | egrep -v '^$' | awk '{split($0,parts,":"); print "host: " parts[1] " user: " parts[4] " db: " parts[3]}'
     )
   }
 

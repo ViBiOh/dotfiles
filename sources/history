@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
 export HISTCONTROL=ignoreboth:erasedups
+export LESSHISTFILE=/dev/null

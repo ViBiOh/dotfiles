@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-CODE_HOME="${HOME}/code/src/github.com/ViBiOh/"
-alias dev='cd "${CODE_HOME}"'
+alias dev='cd ${HOME}/code/src/github.com/ViBiOh/'
 
 EDITOR=vim
 TERM=xterm-256color

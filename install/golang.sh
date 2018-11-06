@@ -7,12 +7,29 @@ echo "----------"
 echo "- Golang -"
 echo "----------"
 
-if [ `uname -s` == 'Darwin' ]; then
-  brew install golang
+GO_VERSION=1.11.2
+OS=`uname -s`
+ARCH=`uname -m`
+
+if [ "${ARCH}" == "x86_64" ]; then
+  ARCH="amd64"
 fi
 
+GO_ARCHIVE="go${GO_VERSION}.${OS,,}-${ARCH,,}.tar.gz"
+
+curl -O "https://dl.google.com/go/${GO_ARCHIVE}"
+rm -rf "${HOME}/opt/go"
+tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
+rm -rf "${GO_ARCHIVE}"
+
+source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/golang"
+
 if command -v go > /dev/null 2>&1; then
-  source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/golang"
+  rm -rf "${GOPATH}/pkg/" "${GOPATH}/bin/" "${HOME}/.dlv"
+  mkdir -p "${GOPATH}/pkg/" "${GOPATH}/bin/" "${GOPATH}/src/"
+
+  ls "${GOPATH}/src" | grep -v 'github.com' | xargs rm -rf
+  ls "${GOPATH}/src/github.com" | grep -v 'ViBiOh' | xargs rm -rf
 
   if [ `uname -m` == 'x86_64' ]; then
     go get -u github.com/derekparker/delve/cmd/dlv
