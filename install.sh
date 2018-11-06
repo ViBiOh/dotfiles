@@ -7,7 +7,9 @@ for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks/*; do
   [ -r "${file}" ] && [ -e "${file}" ] && rm -f ${HOME}/.`basename ${file}` && ln -s ${file} ${HOME}/.`basename ${file}`
 done
 
+set +u
 source "${HOME}/.bashrc"
+set -u
 
 for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/install/*; do
   [ -r "${file}" ] && [ -x "${file}" ] && "${file}"
