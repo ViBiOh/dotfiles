@@ -21,14 +21,16 @@ elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get install -y -qq tree
 fi
 
+rm -rf "${HOME}/password-store"
 git clone https://git.zx2c4.com/password-store "${HOME}/password-store"
 cd "${HOME}/password-store"
-WITH_BASHCOMP=yes WITH_ZSHCOMP=no WITH_FISHCOMP=no PREFIX="${HOME}/opt" make install
+WITH_BASHCOMP=no WITH_ZSHCOMP=no WITH_FISHCOMP=no PREFIX="${HOME}/opt" make install
 cd "${HOME}"
 rm -rf "${HOME}/password-store"
 
+rm -rf "${HOME}/pass-otp"
 git clone https://github.com/tadfisher/pass-otp "${HOME}/pass-otp"
 cd "${HOME}/pass-otp"
-PREFIX="${HOME}/opt" make install
+PREFIX="${HOME}/opt" BASHCOMPDIR=${HOME}/opt/bash_completion.d make install
 cd "${HOME}"
 rm -rf "${HOME}/pass-otp"
