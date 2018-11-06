@@ -25,7 +25,7 @@ cd "${HOME}"
 rm -rf "${HOME}/n-install"
 
 source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/n"
-n latest
+"${HOME}/opt/bin/n" latest
 
 if command -v npm > /dev/null 2>&1; then
   npm install --ignore-scripts -g npm npm-check-updates
