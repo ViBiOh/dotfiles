@@ -7,6 +7,8 @@ for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks/*; do
   [ -r "${file}" ] && [ -e "${file}" ] && rm -f ${HOME}/.`basename ${file}` && ln -s ${file} ${HOME}/.`basename ${file}`
 done
 
+source "${HOME}/.bashrc"
+
 for file in ${HOME}/code/src/github.com/ViBiOh/dotfiles/install/*; do
   [ -r "${file}" ] && [ -x "${file}" ] && "${file}"
 done
