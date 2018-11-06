@@ -7,7 +7,7 @@ echo "--------"
 echo "- node -"
 echo "--------"
 
-rm -rf "${HOME}/.npm" "${HOME}/.npm_packages" "${HOME}/.v8flags*" "${HOME}/.babel.json" "${HOME}/.node_repl_history"
+rm -rf "${HOME}/.npm" "${HOME}/.npm_packages" "${HOME}/.babel.json" "${HOME}/.node_repl_history" ${HOME}/.v8flags.*
 
 if ! command -v git > /dev/null 2>&1; then
   exit
