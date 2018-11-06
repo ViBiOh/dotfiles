@@ -17,11 +17,12 @@ if ! command -v make > /dev/null 2>&1; then
   exit
 fi
 
-git clone --depth 1 https://github.com/tj/n.git "${HOME}/n"
-cd "${HOME}/n"
+rm -rf "${HOME}/n-install"
+git clone --depth 1 https://github.com/tj/n.git "${HOME}/n-install"
+cd "${HOME}/n-install"
 PREFIX="${HOME}/opt" make install
 cd "${HOME}"
-rm -rf "${HOME}/n"
+rm -rf "${HOME}/n-install"
 
 source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/n"
 n latest
