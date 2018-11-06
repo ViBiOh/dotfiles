@@ -43,7 +43,7 @@ cache-size=8192
 # Optional logging directives
 log-async
 log-dhcp
-log-facility=/var/log/dnsmasq.log' | sudo tee "${DNSMASQ_CONF}"
+log-facility=/var/log/dnsmasq.log' | sudo tee "${DNSMASQ_CONF}" > /dev/null
 
 if [ `uname` == 'Darwin' ]; then
   sudo brew services start dnsmasq
