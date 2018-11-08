@@ -11,10 +11,10 @@ if ! command -v git > /dev/null 2>&1; then
   exit
 fi
 
-if [ ! -d "${HOME}/.fzf" ]; then
-  git clone --depth 1 https://github.com/junegunn/fzf.git "${HOME}/.fzf"
+if [ ! -d "${HOME}/opt/fzf" ]; then
+  git clone --depth 1 https://github.com/junegunn/fzf.git "${HOME}/opt/fzf"
 else
-  cd "${HOME}/.fzf" && git pull
+  cd "${HOME}/opt/fzf" && git pull
 fi
 
-"${HOME}/.fzf/install" --key-bindings --completion --no-update-rc
+"${HOME}/opt/fzf/install" --key-bindings --completion --no-zsh --no-fish --no-update-rc
