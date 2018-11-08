@@ -49,12 +49,12 @@ fi
 if command -v pgcli > /dev/null 2>&1; then
   function _fzf_complete_pgcli() {
     FZF_COMPLETION_TRIGGER='' _fzf_complete '-1' "${@}" < <(
-      cat "${PGPASSFILE-${HOME}/.pgpass}" | egrep -v '^\s*#' | egrep -v '^$' | awk '{split($0,parts,":"); print "host: " parts[1] " user: " parts[4] " db: " parts[3]}'
+      cat "${PGPASSFILE-${HOME}/.pgpass}" | egrep -v '^\s*#' | egrep -v '^$' | awk '{split($0,parts,":"); print "host: " parts[1] " user: " parts[4] " db: " parts[3] " port: " parts[2] }'
     )
   }
 
   function _fzf_complete_pgcli_post() {
-    awk '{print "-h " $2 " -U " $4 " " $6}'
+    awk '{print "-h " $2; if ($8 != "*") { print "-p " $8; } print "-U " $4 " " $6}'
   }
 
   [ -n "${BASH}" ] && complete -F _fzf_complete_pgcli -o default -o bashdefault pgcli
