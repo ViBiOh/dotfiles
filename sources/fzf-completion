@@ -48,13 +48,23 @@ fi
 
 if command -v pgcli > /dev/null 2>&1; then
   function _fzf_complete_pgcli() {
-    FZF_COMPLETION_TRIGGER='' _fzf_complete '-1' "${@}" < <(
-      cat "${PGPASSFILE-${HOME}/.pgpass}" | egrep -v '^\s*#' | egrep -v '^$' | awk '{split($0,parts,":"); print "host: " parts[1] " user: " parts[4] " db: " parts[3] " port: " parts[2] }'
+    FZF_COMPLETION_TRIGGER='' _fzf_complete '--ansi' '-1' "${@}" < <(
+      local RED='\033[31m'
+      local GREEN='\033[32m'
+      local YELLOW='\033[33m'
+      local BLUE='\033[34m'
+      local RESET='\033[0m'
+
+      while IFS=':' read -r host port db user pass
+      do
+        echo -e "host: ${BLUE}${host}${RESET} port: ${YELLOW}${port}${RESET} db: ${RED}${db}${RESET} user: ${GREEN}${user}${RESET}"
+      done < "${PGPASSFILE-${HOME}/.pgpass}"
     )
   }
 
   function _fzf_complete_pgcli_post() {
-    awk '{print "-h " $2; if ($8 != "*") { print "-p " $8; } print "-U " $4 " " $6}'
+    sed -E 's|host: ([^:]*) port: ([^:]*) db: ([^:]*) user: ([^:]*)|\1 \2 \3 \4|g' | \
+    awk '{if ($1 != "*") { print "-h " $1; } if ($2 != "*") { print "-p " $2; } if ($3 != "*") { print "-U " $3; } if ($4 != "*") { print $4; }}'
   }
 
   [ -n "${BASH}" ] && complete -F _fzf_complete_pgcli -o default -o bashdefault pgcli
