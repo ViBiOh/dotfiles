@@ -12,7 +12,7 @@ if ! command -v pip > /dev/null 2>&1 && [ `uname -s` == 'Darwin' ]; then
 fi
 
 if command -v pip > /dev/null 2>&1; then
-  pip install pgcli
+  pip install --user pgcli
 fi
 
 if command -v pgcli > /dev/null 2>&1; then

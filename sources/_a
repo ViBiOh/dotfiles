@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
 
+if [ `uname -s` == "Darwin" ]; then
+  export PATH="${HOME}/Library/Python/2.7/bin:${PATH}"
+fi
 export PATH="${HOME}/opt/bin:${PATH}"
