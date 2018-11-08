@@ -7,8 +7,12 @@ echo "---------"
 echo "- Pgcli -"
 echo "---------"
 
+if ! command -v pip > /dev/null 2>&1 && [ `uname -s` == 'Darwin' ]; then
+  sudo easy_install pip
+fi
+
 if command -v pip > /dev/null 2>&1; then
-  sudo pip install pgcli
+  pip install pgcli
 fi
 
 if command -v pgcli > /dev/null 2>&1; then
