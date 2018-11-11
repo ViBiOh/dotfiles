@@ -6,6 +6,11 @@ if command -v go > /dev/null 2>&1; then
   export GOPATH="${HOME}/code"
   export PATH="${GOPATH}/bin:${PATH}"
 
-  alias gocode_update="go install ./vendor/..."
+  function gocode_update() {
+    go clean -cache
+    go install ./vendor/...
+    go build -i ./...
+  }
+
   alias pprof_memory="pprof -http=:8080 -sample_index=alloc_space http://localhost:1080/debug/pprof/profile/heap"
 fi

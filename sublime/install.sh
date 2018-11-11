@@ -11,7 +11,7 @@ PKG_USER="${PKG}/User"
 
 mkdir -p "${PKG_USER}"
 
-rm -rf "${GOCODE_PKG}" "${PKG_USER}/*"
+rm -rf "${GOCODE_PKG}" "${PKG_USER}"/*
 cp -r gocode "${GOCODE_PKG}"
 cp snippets/* "${PKG_USER}/"
 cp settings/* "${PKG_USER}/"

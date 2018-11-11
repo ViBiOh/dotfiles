@@ -1,4 +1,4 @@
-import sublime, sublime_plugin, subprocess, difflib
+import sublime, sublime_plugin, subprocess
 
 # go to balanced pair, e.g.:
 # ((abc(def)))
@@ -69,44 +69,45 @@ def extract_arguments_and_returns(sig):
 # takes gocode's candidate and returns sublime's hint and subj
 def hint_and_subj(cls, name, type):
 	subj = name
-	if cls == "func":
-		hint = cls + " " + name
+	hint = '{} {}'.format(cls, name)
+
+	if cls == 'func':
 		args, returns = extract_arguments_and_returns(type)
+
 		if returns:
-			hint += "\t" + ", ".join(returns)
+			hint += '\t' + ', '.join(returns)
+
 		if args:
 			sargs = []
 			for i, a in enumerate(args):
-				ea = a.replace("{", "\\{").replace("}", "\\}")
+				ea = a.replace('{', '\\{').replace('}', '\\}')
 				sargs.append("${{{0}:{1}}}".format(i+1, ea))
-			subj += "(" + ", ".join(sargs) + ")"
+			subj += '(' + ', '.join(sargs) + ')'
 		else:
-			subj += "()"
-	else:
-		hint = cls + " " + name + "\t" + type
-	return hint, subj
+			subj += '()'
 
-def diff_sanity_check(a, b):
-	if a != b:
-		raise Exception("diff sanity check mismatch\n-%s\n+%s" % (a, b))
+	else:
+		hint += '\t' + type
+
+	return hint, subj
 
 class Gocode(sublime_plugin.EventListener):
 	def on_query_completions(self, view, prefix, locations):
-		loc = locations[0]
-		if not view.match_selector(loc, "source.go"):
-			return None
+		if not view.match_selector(0, 'source.go'):
+			return
 
 		src = view.substr(sublime.Region(0, view.size()))
-		filename = view.file_name()
-		cloc = "c{0}".format(loc)
-		gocode = subprocess.Popen(["gocode", "-f=csv", "autocomplete", filename, cloc],
-			stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+
+		gocode = subprocess.Popen(['gocode', '-f=csv', '-built-in', '-ignore-case', 'autocomplete', view.file_name(), 'c{0}'.format(locations[0])], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 		out = gocode.communicate(src.encode())[0].decode()
 
-		result = []
-		for line in filter(bool, out.split("\n")):
-			arg = line.split(",,")
+		results = []
+		for line in filter(bool, out.split('\n')):
+			arg = line.split(',,')
 			hint, subj = hint_and_subj(arg[0], arg[1], arg[2])
-			result.append([hint, subj])
+			results.append([hint, subj])
 
-		return (result, sublime.INHIBIT_WORD_COMPLETIONS)
+		return (results, sublime.INHIBIT_WORD_COMPLETIONS)
+
+	def on_pre_save(self, view):
+		view.run_command('go_format')

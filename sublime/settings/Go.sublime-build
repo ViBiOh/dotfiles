@@ -1,6 +1,6 @@
 {
-  "shell_cmd": "goimports -w $file && gofmt -s -w $file",
+  "target": "go_test",
   "selector": "source.go",
-  "file_patterns": ["*.go"],
-  "quiet": true
+  "file_patterns": ["*_test.go"],
+  "cancel": { "kill": true }
 }
