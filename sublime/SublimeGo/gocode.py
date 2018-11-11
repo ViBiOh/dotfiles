@@ -98,11 +98,14 @@ class Gocode(sublime_plugin.EventListener):
 
 		src = view.substr(sublime.Region(0, view.size()))
 
-		gocode = subprocess.Popen(['gocode', '-f=csv', '-built-in', '-ignore-case', 'autocomplete', view.file_name(), 'c{0}'.format(locations[0])], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-		out = gocode.communicate(src.encode())[0].decode()
+		gocode = subprocess.Popen(['gocode', '-f=csv', '-builtin', '-ignore-case', 'autocomplete', view.file_name(), 'c{0}'.format(locations[0])], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		out, err = gocode.communicate(src.encode())
+		if gocode.returncode != 0:
+			print('ERROR gocode: {}'.format(err.decode()))
+			return
 
 		results = []
-		for line in filter(bool, out.split('\n')):
+		for line in filter(bool, out.decode().split('\n')):
 			arg = line.split(',,')
 			hint, subj = hint_and_subj(arg[0], arg[1], arg[2])
 			results.append([hint, subj])

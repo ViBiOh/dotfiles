@@ -5,14 +5,15 @@ set -u
 
 echo Configuring SublimeText
 
+GO_PLUGIN="SublimeGo"
+
 PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
-GOCODE_PKG="${PKG}/gocode"
 PKG_USER="${PKG}/User"
 
 mkdir -p "${PKG_USER}"
+rm -rf "${PKG_USER}"/* "${PKG}/${GO_PLUGIN}"
 
-rm -rf "${GOCODE_PKG}" "${PKG_USER}"/*
-cp -r gocode "${GOCODE_PKG}"
+cp -r "${GO_PLUGIN}" "${PKG}/${GO_PLUGIN}"
 cp snippets/* "${PKG_USER}/"
 cp settings/* "${PKG_USER}/"
 
