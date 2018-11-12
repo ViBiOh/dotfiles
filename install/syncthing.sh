@@ -13,6 +13,8 @@ ARCH=`uname -m`
 
 if [ "${ARCH}" == "x86_64" ]; then
   ARCH="amd64"
+elif [[ "${ARCH}" =~ ^arm ]]; then
+  ARCH="arm"
 fi
 
 if [ "${OS}" == "Darwin" ]; then
@@ -21,8 +23,8 @@ fi
 
 SYNCTHING_FILE="syncthing-${OS,,}-${ARCH,,}-${SYNCTHING_VERSION}"
 
-curl -O "https://github.com/syncthing/syncthing/releases/download/${SYNCTHING_VERSION}/${SYNCTHING_FILE}.tar.gz"
-tar -C "${HOME}/opt" -xzf "${SYNCTHING_FILE}.tar.gz"
+curl -o "${HOME}/opt/${SYNCTHING_FILE}.tar.gz" "https://github.com/syncthing/syncthing/releases/download/${SYNCTHING_VERSION}/${SYNCTHING_FILE}.tar.gz"
+tar -C "${HOME}/opt" -xzf "${HOME}/opt/${SYNCTHING_FILE}.tar.gz"
 cp "${HOME}/opt/${SYNCTHING_FILE}/syncthing" "${HOME}/opt/bin/syncthing"
 
 if [ `uname -s` == "Linux" ]; then
@@ -32,4 +34,4 @@ if [ `uname -s` == "Linux" ]; then
   sudo systemctl start syncthing@`whoami`.service
 fi
 
-rm -rf "${SYNCTHING_FILE}.tar.gz" "${HOME}/opt/${SYNCTHING_FILE}"
+rm -rf "${HOME}/opt/${SYNCTHING_FILE}"*
