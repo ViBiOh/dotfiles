@@ -19,9 +19,17 @@ if [ "${OS}" == "Darwin" ]; then
   OS="macos"
 fi
 
-SYNCTHING_ARCHIVE="syncthing-${OS,,}-${ARCH,,}-${SYNCTHING_VERSION}.tar.gz"
+SYNCTHING_FILE="syncthing-${OS,,}-${ARCH,,}-${SYNCTHING_VERSION}"
 
-curl -O "https://github.com/syncthing/syncthing/releases/download/${SYNCTHING_VERSION}/${SYNCTHING_ARCHIVE}"
-rm -rf "${HOME}/opt/syncthing"
-tar -C "${HOME}/opt" -xzf "${SYNCTHING_ARCHIVE}"
-rm -rf "${SYNCTHING_ARCHIVE}"
+curl -O "https://github.com/syncthing/syncthing/releases/download/${SYNCTHING_VERSION}/${SYNCTHING_FILE}.tar.gz"
+tar -C "${HOME}/opt" -xzf "${SYNCTHING_FILE}.tar.gz"
+cp "${HOME}/opt/${SYNCTHING_FILE}/syncthing" "${HOME}/opt/bin/syncthing"
+
+if [ `uname -s` == "Linux" ]; then
+  cat "${HOME}/opt/${SYNCTHING_FILE}/etc/linux-systemd/system/syncthing@.service" | sed -e "s|/usr/bin/syncthing|${HOME}/opt/bin/syncthing|g" | sudo tee "/etc/systemd/system/syncthing@.service" > /dev/null
+  sudo systemctl daemon-reload
+  sudo systemctl enable syncthing@`whoami`.service
+  sudo systemctl start syncthing@`whoami`.service
+fi
+
+rm -rf "${SYNCTHING_FILE}.tar.gz" "${HOME}/opt/${SYNCTHING_FILE}"
