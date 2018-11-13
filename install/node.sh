@@ -29,5 +29,5 @@ source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/n"
 n latest
 
 if command -v npm > /dev/null 2>&1; then
-  npm install --ignore-scripts -g npm npm-check-updates
+  npm install --ignore-scripts -g npm npm-check-updates node-gyp
 fi
