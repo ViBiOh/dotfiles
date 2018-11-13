@@ -8,6 +8,7 @@ echo "- FZF -"
 echo "-------"
 
 if ! command -v git > /dev/null 2>&1; then
+  echo "git not found"
   exit
 fi
 

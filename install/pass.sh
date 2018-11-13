@@ -8,10 +8,12 @@ echo "- Pass -"
 echo "--------"
 
 if ! command -v git > /dev/null 2>&1; then
+  echo "git not found"
   exit
 fi
 
 if ! command -v make > /dev/null 2>&1; then
+  echo "make not found"
   exit
 fi
 
