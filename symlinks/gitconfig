@@ -25,7 +25,8 @@
 [alias]
 	sweep = "!f() { git prune && git gc && git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d; }; f"
 	co = "!f() { git checkout `git branch -vv --all | fzf --ansi --reverse -q "${1:-''}" -1 | awk '{print $1}' | sed 's|^remotes/origin/||'`; }; f"
-	rebasem = "!f() { git fetch origin && git rebase origin/master; }; f"
+	rbm = "!f() { git fetch origin && git rebase origin/master; }; f"
+	plm = "!f() { git fetch origin && git pull --rebase=false origin/master; }; f"
 	pushu = push -u
 	pushf = push --force-with-lease
 	s = status

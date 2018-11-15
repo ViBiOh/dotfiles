@@ -33,7 +33,7 @@ class GoTest(sublime_plugin.WindowCommand):
 			self.proc = None
 
 		self.queue_write('Running go test...\n')
-		self.proc = subprocess.Popen(['go', 'test', '-cover'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=working_dir)
+		self.proc = subprocess.Popen(['go', 'test', '-cover', '-race'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=working_dir)
 		self.killed = False
 
 		threading.Thread(

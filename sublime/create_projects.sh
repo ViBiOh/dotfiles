@@ -6,7 +6,7 @@ set -u
 rm -rf projects
 mkdir -p projects
 
-for project in ${HOME}/code/src/github.com/ViBiOh/*; do
+for project in "${HOME}/code/src/github.com/ViBiOh/"*; do
   projectName=`basename ${project}`
   fileName="./projects/${projectName}.sublime-project"
 
