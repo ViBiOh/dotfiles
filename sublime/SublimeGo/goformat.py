@@ -24,3 +24,8 @@ class GoFormat(sublime_plugin.TextCommand):
     content = gofmt_out.decode()
 
     view.replace(edit, region, content)
+
+
+class GoformatOnSave(sublime_plugin.EventListener):
+  def on_pre_save(self, view):
+    view.run_command('go_format')

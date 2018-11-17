@@ -1,4 +1,5 @@
-import sublime, sublime_plugin, subprocess
+import sublime, sublime_plugin, subprocess, threading
+from . async_task import AsyncTask
 
 # go to balanced pair, e.g.:
 # ((abc(def)))
@@ -91,6 +92,32 @@ def hint_and_subj(cls, name, type):
 
 	return hint, subj
 
+
+class GocodeUpdate(sublime_plugin.WindowCommand):
+	proc = None
+	task = None
+	panel = None
+	panel_lock = threading.Lock()
+
+	def run(self):
+		vars = self.window.extract_variables()
+		working_dir = vars['file_path']
+
+		with self.panel_lock:
+			self.panel = self.window.create_output_panel('gocode')
+			self.window.run_command('show_panel', {'panel': 'output.gocode'})
+
+		self.queue_write('Updating gocode...\n')
+		self.task = AsyncTask(command=['go', 'build', '-i', './...'], output=self.queue_write, cwd=working_dir)
+
+	def queue_write(self, text):
+		sublime.set_timeout(lambda: self.do_write(text), 1)
+
+	def do_write(self, text):
+		with self.panel_lock:
+			self.panel.run_command('append', {'characters': text})
+
+
 class Gocode(sublime_plugin.EventListener):
 	def on_query_completions(self, view, prefix, locations):
 		if not view.match_selector(0, 'source.go'):
@@ -111,6 +138,3 @@ class Gocode(sublime_plugin.EventListener):
 			results.append([hint, subj])
 
 		return (results, sublime.INHIBIT_WORD_COMPLETIONS)
-
-	def on_pre_save(self, view):
-		view.run_command('go_format')
