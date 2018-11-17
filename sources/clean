@@ -11,6 +11,8 @@ function os_clean() {
     docker rmi `docker images -q`
   fi
 
+  rm -rf "${HOME}/.bash_history" "${HOME}/.cache"
+
   if [ `uname -s` == "Darwin" ]; then
     sudo sync && sudo purge
   elif [ `sudo which sysctl | wc -l` -ne 0 ] && [ `sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l` -ne 0 ]; then
