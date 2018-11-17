@@ -6,6 +6,11 @@ function os_clean() {
 
   sudo find / \( -name ".DS_Store" -o -name ".localized" \) -exec rm -f {} \;
 
+  if command -v docker > /dev/null 2>&1; then
+    docker system prune -f
+    docker rmi `docker images -q`
+  fi
+
   if [ `uname -s` == "Darwin" ]; then
     sudo sync && sudo purge
   elif [ `sudo which sysctl | wc -l` -ne 0 ] && [ `sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l` -ne 0 ]; then
