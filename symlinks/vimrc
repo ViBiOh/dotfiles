@@ -53,7 +53,7 @@ set backspace=indent,eol,start
 " Hightlight search
 set hlsearch
 
-" Clear highligh when pressing escape
+" Clear highlight when pressing escape
 nnoremap <esc> :noh<return><esc>
 nnoremap <esc>^[ <esc>^[
 
@@ -94,8 +94,11 @@ endif
 set viminfo=""
 
 " Search using ctrl-p and fzf
-set rtp+=~/.fzf
+set rtp+=~/opt/fzf
 noremap <C-p> :FZF<return>
+
+" Term colors
+set termguicolors
 
 " Using ripgrep for searching
 if executable("rg")
