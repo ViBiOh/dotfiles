@@ -131,10 +131,17 @@ class Gocode(sublime_plugin.EventListener):
 			print('ERROR gocode: {}'.format(err.decode()))
 			return
 
+		has_invalid = False
 		results = []
 		for line in filter(bool, out.decode().split('\n')):
 			arg = line.split(',,')
 			hint, subj = hint_and_subj(arg[0], arg[1], arg[2])
 			results.append([hint, subj])
+
+			if 'invalid type' in hint:
+				has_invalid = True
+
+		if has_invalid:
+			view.run_command('gocode_update')
 
 		return (results, sublime.INHIBIT_WORD_COMPLETIONS)
