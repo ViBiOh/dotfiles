@@ -12,6 +12,8 @@
     "Pretty JSON",
     "SideBarEnhancements",
     "SublimeLinter",
-    "SublimeLinter-eslint"
+    "SublimeLinter-eslint",
+    "SublimeLinter-golint",
+    "SublimeLinter-gotype"
   ]
 }
