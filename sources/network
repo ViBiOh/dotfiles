@@ -11,7 +11,15 @@ function open_ports() {
 function dnsFlushCache() {
   if [ `uname` == "Darwin" ]; then
     sudo dscacheutil -flushcache;sudo killall -HUP mDNSResponder
+
+    if command -v dnsmasq 2>&1 > /dev/null; then
+      sudo brew services restart dnsmasq
+    fi
   elif [ `uname` == "Linux" ]; then
     sudo service network-manager restart
+
+    if command -v dnsmasq 2>&1 > /dev/null; then
+      sudo /etc/init.d/dnsmasq restart
+    fi
   fi
 }
