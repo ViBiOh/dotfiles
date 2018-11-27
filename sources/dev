@@ -8,6 +8,7 @@ TERM=xterm-256color
 function update_deps() {
   if [ -e "package.json" ]; then
     ncu -u
+    npmi
   fi
 
   if [ -e "Gopkg.toml" ]; then
