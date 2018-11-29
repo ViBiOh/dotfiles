@@ -7,11 +7,7 @@
     },
     {
       "characters": ".",
-      "selector": "source.js"
-    },
-    {
-      "characters": ".",
-      "selector": "source.go"
+      "selector": "source.js,source.go"
     }
   ],
   "binary_file_patterns": [

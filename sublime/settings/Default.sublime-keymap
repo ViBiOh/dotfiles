@@ -14,13 +14,20 @@
       {
         "key": "selector",
         "operator": "equal",
-        "operand": "source.js,source.go"
+        "operand": "source.go"
       }
     ]
   },
   {
     "keys": ["super+option+f"],
-    "command": "js_prettier"
+    "command": "js_prettier",
+    "context": [
+      {
+        "key": "selector",
+        "operator": "equal",
+        "operand": "source.js"
+      }
+    ]
   },
   {
     "keys": ["super+m"],

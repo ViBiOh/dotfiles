@@ -6,16 +6,6 @@
       "scopes": ["source.go"],
       "syntaxes": ["Packages/Go/Go.sublime-syntax"],
       "languageId": "go"
-    },
-    "lsp-js": {
-      "enabled": true,
-      "command": ["javascript-typescript-stdio"],
-      "scopes": ["source.js"],
-      "syntaxes": [
-        "Packages/Naomi/syntaxes/naomi.fjsx15.sublime-syntax",
-        "Packages/JavaScript/JavaScript.sublime-syntax"
-      ],
-      "languageId": "javascript"
     }
   }
 }
