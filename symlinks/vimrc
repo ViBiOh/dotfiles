@@ -97,9 +97,6 @@ set viminfo=""
 set rtp+=~/opt/fzf
 noremap <C-p> :FZF<return>
 
-" Term colors
-set termguicolors
-
 " Using ripgrep for searching
 if executable("rg")
   set grepprg=rg\ --vimgrep\ --no-heading
