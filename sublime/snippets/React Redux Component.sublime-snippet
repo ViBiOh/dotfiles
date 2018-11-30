@@ -58,6 +58,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(${1:ComponentName}Co
 
 ]]></content>
 		<tabTrigger>rrc</tabTrigger>
-		<scope>source.js</scope>
+		<scope>source.js,source.jsx</scope>
 		<description>React Redux Component</description>
 </snippet>

@@ -11,6 +11,6 @@ componentDidUpdate(prevProps, prevState) {
 
 ]]></content>
     <tabTrigger>cdup</tabTrigger>
-    <scope>source.js meta.class.js</scope>
+    <scope>source.js</scope>
     <description>React: componentDidUpdate(pp, ps) {…}</description>
 </snippet>

@@ -10,7 +10,7 @@
     "lsp-js": {
       "enabled": true,
       "command": ["javascript-typescript-stdio"],
-      "scopes": ["source.js"],
+      "scopes": ["source.js", "source.jsx"],
       "syntaxes": [
         "Packages/Naomi/syntaxes/naomi.fjsx15.sublime-syntax",
         "Packages/JavaScript/JavaScript.sublime-syntax"

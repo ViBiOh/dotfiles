@@ -17,6 +17,6 @@ test('should always render as a ${2:Type}', (t) => {
 
 ]]></content>
     <tabTrigger>rct</tabTrigger>
-    <scope>source.js</scope>
+    <scope>source.js,source.jsx</scope>
     <description>React Component Test</description>
 </snippet>

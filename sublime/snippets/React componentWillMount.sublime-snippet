@@ -9,6 +9,6 @@ componentWillMount() {
 
 ]]></content>
     <tabTrigger>cwm</tabTrigger>
-    <scope>source.js meta.class.js</scope>
+    <scope>source.js</scope>
     <description>React: componentWillMount() {…}</description>
 </snippet>

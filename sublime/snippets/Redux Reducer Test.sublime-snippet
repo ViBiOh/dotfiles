@@ -9,7 +9,7 @@ test('should return initial state', (t) => {
 
 ]]></content>
     <tabTrigger>rrt</tabTrigger>
-    <scope>source.js</scope>
+    <scope>source.js,source.jsx</scope>
     <description>Redux Reducer Test</description>
 </snippet>
 

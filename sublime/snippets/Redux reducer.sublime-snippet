@@ -25,6 +25,6 @@ export default function (state = initialState, action) {
 
 ]]></content>
 		<tabTrigger>rrr</tabTrigger>
-		<scope>source.js</scope>
+		<scope>source.js,source.jsx</scope>
 		<description>Redux ReduceR</description>
 </snippet>

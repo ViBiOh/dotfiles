@@ -3,6 +3,6 @@
 this.setState({ ${1}: ${2} });
 ]]></content>
     <tabTrigger>rss</tabTrigger>
-    <scope>source.js meta.class.js</scope>
+    <scope>source.js</scope>
     <description>React: this.setState(…)</description>
 </snippet>
