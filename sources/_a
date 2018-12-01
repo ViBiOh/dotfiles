@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+export LC_ALL="en_US.UTF-8"
+export LANG="en_US.UTF-8"
+export LANGUAGE="en_US.UTF-8"
+
 if [ `uname -s` == "Darwin" ]; then
   export PATH="${HOME}/Library/Python/2.7/bin:${PATH}"
 fi
