@@ -13,6 +13,8 @@ ARCH=`uname -m`
 
 if [ "${ARCH}" == "x86_64" ]; then
   ARCH="amd64"
+elif [[ "${ARCH}" =~ ^armv.l$ ]]; then
+  ARCH="armv6l"
 fi
 
 GO_ARCHIVE="go${GO_VERSION}.${OS,,}-${ARCH,,}.tar.gz"
