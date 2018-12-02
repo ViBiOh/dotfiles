@@ -23,6 +23,7 @@ cat \
   | uniq \
   | grep -v '0.0.0.0 twitter.com' \
   | grep -v '0.0.0.0 www.twitter.com' \
+  | grep -v '0.0.0.0 t.co' \
   | grep -v '0.0.0.0 abs.twimg.com' \
   | grep -v '0.0.0.0 pbs.twimg.com' \
   | grep -v '0.0.0.0 www.linkedin.com' \
