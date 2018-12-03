@@ -1,3 +1,4 @@
 prefix=~/.npm_packages
+save-exact=true
 strict-ssl=true
 registry=https://registry.npmjs.org/
