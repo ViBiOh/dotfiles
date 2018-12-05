@@ -8,7 +8,7 @@ echo "- SSH -"
 echo "-------"
 
 MAC_OS_SSH_CONFIG=""
-if [ `uname` == 'Darwin' ]; then
+if [ "${IS_MACOS}" == true ]; then
   MAC_OS_SSH_CONFIG="
     UseKeyChain no"
 fi

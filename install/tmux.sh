@@ -7,7 +7,7 @@ echo "--------"
 echo "- tmux -"
 echo "--------"
 
-if [ `uname` == 'Darwin' ]; then
+if [ "${IS_MACOS}" == true ]; then
   brew install \
     tmux \
     reattach-to-user-namespace

@@ -9,9 +9,9 @@ function sed_replace_properties() {
 }
 
 function sed_inplace() {
-  if [ `uname -s` == "Darwin" ]; then
-    sed -i '' "$@"
+  if [ "${IS_MACOS}" == true ]; then
+    sed -i '' "${@}"
   else
-    sed -i "$@"
+    sed -i "${@}"
   fi
 }

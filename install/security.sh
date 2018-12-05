@@ -43,7 +43,7 @@ if command -v dnsFlushCache > /dev/null 2>&1; then
   dnsFlushCache
 fi
 
-if [ `uname` == 'Darwin' ]; then
+if [ "${IS_MACOS}" == true ]; then
   curl -o "${HOME}/code/bin/stronghold" https://raw.githubusercontent.com/alichtman/stronghold/master/stronghold-script.sh
   chmod +x "${HOME}/code/bin/stronghold"
 

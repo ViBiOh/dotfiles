@@ -7,7 +7,7 @@ echo "-----------"
 echo "- ripgrep -"
 echo "-----------"
 
-if [ `uname -s` == 'Darwin' ]; then
+if [ "${IS_MACOS}" == true ]; then
   brew tap burntsushi/ripgrep https://github.com/BurntSushi/ripgrep.git
   brew install ripgrep-bin
 elif command -v apt-get > /dev/null 2>&1 && [ `uname -m` == 'x86_64' ]; then

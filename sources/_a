@@ -4,8 +4,20 @@ export LC_ALL="en_US.UTF-8"
 export LANG="en_US.UTF-8"
 export LANGUAGE="en_US.UTF-8"
 
-if [ `uname -s` == "Darwin" ]; then
+export IS_MACOS=false
+export IS_LINUX=false
+case `uname -s` in
+  "Darwin")
+    export IS_MACOS=true
+    ;;
+  "Linux")
+    export IS_LINUX=true
+    ;;
+esac
+
+if [ "${IS_MACOS}" == true ]; then
   export PATH="${HOME}/Library/Python/2.7/bin:${PATH}"
 fi
 
 export PATH="${HOME}/opt/bin:${PATH}"
+

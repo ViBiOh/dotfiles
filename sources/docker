@@ -1,51 +1,6 @@
 #!/usr/bin/env bash
 
 if command -v docker > /dev/null 2>&1; then
-  function docker-compose-deploy() {
-    local PROJECT_NAME="${1}"
-    readVariableIfRequired "PROJECT_NAME"
-
-    local oldServices=`docker ps -f name="${PROJECT_NAME}*" -q`
-    local PROJECT_FULLNAME=${PROJECT_NAME}`git rev-parse --short HEAD`
-
-    docker-compose -p ${PROJECT_FULLNAME} config -q
-    docker-compose -p ${PROJECT_FULLNAME} pull
-    docker-compose -p ${PROJECT_FULLNAME} up -d
-    local servicesCount=`docker-compose -p "${PROJECT_FULLNAME}" ps -q | wc -l`
-
-    echo "Waiting 45 seconds for containers to start..."
-    timeout=`date --date="45 seconds" +%s`
-    local healthyCount=`docker events --until "${timeout}" -f event="health_status: healthy" -f name="${PROJECT_FULLNAME}" | wc -l`
-
-    if [ "${servicesCount}" -gt "${healthyCount}" ]; then
-      echo "Containers didn't start, reverting..."
-
-      docker-compose -p "${PROJECT_FULLNAME}" logs || true
-      docker-compose -p "${PROJECT_FULLNAME}" ps -q | xargs docker inspect --format='{{ .Name }}{{ "\n" }}{{range .State.Health.Log }}code={{ .ExitCode }}, log={{ .Output }}{{ end }}' || true
-      docker-compose -p "${PROJECT_FULLNAME}" rm --force --stop -v
-      return 1
-    fi
-
-    if [ ! -z "${oldServices}" ]; then
-      echo "Stopping old containers ${oldServices}"
-      docker stop --time=180 ${oldServices}
-    fi
-
-    if [ ! -z "${oldServices}" ]; then
-      echo "Removing old containers ${oldServices}"
-      docker rm -f -v ${oldServices}
-    fi
-
-    echo Renaming containers
-    for service in `docker-compose -p "${PROJECT_FULLNAME}" ps --services`; do
-      docker rename "${PROJECT_FULLNAME}_${service}_1" "${PROJECT_NAME}_${service}"
-    done
-
-    echo Deploy succeed!
-
-    docker system prune -f || true
-  }
-
   function docker-restart() {
     docker start `docker ps -a -q -f status=exited -f status=created 2>/dev/null` 2>/dev/null
   }

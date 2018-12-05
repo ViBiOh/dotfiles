@@ -7,7 +7,7 @@ echo "---------"
 echo "- Pgcli -"
 echo "---------"
 
-if ! [ -e /usr/local/bin/pip ] > /dev/null 2>&1 && [ `uname -s` == 'Darwin' ]; then
+if ! [ -e /usr/local/bin/pip ] > /dev/null 2>&1 && [ "${IS_MACOS}" == true ]; then
   sudo easy_install pip
 fi
 
