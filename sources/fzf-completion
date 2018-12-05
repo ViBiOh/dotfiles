@@ -66,7 +66,7 @@ if command -v pgcli > /dev/null 2>&1; then
 
   function _fzf_complete_pgcli_post() {
     sed -E 's|host: ([^:]*) port: ([^:]*) db: ([^:]*) user: ([^:]*)|\1 \2 \3 \4|g' | \
-    awk '{if ($1 != "*") { print "-h " $1; } if ($2 != "*") { print "-p " $2; } if ($3 != "*") { print "-U " $3; } if ($4 != "*") { print $4; }}'
+    awk '{if ($1 != "*") { print "-h " $1; } if ($2 != "*") { print "-p " $2; } if ($4 != "*") { print "-U " $4; } if ($3 != "*") { print $3; }}'
   }
 
   [ -n "${BASH}" ] && complete -F _fzf_complete_pgcli -o default -o bashdefault pgcli
