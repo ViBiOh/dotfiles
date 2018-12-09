@@ -13,7 +13,7 @@ type App struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		`${1:FlagName}`: fs.String(tools.ToCamel(fmt.Sprintf(`%s${2:FlagValue}`, prefix)), ``, `${3:FlagDesc}`),
+		${1:FlagName}: fs.String(tools.ToCamel(fmt.Sprintf(`%s${2:FlagValue}`, prefix)), ``, `${3:FlagDesc}`),
 	}
 }
 
