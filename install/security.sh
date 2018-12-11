@@ -38,6 +38,7 @@ cat \
   | grep -v '0.0.0.0 help.rollbar.com' \
   | grep -v '0.0.0.0 reddit.com' \
   | grep -v '0.0.0.0 www.reddit.com' \
+  | grep -v '0.0.0.0 reddit.map.fastly.net' \
   | sudo tee /etc/hosts > /dev/null
 
 if command -v dnsFlushCache > /dev/null 2>&1; then
