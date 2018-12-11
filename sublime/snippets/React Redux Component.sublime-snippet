@@ -15,13 +15,11 @@ function mapStateToProps(state) {
 }
 
 /**
- * Provide dispatch functions in props.
- * @param {Function} dispatch Redux dispatch function
+ * Provide actions to dispatch.
+ * @type {Object}
  */
-function mapDispatchToProps(dispatch) {
-  return {
-    ${4:stateAction}: () => dispatch({ type: 'action' }),
-  };
+const mapDispatchToProps = {
+  ${4:stateAction},
 }
 
 /**
@@ -40,6 +38,8 @@ export class ${1:ComponentName}Component extends Component {
    * React lifecycle.
    */
   render() {
+    const { ${3:stateProp}, ${4:stateAction} } = this.props;
+
     return (
       ${2}
     );
