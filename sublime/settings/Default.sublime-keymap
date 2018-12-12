@@ -14,7 +14,7 @@
       {
         "key": "selector",
         "operator": "equal",
-        "operand": "source.go,source.js,source.jsx"
+        "operand": "source.go"
       }
     ]
   },
