@@ -54,7 +54,7 @@ function head_sync() {
   fi
 
   local branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
-  ssh "${1}" "PS1=$ source ~/.bashrc && cd ${REMOTE_PATH_PREFIX} && git reset HEAD . && git clean -f && git checkout -- . && git fetch && git checkout ${branch} && git pull"
+  ssh "${1}" "cd ${REMOTE_PATH_PREFIX} && git reset HEAD . && git clean -f && git checkout -- . && git fetch && git checkout ${branch} && git pull"
 }
 
 function git_sync() {
