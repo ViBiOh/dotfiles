@@ -7,7 +7,7 @@ echo "----------"
 echo "- Golang -"
 echo "----------"
 
-GO_VERSION=1.11.2
+GO_VERSION=1.11.3
 OS=`uname -s`
 ARCH=`uname -m`
 
