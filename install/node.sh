@@ -26,7 +26,7 @@ PREFIX="${HOME}/opt" make install
 cd "${HOME}"
 rm -rf "${HOME}/n-install"
 
-source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/_a"
+source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/_first"
 source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/n"
 n latest
 
