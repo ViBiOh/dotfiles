@@ -9,7 +9,7 @@ function git_info() {
   local branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
   local dirty=`git diff --quiet --ignore-submodules HEAD &>/dev/null; [ $? -eq 1 ] && echo -e "*"`
 
-  echo " ($branch$dirty)"
+  echo " (${branch}${dirty})"
 }
 
 function ...() {
