@@ -520,11 +520,11 @@
 	<key>VisualBell</key>
 	<false/>
 	<key>columnCount</key>
-	<integer>120</integer>
+	<integer>125</integer>
 	<key>name</key>
 	<string>Pro</string>
 	<key>rowCount</key>
-	<integer>30</integer>
+	<integer>32</integer>
 	<key>shellExitAction</key>
 	<integer>2</integer>
 	<key>type</key>
