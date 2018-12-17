@@ -11,8 +11,6 @@ git clone https://github.com/ViBiOh/dotfiles.git
 
 ## SSH
 
-### Generate key and deploy key
-
 ```bash
 ssh-keygen -t ed25519 -a 100 -C "`whoami`@`hostname`" -f ~/.ssh/id_ed25519
 ```
