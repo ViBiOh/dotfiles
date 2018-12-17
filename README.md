@@ -14,7 +14,7 @@ git clone https://github.com/ViBiOh/dotfiles.git
 ### Generate key and deploy key
 
 ```bash
-ssh-keygen -t ed25519
+ssh-keygen -t ed25519 -a 100
 ```
 
 ## Bash
