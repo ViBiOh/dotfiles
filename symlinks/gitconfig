@@ -24,7 +24,7 @@
 
 [alias]
 	sweep = "!f() { git prune && git gc && git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d; }; f"
-	co = "!f() { git checkout `git branch -vv --all | fzf --ansi --reverse -q "${1:-''}" -1 | awk '{print $1}' | sed 's|^remotes/origin/||'`; }; f"
+	co = "!f() { git checkout `git branch -vv --all | fzf --ansi --reverse -q "${@}" -1 | awk '{print $1}' | sed 's|^remotes/origin/||'`; }; f"
 	rbm = pull --rebase origin master
 	plm = pull --rebase=false origin master
 	commend = commit --amend --no-edit
