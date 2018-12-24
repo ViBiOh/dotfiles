@@ -8,7 +8,7 @@ for file in "${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks"/*; do
 done
 
 set +u
-PS1=install source "${HOME}/.bashrc"
+source "${HOME}/.bashrc"
 set -u
 
 for file in "${HOME}/code/src/github.com/ViBiOh/dotfiles/install"/*; do
