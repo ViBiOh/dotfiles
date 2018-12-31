@@ -11,7 +11,11 @@ function os_clean() {
     docker rmi `docker images -q`
   fi
 
-  rm -rf "${HOME}/.bash_history" "${HOME}/.cache"
+  rm -rf "${HOME}/.bash_history" \
+         "${HOME}/.cache" \
+         "${HOME}/.CFUserTextEncoding" \
+         "${HOME}/.vim" \
+         "${HOME}/.npm"
 
   if [ "${IS_MACOS}" == true ]; then
     sudo sync && sudo purge
