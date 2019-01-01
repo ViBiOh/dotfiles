@@ -52,12 +52,16 @@ if [ "${IS_MACOS}" == true ]; then
   defaults write com.apple.screensaver askForPassword -int 1
   defaults write com.apple.screensaver askForPasswordDelay -int 0
   defaults write com.apple.finder AppleShowAllFiles -bool true
+  defaults write com.apple.finder ShowPathbar -bool true
   defaults write NSGlobalDomain AppleShowAllExtensions -bool true
   defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+  defaults write com.apple.Safari UniversalSearchEnabled -bool false
+  defaults write com.apple.Safari SuppressSearchSuggestions -bool true
   defaults write com.apple.CrashReporter DialogType none
   sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool YES
   sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
 
+  sudo nvram SystemAudioVolume=%01
   sudo scutil --set ComputerName macbook
   sudo scutil --set LocalHostName macbook
 
