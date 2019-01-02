@@ -11,6 +11,10 @@ function os_clean() {
     docker rmi `docker images -q`
   fi
 
+  if command -v npm > /dev/null 2>&1; then
+    npm cache clean --force
+  fi
+
   rm -rf "${HOME}/.bash_history" \
          "${HOME}/.cache" \
          "${HOME}/.CFUserTextEncoding" \
