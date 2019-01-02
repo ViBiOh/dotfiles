@@ -7,6 +7,11 @@ echo "-----------"
 echo "- dnsmasq -"
 echo "-----------"
 
+if command -v pihole > /dev/null 2>&1; then
+  echo "pihole found, no action"
+  exit
+fi
+
 DNSMASQ_CONF='/etc/dnsmasq.conf'
 
 if [ "${IS_MACOS}" == true ]; then
