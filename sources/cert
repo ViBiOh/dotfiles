@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-function random() {
+random() {
     openssl rand -base64 "${1:-30}"
 }
 
-function cert_create_ca() {
+cert_create_ca() {
     if [[ "${#}" -eq 0 ]]; then
         echo Usage cert_create_ca [CN_NAME] [CERT_PASSWORD]
     fi
@@ -29,7 +29,7 @@ function cert_create_ca() {
     chmod -v 0444 "${CA}"
 }
 
-function cert_create_cert() {
+cert_create_cert() {
     if [[ "${#}" -eq 0 ]]; then
         echo Usage cert_create_cert [NAME] [HOST_IP] [CA_PRIVATE_KEY_PASSWORD]
     fi

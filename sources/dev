@@ -5,7 +5,7 @@ alias dev='cd ${HOME}/code/src/github.com/ViBiOh/'
 EDITOR=vim
 TERM=xterm-256color
 
-function update_deps() {
+update_deps() {
   if [[ -e "package.json" ]]; then
     ncu -u
     npm install --ignore-scripts

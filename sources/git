@@ -4,7 +4,7 @@ if command -v perl > /dev/null 2>&1 && [ -x "${HOME}/opt/bin/diff-so-fancy" ]; t
   export GIT_PAGER="${HOME}/opt/bin/diff-so-fancy | less --tabs=4 -RFX"
 fi
 
-function git_info() {
+git_info() {
   git rev-parse --is-inside-work-tree &>/dev/null || return
   local branch=$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')
   local dirty=$(git diff --quiet --ignore-submodules HEAD &>/dev/null; [ $? -eq 1 ] && echo -e "*")
@@ -12,7 +12,7 @@ function git_info() {
   echo " (${branch}${dirty})"
 }
 
-function ...() {
+...() {
   if ! $(git rev-parse --is-inside-work-tree 2>/dev/null); then
     return 1
   else
@@ -24,7 +24,7 @@ function ...() {
   fi
 }
 
-function git_browse() {
+git_browse() {
   local currentWorkDir=$(pwd)
 
   for dir in "${currentWorkDir}"/*; do
@@ -38,11 +38,11 @@ function git_browse() {
   cd "${currentWorkDir}"
 }
 
-function git_pull() {
+git_pull() {
   git_browse 'git pull'
 }
 
-function head_sync() {
+head_sync() {
   if [[ "${#}" -ne 2 ]]; then
     echo Usage: head_sync [REMOTE_SERVER] [REMOTE_PATH]
     return 1
@@ -57,7 +57,7 @@ function head_sync() {
   ssh "${1}" "cd ${REMOTE_PATH_PREFIX} && git reset HEAD . && git clean -f && git checkout -- . && git fetch && git checkout ${branch} && git pull"
 }
 
-function git_sync() {
+git_sync() {
   if [[ "${#}" -lt 2 ]]; then
     echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH] [DRY]?
     return 1
@@ -140,7 +140,7 @@ function git_sync() {
   echo
 }
 
-function watch_sync() {
+watch_sync() {
   git_sync "${@}"
 
   fswatch -0 -o --exclude=.git/ . | while read -d "" event

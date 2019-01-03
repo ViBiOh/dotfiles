@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function open_ports() {
+open_ports() {
   if [[ "${IS_MACOS}" == true ]]; then
     sudo lsof -PniTCP -sTCP:LISTEN
   elif [[ "${IS_LINUX}" == true ]]; then
@@ -8,7 +8,7 @@ function open_ports() {
   fi
 }
 
-function dnsFlushCache() {
+dnsFlushCache() {
   if [[ "${IS_MACOS}" == true ]]; then
     sudo dscacheutil -flushcache;sudo killall -HUP mDNSResponder
 

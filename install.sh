@@ -1,28 +1,34 @@
 #!/usr/bin/env bash
 
-set -e
-set -u
+set -o errexit
+set -o nounset
+set -o pipefail
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-for file in "${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks"/*; do
-  basenameFile=$(basename "${file}")
-  [ -r "${file}" ] && [ -e "${file}" ] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
-done
+main() {
+  for file in "${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks"/*; do
+    basenameFile=$(basename "${file}")
+    [ -r "${file}" ] && [ -e "${file}" ] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
+  done
 
-set +u
-source "${HOME}/.bashrc"
-set -u
+  set +u
+  source "${HOME}/.bashrc"
+  set -u
 
-for file in "${HOME}/code/src/github.com/ViBiOh/dotfiles/install"/*; do
-  [ -r "${file}" ] && [ -x "${file}" ] && "${file}"
-done
+  for file in "${HOME}/code/src/github.com/ViBiOh/dotfiles/install"/*; do
+    [ -r "${file}" ] && [ -x "${file}" ] && "${file}"
+  done
 
-if [[ "${IS_MACOS}" == true ]]; then
-  brew cleanup
-elif command -v apt-get > /dev/null 2>&1; then
-  sudo apt-get autoremove -y
-  sudo apt-get clean all
-fi
+  if [[ "${IS_MACOS}" == true ]]; then
+    brew cleanup
+  elif command -v apt-get > /dev/null 2>&1; then
+    sudo apt-get autoremove -y
+    sudo apt-get clean all
+  fi
 
-if command -v subl > /dev/null 2>&1; then
-  cd sublime && ./install.sh
-fi
+  if command -v subl > /dev/null 2>&1; then
+    pushd sublime && ./install.sh && popd
+  fi
+}
+
+main "${@}"

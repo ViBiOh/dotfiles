@@ -8,7 +8,7 @@ if [[ ! -e "${SSH_KEY}" ]]; then
   SSH_KEY="${HOME}/.ssh/id_rsa"
 fi
 
-function start_ssh_agent() {
+start_ssh_agent() {
   if [[ -e "${SSH_KEY}" ]]; then
     echo "Initializing new SSH agent..."
 
@@ -21,7 +21,7 @@ function start_ssh_agent() {
   fi
 }
 
-function stop_ssh_agent() {
+stop_ssh_agent() {
   kill -0 "${SSH_AGENT_PID}" 2>/dev/null
 }
 

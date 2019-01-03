@@ -8,7 +8,7 @@ if [[ -e "${HOME}/.fzf.bash" ]]; then
     export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
   fi
 
-  function __fzf_history__() {
+  __fzf_history__() {
     local line
     shopt -u nocaseglob nocasematch
 

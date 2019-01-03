@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function os_clean() {
+os_clean() {
   stop_ssh_agent
   gpgconf --kill gpg-agent
 
@@ -30,7 +30,7 @@ function os_clean() {
   fi
 }
 
-function brew_clean_all() {
+brew_clean_all() {
   brew remove --force $(brew list) --ignore-dependencies
   brew cleanup
 }

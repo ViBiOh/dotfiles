@@ -5,13 +5,13 @@ if ! command -v fzf > /dev/null 2>&1; then
 fi
 
 if command -v git > /dev/null 2>&1; then
-  function grip() {
+  grip() {
     fzf --ansi --reverse --tiebreak=index --no-sort --preview 'f() { set -- $(echo -- "$@" | grep -o "[a-f0-9]\{7\}"); [ $# -eq 0 ] || git show --color=always $1; }; f {}'
   }
 fi
 
 if command -v pass > /dev/null 2>&1; then
-  function _fzf_complete_pass() {
+  _fzf_complete_pass() {
     FZF_COMPLETION_TRIGGER='' _fzf_complete '-1' "${@}" < <(
       local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
       find "${PASS_DIR}" -name '*.gpg' -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"
@@ -19,7 +19,7 @@ if command -v pass > /dev/null 2>&1; then
   }
   [ -n "${BASH}" ] && complete -F _fzf_complete_pass -o default -o bashdefault pass
 
-  function passfor() {
+  passfor() {
     pass -c "${1}"
 
     if [[ "${?}" -eq 0 ]] && [[ $(pass show "${1}" | grep '^otpauth:' | wc -l) -eq 1 ]]; then
@@ -33,21 +33,21 @@ if command -v pass > /dev/null 2>&1; then
 fi
 
 if command -v make > /dev/null 2>&1; then
-  function _fzf_complete_make() {
+  _fzf_complete_make() {
     FZF_COMPLETION_TRIGGER='' _fzf_complete '-1' "${@}" < <(make -rpn | sed -n -e '/^$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$// ; p ; } ; }')
   }
   [ -n "${BASH}" ] && complete -F _fzf_complete_make -o default -o bashdefault make
 fi
 
 if command -v ssh > /dev/null 2>&1; then
-  function _fzf_complete_ssh_notrigger() {
+  _fzf_complete_ssh_notrigger() {
     FZF_COMPLETION_TRIGGER='' _fzf_complete_ssh
   }
   [ -n "${BASH}" ] && complete -F _fzf_complete_ssh_notrigger -o default -o bashdefault ssh
 fi
 
 if command -v pgcli > /dev/null 2>&1; then
-  function _fzf_complete_pgcli() {
+  _fzf_complete_pgcli() {
     FZF_COMPLETION_TRIGGER='' _fzf_complete '--ansi' '-1' "${@}" < <(
       local RED='\033[31m'
       local GREEN='\033[32m'
@@ -64,7 +64,7 @@ if command -v pgcli > /dev/null 2>&1; then
     )
   }
 
-  function _fzf_complete_pgcli_post() {
+  _fzf_complete_pgcli_post() {
     sed -E 's|host: ([^:]*) port: ([^:]*) db: ([^:]*) user: ([^:]*)|\1 \2 \3 \4|g' | \
     awk '{if ($1 != "*") { print "-h " $1; } if ($2 != "*") { print "-p " $2; } if ($4 != "*") { print "-U " $4; } if ($3 != "*") { print $3; }}'
   }

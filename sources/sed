@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-function sed_escape_string() {
+sed_escape_string() {
   echo "${1}" | sed 's|\([\|\.]\)|\\\1|g'
 }
 
-function sed_replace_properties() {
+sed_replace_properties() {
   sed -i '' -e "s|^$(sed_escape_string ${2}).*|$(sed_escape_string ${4:-${2}})=$(sed_escape_string ${3})|" "${1}"
 }
 
-function sed_inplace() {
+sed_inplace() {
   if [[ "${IS_MACOS}" == true ]]; then
     sed -i '' "${@}"
   else

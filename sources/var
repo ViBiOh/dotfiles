@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function readVariableIfRequired() {
+readVariableIfRequired() {
   if [[ -z "${!1}" ]]; then
     read -p "${2:-${1}=}" "${1}"
   else
