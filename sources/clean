@@ -21,9 +21,9 @@ function os_clean() {
          "${HOME}/.vim" \
          "${HOME}/.npm"
 
-  if [ "${IS_MACOS}" == true ]; then
+  if [[ "${IS_MACOS}" == true ]]; then
     sudo sync && sudo purge
-  elif [ $(sudo which sysctl | wc -l) -ne 0 ] && [ $(sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l) -ne 0 ]; then
+  elif [[ $(sudo which sysctl | wc -l) -ne 0 ]] && [[ $(sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l) -ne 0 ]]; then
     sudo sysctl vm.drop_caches=3
   else
     sudo sync; echo 3 > /proc/sys/vm/drop_caches

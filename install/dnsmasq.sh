@@ -14,7 +14,7 @@ fi
 
 DNSMASQ_CONF='/etc/dnsmasq.conf'
 
-if [ "${IS_MACOS}" == true ]; then
+if [[ "${IS_MACOS}" == true ]]; then
   brew install dnsmasq --with-dnssec
   DNSMASQ_CONF=$(brew --prefix)/etc/dnsmasq.conf
 elif command -v apt-get > /dev/null 2>&1; then
@@ -50,7 +50,7 @@ log-async
 log-dhcp
 log-facility=/var/log/dnsmasq.log' | sudo tee "${DNSMASQ_CONF}" > /dev/null
 
-if [ "${IS_MACOS}" == true ]; then
+if [[ "${IS_MACOS}" == true ]]; then
   sudo brew services restart dnsmasq
   sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
   scutil --dns

@@ -22,7 +22,7 @@ if command -v pass > /dev/null 2>&1; then
   function passfor() {
     pass -c "${1}"
 
-    if [ "${?}" -eq 0 ] && [ $(pass show "${1}" | grep '^otpauth:' | wc -l) -eq 1 ]; then
+    if [[ "${?}" -eq 0 ]] && [[ $(pass show "${1}" | grep '^otpauth:' | wc -l) -eq 1 ]]; then
       read -s -p "  Press enter for otp"
       echo ""
 

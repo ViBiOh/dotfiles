@@ -11,7 +11,7 @@ GO_VERSION=1.11.3
 OS=$(uname -s)
 ARCH=$(uname -m)
 
-if [ "${ARCH}" == "x86_64" ]; then
+if [[ "${ARCH}" == "x86_64" ]]; then
   ARCH="amd64"
 elif [[ "${ARCH}" =~ ^armv.l$ ]]; then
   ARCH="armv6l"
@@ -33,7 +33,7 @@ if command -v go > /dev/null 2>&1; then
   ls "${GOPATH}/src" | grep -v 'github.com' | xargs rm -rf
   ls "${GOPATH}/src/github.com" | grep -v 'ViBiOh' | xargs rm -rf
 
-  if [ "${ARCH}" == 'amd64' ]; then
+  if [[ "${ARCH}" == "amd64" ]]; then
     go get -u github.com/derekparker/delve/cmd/dlv
   fi
 

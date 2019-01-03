@@ -12,7 +12,7 @@ if ! command -v git > /dev/null 2>&1; then
   exit
 fi
 
-if [ ! -d "${HOME}/opt/fzf" ]; then
+if [[ ! -d "${HOME}/opt/fzf" ]]; then
   git clone --depth 1 https://github.com/junegunn/fzf.git "${HOME}/opt/fzf"
 else
   cd "${HOME}/opt/fzf" && git pull

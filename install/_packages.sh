@@ -7,7 +7,7 @@ echo "------------"
 echo "- Packages -"
 echo "------------"
 
-if [ "${IS_MACOS}" == true ]; then
+if [[ "${IS_MACOS}" == true ]]; then
   if ! command -v brew > /dev/null 2>&1; then
     mkdir "${HOME}/homebrew" && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "${HOME}/homebrew"
     source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/_homebrew"

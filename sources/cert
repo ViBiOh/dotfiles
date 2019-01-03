@@ -5,7 +5,7 @@ function random() {
 }
 
 function cert_create_ca() {
-    if [ "${#}" -eq 0 ]; then
+    if [[ "${#}" -eq 0 ]]; then
         echo Usage cert_create_ca [CN_NAME] [CERT_PASSWORD]
     fi
 
@@ -30,7 +30,7 @@ function cert_create_ca() {
 }
 
 function cert_create_cert() {
-    if [ "${#}" -eq 0 ]; then
+    if [[ "${#}" -eq 0 ]]; then
         echo Usage cert_create_cert [NAME] [HOST_IP] [CA_PRIVATE_KEY_PASSWORD]
     fi
 

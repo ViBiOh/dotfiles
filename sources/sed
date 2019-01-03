@@ -9,7 +9,7 @@ function sed_replace_properties() {
 }
 
 function sed_inplace() {
-  if [ "${IS_MACOS}" == true ]; then
+  if [[ "${IS_MACOS}" == true ]]; then
     sed -i '' "${@}"
   else
     sed -i "${@}"

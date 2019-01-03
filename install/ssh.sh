@@ -8,7 +8,7 @@ echo "- SSH -"
 echo "-------"
 
 MAC_OS_SSH_CONFIG=""
-if [ "${IS_MACOS}" == true ]; then
+if [[ "${IS_MACOS}" == true ]]; then
   MAC_OS_SSH_CONFIG="
     UseKeyChain no"
 fi

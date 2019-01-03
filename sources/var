@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function readVariableIfRequired() {
-  if [ -z "${!1}" ]; then
+  if [[ -z "${!1}" ]]; then
     read -p "${2:-${1}=}" "${1}"
   else
     echo "${1}="${!1}

@@ -7,7 +7,7 @@ echo "--------"
 echo "- tmux -"
 echo "--------"
 
-if [ "${IS_MACOS}" == true ]; then
+if [[ "${IS_MACOS}" == true ]]; then
   brew install \
     tmux \
     reattach-to-user-namespace

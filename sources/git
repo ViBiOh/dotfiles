@@ -18,7 +18,7 @@ function ...() {
   else
     local gitRootDir=$(git rev-parse --show-cdup)
 
-    if [ -n "${gitRootDir}" ]; then
+    if [[ -n "${gitRootDir}" ]]; then
       cd "${gitRootDir}"
     fi
   fi
@@ -29,7 +29,7 @@ function git_browse() {
 
   for dir in "${currentWorkDir}"/*; do
     cd ${dir}
-    if [ $(git rev-parse --is-inside-work-tree 2>/dev/null | grep true | wc -l) -eq 1 ]; then
+    if [[ $(git rev-parse --is-inside-work-tree 2>/dev/null | grep true | wc -l) -eq 1 ]]; then
       echo "${dir}"
       eval "${@}"
     fi
@@ -43,13 +43,13 @@ function git_pull() {
 }
 
 function head_sync() {
-  if [ "${#}" -ne 2 ]; then
+  if [[ "${#}" -ne 2 ]]; then
     echo Usage: head_sync [REMOTE_SERVER] [REMOTE_PATH]
     return 1
   fi
 
   local REMOTE_PATH_PREFIX="~/${2}"
-  if [ "${2:0:1}" == "/" ]; then
+  if [[ "${2:0:1}" == "/" ]]; then
     REMOTE_PATH_PREFIX="${2}"
   fi
 
@@ -58,7 +58,7 @@ function head_sync() {
 }
 
 function git_sync() {
-  if [ "${#}" -lt 2 ]; then
+  if [[ "${#}" -lt 2 ]]; then
     echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH] [DRY]?
     return 1
   fi
@@ -71,21 +71,21 @@ function git_sync() {
 
   ...
   isGit=$?
-  if [ ${isGit} -ne 0 ]; then
+  if [[ ${isGit} -ne 0 ]]; then
     return ${isGit}
   fi
 
   local REMOTE_PATH_PREFIX="~/${2}"
-  if [ "${2:0:1}" == "/" ]; then
+  if [[ "${2:0:1}" == "/" ]]; then
     REMOTE_PATH_PREFIX="${2}"
   fi
 
   local dry=false
-  if [ "${3,,}" == "dry" ]; then
+  if [[ "${3,,}" == "dry" ]]; then
     dry=true
   fi
 
-  if [ "${dry}" == true ]; then
+  if [[ "${dry}" == true ]]; then
     echo -e "${BLUE}Dry run of syncing files...${RESET}\n"
   else
     echo -e "${BLUE}Syncing files...${RESET}\n"
@@ -126,12 +126,12 @@ function git_sync() {
     ssh "${1}" "cd ${REMOTE_PATH_PREFIX} && git clean -f && git checkout -- ."
   fi
 
-  if [ "${#toDelete[@]}" -ne 0 ]; then
+  if [[ "${#toDelete[@]}" -ne 0 ]]; then
     ! ${dry} && ssh "${1}" "rm -rf ${toDelete[@]}"
     echo -e "${RED} - Deleted\n${toDelete[*]}${RESET}\n"
   fi
 
-  if [ "${#toSync[@]}" -ne 0 ]; then
+  if [[ "${#toSync[@]}" -ne 0 ]]; then
     ! ${dry} && rsync -raR "${toSync[@]}" "${1}:${REMOTE_PATH_PREFIX}/"
     echo -e "${GREEN} + Copied\n${toSync[*]}${RESET}\n"
   fi

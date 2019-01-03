@@ -4,12 +4,12 @@
 SSH_ENV="${HOME}/.ssh/environment"
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 
-if [ ! -e "${SSH_KEY}" ]; then
+if [[ ! -e "${SSH_KEY}" ]]; then
   SSH_KEY="${HOME}/.ssh/id_rsa"
 fi
 
 function start_ssh_agent() {
-  if [ -e "${SSH_KEY}" ]; then
+  if [[ -e "${SSH_KEY}" ]]; then
     echo "Initializing new SSH agent..."
 
     touch "${SSH_ENV}"
@@ -25,7 +25,7 @@ function stop_ssh_agent() {
   kill -0 "${SSH_AGENT_PID}" 2>/dev/null
 }
 
-if [ -f "${SSH_ENV}" ]; then
+if [[ -f "${SSH_ENV}" ]]; then
   source "${SSH_ENV}" > /dev/null
   kill -0 "${SSH_AGENT_PID}" 2>/dev/null || {
     start_ssh_agent

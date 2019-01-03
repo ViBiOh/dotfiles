@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
 function open_ports() {
-  if [ "${IS_MACOS}" == true ]; then
+  if [[ "${IS_MACOS}" == true ]]; then
     sudo lsof -PniTCP -sTCP:LISTEN
-  elif [ "${IS_LINUX}" == true ]; then
+  elif [[ "${IS_LINUX}" == true ]]; then
     sudo netstat -pluton
   fi
 }
 
 function dnsFlushCache() {
-  if [ "${IS_MACOS}" == true ]; then
+  if [[ "${IS_MACOS}" == true ]]; then
     sudo dscacheutil -flushcache;sudo killall -HUP mDNSResponder
 
     if command -v dnsmasq 2>&1 > /dev/null; then
       sudo brew services restart dnsmasq
     fi
-  elif [ "${IS_LINUX}" == true ]; then
+  elif [[ "${IS_LINUX}" == true ]]; then
     sudo service network-manager restart
 
     if command -v dnsmasq 2>&1 > /dev/null; then

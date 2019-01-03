@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ `locale -a | grep "en_US.UTF-8" | wc -l` -eq 1 ]; then
+if [[ $(locale -a | grep "en_US.UTF-8" | wc -l) -eq 1 ]]; then
   export LC_ALL="en_US.UTF-8"
   export LANG="en_US.UTF-8"
   export LANGUAGE="en_US.UTF-8"
@@ -17,7 +17,7 @@ case $(uname -s) in
     ;;
 esac
 
-if [ "${IS_MACOS}" == true ]; then
+if [[ "${IS_MACOS}" == true ]]; then
   export PATH="${HOME}/Library/Python/2.7/bin:${PATH}"
 fi
 
