@@ -16,7 +16,7 @@ DNSMASQ_CONF='/etc/dnsmasq.conf'
 
 if [ "${IS_MACOS}" == true ]; then
   brew install dnsmasq --with-dnssec
-  DNSMASQ_CONF=`brew --prefix`/etc/dnsmasq.conf
+  DNSMASQ_CONF=$(brew --prefix)/etc/dnsmasq.conf
 elif command -v apt-get > /dev/null 2>&1; then
   sudo apt-get install -y -qq dnsmasq
 fi

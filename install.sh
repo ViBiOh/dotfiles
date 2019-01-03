@@ -4,7 +4,8 @@ set -e
 set -u
 
 for file in "${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks"/*; do
-  [ -r "${file}" ] && [ -e "${file}" ] && rm -f "${HOME}"/.`basename "${file}"` && ln -s "${file}" "${HOME}"/.`basename "${file}"`
+  basenameFile=$(basename "${file}")
+  [ -r "${file}" ] && [ -e "${file}" ] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
 done
 
 set +u

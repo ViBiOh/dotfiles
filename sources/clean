@@ -8,7 +8,7 @@ function os_clean() {
 
   if command -v docker > /dev/null 2>&1; then
     docker system prune -f
-    docker rmi `docker images -q`
+    docker rmi $(docker images -q)
   fi
 
   if command -v npm > /dev/null 2>&1; then
@@ -23,7 +23,7 @@ function os_clean() {
 
   if [ "${IS_MACOS}" == true ]; then
     sudo sync && sudo purge
-  elif [ `sudo which sysctl | wc -l` -ne 0 ] && [ `sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l` -ne 0 ]; then
+  elif [ $(sudo which sysctl | wc -l) -ne 0 ] && [ $(sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l) -ne 0 ]; then
     sudo sysctl vm.drop_caches=3
   else
     sudo sync; echo 3 > /proc/sys/vm/drop_caches
@@ -31,6 +31,6 @@ function os_clean() {
 }
 
 function brew_clean_all() {
-  brew remove --force `brew list` --ignore-dependencies
+  brew remove --force $(brew list) --ignore-dependencies
   brew cleanup
 }

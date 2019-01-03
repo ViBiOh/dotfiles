@@ -8,7 +8,7 @@ fi
 
 export IS_MACOS=false
 export IS_LINUX=false
-case `uname -s` in
+case $(uname -s) in
   "Darwin")
     export IS_MACOS=true
     ;;

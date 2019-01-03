@@ -21,14 +21,14 @@ Then change default bash for root
 
 ```bash
 sudo -s
-echo `brew --prefix`/bin/bash >> /etc/shells
-chsh -s `brew --prefix`/bin/bash
+echo $(brew --prefix)/bin/bash >> /etc/shells
+chsh -s $(brew --prefix)/bin/bash
 ```
 
 And also for current user
 
 ```bash
-chsh -s `brew --prefix`/bin/bash
+chsh -s $(brew --prefix)/bin/bash
 ```
 
 ## Brew
@@ -36,6 +36,6 @@ chsh -s `brew --prefix`/bin/bash
 Fix it with following command when it's broken.
 
 ```bash
-sudo chown -R `whoami` `brew --prefix`/*
+sudo chown -R `whoami` $(brew --prefix)/*
 brew doctor
 ```

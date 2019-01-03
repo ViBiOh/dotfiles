@@ -6,17 +6,17 @@ fi
 
 function git_info() {
   git rev-parse --is-inside-work-tree &>/dev/null || return
-  local branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
-  local dirty=`git diff --quiet --ignore-submodules HEAD &>/dev/null; [ $? -eq 1 ] && echo -e "*"`
+  local branch=$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')
+  local dirty=$(git diff --quiet --ignore-submodules HEAD &>/dev/null; [ $? -eq 1 ] && echo -e "*")
 
   echo " (${branch}${dirty})"
 }
 
 function ...() {
-  if ! `git rev-parse --is-inside-work-tree 2>/dev/null`; then
+  if ! $(git rev-parse --is-inside-work-tree 2>/dev/null); then
     return 1
   else
-    local gitRootDir=`git rev-parse --show-cdup`
+    local gitRootDir=$(git rev-parse --show-cdup)
 
     if [ -n "${gitRootDir}" ]; then
       cd "${gitRootDir}"
@@ -25,11 +25,11 @@ function ...() {
 }
 
 function git_browse() {
-  local currentWorkDir=`pwd`
+  local currentWorkDir=$(pwd)
 
   for dir in "${currentWorkDir}"/*; do
     cd ${dir}
-    if [ `git rev-parse --is-inside-work-tree 2>/dev/null | grep true | wc -l` -eq 1 ]; then
+    if [ $(git rev-parse --is-inside-work-tree 2>/dev/null | grep true | wc -l) -eq 1 ]; then
       echo "${dir}"
       eval "${@}"
     fi
@@ -53,7 +53,7 @@ function head_sync() {
     REMOTE_PATH_PREFIX="${2}"
   fi
 
-  local branch=`git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||'`
+  local branch=$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')
   ssh "${1}" "cd ${REMOTE_PATH_PREFIX} && git reset HEAD . && git clean -f && git checkout -- . && git fetch && git checkout ${branch} && git pull"
 }
 
@@ -95,7 +95,7 @@ function git_sync() {
   local toDelete=()
 
   local IFS=$'\n'
-  for gitFile in `git status --porcelain`; do
+  for gitFile in $(git status --porcelain); do
     local prefix="${gitFile:0:2}"
     local trimmedPrefix="${prefix#[[:space:]]}"
 
@@ -109,8 +109,8 @@ function git_sync() {
         ;;
 
       "R")
-        local originFile=`echo -n "${gitFile}" | awk '{print $2}'`
-        local destinationFile=`echo -n "${gitFile}" | awk '{print $4}'`
+        local originFile=$(echo -n "${gitFile}" | awk '{print $2}')
+        local destinationFile=$(echo -n "${gitFile}" | awk '{print $4}')
 
         toDelete=("${toDelete[@]}" "${REMOTE_PATH_PREFIX}/${originFile}")
         toSync=("${toSync[@]}" "${destinationFile}")
