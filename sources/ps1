@@ -15,4 +15,4 @@ fi
 
 PROMPT_DIRTRIM=3
 
-export PS1="${PS1} "
+export PS1="${PS1}\n> "
