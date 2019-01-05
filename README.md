@@ -5,7 +5,7 @@
 ```
 mkdir -p ${HOME}/code/src/github.com/ViBiOh/
 cd ${HOME}/code/src/github.com/ViBiOh/
-git clone https://github.com/ViBiOh/dotfiles.git
+git clone --depth 1 https://github.com/ViBiOh/dotfiles.git
 ./dotfiles/install.sh
 ```
 
