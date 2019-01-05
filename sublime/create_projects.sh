@@ -17,7 +17,7 @@ main() {
   \"folders\": [{
       \"path\": \"${project}\"
   }]
-}" "${fileName}"
+}" > "${fileName}"
 
     subl --project "${fileName}"
   done
