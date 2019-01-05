@@ -5,21 +5,22 @@ set -o nounset
 set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-if command -v pihole > /dev/null 2>&1; then
-  echo "pihole found, no action"
-  exit
-fi
+main() {
+  if command -v pihole > /dev/null 2>&1; then
+    echo "pihole found, no action"
+    exit
+  fi
 
-DNSMASQ_CONF='/etc/dnsmasq.conf'
+  DNSMASQ_CONF='/etc/dnsmasq.conf'
 
-if [[ "${IS_MACOS}" == true ]]; then
-  brew install dnsmasq --with-dnssec
-  DNSMASQ_CONF=$(brew --prefix)/etc/dnsmasq.conf
-elif command -v apt-get > /dev/null 2>&1; then
-  sudo apt-get install -y -qq dnsmasq
-fi
+  if [[ "${IS_MACOS}" == true ]]; then
+    brew install dnsmasq --with-dnssec
+    DNSMASQ_CONF=$(brew --prefix)/etc/dnsmasq.conf
+  elif command -v apt-get > /dev/null 2>&1; then
+    sudo apt-get install -y -qq dnsmasq
+  fi
 
-echo '# Forward queries to DNSCrypt on localhost port 5355
+  echo '# Forward queries to DNSCrypt on localhost port 5355
 server=127.0.0.1#5355
 
 # Uncomment to forward queries to Google Public DNS, if DNSCrypt is not used
@@ -48,11 +49,14 @@ log-async
 log-dhcp
 log-facility=/var/log/dnsmasq.log' | sudo tee "${DNSMASQ_CONF}" > /dev/null
 
-if [[ "${IS_MACOS}" == true ]]; then
-  sudo brew services restart dnsmasq
-  sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
-  scutil --dns
-  networksetup -getdnsservers "Wi-Fi"
-elif command -v apt-get > /dev/null 2>&1; then
-  sudo /etc/init.d/dnsmasq restart
-fi
+  if [[ "${IS_MACOS}" == true ]]; then
+    sudo brew services restart dnsmasq
+    sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
+    scutil --dns
+    networksetup -getdnsservers "Wi-Fi"
+  elif command -v apt-get > /dev/null 2>&1; then
+    sudo /etc/init.d/dnsmasq restart
+  fi
+}
+
+main "${@}"
