@@ -15,7 +15,14 @@ main() {
   source "${HOME}/.bashrc"
   set -u
 
+  local line='--------------------'
+
   for file in "${HOME}/code/src/github.com/ViBiOh/dotfiles/install"/*; do
+    local basenameFile=$(basename ${file%.*})
+    printf "%s%s%s\n" "+-" "${line:0:${#basenameFile}}" "-+"
+    printf "%s%s%s\n" "| " ${basenameFile} " |"
+    printf "%s%s%s\n" "+-" "${line:0:${#basenameFile}}" "-+"
+
     [ -r "${file}" ] && [ -x "${file}" ] && "${file}"
   done
 

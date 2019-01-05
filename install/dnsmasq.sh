@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
-set -u
-
-echo "-----------"
-echo "- dnsmasq -"
-echo "-----------"
+set -o errexit
+set -o nounset
+set -o pipefail
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if command -v pihole > /dev/null 2>&1; then
   echo "pihole found, no action"

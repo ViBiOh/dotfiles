@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
-set -u
-
-echo "--------"
-echo "- Pass -"
-echo "--------"
+set -o errexit
+set -o nounset
+set -o pipefail
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if ! command -v git > /dev/null 2>&1; then
   echo "git not found"
@@ -25,14 +23,14 @@ fi
 
 rm -rf "${HOME}/password-store"
 git clone --depth 1 https://git.zx2c4.com/password-store "${HOME}/password-store"
-cd "${HOME}/password-store"
+pushd "${HOME}/password-store"
 WITH_BASHCOMP=no WITH_ZSHCOMP=no WITH_FISHCOMP=no PREFIX="${HOME}/opt" make install
-cd "${HOME}"
+popd
 rm -rf "${HOME}/password-store"
 
 rm -rf "${HOME}/pass-otp"
 git clone --depth 1 https://github.com/tadfisher/pass-otp "${HOME}/pass-otp"
-cd "${HOME}/pass-otp"
+pushd "${HOME}/pass-otp"
 PREFIX="${HOME}/opt" BASHCOMPDIR=${HOME}/opt/bash_completion.d make install
-cd "${HOME}"
+popd
 rm -rf "${HOME}/pass-otp"

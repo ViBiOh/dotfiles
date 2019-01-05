@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
-set -u
-
-echo '------------'
-echo '- Security -'
-echo '------------'
+set -o errexit
+set -o nounset
+set -o pipefail
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cat \
   <(curl "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \

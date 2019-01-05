@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
-set -u
-
-echo "-------"
-echo "- SSH -"
-echo "-------"
+set -o errexit
+set -o nounset
+set -o pipefail
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 MAC_OS_SSH_CONFIG=""
 if [[ "${IS_MACOS}" == true ]]; then

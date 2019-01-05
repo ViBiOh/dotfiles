@@ -25,17 +25,16 @@ git_info() {
 }
 
 git_browse() {
-  local currentWorkDir=$(pwd)
-
   for dir in "${currentWorkDir}"/*; do
-    cd ${dir}
+    pushd ${dir}
+
     if [[ $(git rev-parse --is-inside-work-tree 2>/dev/null | grep true | wc -l) -eq 1 ]]; then
       echo "${dir}"
       eval "${@}"
     fi
-  done
 
-  cd "${currentWorkDir}"
+    popd
+  done
 }
 
 git_pull() {

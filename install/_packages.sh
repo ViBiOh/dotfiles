@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
-set -u
-
-echo "------------"
-echo "- Packages -"
-echo "------------"
+set -o errexit
+set -o nounset
+set -o pipefail
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ "${IS_MACOS}" == true ]]; then
   if ! command -v brew > /dev/null 2>&1; then

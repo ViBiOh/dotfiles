@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
-set -u
-
-echo "--------"
-echo "- node -"
-echo "--------"
+set -o errexit
+set -o nounset
+set -o pipefail
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 rm -rf "${HOME}/.npm" "${HOME}/.npm_packages" "${HOME}/.babel.json" "${HOME}/.node_repl_history" ${HOME}/.v8flags.*
 
@@ -21,9 +19,9 @@ fi
 
 rm -rf "${HOME}/n-install"
 git clone --depth 1 https://github.com/tj/n.git "${HOME}/n-install"
-cd "${HOME}/n-install"
+pushd "${HOME}/n-install"
 PREFIX="${HOME}/opt" make install
-cd "${HOME}"
+popd
 rm -rf "${HOME}/n-install"
 
 source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/_first"
