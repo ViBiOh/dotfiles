@@ -8,6 +8,15 @@ open_ports() {
   fi
 }
 
+forward_remote_port() {
+  if [[ "${#}" -ne 3 ]]; then
+    echo Usage: forward_port [REMOTE_PORT] [LOCAL_PORT] [SSH_PART]
+    return 1
+  fi
+
+  ssh -R "${1}:localhost:${2}" "${3}"
+}
+
 dnsFlushCache() {
   if [[ "${IS_MACOS}" == true ]]; then
     sudo dscacheutil -flushcache;sudo killall -HUP mDNSResponder
