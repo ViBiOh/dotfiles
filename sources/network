@@ -8,9 +8,18 @@ open_ports() {
   fi
 }
 
+forward_local_port() {
+  if [[ "${#}" -ne 3 ]]; then
+    echo Usage: forward_local_port [LOCAL_PORT] [REMOTE_PORT] [SSH_PART]
+    return 1
+  fi
+
+  ssh -L "${1}:localhost:${2}" "${3}"
+}
+
 forward_remote_port() {
   if [[ "${#}" -ne 3 ]]; then
-    echo Usage: forward_port [REMOTE_PORT] [LOCAL_PORT] [SSH_PART]
+    echo Usage: forward_remote_port [REMOTE_PORT] [LOCAL_PORT] [SSH_PART]
     return 1
   fi
 
