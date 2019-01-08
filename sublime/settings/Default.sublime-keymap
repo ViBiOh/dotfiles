@@ -48,6 +48,15 @@
     }
   },
   {
+    "keys": ["super+-"],
+    "command": "set_layout",
+    "args": {
+      "cols": [0.0, 1.0],
+      "rows": [0.0, 0.5, 1.0],
+      "cells": [[0, 0, 1, 1], [0, 1, 1, 2]]
+    }
+  },
+  {
     "keys": ["super+:"],
     "command": "focus_group",
     "args": {
