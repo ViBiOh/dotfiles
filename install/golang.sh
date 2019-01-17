@@ -42,6 +42,7 @@ main() {
     go get -u github.com/kisielk/errcheck
     go get -u golang.org/x/lint/golint
     go get -u golang.org/x/tools/cmd/goimports
+    go get -u https://github.com/cjbassi/gotop
   fi
 }
 
