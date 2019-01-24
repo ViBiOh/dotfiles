@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-GO_VERSION=1.11.3
+GO_VERSION=1.11.5
 
 main() {
   OS=$(uname -s)
