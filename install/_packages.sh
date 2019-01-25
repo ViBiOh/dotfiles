@@ -18,6 +18,7 @@ main() {
       bash \
       bash-completion \
       htop \
+      ncdu \
       git \
       fswatch \
       openssl
@@ -31,6 +32,7 @@ main() {
       bash \
       bash-completion \
       htop \
+      ncdu \
       git \
       openssl
   fi
