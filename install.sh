@@ -14,7 +14,9 @@ main() {
     [ -r "${file}" ] && [ -e "${file}" ] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
   done
 
+  set +u
   PS1='$' source "${HOME}/.bashrc"
+  set -u
 
   local line='--------------------------------------------------------------------------------'
 
