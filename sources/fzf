@@ -4,7 +4,7 @@ if [[ -e "${HOME}/.fzf.bash" ]]; then
   source "${HOME}/.fzf.bash"
 
   if command -v rg > /dev/null 2>&1; then
-    export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git" *'
+    export FZF_DEFAULT_COMMAND='rg --files --hidden 2> /dev/null'
     export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
   fi
 
