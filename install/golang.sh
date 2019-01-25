@@ -24,7 +24,7 @@ main() {
   tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
   rm -rf "${GO_ARCHIVE}"
 
-  source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/golang"
+  source "${SCRIPT_DIR}/../sources/golang"
 
   if command -v go > /dev/null 2>&1; then
     rm -rf "${GOPATH}/pkg/" "${GOPATH}/bin/" "${HOME}/.dlv"

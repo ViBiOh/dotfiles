@@ -25,8 +25,8 @@ main() {
   popd
   rm -rf "${HOME}/n-install"
 
-  source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/_first"
-  source "${HOME}/code/src/github.com/ViBiOh/dotfiles/sources/n"
+  source "${SCRIPT_DIR}/../sources/_first"
+  source "${SCRIPT_DIR}/../sources/n"
   n latest
 
   if command -v npm > /dev/null 2>&1; then

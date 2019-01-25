@@ -6,18 +6,19 @@ set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
-  for file in "${HOME}/code/src/github.com/ViBiOh/dotfiles/symlinks"/*; do
+  printf '+----------+\n'
+  printf '| symlinks |\n'
+  printf '+----------+\n'
+  for file in "${SCRIPT_DIR}/symlinks"/*; do
     basenameFile=$(basename "${file}")
     [ -r "${file}" ] && [ -e "${file}" ] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
   done
 
-  set +u
-  source "${HOME}/.bashrc"
-  set -u
+  PS1='$' source "${HOME}/.bashrc"
 
-  local line='--------------------'
+  local line='--------------------------------------------------------------------------------'
 
-  for file in "${HOME}/code/src/github.com/ViBiOh/dotfiles/install"/*; do
+  for file in "${SCRIPT_DIR}/install"/*; do
     local basenameFile=$(basename ${file%.*})
     printf "%s%s%s\n" "+-" "${line:0:${#basenameFile}}" "-+"
     printf "%s%s%s\n" "| " ${basenameFile} " |"
@@ -26,6 +27,9 @@ main() {
     [ -r "${file}" ] && [ -x "${file}" ] && "${file}"
   done
 
+  printf '+-------+\n'
+  printf '| clean |\n'
+  printf '+-------+\n'
   if [[ "${IS_MACOS}" == true ]]; then
     brew cleanup
   elif command -v apt-get > /dev/null 2>&1; then
@@ -33,6 +37,9 @@ main() {
     sudo apt-get clean all
   fi
 
+  printf '+---------+\n'
+  printf '| sublime |\n'
+  printf '+---------+\n'
   if command -v subl > /dev/null 2>&1; then
     pushd sublime && ./install.sh && popd
   fi

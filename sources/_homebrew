@@ -3,4 +3,7 @@
 export HOMEBREW_NO_ANALYTICS=1
 export HOMEBREW_NO_INSECURE_REDIRECT=1
 export HOMEBREW_CASK_OPTS=--require-sha
-export PATH="${HOME}/homebrew/sbin:${HOME}/homebrew/bin:${PATH}"
+
+if [[ -d "${HOME}/homebrew" ]]; then
+  export PATH="${HOME}/homebrew/sbin:${HOME}/homebrew/bin:${PATH}"
+fi
