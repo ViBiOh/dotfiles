@@ -39,10 +39,10 @@ main() {
     sudo apt-get clean all
   fi
 
-  printf '+---------+\n'
-  printf '| sublime |\n'
-  printf '+---------+\n'
   if command -v subl > /dev/null 2>&1; then
+    printf '+---------+\n'
+    printf '| sublime |\n'
+    printf '+---------+\n'
     pushd sublime && ./install.sh && popd
   fi
 }
