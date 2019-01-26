@@ -17,6 +17,12 @@ main() {
     ARCH="armv6l"
   fi
 
+  rm -rf "${GOPATH}/pkg/" "${GOPATH}/bin/" "${HOME}/.dlv"
+  mkdir -p "${GOPATH}/pkg/" "${GOPATH}/bin/" "${GOPATH}/src/"
+
+  ls "${GOPATH}/src" | grep -v 'github.com' | xargs rm -rf
+  ls "${GOPATH}/src/github.com" | grep -v 'ViBiOh' | xargs rm -rf
+
   GO_ARCHIVE="go${GO_VERSION}.${OS,,}-${ARCH,,}.tar.gz"
 
   curl -O "https://dl.google.com/go/${GO_ARCHIVE}"
@@ -27,12 +33,6 @@ main() {
   source "${SCRIPT_DIR}/../sources/golang"
 
   if command -v go > /dev/null 2>&1; then
-    rm -rf "${GOPATH}/pkg/" "${GOPATH}/bin/" "${HOME}/.dlv"
-    mkdir -p "${GOPATH}/pkg/" "${GOPATH}/bin/" "${GOPATH}/src/"
-
-    ls "${GOPATH}/src" | grep -v 'github.com' | xargs rm -rf
-    ls "${GOPATH}/src/github.com" | grep -v 'ViBiOh' | xargs rm -rf
-
     if [[ "${ARCH}" == "amd64" ]]; then
       go get -u github.com/derekparker/delve/cmd/dlv
     fi
