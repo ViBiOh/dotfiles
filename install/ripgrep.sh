@@ -5,9 +5,8 @@ set -o nounset
 set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-RIPGREP_VERSION=0.10.0
-
 main() {
+  local RIPGREP_VERSION=0.10.0
 
   if [[ "${IS_MACOS}" == true ]]; then
     brew tap burntsushi/ripgrep https://github.com/BurntSushi/ripgrep.git

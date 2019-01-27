@@ -11,7 +11,7 @@ main() {
     exit
   fi
 
-  DNSMASQ_CONF='/etc/dnsmasq.conf'
+  local DNSMASQ_CONF='/etc/dnsmasq.conf'
 
   if [[ "${IS_MACOS}" == true ]]; then
     brew install dnsmasq --with-dnssec

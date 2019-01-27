@@ -6,7 +6,7 @@ set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
-    MAC_OS_SSH_CONFIG=""
+    local MAC_OS_SSH_CONFIG=""
     if [[ "${IS_MACOS}" == true ]]; then
       MAC_OS_SSH_CONFIG="
         UseKeyChain no"
@@ -24,7 +24,7 @@ main() {
     Host vibioh
         HostName vibioh.fr
         User vibioh
-    " > ${HOME}/.ssh/config
+    " > "${HOME}/.ssh/config"
 }
 
 main "${@}"
