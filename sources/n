@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
 if command -v n > /dev/null 2>&1; then
-  export N_PREFIX="${HOME}/opt/n"
-  export PATH="${N_PREFIX}/bin:${PATH}"
+  export N_PREFIX="${HOME}/opt"
 fi

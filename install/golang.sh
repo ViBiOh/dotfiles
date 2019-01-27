@@ -5,7 +5,29 @@ set -o nounset
 set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+clean() {
+  if [[ -n "${GOPATH-}" ]]; then
+    rm -rf "${GOPATH}/pkg/" "${GOPATH}/bin/" "${HOME}/.dlv"
+    mkdir -p "${GOPATH}/pkg/" "${GOPATH}/bin/" "${GOPATH}/src/"
+
+    pushd "${GOPATH}/src"
+    for src in $(ls | grep -v 'github.com'); do
+      rm -rf "${src}"
+    done
+
+    pushd "${GOPATH}/src/github.com"
+    for src in $(ls | grep -v 'ViBiOh'); do
+      rm -rf "${src}"
+    done
+
+    popd
+    popd
+  fi
+}
+
 main() {
+  clean
+
   local GO_VERSION=1.11.5
   local OS=$(uname -s)
   local ARCH=$(uname -m)
@@ -26,11 +48,6 @@ main() {
   source "${SCRIPT_DIR}/../sources/golang"
 
   if command -v go > /dev/null 2>&1; then
-    rm -rf "${GOPATH}/pkg/" "${GOPATH}/bin/" "${HOME}/.dlv"
-    mkdir -p "${GOPATH}/pkg/" "${GOPATH}/bin/" "${GOPATH}/src/"
-    ls "${GOPATH}/src" | grep -v 'github.com' | xargs rm -rf
-    ls "${GOPATH}/src/github.com" | grep -v 'ViBiOh' | xargs rm -rf
-
     if [[ "${ARCH}" == "amd64" ]]; then
       go get -u github.com/derekparker/delve/cmd/dlv
     fi

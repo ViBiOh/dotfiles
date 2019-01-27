@@ -5,8 +5,17 @@ set -o nounset
 set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+clean() {
+  rm -rf \
+    "${HOME}/.npm" \
+    "${HOME}/.npm_packages" \
+    "${HOME}/.babel.json" \
+    "${HOME}/.node_repl_history" \
+    "${HOME}/.v8flags."*
+}
+
 main() {
-  rm -rf "${HOME}/.npm" "${HOME}/.npm_packages" "${HOME}/.babel.json" "${HOME}/.node_repl_history" ${HOME}/.v8flags.*
+  clean
 
   if ! command -v git > /dev/null 2>&1; then
     echo "git not found"
@@ -25,7 +34,6 @@ main() {
   popd
   rm -rf "${HOME}/n-install"
 
-  source "${SCRIPT_DIR}/../sources/_first"
   source "${SCRIPT_DIR}/../sources/n"
   n latest
 
