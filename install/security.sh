@@ -37,6 +37,15 @@ main() {
     | grep -v '0.0.0.0 help.rollbar.com' \
     | grep -v '0.0.0.0 reddit.com' \
     | grep -v '0.0.0.0 www.reddit.com' \
+    | grep -v '0.0.0.0 www.redditstatic.com' \
+    | grep -v '0.0.0.0 alb.reddit.com' \
+    | grep -v '0.0.0.0 redditmedia.com' \
+    | grep -v '0.0.0.0 www.redditmedia.com' \
+    | grep -v 'thumbs.redditmedia.com' \
+    | grep -v '0.0.0.0 preview.redd.it' \
+    | grep -v '0.0.0.0 external-preview.redd.it' \
+    | grep -v '0.0.0.0 v.redd.it' \
+    | grep -v '0.0.0.0 styles.redditmedia.com' \
     | grep -v '0.0.0.0 reddit.map.fastly.net' \
     | sudo tee /etc/hosts > /dev/null
 
