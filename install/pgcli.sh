@@ -6,12 +6,13 @@ set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
-  if ! [ -e /usr/local/bin/pip ] > /dev/null 2>&1 && [ "${IS_MACOS}" == true ]; then
-    sudo easy_install pip
+  if command -v easy_install > /dev/null 2>&1; then
+    easy_install --user pip
   fi
 
   if command -v pip > /dev/null 2>&1; then
-    /usr/local/bin/pip install --user pgcli
+    pip install --user --upgrade pip
+    pip install --user pgcli
   fi
 
   if command -v pgcli > /dev/null 2>&1; then
