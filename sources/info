@@ -5,3 +5,5 @@ alias now="date '+%Y-%m-%d %H:%M:%S'"
 meteo() {
   curl -4 "wttr.in/${1:-France}"
 }
+
+alias realpath="python -c 'import sys; import os.path; print(os.path.realpath(sys.argv[1]))'"
