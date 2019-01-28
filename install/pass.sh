@@ -37,4 +37,4 @@ main() {
   rm -rf "${HOME}/pass-otp"
 }
 
-main "${@}"
+main

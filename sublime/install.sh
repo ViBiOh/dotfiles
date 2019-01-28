@@ -32,4 +32,4 @@ main() {
   echo Success!
 }
 
-main "${@}"
+main

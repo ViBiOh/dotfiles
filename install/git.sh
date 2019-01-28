@@ -10,4 +10,4 @@ main() {
   chmod +x "${HOME}/opt/bin/diff-so-fancy"
 }
 
-main "${@}"
+main

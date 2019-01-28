@@ -39,4 +39,4 @@ use-agent' > "${HOME}/.gnupg/gpg.conf"
   fi
 }
 
-main "${@}"
+main

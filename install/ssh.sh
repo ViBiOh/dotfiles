@@ -29,4 +29,4 @@ Host vibioh
   find "${HOME}/.ssh/" -name "config_*" -type f -exec cat {} + >> "${HOME}/.ssh/config"
 }
 
-main "${@}"
+main

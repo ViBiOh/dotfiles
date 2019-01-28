@@ -10,4 +10,4 @@ main() {
   mkdir -p "${HOME}/opt/bin"
 }
 
-main "${@}"
+main

@@ -24,4 +24,4 @@ row_limit = 100' > "${HOME}/.config/pgcli/config"
   fi
 }
 
-main "${@}"
+main

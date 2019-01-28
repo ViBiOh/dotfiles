@@ -20,4 +20,4 @@ main() {
   "${HOME}/opt/fzf/install" --key-bindings --completion --no-zsh --no-fish --no-update-rc
 }
 
-main "${@}"
+main

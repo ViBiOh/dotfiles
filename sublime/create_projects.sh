@@ -23,4 +23,4 @@ main() {
   done
 }
 
-main "${@}"
+main

@@ -59,4 +59,4 @@ log-facility=/var/log/dnsmasq.log' | sudo tee "${DNSMASQ_CONF}" > /dev/null
   fi
 }
 
-main "${@}"
+main
