@@ -6,7 +6,7 @@ random() {
 
 cert_create_ca() {
     if [[ "${#}" -eq 0 ]]; then
-        echo Usage cert_create_ca [CN_NAME] [CERT_PASSWORD]
+        echo "Usage cert_create_ca [CN_NAME] [CERT_PASSWORD]"
     fi
 
     local CN_NAME="${1}"
@@ -31,7 +31,7 @@ cert_create_ca() {
 
 cert_create_cert() {
     if [[ "${#}" -eq 0 ]]; then
-        echo Usage cert_create_cert [NAME] [HOST_IP] [CA_PRIVATE_KEY_PASSWORD]
+        echo "Usage cert_create_cert [NAME] [HOST_IP] [CA_PRIVATE_KEY_PASSWORD]"
     fi
 
     local NAME="${1}"
