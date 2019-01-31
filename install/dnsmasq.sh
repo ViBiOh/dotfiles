@@ -20,21 +20,20 @@ main() {
   fi
 
   local DNSMASQ_CONF='/etc/dnsmasq.conf'
-  local DNSCRYPT-PROXY_CONF='/etc/dnscrypt-proxy'
 
   if [[ "${IS_MACOS}" == true ]]; then
-    brew install dnsmasq dnscrypt-proxy --with-dnssec
+    brew install dnsmasq --with-dnssec
+    brew install dnscrypt-proxy
     DNSMASQ_CONF=$(brew --prefix)/etc/dnsmasq.conf
+
+    if [[ -e "$(brew --prefix)/etc/dnscrypt-proxy.toml" ]]; then
+      sed_inplace "s|^listen_addresses.*$|listen_addresses = ['127.0.0.1:5355']|g" /Users/macbook/homebrew/etc/dnscrypt-proxy.toml
+    fi
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get install -y -qq dnsmasq
   fi
 
-  if [[ -e "$(brew --prefix)/etc/dnscrypt-proxy.toml" ]]; then
-    sed_inplace "s|^listen_addresses.*$|listen_addresses = ['127.0.0.1:5355']|g" /Users/macbook/homebrew/etc/dnscrypt-proxy.toml
-  fi
-
-  echo "listen-address=127.0.0.1
-listen-address=$(hostname -I)
+  echo "listen-address=$(hostname -I || '127.0.0.1')
 bind-interfaces
 
 # Forward queries to DNSCrypt on localhost port 5355
