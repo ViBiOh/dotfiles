@@ -28,12 +28,7 @@ main() {
     sudo apt-get install -y -qq dnsmasq
   fi
 
-  local LISTEN_ADDRESS="127.0.0.1"
-  if [[ "${IS_LINUX}" == true ]]; then
-    LISTEN_ADDRESS="$(hostname -I | awk '{print $1}')"
-  fi
-
-  echo "listen-address=${LISTEN_ADDRESS}
+  echo "listen-address=127.0.0.1
 bind-interfaces
 
 server=1.1.1.1
