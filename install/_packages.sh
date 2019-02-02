@@ -21,8 +21,8 @@ main() {
       ncdu \
       git \
       fswatch \
-      openssl
-    brew install curl --with-openssl
+      openssl \
+      curl
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get update
     sudo apt-get upgrade -y -qq
