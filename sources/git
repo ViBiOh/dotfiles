@@ -35,7 +35,7 @@ git_pull() {
 
 head_sync() {
   if [[ "${#}" -ne 2 ]]; then
-    echo Usage: head_sync [REMOTE_SERVER] [REMOTE_PATH]
+    echo "Usage: head_sync [REMOTE_SERVER] [REMOTE_PATH]"
     return 1
   fi
 
@@ -50,7 +50,7 @@ head_sync() {
 
 git_sync() {
   if [[ "${#}" -lt 2 ]]; then
-    echo Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH] [DRY]?
+    echo "Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH] [DRY]?"
     return 1
   fi
 

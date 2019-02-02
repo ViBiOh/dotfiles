@@ -15,3 +15,16 @@ update_deps() {
     dep ensure -update
   fi
 }
+
+mount_usb() {
+  if [[ "${#}" -lt 2 ]]; then
+    echo "Usage: mount_usb [DIRECTORY] [MOUNT_POINT]"
+    return 1
+  fi
+
+  local USER=$(whoami)
+
+  sudo mkdir "/media/${1}"
+  sudo chown -R "${USER}:${USER}" "/media/${1}"
+  sudo mount "${2}" "/media/${1}" -o "uid=${USER},gid=${USER}"
+}
