@@ -5,7 +5,13 @@ set -o nounset
 set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+clean() {
+  rm -rf "${HOME}/.fzf"*
+}
+
 main() {
+  clean
+
   if ! command -v git > /dev/null 2>&1; then
     echo "git not found"
     exit

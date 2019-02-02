@@ -19,7 +19,10 @@ os_clean() {
          "${HOME}/.cache" \
          "${HOME}/.CFUserTextEncoding" \
          "${HOME}/.vim" \
-         "${HOME}/.npm"
+         "${HOME}/.viminfo" \
+         "${HOME}/.local" \
+         "${HOME}/.npm" \
+         "${HOME}/.z"*
 
   if [[ "${IS_MACOS}" == true ]]; then
     sudo sync && sudo purge
