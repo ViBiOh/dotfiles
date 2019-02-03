@@ -29,7 +29,7 @@ main() {
   fi
 
   LISTEN_ADDRESS="127.0.0.1"
-  if [[ $(grep 'infra-vpn' /etc/sysctl.conf | wc -l) == 1 ]] then
+  if [[ $(grep 'infra-vpn' /etc/sysctl.conf | wc -l) == 1 ]]; then
     LISTEN_ADDRESS=$(hostname -I | awk '{print $1}')
   fi
 
