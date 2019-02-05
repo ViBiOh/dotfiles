@@ -24,6 +24,8 @@ main() {
       openssl \
       curl
   elif command -v apt-get > /dev/null 2>&1; then
+    export DEBIAN_FRONTEND=noninteractive
+
     sudo apt-get update
     sudo apt-get upgrade -y -qq
     sudo apt-get install -y -qq apt-transport-https

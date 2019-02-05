@@ -11,6 +11,10 @@ main() {
     exit
   fi
 
+  if command -v apt-get > /dev/null 2>&1; then
+    sudo apt-get install -y -qq libpq-dev
+  fi
+
   pip install --user pgcli
 
   if command -v pgcli > /dev/null 2>&1; then
