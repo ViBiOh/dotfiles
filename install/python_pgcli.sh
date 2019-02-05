@@ -6,12 +6,7 @@ set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
-  if command -v easy_install > /dev/null 2>&1; then
-    easy_install --user pip
-  fi
-
   if command -v pip > /dev/null 2>&1; then
-    pip install --user --upgrade pip
     pip install --user pgcli
   fi
 
