@@ -6,6 +6,16 @@ set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
+  if ! command -v make > /dev/null 2>&1; then
+    echo "make not found"
+    exit
+  fi
+
+  if ! command -v gcc > /dev/null 2>&1; then
+    echo "gcc not found"
+    exit
+  fi
+
   local PYTHON3_VERSION="3.6.8"
 
   if [[ ! -d "${HOME}/opt/pyenv" ]]; then
@@ -18,7 +28,7 @@ main() {
 
   if command -v pyenv 1>/dev/null 2>&1; then
     if command -v apt-get > /dev/null 2>&1; then
-      sudo apt-get install -y -qq make gcc zlib1g-dev libssl-dev
+      sudo apt-get install -y -qq zlib1g-dev libssl-dev
     fi
 
     pyenv install "${PYTHON3_VERSION}"
