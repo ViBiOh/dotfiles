@@ -17,9 +17,13 @@ main() {
   source "${SCRIPT_DIR}/../sources/_python"
 
   if command -v pyenv 1>/dev/null 2>&1; then
+    if command -v apt-get > /dev/null 2>&1; then
+      sudo apt-get install -y -qq zlib1g-dev
+    fi
+
     pyenv install "${PYTHON3_VERSION}"
     pyenv global "${PYTHON3_VERSION}"
-
+ 
     if command -v pip > /dev/null 2>&1; then
       pip install --user --upgrade pip
     fi
