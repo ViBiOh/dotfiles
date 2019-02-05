@@ -14,7 +14,7 @@ main() {
     pushd "${HOME}/opt/pyenv" && git pull && popd
   fi
 
-  source "${SCRIPT_DIR}/../sources/python"
+  source "${SCRIPT_DIR}/../sources/_python"
 
   if command -v pyenv 1>/dev/null 2>&1; then
     if [[ $(pyenv whence pip3 | wc -l) = 0 ]]; then
