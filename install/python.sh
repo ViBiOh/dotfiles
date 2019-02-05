@@ -18,7 +18,7 @@ main() {
 
   if command -v pyenv 1>/dev/null 2>&1; then
     if command -v apt-get > /dev/null 2>&1; then
-      sudo apt-get install -y -qq zlib1g-dev libssl-dev
+      sudo apt-get install -y -qq make gcc zlib1g-dev libssl-dev
     fi
 
     pyenv install "${PYTHON3_VERSION}"
