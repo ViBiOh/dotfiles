@@ -18,7 +18,7 @@ main() {
 
   if command -v pyenv 1>/dev/null 2>&1; then
     if command -v apt-get > /dev/null 2>&1; then
-      sudo apt-get install -y -qq zlib1g-dev
+      sudo apt-get install -y -qq make build-essential libssl-dev zlib1g-dev libbz2-devlibreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl
     fi
 
     pyenv install "${PYTHON3_VERSION}"
