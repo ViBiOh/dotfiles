@@ -4,6 +4,10 @@ if [[ $(locale -a | grep "en_US.UTF-8" | wc -l) -eq 1 ]]; then
   export LC_ALL="en_US.UTF-8"
   export LANG="en_US.UTF-8"
   export LANGUAGE="en_US.UTF-8"
+elif [[ $(locale -a | grep "C.UTF-8" | wc -l) -eq 1 ]]; then
+  export LC_ALL="C.UTF-8"
+  export LANG="C.UTF-8"
+  export LANGUAGE="C.UTF-8"
 fi
 
 export IS_MACOS=false
