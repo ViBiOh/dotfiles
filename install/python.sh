@@ -16,6 +16,11 @@ main() {
     exit
   fi
 
+  if ! command -v git > /dev/null 2>&1; then
+    echo "git not found"
+    exit
+  fi
+
   local PYTHON3_VERSION="3.6.8"
 
   if [[ ! -d "${HOME}/opt/pyenv" ]]; then
