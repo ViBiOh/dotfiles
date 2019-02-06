@@ -27,6 +27,8 @@ main() {
     exit
   fi
 
+  local NODE_VERSION="latest"
+
   rm -rf "${HOME}/n-install"
   git clone --depth 1 https://github.com/tj/n.git "${HOME}/n-install"
   pushd "${HOME}/n-install"
@@ -35,7 +37,7 @@ main() {
   rm -rf "${HOME}/n-install"
 
   source "${SCRIPT_DIR}/../sources/n"
-  n latest
+  n "${NODE_VERSION}"
 
   if command -v npm > /dev/null 2>&1; then
     npm install --ignore-scripts -g npm npm-check-updates node-gyp

@@ -6,6 +6,11 @@ set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
+  if ! command -v git > /dev/null 2>&1; then
+    echo "git not found"
+    exit
+  fi
+
   if ! command -v make > /dev/null 2>&1; then
     echo "make not found"
     exit
@@ -13,11 +18,6 @@ main() {
 
   if ! command -v gcc > /dev/null 2>&1; then
     echo "gcc not found"
-    exit
-  fi
-
-  if ! command -v git > /dev/null 2>&1; then
-    echo "git not found"
     exit
   fi
 
