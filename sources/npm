@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-if command -v node > /dev/null 2>&1; then
-  export PATH="${HOME}/.npm_packages/bin:${PATH}"
-  alias npmi="npm install --ignore-scripts"
+if ! command -v node > /dev/null 2>&1; then
+  return
 fi
+
+export PATH="${HOME}/.npm_packages/bin:${PATH}"
+alias npmi="npm install --ignore-scripts"

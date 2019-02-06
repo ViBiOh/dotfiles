@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# Set up ssh-agent
 SSH_ENV="${HOME}/.ssh/environment"
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 
@@ -15,9 +14,9 @@ start_ssh_agent() {
     touch "${SSH_ENV}"
     chmod 600 "${SSH_ENV}"
 
-    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
     source "${SSH_ENV}" > /dev/null
-    /usr/bin/ssh-add -k "${SSH_KEY}"
+    ssh-add -k "${SSH_KEY}"
   fi
 }
 
