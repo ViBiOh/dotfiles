@@ -18,11 +18,10 @@ main() {
       bash \
       bash-completion \
       htop \
-      ncdu \
       git \
-      fswatch \
       openssl \
-      curl
+      curl \
+      fswatch
   elif command -v apt-get > /dev/null 2>&1; then
     export DEBIAN_FRONTEND=noninteractive
 
@@ -34,9 +33,10 @@ main() {
       bash \
       bash-completion \
       htop \
-      ncdu \
       git \
-      openssl
+      openssl \
+      curl \
+      vim
   fi
 }
 
