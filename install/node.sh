@@ -36,7 +36,7 @@ main() {
   rm -rf "${HOME}/n-install"
 
   mkdir -p "${HOME}/opt/node"
-  source "${SCRIPT_DIR}/../sources/n"
+  source "${SCRIPT_DIR}/../sources/node"
   n "${NODE_VERSION}"
 
   if command -v npm > /dev/null 2>&1; then
