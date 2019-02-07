@@ -8,7 +8,6 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 clean() {
   rm -rf \
     "${HOME}/.npm" \
-    "${HOME}/.npm_packages" \
     "${HOME}/.babel.json" \
     "${HOME}/.node_repl_history" \
     "${HOME}/.v8flags."*
@@ -36,6 +35,7 @@ main() {
   popd
   rm -rf "${HOME}/n-install"
 
+  mkdir -p "${HOME}/opt/node"
   source "${SCRIPT_DIR}/../sources/n"
   n "${NODE_VERSION}"
 
