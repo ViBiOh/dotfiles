@@ -36,7 +36,7 @@ main() {
       sudo apt-get install -y -qq zlib1g-dev libssl-dev
     fi
 
-    pyenv install "${PYTHON3_VERSION}"
+    pyenv install -s "${PYTHON3_VERSION}"
     pyenv global "${PYTHON3_VERSION}"
  
     if command -v pip > /dev/null 2>&1; then
