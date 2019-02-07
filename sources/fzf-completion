@@ -48,6 +48,10 @@ fi
 
 if command -v pgcli > /dev/null 2>&1; then
   _fzf_complete_pgcli() {
+    if [[ ! -f "${PGPASSFILE-${HOME}/.pgpass}" ]]; then
+      return
+    fi
+
     FZF_COMPLETION_TRIGGER='' _fzf_complete '--ansi' '-1' "${@}" < <(
       local RED='\033[31m'
       local GREEN='\033[32m'
