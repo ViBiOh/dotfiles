@@ -15,6 +15,8 @@ main() {
     sudo apt-get install -y -qq libpq-dev
   fi
 
+  source "${SCRIPT_DIR}/../sources/_python"
+
   pip install --user pgcli
 
   if command -v pgcli > /dev/null 2>&1; then

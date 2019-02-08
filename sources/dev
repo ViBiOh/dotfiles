@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 alias dev='cd ${HOME}/code/src/github.com/ViBiOh/'
+alias grep="grep --color=auto"
 
 EDITOR=vim
 TERM=xterm-256color
