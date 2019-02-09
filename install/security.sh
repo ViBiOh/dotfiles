@@ -15,17 +15,11 @@ main() {
     <(echo "0.0.0.0 lead-the-way.fr") \
     <(echo "0.0.0.0 www.lead-the-way.fr") \
     <(echo "0.0.0.0 gl.hostcg.com") \
-    <(echo "0.0.0.0 fakeupdate.net") \
     <(echo "127.0.0.1 $(hostname)") \
     | egrep -v '^\s*#' \
     | egrep -v '^$' \
     | sort \
     | uniq \
-    | grep -v '0.0.0.0 twitter.com' \
-    | grep -v '0.0.0.0 www.twitter.com' \
-    | grep -v '0.0.0.0 t.co' \
-    | grep -v '0.0.0.0 abs.twimg.com' \
-    | grep -v '0.0.0.0 pbs.twimg.com' \
     | grep -v '0.0.0.0 www.linkedin.com' \
     | grep -v '0.0.0.0 static.licdn.com' \
     | grep -v '0.0.0.0 media.licdn.com' \
