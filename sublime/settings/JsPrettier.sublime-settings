@@ -1,5 +1,6 @@
 {
   "allow_inline_formatting": true,
+  "prettier_cli_path": "/Users/macbook/opt/node/bin/prettier",
   "prettier_options": {
     "singleQuote": true,
     "trailingComma": "all",
