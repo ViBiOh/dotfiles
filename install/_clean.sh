@@ -8,6 +8,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 main() {
   if [[ "${DOTFILES_CLEAN:-}" = "true" ]]; then
     rm -rf "${HOME}/opt" "${HOME}/.config"
+    mkdir -p "${HOME}/opt/bin"
   fi
 }
 
