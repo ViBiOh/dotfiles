@@ -16,6 +16,7 @@ main() {
 
   set +u
   set +e
+  mkdir -p "${HOME}/opt/bin"
   PS1='$' source "${HOME}/.bashrc"
   set -e
   set -u
