@@ -28,22 +28,24 @@ clean() {
 main() {
   clean
 
-  local GO_VERSION=1.11.5
-  local OS=$(uname -s)
-  local ARCH=$(uname -m)
+  if [[ ! -d "${HOME}/opt/go" ]]; then
+    local GO_VERSION=1.11.5
+    local OS=$(uname -s)
+    local ARCH=$(uname -m)
 
-  if [[ "${ARCH}" == "x86_64" ]]; then
-    ARCH="amd64"
-  elif [[ "${ARCH}" =~ ^armv.l$ ]]; then
-    ARCH="armv6l"
+    if [[ "${ARCH}" == "x86_64" ]]; then
+      ARCH="amd64"
+    elif [[ "${ARCH}" =~ ^armv.l$ ]]; then
+      ARCH="armv6l"
+    fi
+
+    local GO_ARCHIVE="go${GO_VERSION}.${OS,,}-${ARCH,,}.tar.gz"
+ 
+    curl -O "https://dl.google.com/go/${GO_ARCHIVE}"
+    rm -rf "${HOME}/opt/go"
+    tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
+    rm -rf "${GO_ARCHIVE}"
   fi
-
-  local GO_ARCHIVE="go${GO_VERSION}.${OS,,}-${ARCH,,}.tar.gz"
-
-  curl -O "https://dl.google.com/go/${GO_ARCHIVE}"
-  rm -rf "${HOME}/opt/go"
-  tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
-  rm -rf "${GO_ARCHIVE}"
 
   source "${SCRIPT_DIR}/../sources/golang"
 
