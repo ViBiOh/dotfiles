@@ -6,9 +6,9 @@ set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
-  rm -rf "${HOME}/opt" \
-         "${HOME}/.config"
-  mkdir -p "${HOME}/opt/bin"
+  if [[ "${DOTFILES_CLEAN:-}" = "true" ]]; then
+    rm -rf "${HOME}/opt" "${HOME}/.config"
+  fi
 }
 
 main
