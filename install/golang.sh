@@ -28,16 +28,17 @@ clean() {
 main() {
   clean
 
-  if [[ ! -d "${HOME}/opt/go" ]]; then
-    local GO_VERSION=1.11.5
-    local OS=$(uname -s)
-    local ARCH=$(uname -m)
+  local GO_VERSION=1.11.5
+  local OS=$(uname -s)
+  local ARCH=$(uname -m)
 
-    if [[ "${ARCH}" == "x86_64" ]]; then
-      ARCH="amd64"
-    elif [[ "${ARCH}" =~ ^armv.l$ ]]; then
-      ARCH="armv6l"
-    fi
+  if [[ "${ARCH}" = "x86_64" ]]; then
+    ARCH="amd64"
+  elif [[ "${ARCH}" =~ ^armv.l$ ]]; then
+    ARCH="armv6l"
+  fi
+
+  if [[ ! -d "${HOME}/opt/go" ]]; then
 
     local GO_ARCHIVE="go${GO_VERSION}.${OS,,}-${ARCH,,}.tar.gz"
  
@@ -50,7 +51,7 @@ main() {
   source "${SCRIPT_DIR}/../sources/golang"
 
   if command -v go > /dev/null 2>&1; then
-    if [[ "${ARCH}" == "amd64" ]]; then
+    if [[ "${ARCH}" = "amd64" ]]; then
       go get -u github.com/derekparker/delve/cmd/dlv
     fi
 

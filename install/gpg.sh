@@ -6,7 +6,7 @@ set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
-  if [[ "${IS_MACOS}" == true ]]; then
+  if [[ "${IS_MACOS}" = true ]]; then
     brew install gnupg
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get install -y -qq gnupg

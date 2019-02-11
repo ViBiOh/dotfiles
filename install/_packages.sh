@@ -6,7 +6,7 @@ set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
-  if [[ "${IS_MACOS}" == true ]]; then
+  if [[ "${IS_MACOS}" = true ]]; then
     if ! command -v brew > /dev/null 2>&1; then
       mkdir "${HOME}/homebrew" && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "${HOME}/homebrew"
       source "${SCRIPT_DIR}/../sources/_homebrew"

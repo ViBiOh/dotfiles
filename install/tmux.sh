@@ -6,7 +6,7 @@ set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
-  if [[ "${IS_MACOS}" == true ]]; then
+  if [[ "${IS_MACOS}" = true ]]; then
     brew install \
       tmux \
       reattach-to-user-namespace
