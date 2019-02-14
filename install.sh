@@ -35,7 +35,7 @@ main() {
   printf '+-------+\n'
   printf '| clean |\n'
   printf '+-------+\n'
-  if [[ "${IS_MACOS}" == true ]]; then
+  if command -v brew > /dev/null 2>&1; then
     brew cleanup
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get autoremove -y
