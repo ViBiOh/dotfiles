@@ -22,6 +22,27 @@ main() {
       openssl \
       curl \
       fswatch
+
+    if [[ $(cat /etc/shells | grep "$(brew --prefix)" | wc -l) -eq 0 ]]; then
+      echo '+-------------------------+'
+      echo '| changing shell for user |'
+      echo '+-------------------------+'
+
+      echo $(brew --prefix)/bin/bash | sudo tee -a /etc/shells
+      sudo chsh -s $(brew --prefix)/bin/bash -u "$(whoami)"
+    fi
+
+    if [[ ! -f "${HOME}/.bash_profile" ]]; then
+      echo '+---------------------------------+'
+      echo '| adding .bashrc to .bash_profile |'
+      echo '+---------------------------------+'
+
+      echo '#!/usr/bin/env bash
+
+ if [[ -f "${HOME}/.bashrc" ]]; then
+   source ${HOME}/.bashrc
+ fi' > "${HOME}/.bash_profile"
+    fi
   elif command -v apt-get > /dev/null 2>&1; then
     export DEBIAN_FRONTEND=noninteractive
 

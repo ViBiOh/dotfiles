@@ -29,8 +29,8 @@ main() {
   clean
 
   local GO_VERSION=1.11.5
-  local OS=$(uname -s)
-  local ARCH=$(uname -m)
+  local OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+  local ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
 
   if [[ "${ARCH}" = "x86_64" ]]; then
     ARCH="amd64"
