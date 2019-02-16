@@ -14,7 +14,7 @@ sed_inplace() {
 }
 
 main() {
-  if command -v brew > /dev/null 2>&1; then
+  if ! command -v brew > /dev/null 2>&1; then
     echo "brew not found, no action"
     exit
   fi
