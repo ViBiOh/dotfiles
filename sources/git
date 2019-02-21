@@ -8,18 +8,6 @@ if command -v perl > /dev/null 2>&1 && [ -x "${HOME}/opt/bin/diff-so-fancy" ]; t
   export GIT_PAGER="${HOME}/opt/bin/diff-so-fancy | less --tabs=4 -RFX"
 fi
 
-...() {
-  if ! $(git rev-parse --is-inside-work-tree 2>/dev/null); then
-    return 1
-  else
-    local gitRootDir=$(git rev-parse --show-cdup)
-
-    if [[ -n "${gitRootDir}" ]]; then
-      cd "${gitRootDir}"
-    fi
-  fi
-}
-
 git_browse() {
   for dir in "$(pwd)"/*; do
     pushd ${dir}
@@ -35,6 +23,20 @@ git_browse() {
 
 git_pull() {
   git_browse 'git pull'
+}
+
+alias ...="git_root"
+
+git_root() {
+  if ! $(git rev-parse --is-inside-work-tree 2>/dev/null); then
+    return 1
+  else
+    local gitRootDir=$(git rev-parse --show-cdup)
+
+    if [[ -n "${gitRootDir}" ]]; then
+      cd "${gitRootDir}"
+    fi
+  fi
 }
 
 head_sync() {
@@ -64,7 +66,7 @@ git_sync() {
   local BLUE='\033[0;34m'
   local RESET='\033[0m'
 
-  ...
+  git_root
   isGit=$?
   if [[ ${isGit} -ne 0 ]]; then
     return ${isGit}
@@ -136,6 +138,10 @@ git_sync() {
 }
 
 watch_sync() {
+  if [[ -z "${NO_HEAD_SYNC:-}" ]]; then
+    head_sync "${@}"
+  fi
+
   git_sync "${@}"
 
   fswatch -0 -o --exclude=.git/ . | while read -d "" event
