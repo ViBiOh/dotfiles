@@ -4,7 +4,7 @@ if ! command -v git > /dev/null 2>&1; then
   return
 fi
 
-if command -v perl > /dev/null 2>&1 && [ -x "${HOME}/opt/bin/diff-so-fancy" ]; then
+if command -v perl > /dev/null 2>&1 && [[ -f "${HOME}/opt/bin/diff-so-fancy" ]]; then
   export GIT_PAGER="${HOME}/opt/bin/diff-so-fancy | less --tabs=4 -RFX"
 fi
 
