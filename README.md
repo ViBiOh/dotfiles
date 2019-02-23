@@ -10,6 +10,13 @@ git clone --depth 1 https://github.com/ViBiOh/dotfiles.git
 popd
 ```
 
+### Configuration
+
+You can set followin environment variables for customizing installation behavior:
+
+* `DOTFILES_CLEAN="true"` will perform a clean before installation (deleting `${HOME}/opt` dir)
+* `DOTFILES_NO_SUDO="true"` will doesn't perform `sudo` command
+
 ## SSH
 
 ```bash

@@ -25,7 +25,9 @@ main() {
     brew install dnsmasq
     DNSMASQ_CONF=$(brew --prefix)/etc/dnsmasq.conf
   elif command -v apt-get > /dev/null 2>&1; then
-    sudo apt-get install -y -qq dnsmasq
+    if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
+      sudo apt-get install -y -qq dnsmasq
+    fi
   fi
 
   LISTEN_ADDRESS="127.0.0.1"
@@ -33,7 +35,8 @@ main() {
     LISTEN_ADDRESS=$(hostname -I | awk '{print $1}')
   fi
 
-  echo "listen-address=${LISTEN_ADDRESS}
+  if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
+    echo "listen-address=${LISTEN_ADDRESS}
 bind-interfaces
 
 server=1.1.1.1
@@ -60,14 +63,20 @@ cache-size=8192
 log-async
 log-dhcp
 log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" > /dev/null
+  fi
 
   if [[ "${IS_MACOS}" = true ]]; then
-    sudo brew services restart dnsmasq
-    sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
+    if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
+      sudo brew services restart dnsmasq
+      sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
+    fi
+
     scutil --dns
     networksetup -getdnsservers "Wi-Fi"
   elif command -v apt-get > /dev/null 2>&1; then
-    sudo systemctl restart dnsmasq
+    if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
+      sudo systemctl restart dnsmasq
+    fi
   fi
 }
 

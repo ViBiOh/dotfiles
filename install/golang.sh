@@ -39,8 +39,7 @@ main() {
   fi
 
   if [[ ! -d "${HOME}/opt/go" ]]; then
-
-    local GO_ARCHIVE="go${GO_VERSION}.${OS,,}-${ARCH,,}.tar.gz"
+    local GO_ARCHIVE="go${GO_VERSION}.${OS}-${ARCH}.tar.gz"
  
     curl -O "https://dl.google.com/go/${GO_ARCHIVE}"
     rm -rf "${HOME}/opt/go"

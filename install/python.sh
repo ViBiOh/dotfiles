@@ -34,7 +34,9 @@ main() {
 
   if command -v pyenv 1>/dev/null 2>&1; then
     if command -v apt-get > /dev/null 2>&1; then
-      sudo apt-get install -y -qq zlib1g-dev libssl-dev
+      if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
+        sudo apt-get install -y -qq zlib1g-dev libssl-dev
+      fi
     fi
 
     pyenv install -s "${PYTHON_VERSION}"
