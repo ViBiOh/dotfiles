@@ -11,7 +11,7 @@ main() {
     exit
   fi
 
-  brew cask install alacritty
+  brew cask install firefox
 }
 
 main
