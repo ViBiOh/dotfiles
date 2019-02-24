@@ -28,9 +28,7 @@ main() {
       echo '| changing shell for user |'
       echo '+-------------------------+'
 
-      if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
-        echo $(brew --prefix)/bin/bash | sudo tee -a /etc/shells
-      fi
+      echo $(brew --prefix)/bin/bash | sudo tee -a /etc/shells
       chsh -s $(brew --prefix)/bin/bash -u "$(whoami)"
     fi
 
@@ -48,20 +46,18 @@ main() {
   elif command -v apt-get > /dev/null 2>&1; then
     export DEBIAN_FRONTEND=noninteractive
 
-    if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
-      sudo apt-get update
-      sudo apt-get upgrade -y -qq
-      sudo apt-get install -y -qq apt-transport-https
+    sudo apt-get update
+    sudo apt-get upgrade -y -qq
+    sudo apt-get install -y -qq apt-transport-https
 
-      sudo apt-get install -y -qq \
-        bash \
-        bash-completion \
-        htop \
-        git \
-        openssl \
-        curl \
-        vim
-    fi
+    sudo apt-get install -y -qq \
+      bash \
+      bash-completion \
+      htop \
+      git \
+      openssl \
+      curl \
+      vim
   fi
 }
 

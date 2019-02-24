@@ -25,6 +25,13 @@ main() {
 
   for file in "${SCRIPT_DIR}/install"/*; do
     local basenameFile=$(basename ${file%.*})
+    local upperCaseFilename=$(echo ${basenameFile} | tr '[:lower:]' '[:upper:]')
+    local disableVariableName="DOTFILES_NO_${upperCaseFilename}"
+
+    if [[ "${!disableVariableName:-}" == "true" ]]; then
+      continue
+    fi
+
     printf "%s%s%s\n" "+-" "${line:0:${#basenameFile}}" "-+"
     printf "%s%s%s\n" "| " ${basenameFile} " |"
     printf "%s%s%s\n" "+-" "${line:0:${#basenameFile}}" "-+"

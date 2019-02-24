@@ -12,9 +12,7 @@ main() {
   fi
 
   if command -v apt-get > /dev/null 2>&1; then
-    if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
-      sudo apt-get install -y -qq libpq-dev
-    fi
+    sudo apt-get install -y -qq libpq-dev
   fi
 
   source "${SCRIPT_DIR}/../sources/_python"

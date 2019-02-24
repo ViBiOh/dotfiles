@@ -13,22 +13,16 @@ main() {
     brew install ripgrep-bin
   elif command -v apt-get > /dev/null 2>&1 && [ $(uname -m) = 'x86_64' ]; then
     set +e
-    if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
-      sudo apt-cache show ripgrep > /dev/null 2>&1
-      ripgrep=$?
-    fi
+    sudo apt-cache show ripgrep > /dev/null 2>&1
+    ripgrep=$?
     set -e
 
     if [[ "${ripgrep}" -eq 0 ]]; then
-      if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
-        sudo apt-get install -y -qq ripgrep
-      fi
+      sudo apt-get install -y -qq ripgrep
     else
-      if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
-        curl -LO "https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep_${RIPGREP_VERSION}_amd64.deb"
-        sudo dpkg -i "ripgrep_${RIPGREP_VERSION}_amd64.deb"
-        rm -rf "ripgrep_${RIPGREP_VERSION}_amd64.deb"
-      fi
+      curl -LO "https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep_${RIPGREP_VERSION}_amd64.deb"
+      sudo dpkg -i "ripgrep_${RIPGREP_VERSION}_amd64.deb"
+      rm -rf "ripgrep_${RIPGREP_VERSION}_amd64.deb"
     fi
   fi
 }

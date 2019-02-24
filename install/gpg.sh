@@ -9,9 +9,7 @@ main() {
   if [[ "${IS_MACOS}" = true ]]; then
     brew install gnupg
   elif command -v apt-get > /dev/null 2>&1; then
-    if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
-      sudo apt-get install -y -qq gnupg
-    fi
+    sudo apt-get install -y -qq gnupg
   fi
 
   if command -v gpg > /dev/null 2>&1; then

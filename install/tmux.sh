@@ -11,9 +11,7 @@ main() {
       tmux \
       reattach-to-user-namespace
   elif command -v apt-get > /dev/null 2>&1; then
-    if [[ "${DOTFILES_NO_SUDO:-}" != "true" ]]; then
-      sudo apt-get install -y -qq tmux
-    fi
+    sudo apt-get install -y -qq tmux
   fi
 }
 

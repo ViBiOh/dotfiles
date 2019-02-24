@@ -14,8 +14,7 @@ popd
 
 You can set followin environment variables for customizing installation behavior:
 
-* `DOTFILES_CLEAN="true"` will perform a clean before installation (deleting `${HOME}/opt` dir)
-* `DOTFILES_NO_SUDO="true"` will doesn't perform `sudo` command
+* `DOTFILES_NO_NODE="true"` doesn't perform install of `install/node` file (replace `NODE` by any filename in `install/` dir)
 
 ## SSH
 
