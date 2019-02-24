@@ -16,6 +16,15 @@ You can set followin environment variables for customizing installation behavior
 
 * `DOTFILES_NO_NODE="true"` doesn't perform install of `install/node` file (replace `NODE` by any filename in `install/` dir)
 
+```bash
+# Server configuration example
+
+export DOTFILES_NO_NODE="true"
+export DOTFILES_NO_PASS="true"
+export DOTFILES_NO_PYTHON="true"
+export DOTFILES_NO_PYTHON_PGCLI="true"
+```
+
 ## SSH
 
 ```bash
