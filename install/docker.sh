@@ -14,7 +14,7 @@ main() {
     ARCH="amd64"
   fi
 
-  if command -v go > /dev/null 2>&1; then
+  if command -v docker > /dev/null 2>&1; then
     curl -Lo "${HOME}/opt/bin/ctop" "https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-${OS}-${ARCH}"
     chmod +x "${HOME}/opt/bin/ctop"
   fi
