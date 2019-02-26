@@ -11,7 +11,7 @@ fi
 export GOPATH="${HOME}/code"
 export PATH="${GOPATH}/bin:${PATH}"
 
-alias pprof_memory="pprof -http=:8080 -sample_index=alloc_space http://localhost:1080/debug/pprof/profile/heap"
+alias pprof_memory="go tool pprof http://localhost:1080/debug/pprof/profile/heap"
 
 if command -v gotop > /dev/null 2>&1; then
   alias monitor="gotop -c monokai -b"

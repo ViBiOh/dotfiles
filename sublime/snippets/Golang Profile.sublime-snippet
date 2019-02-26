@@ -7,8 +7,14 @@ if strings.HasPrefix(r.URL.Path, `/debug/pprof`) {
 		pprof.Profile(w, r)
 	} else if strings.HasPrefix(r.URL.Path, `/debug/pprof/symbol`) {
 		pprof.Symbol(w, r)
-	} else if strings.HasPrefix(r.URL.Path, `/debug/pprof/trace`) {
-		pprof.Trace(w, r)
+	} else if strings.HasPrefix(r.URL.Path, `/debug/pprof/goroutine`) {
+		pprof.Handler("goroutine").ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, `/debug/pprof/heap`) {
+		pprof.Handler("heap").ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, `/debug/pprof/threadcreate`) {
+		pprof.Handler("threadcreate").ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, `/debug/pprof/block`) {
+		pprof.Handler("block").ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, `/debug/pprof/`) {
 		pprof.Index(w, r)
 	}
