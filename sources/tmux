@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+alias tmux_ssh_agent='eval $(tmux showenv -s SSH_AUTH_SOCK)'
