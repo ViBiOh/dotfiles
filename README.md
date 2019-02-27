@@ -19,13 +19,13 @@ You can set followin environment variables for customizing installation behavior
 ```bash
 # Server configuration example
 
+export DOTFILES_NO_ALACRITTY="true"
+export DOTFILES_NO_GOLANG="true"
+export DOTFILES_NO_GPG="true"
 export DOTFILES_NO_NODE="true"
 export DOTFILES_NO_PASS="true"
 export DOTFILES_NO_PYTHON="true"
 export DOTFILES_NO_PYTHON_PGCLI="true"
-export DOTFILES_NO_GOLANG="true"
-export DOTFILES_NO_FIREFOX="true"
-export DOTFILES_NO_ALACRITTY="true"
 ```
 
 ## SSH
