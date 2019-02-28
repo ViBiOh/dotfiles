@@ -12,6 +12,8 @@ main() {
   fi
 
   brew cask install alacritty
+
+  ln -s /Applications/Alacritty.app/Contents/MacOS/alacritty "${HOME}/opt/bin/alacritty"
 }
 
 main
