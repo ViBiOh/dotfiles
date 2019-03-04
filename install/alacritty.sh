@@ -13,7 +13,7 @@ main() {
 
   brew cask install alacritty
 
-  ln -s /Applications/Alacritty.app/Contents/MacOS/alacritty "${HOME}/opt/bin/alacritty"
+  ln -f -s /Applications/Alacritty.app/Contents/MacOS/alacritty "${HOME}/opt/bin/alacritty"
 }
 
 main
