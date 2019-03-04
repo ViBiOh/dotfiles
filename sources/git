@@ -12,7 +12,7 @@ git_browse() {
   for dir in "$(pwd)"/*; do
     pushd ${dir}
 
-    if [[ $(git rev-parse --is-inside-work-tree > /dev/null 2>&1) ]]; then
+    if [[ $(git rev-parse --is-inside-work-tree 2>&1) == "true" ]]; then
       echo "${dir}"
       eval "${@}"
     fi
