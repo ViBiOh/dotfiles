@@ -69,9 +69,5 @@
     "args": {
       "group": 1
     }
-  },
-  {
-    "keys": ["super+k", "super+d"],
-    "command": "toggle_inline_diff"
   }
 ]
