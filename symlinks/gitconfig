@@ -30,7 +30,7 @@
 	commend = commit --amend --no-edit
 	pushu = push -u
 	pushf = push --force-with-lease
-	s = status
+	s = status -sb
 	d = diff -w
 	unstage = reset HEAD --
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
