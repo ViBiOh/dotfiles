@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-alias now="date '+%Y-%m-%d %H:%M:%S'"
-
 if command -v python > /dev/null 2>&1; then
   alias realpath="python -c 'import sys; import os.path; print(os.path.realpath(sys.argv[1]))'"
 fi
