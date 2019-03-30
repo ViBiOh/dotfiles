@@ -34,7 +34,8 @@ main() {
 
   if command -v pyenv 1>/dev/null 2>&1; then
     if [[ "${IS_MACOS}" = true ]]; then
-      brew install zlib
+      # Zlib header of macOS Mojave
+      sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
     elif command -v apt-get > /dev/null 2>&1; then
       sudo apt-get install -y -qq zlib1g-dev libssl-dev
     fi
