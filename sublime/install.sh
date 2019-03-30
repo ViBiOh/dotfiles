@@ -26,7 +26,7 @@ main() {
   fi
 
   if command -v npm > /dev/null 2>&1; then
-    npm install -g prettier
+    npm install -g prettier javascript-typescript-langserver
   fi
 
   echo Success!
