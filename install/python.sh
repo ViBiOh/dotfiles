@@ -21,7 +21,7 @@ main() {
     exit
   fi
 
-  local PYTHON_VERSION="3.6.8"
+  local PYTHON_VERSION="3.7.3"
 
   if [[ ! -d "${HOME}/opt/pyenv" ]]; then
     git clone --depth 1 https://github.com/pyenv/pyenv.git "${HOME}/opt/pyenv"
