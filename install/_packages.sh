@@ -39,9 +39,9 @@ main() {
 
       echo '#!/usr/bin/env bash
 
- if [[ -f "${HOME}/.bashrc" ]]; then
-   source ${HOME}/.bashrc
- fi' > "${HOME}/.bash_profile"
+if [[ -f "${HOME}/.bashrc" ]]; then
+  source ${HOME}/.bashrc
+fi' > "${HOME}/.bash_profile"
     fi
   elif command -v apt-get > /dev/null 2>&1; then
     export DEBIAN_FRONTEND=noninteractive
