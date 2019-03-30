@@ -33,7 +33,9 @@ main() {
   source "${SCRIPT_DIR}/../sources/_python"
 
   if command -v pyenv 1>/dev/null 2>&1; then
-    if command -v apt-get > /dev/null 2>&1; then
+    if [[ "${IS_MACOS}" = true ]]; then
+      brew install zlib
+    elif command -v apt-get > /dev/null 2>&1; then
       sudo apt-get install -y -qq zlib1g-dev libssl-dev
     fi
 
