@@ -4,7 +4,6 @@
   "installed_packages": [
     "DocBlockr",
     "Git",
-    "GitGutter",
     "JsPrettier",
     "LSP",
     "Naomi",
