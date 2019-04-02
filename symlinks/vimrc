@@ -93,14 +93,20 @@ endif
 " Disabling viminfo
 set viminfo=""
 
+" Be lazy when redrawing screen
+set lazyredraw
+
 " Search using ctrl-p and fzf
 set rtp+=~/opt/fzf
 noremap <C-p> :FZF<return>
 
+" Redirecting output to shell to null
+set shellpipe=>
+
 " Using ripgrep for searching
 if executable("rg")
-  set grepprg=rg\ --vimgrep\ --no-heading
-  set grepformat=%f:%l:%c:%m,%f:%l:%m
+  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+  nnoremap <Leader>g :silent lgrep -P<Space>
 endif
 
 " Opening quickfix automatically
