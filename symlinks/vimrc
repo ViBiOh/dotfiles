@@ -4,11 +4,12 @@ set nocompatible
 " Plugins configuration
 call plug#begin('~/.vim/vim-plug')
 
-Plug 'vim-airline/vim-airline'
-Plug 'airblade/vim-gitgutter'
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'itchyny/lightline.vim'
 
 call plug#end()
+
+" Enable status line
+set laststatus=2
 
 " Line highlight
 set cursorline
