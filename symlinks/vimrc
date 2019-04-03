@@ -1,21 +1,13 @@
 " Turnoff vi backward compatibility
 set nocompatible
 
-" Show status line
-set laststatus=2
+" Plugins configuration
+call plug#begin('~/.vim/vim-plug')
 
-set statusline=
-set statusline+=%* " Highlight current window
-set statusline+=\%f " Filename
-set statusline+=\%m " Modified
-set statusline+=\%R " Read-Only indicator
-set statusline+=%=
-set statusline+=\%y " Type of file
-set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
-set statusline+=\[%{&fileformat}\]
-set statusline+=\ %p%% " Percentage of the file
-set statusline+=\ %l:%c " Line Number and Total Line
-set statusline+=\  " Empty space at end
+Plug 'vim-airline/vim-airline'
+Plug 'airblade/vim-gitgutter'
+
+call plug#end()
 
 " Line highlight
 set cursorline
@@ -92,6 +84,9 @@ endif
 
 " Disabling viminfo
 set viminfo=""
+
+" Turn on the Wild menu, better suggestion
+set wildmenu
 
 " Be lazy when redrawing screen
 set lazyredraw
