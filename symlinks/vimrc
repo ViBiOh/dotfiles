@@ -1,15 +1,27 @@
 " Turnoff vi backward compatibility
 set nocompatible
 
-" Plugins configuration
-call plug#begin('~/.vim/vim-plug')
-
-Plug 'itchyny/lightline.vim'
-
-call plug#end()
-
-" Enable status line
+" Show status line
 set laststatus=2
+
+set statusline=
+set statusline+=\%f " Filename
+set statusline+=\%m " Modified
+set statusline+=\%R " Read-Only indicator
+set statusline+=%=
+set statusline+=\%y " Type of file
+set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
+set statusline+=\[%{&fileformat}\]
+set statusline+=\ %p%% " Percentage of the file
+set statusline+=\ %l:%c " Line Number and Total Line
+set statusline+=\  " Empty space at end
+
+" Hightlight current window with line number
+augroup BgHighlight
+    autocmd!
+    autocmd WinEnter * set number
+    autocmd WinLeave * set nonumber
+augroup END
 
 " Line highlight
 set cursorline
@@ -56,10 +68,6 @@ noremap  <up>    <nop>
 noremap  <down>  <nop>
 noremap  <left>  <nop>
 noremap  <right> <nop>
-inoremap <up>    <nop>
-inoremap <down>  <nop>
-inoremap <left>  <nop>
-inoremap <right> <nop>
 
 " Search as you type character
 set incsearch
