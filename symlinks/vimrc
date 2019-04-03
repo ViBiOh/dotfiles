@@ -50,6 +50,16 @@ set hlsearch
 nnoremap <esc> :noh<return><esc>
 nnoremap <esc>^[ <esc>^[
 
+" Disable arrow keys
+noremap  <up>    <nop>
+noremap  <down>  <nop>
+noremap  <left>  <nop>
+noremap  <right> <nop>
+inoremap <up>    <nop>
+inoremap <down>  <nop>
+inoremap <left>  <nop>
+inoremap <right> <nop>
+
 " Search as you type character
 set incsearch
 
