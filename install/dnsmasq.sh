@@ -5,14 +5,6 @@ set -o nounset
 set -o pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-sed_inplace() {
-  if [[ "${IS_MACOS}" = true ]]; then
-    sed -i '' "${@}"
-  else
-    sed -i "${@}"
-  fi
-}
-
 main() {
   if command -v pihole > /dev/null 2>&1; then
     echo "pihole found, no action"

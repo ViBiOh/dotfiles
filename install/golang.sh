@@ -14,13 +14,12 @@ clean() {
     for src in $(ls | grep -v 'github.com'); do
       rm -rf "${src}"
     done
+    popd
 
     pushd "${GOPATH}/src/github.com"
     for src in $(ls | grep -v 'ViBiOh'); do
       rm -rf "${src}"
     done
-
-    popd
     popd
   fi
 }
