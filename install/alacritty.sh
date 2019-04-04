@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
-set -o pipefail
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+set -o nounset -o pipefail -o errexit
 
 main() {
   if ! command -v brew > /dev/null 2>&1; then
