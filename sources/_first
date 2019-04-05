@@ -1,17 +1,5 @@
 #!/usr/bin/env bash
 
-export IS_MACOS=false
-export IS_LINUX=false
-
-case $(uname -s) in
-  "Darwin")
-    export IS_MACOS=true
-    ;;
-  "Linux")
-    export IS_LINUX=true
-    ;;
-esac
-
 if [[ -d "${HOME}/opt/bin" ]]; then
   export PATH="${HOME}/opt/bin:${PATH}"
 fi

@@ -9,7 +9,7 @@ sed_replace_properties() {
 }
 
 sed_inplace() {
-  if [[ "${IS_MACOS}" == true ]]; then
+  if [[ "${OSTYPE}" =~ ^darwin ]]; then
     sed -i '' "${@}"
   else
     sed -i "${@}"

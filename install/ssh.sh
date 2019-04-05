@@ -4,7 +4,8 @@ set -o nounset -o pipefail -o errexit
 
 main() {
   local MAC_OS_SSH_CONFIG=""
-  if [[ "${IS_MACOS}" = true ]]; then
+
+  if [[ "${OSTYPE}" =~ ^darwin ]]; then
     MAC_OS_SSH_CONFIG="
   UseKeyChain no"
   fi

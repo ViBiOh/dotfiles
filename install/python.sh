@@ -31,7 +31,7 @@ main() {
   source "${SCRIPT_DIR}/../sources/_python"
 
   if command -v pyenv 1>/dev/null 2>&1; then
-    if [[ "${IS_MACOS}" = true ]]; then
+    if [[ "${OSTYPE}" =~ ^darwin ]]; then
       # Zlib header of macOS Mojave
       sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
     elif command -v apt-get > /dev/null 2>&1; then

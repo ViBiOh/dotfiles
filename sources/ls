@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ "${IS_MACOS}" == true ]]; then
+if [[ "${OSTYPE}" =~ ^darwin ]]; then
   export CLICOLOR=1
   export LS_OPTIONS=""
   export LSCOLORS="ExFxCxDxBxEgEdAbAgAcAd"

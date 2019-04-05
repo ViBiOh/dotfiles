@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 open_ports() {
-  if [[ "${IS_MACOS}" == true ]]; then
+  if [[ "${OSTYPE}" =~ ^darwin ]]; then
     sudo lsof -PniTCP -sTCP:LISTEN
-  elif [[ "${IS_LINUX}" == true ]]; then
+  else
     sudo netstat -pluton
   fi
 }
@@ -27,13 +27,13 @@ forward_remote_port() {
 }
 
 dnsFlushCache() {
-  if [[ "${IS_MACOS}" == true ]]; then
+  if [[ "${OSTYPE}" =~ ^darwin ]]; then
     sudo dscacheutil -flushcache;sudo killall -HUP mDNSResponder
 
     if command -v dnsmasq 2>&1 > /dev/null; then
       sudo brew services restart dnsmasq
     fi
-  elif [[ "${IS_LINUX}" == true ]]; then
+  else
     sudo service network-manager restart
 
     if command -v dnsmasq 2>&1 > /dev/null; then

@@ -46,7 +46,7 @@ main() {
     dnsFlushCache
   fi
 
-  if [[ "${IS_MACOS}" = true ]]; then
+  if [[ "${OSTYPE}" =~ ^darwin ]]; then
     defaults write com.apple.screensaver askForPassword -int 1
     defaults write com.apple.screensaver askForPasswordDelay -int 0
     defaults write com.apple.finder AppleShowAllFiles -bool true
