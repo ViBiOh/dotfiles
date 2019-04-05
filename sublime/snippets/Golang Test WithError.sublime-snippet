@@ -8,10 +8,10 @@ func Test_${1:FuncName}(t *testing.T) {
 		wantErr error
 	}{
 		{
-			`should work with given params`,
-			`test`,
+			"should work with given params",
+			"test",
 			false,
-			errors.New(`Error while testing`),
+			errors.New("Error while testing"),
 		},
 	}
 
