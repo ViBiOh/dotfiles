@@ -16,13 +16,15 @@ os_clean() {
   fi
 
   rm -rf "${HOME}/.bash_history" \
-         "${HOME}/.cache" \
+         "${HOME}/.cache/" \
          "${HOME}/.CFUserTextEncoding" \
-         "${HOME}/.vim" \
+         "${HOME}/.cups/"
+         "${HOME}/.local/" \
+         "${HOME}/.npm/" \
+         "${HOME}/.ssh/known_hosts" \
+         "${HOME}/.vim/" \
          "${HOME}/.viminfo" \
-         "${HOME}/.local" \
-         "${HOME}/.npm" \
-         "${HOME}/.z"*
+         "${HOME}/.z"
 
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
     sudo sync && sudo purge
