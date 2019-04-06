@@ -14,7 +14,7 @@ main() {
   fi
 
   if command -v brew > /dev/null 2>&1; then
-    brew install gnu-getopt tree oath-toolkit zbar
+    brew install gnu-getopt tree oath-toolkit
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get install -y -qq tree
   fi
