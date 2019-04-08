@@ -25,8 +25,9 @@ export DOTFILES_NO_GPG="true"
 export DOTFILES_NO_NODE="true"
 export DOTFILES_NO_PASS="true"
 export DOTFILES_NO_PYTHON="true"
-export DOTFILES_NO_PYTHON_PGCLI="true"
 export DOTFILES_NO_PYTHON_ASCIINEMA="true"
+export DOTFILES_NO_PYTHON_PGCLI="true"
+export DOTFILES_NO_TRAVIS="true"
 ```
 
 ## SSH
