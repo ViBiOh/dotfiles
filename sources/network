@@ -10,7 +10,7 @@ open_ports() {
 
 forward_local_port() {
   if [[ "${#}" -ne 3 ]]; then
-    echo Usage: forward_local_port [LOCAL_PORT] [REMOTE_PORT] [SSH_PART]
+    echo "Usage: forward_local_port [LOCAL_PORT] [REMOTE_PORT] [SSH_PART]"
     return 1
   fi
 
@@ -19,7 +19,7 @@ forward_local_port() {
 
 forward_remote_port() {
   if [[ "${#}" -ne 3 ]]; then
-    echo Usage: forward_remote_port [REMOTE_PORT] [LOCAL_PORT] [SSH_PART]
+    echo "Usage: forward_remote_port [REMOTE_PORT] [LOCAL_PORT] [SSH_PART]"
     return 1
   fi
 

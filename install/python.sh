@@ -5,17 +5,17 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
   if ! command -v git > /dev/null 2>&1; then
-    echo "git not found"
+    echo "git is required"
     exit
   fi
 
   if ! command -v make > /dev/null 2>&1; then
-    echo "make not found"
+    echo "make is required"
     exit
   fi
 
   if ! command -v gcc > /dev/null 2>&1; then
-    echo "gcc not found"
+    echo "gcc is required"
     exit
   fi
 

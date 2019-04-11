@@ -5,7 +5,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
   if ! command -v pip > /dev/null 2>&1; then
-    echo "pgcli requires pip"
+    echo "pip is required"
     exit
   fi
 

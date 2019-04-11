@@ -26,8 +26,8 @@ main() {
       echo '| changing shell for user |'
       echo '+-------------------------+'
 
-      echo $(brew --prefix)/bin/bash | sudo tee -a /etc/shells > /dev/null
-      chsh -s $(brew --prefix)/bin/bash -u "$(whoami)"
+      echo "$(brew --prefix)/bin/bash" | sudo tee -a /etc/shells > /dev/null
+      chsh -s "$(brew --prefix)/bin/bash" -u "$(whoami)"
     fi
 
     if [[ ! -f "${HOME}/.bash_profile" ]]; then

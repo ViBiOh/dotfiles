@@ -21,7 +21,7 @@ cert_create_ca() {
     CA=${DIRECTORY}/ca.pem
     CA_PK=${DIRECTORY}/ca-private-key
 
-    echo Creating Certificate Authority
+    echo "Creating Certificate Authority"
     openssl genrsa -aes256 -out ${CA_PK} -passout pass:${CERT_PASSWORD} 4096
     openssl req -subj "/CN=${CN_NAME}" -new -x509 -days 365 -key ${CA_PK} -sha256 -out ${CA} -passin pass:${CERT_PASSWORD}
 
@@ -55,10 +55,10 @@ cert_create_cert() {
     local CA="${DIRECTORY}/ca.pem"
     local CA_PK="${CA_DIRECTORY}/ca-private-key"
 
-    echo Creating private key and Certificate
+    echo "Creating private key and Certificate"
     openssl genrsa -out "${KEY}" 4096
     openssl req -subj "/CN=${NAME}" -sha256 -new -key "${KEY}" -out "${CSR}"
-    echo subjectAltName = IP:${HOST_IP},IP:127.0.0.1 > "${EXT}"
+    echo "subjectAltName = IP:${HOST_IP},IP:127.0.0.1" > "${EXT}"
     openssl x509 -req -days 365 -sha256 -in "${CSR}" -CA "${CA}" -CAkey "${CA_PK}" -CAcreateserial -out "${CERT}" -extfile "${EXT}" -passin "pass:${CA_PRIVATE_KEY_PASSWORD}"
 
     rm -f "${CSR}" "${EXT}" .srl

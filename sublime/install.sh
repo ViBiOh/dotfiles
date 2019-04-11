@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
-  echo Configuring SublimeText
+  echo "Configuring SublimeText"
 
   local GO_PLUGIN="SublimeGo"
   local PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
@@ -26,8 +26,6 @@ main() {
   if command -v npm > /dev/null 2>&1; then
     npm install -g prettier javascript-typescript-langserver
   fi
-
-  echo Success!
 }
 
 main

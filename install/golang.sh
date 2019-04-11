@@ -25,7 +25,7 @@ clean() {
 main() {
   clean
 
-  local GO_VERSION=1.12.2
+  local GO_VERSION=1.12.3
   local OS=$(uname -s | tr '[:upper:]' '[:lower:]')
   local ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
 
