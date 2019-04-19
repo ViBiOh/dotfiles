@@ -18,7 +18,7 @@ os_clean() {
   rm -rf "${HOME}/.bash_history" \
          "${HOME}/.cache/" \
          "${HOME}/.CFUserTextEncoding" \
-         "${HOME}/.cups/"
+         "${HOME}/.cups/" \
          "${HOME}/.local/" \
          "${HOME}/.npm/" \
          "${HOME}/.ssh/known_hosts" \
