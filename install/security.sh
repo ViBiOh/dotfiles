@@ -17,16 +17,9 @@ main() {
     | egrep -v '^$' \
     | sort \
     | uniq \
-    | grep -v '0.0.0.0 plus.l.google.com' \
     | grep -v '0.0.0.0 www.linkedin.com' \
     | grep -v '0.0.0.0 static.licdn.com' \
     | grep -v '0.0.0.0 media.licdn.com' \
-    | grep -v '0.0.0.0 rollbar.com' \
-    | grep -v '0.0.0.0 www.rollbar.com' \
-    | grep -v '0.0.0.0 api.rollbar.com' \
-    | grep -v '0.0.0.0 cdn.rollbar.com' \
-    | grep -v '0.0.0.0 docs.rollbar.com' \
-    | grep -v '0.0.0.0 help.rollbar.com' \
     | grep -v '0.0.0.0 reddit.com' \
     | grep -v '0.0.0.0 www.reddit.com' \
     | grep -v '0.0.0.0 oauth.reddit.com' \
