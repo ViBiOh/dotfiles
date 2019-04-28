@@ -15,21 +15,22 @@ os_clean() {
     npm cache clean --force
   fi
 
-  rm -rf "${HOME}/.bash_history" \
-         "${HOME}/.babel.json" \
-         "${HOME}/.cache/" \
-         "${HOME}/.CFUserTextEncoding" \
-         "${HOME}/.cups/" \
-         "${HOME}/.dlv" \
-         "${HOME}/.local/" \
-         "${HOME}/.node_repl_history" \
-         "${HOME}/.npm" \
-         "${HOME}/.python_history" \
-         "${HOME}/.ssh/known_hosts" \
-         "${HOME}/.v8flags."*
-         "${HOME}/.vim/" \
-         "${HOME}/.viminfo" \
-         "${HOME}/.z"
+  rm -rf "${HOME}/.babel.json"
+  rm -rf "${HOME}/.bash_history"
+  rm -rf "${HOME}/.cache/"
+  rm -rf "${HOME}/.CFUserTextEncoding"
+  rm -rf "${HOME}/.cups/"
+  rm -rf "${HOME}/.dlv"
+  rm -rf "${HOME}/.local/"
+  rm -rf "${HOME}/.node_repl_history"
+  rm -rf "${HOME}/.npm"
+  rm -rf "${HOME}/.python_history"
+  rm -rf "${HOME}/.ssh/environment"
+  rm -rf "${HOME}/.ssh/known_hosts"
+  rm -rf "${HOME}/.v8flags."*
+  rm -rf "${HOME}/.vim/"
+  rm -rf "${HOME}/.viminfo"
+  rm -rf "${HOME}/.z"
 
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
     sudo sync && sudo purge
