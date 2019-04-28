@@ -5,7 +5,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 clean() {
   if [[ -n "${GOPATH-}" ]]; then
-    rm -rf "${GOPATH}/pkg/" "${GOPATH}/bin/" "${HOME}/.dlv"
+    rm -rf "${GOPATH}/pkg/" "${GOPATH}/bin/"
     mkdir -p "${GOPATH}/pkg/" "${GOPATH}/bin/" "${GOPATH}/src/"
 
     pushd "${GOPATH}/src"

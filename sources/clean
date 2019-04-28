@@ -16,12 +16,17 @@ os_clean() {
   fi
 
   rm -rf "${HOME}/.bash_history" \
+         "${HOME}/.babel.json" \
          "${HOME}/.cache/" \
          "${HOME}/.CFUserTextEncoding" \
          "${HOME}/.cups/" \
+         "${HOME}/.dlv" \
          "${HOME}/.local/" \
-         "${HOME}/.npm/" \
+         "${HOME}/.node_repl_history" \
+         "${HOME}/.npm" \
+         "${HOME}/.python_history" \
          "${HOME}/.ssh/known_hosts" \
+         "${HOME}/.v8flags."*
          "${HOME}/.vim/" \
          "${HOME}/.viminfo" \
          "${HOME}/.z"
