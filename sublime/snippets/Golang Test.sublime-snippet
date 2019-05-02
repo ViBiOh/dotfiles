@@ -1,6 +1,6 @@
 <snippet>
 		<content><![CDATA[
-func Test_${2:FuncName}(t *testing.T) {
+func Test${2:FuncName}(t *testing.T) {
 	var cases = []struct {
 		intention string
 		input     string
