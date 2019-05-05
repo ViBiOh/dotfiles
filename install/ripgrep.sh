@@ -16,10 +16,6 @@ main() {
 
     if [[ "${ripgrep}" -eq 0 ]]; then
       sudo apt-get install -y -qq ripgrep
-    else
-      curl -LO "https://github.com/BurntSushi/ripgrep/releases/download/${RIPGREP_VERSION}/ripgrep_${RIPGREP_VERSION}_amd64.deb"
-      sudo dpkg -i "ripgrep_${RIPGREP_VERSION}_amd64.deb"
-      rm -rf "ripgrep_${RIPGREP_VERSION}_amd64.deb"
     fi
   fi
 }
