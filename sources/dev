@@ -13,8 +13,9 @@ update_deps() {
     npm audit fix
   fi
 
-  if [[ -e "Gopkg.toml" ]]; then
-    dep ensure -update
+  if [[ -e "go.mod" ]]; then
+    go get -u
+    go mod tidy
   fi
 }
 

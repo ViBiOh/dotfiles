@@ -5,20 +5,8 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 clean() {
   if [[ -n "${GOPATH-}" ]]; then
-    rm -rf "${GOPATH}/pkg/" "${GOPATH}/bin/"
-    mkdir -p "${GOPATH}/pkg/" "${GOPATH}/bin/" "${GOPATH}/src/"
-
-    pushd "${GOPATH}/src"
-    for src in $(ls | grep -v 'github.com'); do
-      rm -rf "${src}"
-    done
-    popd
-
-    pushd "${GOPATH}/src/github.com"
-    for src in $(ls | grep -v 'ViBiOh'); do
-      rm -rf "${src}"
-    done
-    popd
+    rm -rf "${GOPATH}"
+    mkdir -p "${GOPATH}"
   fi
 }
 
@@ -45,6 +33,7 @@ main() {
   fi
 
   source "${SCRIPT_DIR}/../sources/golang"
+  mkdir -p "${GOPATH}"
 
   if command -v go > /dev/null 2>&1; then
     if [[ "${ARCH}" = "amd64" ]]; then
