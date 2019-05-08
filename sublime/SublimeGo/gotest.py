@@ -2,7 +2,6 @@ import sublime, sublime_plugin, threading
 from . async_task import AsyncTask
 
 class GoTest(sublime_plugin.WindowCommand):
-	proc = None
 	task = None
 	panel = None
 	panel_lock = threading.Lock()
