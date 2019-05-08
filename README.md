@@ -3,8 +3,8 @@
 ## Installation
 
 ```bash
-mkdir -p ${HOME}/code/src/github.com/ViBiOh/
-pushd ${HOME}/code/src/github.com/ViBiOh/
+mkdir -p ${HOME}/code/
+pushd ${HOME}/code/
 git clone https://github.com/ViBiOh/dotfiles.git
 ./dotfiles/install.sh
 popd
