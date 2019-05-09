@@ -8,7 +8,7 @@ func Test${1:FuncName}(t *testing.T) {
 		wantErr error
 	}{
 		{
-			"should work with given params",
+			"simple",
 			"test",
 			false,
 			errors.New("Error while testing"),
@@ -18,23 +18,25 @@ func Test${1:FuncName}(t *testing.T) {
 	var failed bool
 
 	for _, testCase := range cases {
-		result, err := ${1:FuncName}(testCase.input)
+		t.Run(testCase.intention, func(t *testing.T) {
+			result, err := ${1:FuncName}(testCase.input)
 
-		failed = false
+			failed = false
 
-		if err == nil && testCase.wantErr != nil {
-			failed = true
-		} else if err != nil && testCase.wantErr == nil {
-			failed = true
-		} else if err != nil && err.Error() != testCase.wantErr.Error() {
-			failed = true
-		} else if result != testCase.want {
-			failed = true
-		}
+			if err == nil && testCase.wantErr != nil {
+				failed = true
+			} else if err != nil && testCase.wantErr == nil {
+				failed = true
+			} else if err != nil && err.Error() != testCase.wantErr.Error() {
+				failed = true
+			} else if result != testCase.want {
+				failed = true
+			}
 
-		if failed {
-			t.Errorf("%s\n${1:FuncName}(`%s`) = (%+v, %+v), want (%+v, %+v)", testCase.intention, testCase.input, result, err, testCase.want, testCase.wantErr)
-		}
+			if failed {
+				t.Errorf("${1:FuncName}(`%s`) = (%+v, %+v), want (%+v, %+v)", testCase.input, result, err, testCase.want, testCase.wantErr)
+			}
+		})
 	}
 }
 
