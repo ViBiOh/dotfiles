@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 main() {
   if command -v pihole > /dev/null 2>&1; then
-    echo "pihole found, no action"
+    pihole -up
     exit
   fi
 
