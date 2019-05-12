@@ -16,6 +16,7 @@ update_deps() {
   if [[ -e "go.mod" ]]; then
     go get -u
     go mod tidy
+    git diff go.mod
   fi
 }
 
