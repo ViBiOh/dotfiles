@@ -70,7 +70,7 @@ git_sync() {
   fi
 
   local dry=false
-  if [[ "${3,,}" == "dry" ]]; then
+  if [[ "$(echo ${3} | tr '[:upper:]' '[:lower:]')" == "dry" ]]; then
     dry=true
   fi
 
