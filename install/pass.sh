@@ -32,6 +32,8 @@ main() {
   PREFIX="${HOME}/opt" BASHCOMPDIR=${HOME}/opt/bash_completion.d make install
   popd
   rm -rf "${HOME}/pass-otp"
+
+  pass git pull
 }
 
 main
