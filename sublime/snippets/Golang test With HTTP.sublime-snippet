@@ -22,7 +22,7 @@ func Test${1:FuncName}(t *testing.T) {
 				${1:FuncName}(writer, testCase.request)
 
 				if result := writer.Code; result != testCase.wantStatus {
-					t.Errorf("%s\n${1:FuncName}(%+v) = %d, want status %d", testCase.intention, testCase.request, result, testCase.wantStatus)
+					t.Errorf("${1:FuncName}(%+v) = %d, want status %d", testCase.request, result, testCase.wantStatus)
 				}
 
 				if result, _ := request.ReadBody(writer.Result().Body); string(result) != testCase.want {
