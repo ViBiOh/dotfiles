@@ -3,8 +3,8 @@
 alias dev='cd ${HOME}/code/'
 alias grep="grep --color=auto"
 
-EDITOR=vim
-TERM=xterm-256color
+export EDITOR=vim
+export TERM=xterm-256color
 
 update_deps() {
   if [[ -e "package.json" ]]; then
