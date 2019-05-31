@@ -21,6 +21,20 @@ git_browse() {
   done
 }
 
+git_open() {
+  local RED='\033[0;31m'
+  local RESET='\033[0m'
+
+  if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
+    echo -e "${RED}You're not inside a git repository${RESET}"
+    return 1
+  fi
+
+  local pushURL=$(git remote get-url --push $(git remote show))
+
+  open "${pushURL/git@github.com:/https://github.com/}"
+}
+
 git_pull() {
   git_browse 'git pull'
 }
