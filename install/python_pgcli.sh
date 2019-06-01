@@ -15,7 +15,7 @@ main() {
     sudo apt-get install -y -qq libpq-dev
   fi
 
-  pip install --user pgcli
+  pip install --user --prefer-binary pgcli
 
   if command -v pgcli > /dev/null 2>&1; then
     mkdir -p "${HOME}/.config/pgcli"
