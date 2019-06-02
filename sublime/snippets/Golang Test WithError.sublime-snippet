@@ -34,7 +34,7 @@ func Test${1:FuncName}(t *testing.T) {
 			}
 
 			if failed {
-				t.Errorf("${1:FuncName}(`%s`) = (%+v, %+v), want (%+v, %+v)", testCase.input, result, err, testCase.want, testCase.wantErr)
+				t.Errorf("${1:FuncName}(`%s`) = (%#v, %#v), want (%#v, %#v)", testCase.input, result, err, testCase.want, testCase.wantErr)
 			}
 		})
 	}
