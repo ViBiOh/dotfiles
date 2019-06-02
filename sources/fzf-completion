@@ -59,10 +59,15 @@ if command -v pgcli > /dev/null 2>&1; then
       local BLUE='\033[34m'
       local RESET='\033[0m'
 
+      local comment=''
+
       while IFS=':' read -r host port db user pass
       do
         if [[ ! "${host}" =~ ^\s*# ]] && [[ ! "${host}" =~ ^\s*$ ]]; then
-          echo -e "host: ${BLUE}${host}${RESET} port: ${YELLOW}${port}${RESET} db: ${RED}${db}${RESET} user: ${GREEN}${user}${RESET}"
+          echo -e "host: ${BLUE}${host}${RESET} port: ${YELLOW}${port}${RESET} db: ${RED}${db}${RESET} user: ${GREEN}${user}${RESET} ${BLUE}${comment}${RESET}"
+          comment=''
+        elif [[ "${host}" =~ ^\s*# ]]; then
+          comment="${host}"
         fi
       done < "${PGPASSFILE-${HOME}/.pgpass}"
     )
