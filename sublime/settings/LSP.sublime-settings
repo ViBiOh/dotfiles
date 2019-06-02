@@ -2,7 +2,7 @@
   "clients": {
     "lsp-go": {
       "enabled": true,
-      "command": ["go-langserver"],
+      "command": ["gopls"],
       "scopes": ["source.go"],
       "syntaxes": ["Packages/Go/Go.sublime-syntax"],
       "languageId": "go"

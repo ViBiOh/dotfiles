@@ -1,5 +1,4 @@
 [
-  { "caption": "Go gocode update", "command": "gocode_update" },
   { "caption": "Go Format", "command": "go_format" },
   { "caption": "Go Test", "command": "go_test" },
   { "caption": "Debug Test", "command": "debug_test" }

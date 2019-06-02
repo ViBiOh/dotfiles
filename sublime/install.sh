@@ -19,7 +19,7 @@ main() {
 
   if command -v go > /dev/null 2>&1; then
     go get -u github.com/mdempsky/gocode
-    go get -u github.com/sourcegraph/go-langserver
+    go get -u golang.org/x/tools/cmd/gopls
     go get -u golang.org/x/tools/cmd/gotype
   fi
 
