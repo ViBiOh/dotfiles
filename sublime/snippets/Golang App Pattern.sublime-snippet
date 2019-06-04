@@ -1,7 +1,5 @@
 <snippet>
 		<content><![CDATA[
-var _ App = &app{}
-
 // App of package
 type App interface {
 }
