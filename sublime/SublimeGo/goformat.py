@@ -9,7 +9,10 @@ class GoFormat(sublime_plugin.TextCommand):
     region = sublime.Region(0, view.size())
     src = view.substr(region)
 
-    goimports = subprocess.Popen(['goimports'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    vars = view.window().extract_variables()
+    working_dir = vars['file_path']
+
+    goimports = subprocess.Popen(['goimports'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_dir)
     goimports_out, goimports_err = goimports.communicate(src.encode())
     if goimports.returncode != 0:
       print(goimports_err.decode(), end="")
@@ -21,9 +24,7 @@ class GoFormat(sublime_plugin.TextCommand):
       print(gofmt_err.decode(), end="")
       return
 
-    content = gofmt_out.decode()
-
-    view.replace(edit, region, content)
+    view.replace(edit, region, gofmt_out.decode())
 
 
 class GoformatOnSave(sublime_plugin.EventListener):
