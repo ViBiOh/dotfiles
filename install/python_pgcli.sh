@@ -15,7 +15,11 @@ main() {
     sudo apt-get install -y -qq libpq-dev
   fi
 
-  pip install --user --prefer-binary pgcli
+  local PIP_INSTALL_OPTIONS=""
+  if [[ "$(pip install --help | grep prefer-binary | wc -l)" -eq 1 ]]; then
+    PIP_INSTALL_OPTIONS="${PIP_INSTALL_OPTIONS} --prefer-binary"
+  fi
+  pip install --user "${PIP_INSTALL_OPTIONS}" pgcli
 
   if command -v pgcli > /dev/null 2>&1; then
     mkdir -p "${HOME}/.config/pgcli"
