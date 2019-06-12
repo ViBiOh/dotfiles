@@ -2,9 +2,15 @@
   "clients": {
     "lsp-go": {
       "enabled": true,
-      "command": ["gopls"],
-      "scopes": ["source.go"],
-      "syntaxes": ["Packages/Go/Go.sublime-syntax"],
+      "command": [
+        "gopls"
+      ],
+      "scopes": [
+        "source.go"
+      ],
+      "syntaxes": [
+        "Packages/Go/Go.sublime-syntax"
+      ],
       "languageId": "go"
     },
     "lsp-js": {
@@ -12,7 +18,8 @@
         "javascript-typescript-stdio"
       ],
       "enabled": true,
-      "languages": [{
+      "languages": [
+        {
           "languageId": "javascript",
           "scopes": [
             "source.js",
@@ -22,7 +29,8 @@
             "Javascript",
             "Packages/Naomi/syntaxes/naomi.fjsx15.sublime-syntax"
           ]
-      }]
+        }
+      ]
     }
   }
 }

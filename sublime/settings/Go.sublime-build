@@ -1,6 +1,10 @@
 {
   "target": "go_test",
   "selector": "source.go",
-  "file_patterns": ["*_test.go"],
-  "cancel": { "kill": true }
+  "file_patterns": [
+    "*_test.go"
+  ],
+  "cancel": {
+    "kill": true
+  }
 }
