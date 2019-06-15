@@ -3,8 +3,6 @@
 set -o nounset -o pipefail -o errexit
 
 main() {
-  local RIPGREP_VERSION=0.10.0
-
   if command -v brew > /dev/null 2>&1; then
     brew tap burntsushi/ripgrep https://github.com/BurntSushi/ripgrep.git
     brew install ripgrep-bin
