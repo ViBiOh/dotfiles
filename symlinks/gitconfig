@@ -9,12 +9,6 @@
 	excludesfile = ~/.gitignore_global
 	ignorecase = false
 
-[color]
-	ui = true
-
-[color "branch"]
-	upstream = cyan
-
 [diff]
 	mnemonicPrefix = true
 	renames = true
@@ -55,6 +49,12 @@
 
 [rebase]
 	autosquash = true
+
+[color]
+	ui = true
+
+[color "branch"]
+	upstream = cyan
 
 [color "diff-highlight"]
 	oldNormal = red bold
