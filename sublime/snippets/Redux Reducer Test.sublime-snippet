@@ -2,7 +2,7 @@
     <content><![CDATA[
 import reducer, { initialState } from './${1:ReducerName}';
 
-it('should return initial state', (t) => {
+it('should return initial state', () => {
   expect(reducer(undefined, { type: '' })).toEqual(initialState);
 });
 
