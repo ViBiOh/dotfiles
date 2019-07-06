@@ -27,7 +27,6 @@ main() {
     local GO_ARCHIVE="go${GO_VERSION}.${OS}-${ARCH}.tar.gz"
  
     curl -O "https://dl.google.com/go/${GO_ARCHIVE}"
-    rm -rf "${HOME}/opt/go"
     tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
     rm -rf "${GO_ARCHIVE}"
   fi
