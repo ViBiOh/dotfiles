@@ -4,6 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 main() {
   local TERRAFORM_VERSION=0.12.3
+
   local OS=$(uname -s | tr '[:upper:]' '[:lower:]')
   local ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
 
