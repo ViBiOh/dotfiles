@@ -12,6 +12,17 @@ main() {
   fi
 
   pip install --user ansible
+
+  if ! command -v pass > /dev/null 2>&1; then
+    exit
+  fi
+
+  local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
+  local ANSIBLE_PASS=$(find "${PASS_DIR}" -name '*ansible.gpg' -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|")
+
+  if [[ $(echo "${ANSIBLE_PASS}" | wc -l) -eq 1 ]]; then
+    pass show "${ANSIBLE_PASS}" > "${HOME}/.ansible-vault-pass"
+  fi
 }
 
 main
