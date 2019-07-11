@@ -34,7 +34,6 @@ os_clean() {
   rm -rf "${HOME}/.v8flags."*
   rm -rf "${HOME}/.vim/"
   rm -rf "${HOME}/.viminfo"
-  rm -rf "${HOME}/.z"
 
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
     sudo sync && sudo purge
