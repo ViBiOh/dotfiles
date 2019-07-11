@@ -2,7 +2,7 @@
 
 set -o nounset -o pipefail -o errexit
 
-main() {
+credentials() {
   if ! command -v pass > /dev/null 2>&1; then
     exit
   fi
@@ -19,6 +19,10 @@ main() {
   \"token\": \"${SCALEWAY_TOKEN}\"
 }" > "${HOME}/.scwrc"
   fi
+}
+
+main() {
+  credentials
 }
 
 main

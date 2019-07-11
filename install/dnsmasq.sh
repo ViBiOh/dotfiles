@@ -8,18 +8,19 @@ main() {
     exit
   fi
 
+  if [[ -e "${HOME}/vpn.mobileconfig" ]] then
+    echo "dnsmasq is managed by vpn"
+    exit
+  fi
+
   local DNSMASQ_CONF='/etc/dnsmasq.conf'
+  local LISTEN_ADDRESS="127.0.0.1"
 
   if command -v brew > /dev/null 2>&1; then
     brew install dnsmasq
     DNSMASQ_CONF=$(brew --prefix)/etc/dnsmasq.conf
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get install -y -qq dnsmasq
-  fi
-
-  LISTEN_ADDRESS="127.0.0.1"
-  if [[ -e "/etc/sysctl.conf" ]] && [[ $(grep 'infra-vpn' /etc/sysctl.conf | wc -l) -eq 1 ]]; then
-    LISTEN_ADDRESS=$(hostname -I | awk '{print $1}')
   fi
 
   echo "listen-address=${LISTEN_ADDRESS}
