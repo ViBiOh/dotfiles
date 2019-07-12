@@ -3,16 +3,7 @@
 set -o nounset -o pipefail -o errexit
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-main() {
-  source "${SCRIPT_DIR}/../sources/_python"
-
-  if ! command -v pip > /dev/null 2>&1; then
-    echo "pip is required"
-    exit
-  fi
-
-  pip install --user ansible
-
+credentials() {
   if ! command -v pass > /dev/null 2>&1; then
     exit
   fi
@@ -23,6 +14,19 @@ main() {
   if [[ $(echo "${ANSIBLE_PASS}" | wc -l) -eq 1 ]]; then
     pass show "${ANSIBLE_PASS}" > "${HOME}/.ansible-vault-pass"
   fi
+}
+
+main() {
+  source "${SCRIPT_DIR}/../sources/_python"
+
+  if ! command -v pip > /dev/null 2>&1; then
+    echo "pip is required"
+    exit
+  fi
+
+  pip install --user ansible
+
+  credentials
 }
 
 main

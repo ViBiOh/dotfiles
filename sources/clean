@@ -27,7 +27,6 @@ os_clean() {
   rm -rf "${HOME}/.node_repl_history"
   rm -rf "${HOME}/.npm"
   rm -rf "${HOME}/.python_history"
-  rm -rf "${HOME}/.scwrc"
   rm -rf "${HOME}/.ssh/environment"
   rm -rf "${HOME}/.ssh/known_hosts"
   rm -rf "${HOME}/.terraform"*
