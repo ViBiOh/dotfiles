@@ -3,16 +3,6 @@
 set -o nounset -o pipefail -o errexit
 
 main() {
-  if command -v pihole > /dev/null 2>&1; then
-    pihole -up
-    exit
-  fi
-
-  if [[ -e "${HOME}/vpn.mobileconfig" ]] then
-    echo "dnsmasq is managed by vpn"
-    exit
-  fi
-
   local DNSMASQ_CONF='/etc/dnsmasq.conf'
   local LISTEN_ADDRESS="127.0.0.1"
 
