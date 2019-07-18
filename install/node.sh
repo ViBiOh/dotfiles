@@ -27,9 +27,11 @@ main() {
   source "${SCRIPT_DIR}/../sources/node"
   n "${NODE_VERSION}"
 
-  if command -v npm > /dev/null 2>&1; then
-    npm install --ignore-scripts -g npm npm-check-updates node-gyp
+  if ! command -v npm > /dev/null 2>&1; then
+    return
   fi
+
+  npm install --ignore-scripts -g npm npm-check-updates node-gyp
 }
 
 main

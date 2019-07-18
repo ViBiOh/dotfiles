@@ -33,6 +33,10 @@ main() {
   popd
   rm -rf "${HOME}/pass-otp"
 
+  if ! command -v pass > /dev/null 2>&1; then
+    return
+  fi
+
   pass git pull
 }
 

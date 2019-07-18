@@ -10,14 +10,18 @@ main() {
     sudo apt-get install -y -qq python
   fi
 
-  if command -v python > /dev/null 2>&1; then
-    mkdir -p "${HOME}/opt/python"
-    source "${SCRIPT_DIR}/../sources/_python"
+  if ! command -v python > /dev/null 2>&1; then
+    return
   fi
 
-  if command -v pip > /dev/null 2>&1; then
-    pip install --user --upgrade pip
+  mkdir -p "${HOME}/opt/python"
+  source "${SCRIPT_DIR}/../sources/_python"
+
+  if ! command -v pip > /dev/null 2>&1; then
+    return
   fi
+
+  pip install --user --upgrade pip
 }
 
 main

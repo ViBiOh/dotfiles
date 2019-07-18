@@ -13,6 +13,10 @@ main() {
     sudo apt-get install -y -qq dnsmasq
   fi
 
+  if ! command -v dnsmasq > /dev/null 2>&1; then
+    return
+  fi
+
   echo "listen-address=${LISTEN_ADDRESS}
 bind-interfaces
 

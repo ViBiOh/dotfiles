@@ -21,14 +21,16 @@ main() {
     pip install --user pgcli
   fi
 
-  if command -v pgcli > /dev/null 2>&1; then
-    mkdir -p "${HOME}/.config/pgcli"
+  if ! command -v pgcli > /dev/null 2>&1; then
+    return
+  fi
 
-    echo '[main]
+  mkdir -p "${HOME}/.config/pgcli"
+
+  echo '[main]
 multi_line = True
 auto_expand = True
 row_limit = 100' > "${HOME}/.config/pgcli/config"
-  fi
 }
 
 main
