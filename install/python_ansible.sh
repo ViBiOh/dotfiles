@@ -24,7 +24,7 @@ main() {
     exit
   fi
 
-  pip install --user ansible jmespath
+  pip install --user ansible ansible-lint jmespath
 
   credentials
 }
