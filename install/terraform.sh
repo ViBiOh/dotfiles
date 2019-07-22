@@ -20,7 +20,7 @@ credentials() {
 }
 
 main() {
-  local TERRAFORM_VERSION=0.12.3
+  local TERRAFORM_VERSION=0.12.5
 
   local OS=$(uname -s | tr '[:upper:]' '[:lower:]')
   local ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
@@ -28,7 +28,7 @@ main() {
   if [[ "${ARCH}" = "x86_64" ]]; then
     ARCH="amd64"
   elif [[ "${ARCH}" =~ ^armv.l$ ]]; then
-    ARCH="armv6l"
+    ARCH="arm"
   fi
 
   local TERRAFORM_ARCHIVE="terraform_${TERRAFORM_VERSION}_${OS}_${ARCH}.zip"
