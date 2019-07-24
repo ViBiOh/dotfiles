@@ -5,19 +5,33 @@
 readonly BASHRC_PATH=$(python -c 'import sys; import os.path; print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")
 readonly DOTFILES_PATH=$(dirname ${BASHRC_PATH})
 
-if [[ $(locale -a | grep "en_US.UTF-8" | wc -l) -eq 1 ]]; then
-  export LC_ALL="en_US.UTF-8"
-  export LANG="en_US.UTF-8"
-  export LANGUAGE="en_US.UTF-8"
-elif [[ $(locale -a | grep "C.UTF-8" | wc -l) -eq 1 ]]; then
-  export LC_ALL="C.UTF-8"
-  export LANG="C.UTF-8"
-  export LANGUAGE="C.UTF-8"
-fi
+set_locale() {
+  local LOCALES=("en_US.UTF-8" "C.UTF-8" "C")
+  local ALL_LOCALES="$(locale -a)"
 
-for file in "${DOTFILES_PATH}/../sources/"*; do
-  [[ -r "${file}" ]] && [[ -f "${file}" ]] && source "${file}"
-done
+  for locale in "${LOCALES[@]}"; do
+    if [[ $(echo "${ALL_LOCALES}" | grep "${locale}" | wc -l) -eq 1 ]]; then
+      export LC_ALL="${locale}"
+      export LANG="${locale}"
+      export LANGUAGE="${locale}"
+
+      return
+    fi
+  done
+
+  return 1
+}
+
+source_all() {
+  local LANG=C
+
+  for file in "${DOTFILES_PATH}/../sources/"*; do
+    [[ -r "${file}" ]] && [[ -f "${file}" ]] && source "${file}"
+  done
+}
+
+set_locale
+source_all
 
 if [[ -e "${HOME}/.localrc" ]]; then
   source "${HOME}/.localrc"

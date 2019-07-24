@@ -45,8 +45,12 @@ cleanPackages() {
 }
 
 main() {
-  printTitle "symlinks"
-  createSymlinks
+  local ARGS="'${*}'"
+
+  if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ symlinks ]]; then
+    printTitle "symlinks"
+    createSymlinks
+  fi
 
   set +u
   set +e
@@ -55,16 +59,15 @@ main() {
   set -e
   set -u
 
-  printTitle "install"
-  installTools
+  if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ install ]]; then
+    printTitle "install"
+    installTools
+  fi
 
-  printTitle "clean"
-  cleanPackages
-
-  if command -v subl > /dev/null 2>&1; then
-    printTitle "sublime"
-    pushd sublime && ./install.sh && popd
+  if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ clean ]]; then
+    printTitle "clean"
+    cleanPackages
   fi
 }
 
-main
+main "${@}"
