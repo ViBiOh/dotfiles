@@ -17,6 +17,8 @@ main() {
     brew install gnu-getopt tree oath-toolkit zbar
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get install -y -qq tree
+  elif command -v pacman > /dev/null 2>&1; then
+    sudo pacman -S --noconfirm pass
   fi
 
   rm -rf "${HOME}/password-store"
