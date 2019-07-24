@@ -7,7 +7,13 @@ main() {
   echo "Configuring SublimeText"
 
   local GO_PLUGIN="SublimeGo"
-  local PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
+
+  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+    local PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
+  else
+    local PKG="${HOME}/.config/sublime-text-3/Packages"
+  fi
+
   local PKG_USER="${PKG}/User"
 
   mkdir -p "${PKG_USER}"
