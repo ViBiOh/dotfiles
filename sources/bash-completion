@@ -6,4 +6,6 @@ if command -v brew > /dev/null 2>&1; then
   fi
 elif [[ -f "/etc/bash_completion" ]]; then
   source "/etc/bash_completion"
+elif [[ -f "/usr/share/bash_completion" ]]; then
+  source "/usr/share/bash_completion"
 fi

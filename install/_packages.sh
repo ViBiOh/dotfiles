@@ -16,7 +16,6 @@ main() {
       bash \
       bash-completion \
       htop \
-      git \
       openssl \
       curl \
       fswatch
@@ -52,7 +51,6 @@ fi' > "${HOME}/.bash_profile"
       bash \
       bash-completion \
       htop \
-      git \
       openssl \
       curl \
       vim
@@ -64,7 +62,6 @@ fi' > "${HOME}/.bash_profile"
       bash \
       bash-completion \
       htop \
-      git \
       openssl \
       curl \
       vim
