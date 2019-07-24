@@ -17,7 +17,7 @@ if command -v pass > /dev/null 2>&1; then
       find "${PASS_DIR}" -name '*.gpg' -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"
     )
   }
-  [ -n "${BASH}" ] && complete -F _fzf_complete_pass -o default -o bashdefault pass
+  [[ -n "${BASH}" ]] && complete -F _fzf_complete_pass -o default -o bashdefault pass
 
   passfor() {
     pass -c "${1}"
@@ -29,21 +29,21 @@ if command -v pass > /dev/null 2>&1; then
       pass otp -c "${1}"
     fi
   }
-  [ -n "${BASH}" ] && complete -F _fzf_complete_pass -o default -o bashdefault passfor
+  [[ -n "${BASH}" ]] && complete -F _fzf_complete_pass -o default -o bashdefault passfor
 fi
 
 if command -v make > /dev/null 2>&1; then
   _fzf_complete_make() {
     FZF_COMPLETION_TRIGGER='' _fzf_complete '-1' "${@}" < <(make -rpn | sed -n -e '/^$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$// ; p ; } ; }')
   }
-  [ -n "${BASH}" ] && complete -F _fzf_complete_make -o default -o bashdefault make
+  [[ -n "${BASH}" ]] && complete -F _fzf_complete_make -o default -o bashdefault make
 fi
 
 if command -v ssh > /dev/null 2>&1; then
   _fzf_complete_ssh_notrigger() {
     FZF_COMPLETION_TRIGGER='' _fzf_complete_ssh
   }
-  [ -n "${BASH}" ] && complete -F _fzf_complete_ssh_notrigger -o default -o bashdefault ssh
+  [[ -n "${BASH}" ]] && complete -F _fzf_complete_ssh_notrigger -o default -o bashdefault ssh
 fi
 
 if command -v pgcli > /dev/null 2>&1; then
@@ -78,5 +78,5 @@ if command -v pgcli > /dev/null 2>&1; then
     awk '{if ($1 != "*") { print "-h " $1; } if ($2 != "*") { print "-p " $2; } if ($4 != "*") { print "-U " $4; } if ($3 != "*") { print $3; }}'
   }
 
-  [ -n "${BASH}" ] && complete -F _fzf_complete_pgcli -o default -o bashdefault pgcli
+  [[ -n "${BASH}" ]] && complete -F _fzf_complete_pgcli -o default -o bashdefault pgcli
 fi

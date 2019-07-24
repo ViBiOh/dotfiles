@@ -14,7 +14,7 @@ printTitle() {
 createSymlinks() {
   for file in "${SCRIPT_DIR}/symlinks"/*; do
     basenameFile=$(basename "${file}")
-    [ -r "${file}" ] && [ -e "${file}" ] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
+    [[ -r "${file}" ]] && [[ -e "${file}" ]] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
   done
 }
 
@@ -30,8 +30,8 @@ installTools() {
       continue
     fi
 
-    printTitle "${basenameFile}"
-    [ -r "${file}" ] && [ -x "${file}" ] && "${file}"
+    printTitle "install - ${basenameFile}"
+    [[ -r "${file}" ]] && [[ -x "${file}" ]] && "${file}"
   done
 }
 
@@ -45,7 +45,7 @@ cleanPackages() {
 }
 
 main() {
-  local ARGS="'${*}'"
+  local ARGS="${*}"
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ symlinks ]]; then
     printTitle "symlinks"

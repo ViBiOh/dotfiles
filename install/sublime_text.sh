@@ -5,7 +5,7 @@ set -o nounset -o pipefail -o errexit
 main() {
   if command -v brew > /dev/null 2>&1; then
     brew cask reinstall sublime-text
-  if command -v pacman > /dev/null 2>&1; then
+  elif command -v pacman > /dev/null 2>&1; then
     if [[ $(cat "/etc/pacman.conf" | grep "sublime-text" | wc -l) -eq 0 ]]; then
       local SUBLIME_TEXT_SIGN_KEY="8A8F901A"
       local SUBLIME_TEXT_KEY_FILE="sublimehq-pub.gpg"
