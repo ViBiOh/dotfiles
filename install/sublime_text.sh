@@ -3,6 +3,8 @@
 set -o nounset -o pipefail -o errexit
 
 main() {
+  if command -v brew > /dev/null 2>&1; then
+    brew cask reinstall sublime-text
   if command -v pacman > /dev/null 2>&1; then
     local SUBLIME_TEXT_SIGN_KEY="8A8F901A"
     local SUBLIME_TEXT_KEY_FILE="sublimehq-pub.gpg"
@@ -14,7 +16,7 @@ main() {
 
     echo -e "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/dev/x86_64" | sudo tee -a /etc/pacman.conf
 
-    sudo pacman -Syu sublime-text
+    sudo pacman -Syu --no-confirm sublime-text
   fi
 }
 
