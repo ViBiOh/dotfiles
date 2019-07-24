@@ -39,6 +39,11 @@ main() {
     return
   fi
 
+  local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
+  if [[ ! -d "${PASS_DIR}" ]]; then
+    return
+  fi
+
   pass git pull
 }
 

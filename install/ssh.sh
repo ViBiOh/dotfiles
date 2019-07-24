@@ -10,6 +10,8 @@ main() {
   UseKeyChain no"
   fi
 
+  mkdir -p "${HOME}/.ssh"
+
   echo "Host *
   PasswordAuthentication no
   ChallengeResponseAuthentication no
