@@ -16,7 +16,7 @@ main() {
       sudo apt-get install -y -qq ripgrep
     fi
   elif command -v pacman > /dev/null 2>&1; then
-    sudo pacman -S --noconfirm ripgrep
+    sudo pacman -S --noconfirm --needed ripgrep
   fi
 }
 

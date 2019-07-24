@@ -8,7 +8,7 @@ main() {
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get install -y -qq gnupg
   elif command -v pacman > /dev/null 2>&1; then
-    sudo pacman -S --noconfirm gnupg
+    sudo pacman -S --noconfirm --needed gnupg
   fi
 
   if ! command -v gpg > /dev/null 2>&1; then

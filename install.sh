@@ -19,6 +19,8 @@ createSymlinks() {
 }
 
 installTools() {
+  local LANG=C
+
   for file in "${SCRIPT_DIR}/install"/*; do
     local basenameFile=$(basename ${file%.*})
     local upperCaseFilename=$(echo "${basenameFile}" | tr '[:lower:]' '[:upper:]')

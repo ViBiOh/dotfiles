@@ -58,15 +58,16 @@ fi' > "${HOME}/.bash_profile"
       vim
   elif command -v pacman > /dev/null 2>&1; then
     sudo pacman -Syuq --noconfirm
-    sudo pacman -S --noconfirm \
+    sudo pacman -S --noconfirm --needed \
+      make \
+      binutils \
       bash \
       bash-completion \
       htop \
       git \
       openssl \
       curl \
-      vim \
-      firefox
+      vim
   fi
 }
 
