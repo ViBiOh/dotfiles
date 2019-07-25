@@ -16,7 +16,10 @@ main() {
   fi
 
   if command -v pacman > /dev/null 2>&1; then
-    curl -o "/usr/share/bash_completion/completions/git" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{print $3}')/contrib/completion/git-prompt.sh"
+    local GIT_COMPLETION="git-prompt.sh"
+
+    curl -O  "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{print $3}')/contrib/completion/${GIT_COMPLETION}"
+    sudo mv "${GIT_COMPLETION}" "/usr/share/bash-completion/completions/git"
   fi
 
   if command -v perl > /dev/null 2>&1; then
