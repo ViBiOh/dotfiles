@@ -15,7 +15,7 @@ main() {
       sudo pacman-key --lsign-key "${SUBLIME_TEXT_SIGN_KEY}"
       rm "${SUBLIME_TEXT_KEY_FILE}"
 
-      echo -e "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/dev/x86_64" | sudo tee -a "/etc/pacman.conf"
+      echo -e "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/stable/x86_64" | sudo tee -a "/etc/pacman.conf"
 
       sudo pacman -Syuq --noconfirm
     fi
