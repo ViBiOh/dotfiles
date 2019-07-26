@@ -32,3 +32,53 @@ mount_usb() {
   sudo chown -R "${USER}:${USER}" "/media/${1}"
   sudo mount "${2}" "/media/${1}" -o "uid=${USER},gid=${USER}"
 }
+
+semver() {
+  if [[ "${#}" -ne 1 ]]; then
+    echo "Usage: semver [major|minor|patch]"
+    return 1
+  fi
+
+  local PREFIX=v
+  local MAJOR=0
+  local MINOR=0
+  local PATCH=0
+
+  local CURRENT_VERSION="$(git describe --tag 2> /dev/null | awk -F '-' '{print $1}')"
+  if [[ -n "${CURRENT_VERSION}" ]]; then
+    if ! [[ "${CURRENT_VERSION}" =~ ([a-zA-Z]*)([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+      echo "invalid version ${CURRENT_VERSION}"
+      return 1
+    fi
+
+    local PREFIX="${BASH_REMATCH[1]}"
+    local MAJOR="${BASH_REMATCH[2]}"
+    local MINOR="${BASH_REMATCH[3]}"
+    local PATCH="${BASH_REMATCH[4]}"
+  fi
+
+  case "${1}" in
+    "major")
+      MAJOR="$(( ${MAJOR}+1 ))"
+      MINOR=0
+      PATCH=0
+      ;;
+
+    "minor")
+      MINOR="$(( ${MINOR}+1 ))"
+      PATCH=0
+      ;;
+
+    "patch")
+      PATCH="$(( ${PATCH}+1 ))"
+      ;;
+
+    *)
+      echo "unknown version name %{1}"
+      return 1
+  esac
+
+  local NEW_VERSION="${PREFIX}${MAJOR}.${MINOR}.${PATCH}"
+
+  git tag "${NEW_VERSION}"
+}
