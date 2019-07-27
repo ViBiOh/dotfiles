@@ -80,5 +80,6 @@ semver() {
 
   local NEW_VERSION="${PREFIX}${MAJOR}.${MINOR}.${PATCH}"
 
+  echo "New version is: ${NEW_VERSION}"
   git tag "${NEW_VERSION}"
 }
