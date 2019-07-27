@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 
-sed_escape_string() {
-  echo "${1}" | sed 's|\([\|\.]\)|\\\1|g'
-}
-
-sed_replace_properties() {
-  sed -i '' -e "s|^$(sed_escape_string ${2}).*|$(sed_escape_string ${4:-${2}})=$(sed_escape_string ${3})|" "${1}"
-}
-
 sed_inplace() {
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
     sed -i '' "${@}"

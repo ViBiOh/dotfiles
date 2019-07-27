@@ -28,7 +28,8 @@ forward_remote_port() {
 
 dnsFlushCache() {
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
-    sudo dscacheutil -flushcache;sudo killall -HUP mDNSResponder
+    sudo dscacheutil -flushcache
+    sudo killall -HUP mDNSResponder
 
     if command -v dnsmasq 2>&1 > /dev/null; then
       sudo brew services restart dnsmasq

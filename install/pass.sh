@@ -22,14 +22,14 @@ main() {
   fi
 
   rm -rf "${HOME}/password-store"
-  git clone --depth 1 https://git.zx2c4.com/password-store "${HOME}/password-store"
+  git clone --depth 1 "https://git.zx2c4.com/password-store" "${HOME}/password-store"
   pushd "${HOME}/password-store"
   WITH_BASHCOMP=no WITH_ZSHCOMP=no WITH_FISHCOMP=no PREFIX="${HOME}/opt" make install
   popd
   rm -rf "${HOME}/password-store"
 
   rm -rf "${HOME}/pass-otp"
-  git clone --depth 1 https://github.com/tadfisher/pass-otp "${HOME}/pass-otp"
+  git clone --depth 1 "https://github.com/tadfisher/pass-otp" "${HOME}/pass-otp"
   pushd "${HOME}/pass-otp"
   PREFIX="${HOME}/opt" BASHCOMPDIR=${HOME}/opt/bash_completion.d make install
   popd
