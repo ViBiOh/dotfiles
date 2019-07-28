@@ -1,3 +1,11 @@
 #!/usr/bin/env bash
 
+if ! command -v tmux > /dev/null 2>&1; then
+  return
+fi
+
 alias tmux_ssh_agent='eval $(tmux showenv -s SSH_AUTH_SOCK)'
+
+if [[ -z "$TMUX" ]] && [[ -z "${SSH_CLIENT}" ]]; then
+  tmux new-session -A -s "$(whoami)"
+fi
