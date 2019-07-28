@@ -7,5 +7,5 @@ fi
 alias tmux_ssh_agent='eval $(tmux showenv -s SSH_AUTH_SOCK)'
 
 if [[ -z "$TMUX" ]] && [[ -z "${SSH_CLIENT}" ]]; then
-  tmux new-session -A -s "$(whoami)"
+  tmux new-session -A -s "$(whoami)" && exit
 fi
