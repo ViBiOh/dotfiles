@@ -17,22 +17,22 @@ main() {
     | egrep -v '^$' \
     | sort \
     | uniq \
-    | grep -v '0.0.0.0 www.linkedin.com' \
-    | grep -v '0.0.0.0 static.licdn.com' \
-    | grep -v '0.0.0.0 media.licdn.com' \
-    | grep -v '0.0.0.0 reddit.com' \
-    | grep -v '0.0.0.0 www.reddit.com' \
-    | grep -v '0.0.0.0 oauth.reddit.com' \
-    | grep -v '0.0.0.0 www.redditstatic.com' \
-    | grep -v '0.0.0.0 alb.reddit.com' \
-    | grep -v '0.0.0.0 redditmedia.com' \
-    | grep -v '0.0.0.0 www.redditmedia.com' \
-    | grep -v 'thumbs.redditmedia.com' \
-    | grep -v '0.0.0.0 preview.redd.it' \
-    | grep -v '0.0.0.0 external-preview.redd.it' \
-    | grep -v '0.0.0.0 v.redd.it' \
-    | grep -v '0.0.0.0 styles.redditmedia.com' \
-    | grep -v '0.0.0.0 reddit.map.fastly.net' \
+    | grep -v "0.0.0.0 www.linkedin.com" \
+    | grep -v "0.0.0.0 static.licdn.com" \
+    | grep -v "0.0.0.0 media.licdn.com" \
+    | grep -v "0.0.0.0 reddit.com" \
+    | grep -v "0.0.0.0 www.reddit.com" \
+    | grep -v "0.0.0.0 oauth.reddit.com" \
+    | grep -v "0.0.0.0 www.redditstatic.com" \
+    | grep -v "0.0.0.0 alb.reddit.com" \
+    | grep -v "0.0.0.0 redditmedia.com" \
+    | grep -v "0.0.0.0 www.redditmedia.com" \
+    | grep -v "thumbs.redditmedia.com" \
+    | grep -v "0.0.0.0 preview.redd.it" \
+    | grep -v "0.0.0.0 external-preview.redd.it" \
+    | grep -v "0.0.0.0 v.redd.it" \
+    | grep -v "0.0.0.0 styles.redditmedia.com" \
+    | grep -v "0.0.0.0 reddit.map.fastly.net" \
     | sudo tee /etc/hosts > /dev/null
 
   if command -v dnsFlushCache > /dev/null 2>&1; then
@@ -64,7 +64,7 @@ main() {
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsignedapp off
     sudo pkill -HUP socketfilterfw
 
-    chflags nohidden ~/Library
+    chflags nohidden "~/Library"
 
     csrutil status
   fi

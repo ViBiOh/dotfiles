@@ -1,49 +1,30 @@
 #!/usr/bin/env bash
 
+memory_clean() {
+  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+    sudo sync && sudo purge
+  elif [[ "$(sudo which sysctl | wc -l)" -ne 0 ]] && [[ "$(sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l)" -ne 0 ]]; then
+    sudo sysctl vm.drop_caches=3
+  else
+    sudo sync; echo "3" > "/proc/sys/vm/drop_caches"
+  fi
+}
+
 os_clean() {
-  stop_ssh_agent
-  gpgconf --kill gpg-agent
-
-  sudo find / \( -name ".DS_Store" -o -name ".localized" \) -exec rm -f {} \; 2> /dev/null
-
-  if command -v docker > /dev/null 2>&1; then
-    docker system prune -f
-    docker rmi $(docker images -q)
-  fi
-
-  if command -v npm > /dev/null 2>&1; then
-    npm cache clean --force
-  fi
-
-  rm -rf "${HOME}/.ansible"
-  rm -rf "${HOME}/.ansible-vault-pass"
-  rm -rf "${HOME}/.babel.json"
   rm -rf "${HOME}/.bash_history"
   rm -rf "${HOME}/.cache/"
   rm -rf "${HOME}/.CFUserTextEncoding"
   rm -rf "${HOME}/.cups/"
-  rm -rf "${HOME}/.dlv"
   rm -rf "${HOME}/.local/"
-  rm -rf "${HOME}/.node_repl_history"
-  rm -rf "${HOME}/.npm"
-  rm -rf "${HOME}/.python_history"
-  rm -rf "${HOME}/.ssh/environment"
-  rm -rf "${HOME}/.ssh/known_hosts"
-  rm -rf "${HOME}/.terraform"*
-  rm -rf "${HOME}/.v8flags."*
   rm -rf "${HOME}/.vim/"
   rm -rf "${HOME}/.viminfo"
 
-  if [[ "${OSTYPE}" =~ ^darwin ]]; then
-    sudo sync && sudo purge
-  elif [[ $(sudo which sysctl | wc -l) -ne 0 ]] && [[ $(sudo sysctl -a 2>/dev/null | grep vm.drop_caches | wc -l) -ne 0 ]]; then
-    sudo sysctl vm.drop_caches=3
-  else
-    sudo sync; echo "3" > /proc/sys/vm/drop_caches
-  fi
+  sudo find / \( -name ".DS_Store" -o -name ".localized" \) -exec rm -f {} \; 2> /dev/null
+
+  memory_clean
 }
 
 brew_clean_all() {
-  brew remove --force $(brew list) --ignore-dependencies
+  brew remove --force "$(brew list)" --ignore-dependencies
   brew cleanup
 }

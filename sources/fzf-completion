@@ -12,9 +12,9 @@ fi
 
 if command -v pass > /dev/null 2>&1; then
   _fzf_complete_pass() {
-    FZF_COMPLETION_TRIGGER='' _fzf_complete '-1' "${@}" < <(
+    FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(
       local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
-      find "${PASS_DIR}" -name '*.gpg' -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"
+      find "${PASS_DIR}" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"
     )
   }
   [[ -n "${BASH}" ]] && complete -F _fzf_complete_pass -o default -o bashdefault pass
@@ -22,7 +22,7 @@ if command -v pass > /dev/null 2>&1; then
   passfor() {
     pass -c "${1}"
 
-    if [[ "${?}" -eq 0 ]] && [[ $(pass show "${1}" | grep '^otpauth:' | wc -l) -eq 1 ]]; then
+    if [[ "${?}" -eq 0 ]] && [[ "$(pass show "${1}" | grep "^otpauth:" | wc -l)" -eq 1 ]]; then
       read -s -p "  Press enter for otp"
       echo ""
 
@@ -34,14 +34,14 @@ fi
 
 if command -v make > /dev/null 2>&1; then
   _fzf_complete_make() {
-    FZF_COMPLETION_TRIGGER='' _fzf_complete '-1' "${@}" < <(make -rpn | sed -n -e '/^$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$// ; p ; } ; }')
+    FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(make -rpn | sed -n -e '/^$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$// ; p ; } ; }')
   }
   [[ -n "${BASH}" ]] && complete -F _fzf_complete_make -o default -o bashdefault make
 fi
 
 if command -v ssh > /dev/null 2>&1; then
   _fzf_complete_ssh_notrigger() {
-    FZF_COMPLETION_TRIGGER='' _fzf_complete_ssh
+    FZF_COMPLETION_TRIGGER="" _fzf_complete_ssh
   }
   [[ -n "${BASH}" ]] && complete -F _fzf_complete_ssh_notrigger -o default -o bashdefault ssh
 fi
@@ -52,20 +52,20 @@ if command -v pgcli > /dev/null 2>&1; then
       return
     fi
 
-    FZF_COMPLETION_TRIGGER='' _fzf_complete '--ansi' '-1' "${@}" < <(
-      local RED='\033[31m'
-      local GREEN='\033[32m'
-      local YELLOW='\033[33m'
-      local BLUE='\033[34m'
-      local RESET='\033[0m'
+    FZF_COMPLETION_TRIGGER="" _fzf_complete "--ansi" "-1" "${@}" < <(
+      local RED="\033[31m"
+      local GREEN="\033[32m"
+      local YELLOW="\033[33m"
+      local BLUE="\033[34m"
+      local RESET="\033[0m"
 
-      local comment=''
+      local comment=""
 
-      while IFS=':' read -r host port db user pass
+      while IFS=":" read -r host port db user pass
       do
         if [[ ! "${host}" =~ ^\s*# ]] && [[ ! "${host}" =~ ^\s*$ ]]; then
           echo -e "host: ${BLUE}${host}${RESET} port: ${YELLOW}${port}${RESET} db: ${RED}${db}${RESET} user: ${GREEN}${user}${RESET} ${BLUE}${comment}${RESET}"
-          comment=''
+          comment=""
         elif [[ "${host}" =~ ^\s*# ]]; then
           comment="${host}"
         fi

@@ -3,7 +3,13 @@
 set -o nounset -o pipefail -o errexit
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+clean() {
+  rm -rf "${HOME}/.python_history"
+}
+
 main() {
+  clean
+
   if command -v brew > /dev/null 2>&1; then
     brew install python
   elif command -v apt-get > /dev/null 2>&1; then

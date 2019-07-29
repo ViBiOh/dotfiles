@@ -44,6 +44,6 @@ ssh-keygen -t ed25519 -a 100 -C "$(whoami)@$(hostname)" -f ~/.ssh/id_ed25519
 Fix it with following command when it's broken.
 
 ```bash
-sudo chown -R $(whoami) $(brew --prefix)/*
+sudo chown -R "$(whoami)" "$(brew --prefix)"/*
 brew doctor
 ```

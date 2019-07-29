@@ -9,7 +9,7 @@ if ! command -v fzf > /dev/null 2>&1; then
 fi
 
 if command -v rg > /dev/null 2>&1; then
-  export FZF_DEFAULT_COMMAND='rg --files --hidden 2> /dev/null'
+  export FZF_DEFAULT_COMMAND="rg --files --hidden 2> /dev/null"
   export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
 fi
 
@@ -20,7 +20,7 @@ __fzf_history__() {
   line=$(
     HISTTIMEFORMAT= history | sort -r -k 2 | uniq -f 1 | sort -n |
     FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} ${FZF_DEFAULT_OPTS} --tac --sync -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort ${FZF_CTRL_R_OPTS} +m" $(__fzfcmd) |
-    command grep '^ *[0-9]') &&
+    command grep "^ *[0-9]") &&
     if [[ $- =~ H ]]; then
       sed 's/^ *\([0-9]*\)\** .*/!\1/' <<< "${line}"
     else

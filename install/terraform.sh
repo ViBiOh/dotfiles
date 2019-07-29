@@ -2,16 +2,20 @@
 
 set -o nounset -o pipefail -o errexit
 
+clean() {
+  rm -rf "${HOME}/.terraform"*
+}
+
 credentials() {
   if ! command -v pass > /dev/null 2>&1; then
     exit
   fi
 
-  local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
-  local TERRAFORM_PASS=$(find "${PASS_DIR}" -name '*terraform.gpg' -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|")
+  local PASS_DIR="${PASSWORD_STORE_DIR-~/.password-store}"
+  local TERRAFORM_PASS="$(find "${PASS_DIR}" -name "*terraform.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|")"
 
-  if [[ $(echo "${TERRAFORM_PASS}" | wc -l) -eq 1 ]]; then
-    local TERRAFORM_TOKEN=$(pass show "${TERRAFORM_PASS}" | grep token | awk '{print $2}')
+  if [[ "$(echo "${TERRAFORM_PASS}" | wc -l)" -eq 1 ]]; then
+    local TERRAFORM_TOKEN="$(pass show "${TERRAFORM_PASS}" | grep token | awk '{print $2}')"
 
     echo "credentials \"app.terraform.io\" {
   token = \"${TERRAFORM_TOKEN}\"
@@ -20,10 +24,12 @@ credentials() {
 }
 
 main() {
-  local TERRAFORM_VERSION=0.12.5
+  clean
 
-  local OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-  local ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
+  local TERRAFORM_VERSION="0.12.5"
+
+  local OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
+  local ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
   if [[ "${ARCH}" = "x86_64" ]]; then
     ARCH="amd64"

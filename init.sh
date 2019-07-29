@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 printTitle() {
-  local line='--------------------------------------------------------------------------------'
+  local line="--------------------------------------------------------------------------------"
 
   printf "%s%s%s\n" "+-" "${line:0:${#1}}" "-+"
   printf "%s%s%s\n" "| " "${1}" " |"
@@ -13,17 +13,17 @@ printTitle() {
 
 createSymlinks() {
   for file in "${SCRIPT_DIR}/symlinks"/*; do
-    basenameFile=$(basename "${file}")
+    basenameFile="$(basename "${file}")"
     [[ -r "${file}" ]] && [[ -e "${file}" ]] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
   done
 }
 
 installTools() {
-  local LANG=C
+  local LANG="C"
 
   for file in "${SCRIPT_DIR}/install"/*; do
-    local basenameFile=$(basename ${file%.*})
-    local upperCaseFilename=$(echo "${basenameFile}" | tr '[:lower:]' '[:upper:]')
+    local basenameFile="$(basename ${file%.*})"
+    local upperCaseFilename="$(echo "${basenameFile}" | tr "[:lower:]" "[:upper:]")"
     local disableVariableName="DOTFILES_NO_${upperCaseFilename}"
 
     if [[ "${!disableVariableName:-}" == "true" ]]; then
@@ -55,7 +55,7 @@ main() {
   set +u
   set +e
   mkdir -p "${HOME}/opt/bin"
-  PS1='$' source "${HOME}/.bashrc"
+  PS1="$" source "${HOME}/.bashrc"
   set -e
   set -u
 

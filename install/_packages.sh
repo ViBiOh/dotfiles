@@ -20,19 +20,19 @@ main() {
       curl \
       fswatch
 
-    if [[ $(cat /etc/shells | grep "$(brew --prefix)" | wc -l) -eq 0 ]]; then
-      echo '+-------------------------+'
-      echo '| changing shell for user |'
-      echo '+-------------------------+'
+    if [[ "$(cat "/etc/shells" | grep "$(brew --prefix)" | wc -l)" -eq 0 ]]; then
+      echo "+-------------------------+"
+      echo "| changing shell for user |"
+      echo "+-------------------------+"
 
-      echo "$(brew --prefix)/bin/bash" | sudo tee -a /etc/shells > /dev/null
+      echo "$(brew --prefix)/bin/bash" | sudo tee -a "/etc/shells" > /dev/null
       chsh -s "$(brew --prefix)/bin/bash" -u "$(whoami)"
     fi
 
     if [[ ! -f "${HOME}/.bash_profile" ]]; then
-      echo '+---------------------------------+'
-      echo '| adding .bashrc to .bash_profile |'
-      echo '+---------------------------------+'
+      echo "+---------------------------------+"
+      echo "| adding .bashrc to .bash_profile |"
+      echo "+---------------------------------+"
 
       echo '#!/usr/bin/env bash
 

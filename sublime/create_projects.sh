@@ -3,12 +3,14 @@
 set -o nounset -o pipefail -o errexit
 
 main() {
-  rm -rf projects
-  mkdir -p projects
+  local PROJECT_FOLDER="projects"
+
+  rm -rf "${PROJECT_FOLDER}"
+  mkdir -p "${PROJECT_FOLDER}"
 
   for project in "${HOME}/code/"*; do
-    projectName=$(basename ${project})
-    fileName="./projects/${projectName}.sublime-project"
+    projectName="$(basename ${project})"
+    fileName="./${PROJECT_FOLDER}/${projectName}.sublime-project"
 
     echo "{
   \"folders\": [{

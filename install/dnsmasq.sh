@@ -3,12 +3,12 @@
 set -o nounset -o pipefail -o errexit
 
 main() {
-  local DNSMASQ_CONF='/etc/dnsmasq.conf'
+  local DNSMASQ_CONF="/etc/dnsmasq.conf"
   local LISTEN_ADDRESS="127.0.0.1"
 
   if command -v brew > /dev/null 2>&1; then
     brew install dnsmasq
-    DNSMASQ_CONF=$(brew --prefix)/etc/dnsmasq.conf
+    DNSMASQ_CONF="$(brew --prefix)/etc/dnsmasq.conf"
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get install -y -qq dnsmasq
   fi

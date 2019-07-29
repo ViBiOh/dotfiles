@@ -8,4 +8,4 @@ else
   export LS_OPTIONS="--color=auto"
 fi
 
-alias ll='ls ${LS_OPTIONS} -hAltr'
+alias ll="ls ${LS_OPTIONS} -hAltr"

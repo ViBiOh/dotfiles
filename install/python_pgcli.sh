@@ -27,10 +27,10 @@ main() {
 
   mkdir -p "${HOME}/.config/pgcli"
 
-  echo '[main]
+  echo "[main]
 multi_line = True
 auto_expand = True
-row_limit = 100' > "${HOME}/.config/pgcli/config"
+row_limit = 100" > "${HOME}/.config/pgcli/config"
 }
 
 main

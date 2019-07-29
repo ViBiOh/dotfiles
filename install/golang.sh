@@ -8,6 +8,8 @@ clean() {
     rm -rf "${GOPATH}"
     mkdir -p "${GOPATH}"
   fi
+
+  rm -rf "${HOME}/.dlv"
 }
 
 main() {
@@ -15,8 +17,8 @@ main() {
 
   local GO_VERSION=1.12.7
 
-  local OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-  local ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
+  local OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
+  local ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
   if [[ "${ARCH}" = "x86_64" ]]; then
     ARCH="amd64"

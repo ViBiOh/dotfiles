@@ -3,7 +3,20 @@
 set -o nounset -o pipefail -o errexit
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+clean() {
+  if command -v npm > /dev/null 2>&1; then
+    npm cache clean --force
+  fi
+
+  rm -rf "${HOME}/.babel.json"
+  rm -rf "${HOME}/.node_repl_history"
+  rm -rf "${HOME}/.npm"
+  rm -rf "${HOME}/.v8flags."*
+}
+
 main() {
+  clean
+
   if ! command -v git > /dev/null 2>&1; then
     echo "git is required"
     exit

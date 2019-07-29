@@ -10,9 +10,9 @@ fi
 
 git_browse() {
   for dir in "$(pwd)"/*; do
-    pushd ${dir}
+    pushd "${dir}"
 
-    if [[ $(git rev-parse --is-inside-work-tree 2>&1) == "true" ]]; then
+    if [[ "$(git rev-parse --is-inside-work-tree 2>&1)" == "true" ]]; then
       echo "${dir}"
       eval "${@}"
     fi
@@ -22,15 +22,15 @@ git_browse() {
 }
 
 git_open() {
-  local RED='\033[0;31m'
-  local RESET='\033[0m'
+  local RED="\033[0;31m"
+  local RESET="\033[0m"
 
-  if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
+  if [[ "$(git rev-parse --is-inside-work-tree 2>&1)" != "true" ]]; then
     echo -e "${RED}You're not inside a git repository${RESET}"
     return 1
   fi
 
-  local pushURL=$(git remote get-url --push $(git remote show | head -1))
+  local pushURL="$(git remote get-url --push $(git remote show | head -1))"
 
   if [[ "${pushURL}" =~ ^.*@(.*):(.*)$ ]]; then
     pushURL="https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
@@ -40,13 +40,13 @@ git_open() {
 }
 
 git_pull() {
-  git_browse 'git pull'
+  git_browse "git pull"
 }
 
 alias ...="git_root"
 
 git_root() {
-  git rev-parse --is-inside-work-tree > /dev/null 2>&1 && cd $(git rev-parse --show-toplevel)
+  git rev-parse --is-inside-work-tree > /dev/null 2>&1 && cd "$(git rev-parse --show-toplevel)"
 }
 
 head_sync() {
@@ -60,7 +60,7 @@ head_sync() {
     REMOTE_PATH_PREFIX="${2}"
   fi
 
-  local branch=$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')
+  local branch="$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')"
   ssh "${1}" "cd ${REMOTE_PATH_PREFIX} && git reset HEAD . && git clean -f && git status -u -s | awk '{print $2}' | xargs rm -rf && git checkout -- . && git fetch && git checkout ${branch} && git pull"
 }
 
@@ -70,11 +70,11 @@ git_sync() {
     return 1
   fi
 
-  local RED='\033[0;31m'
-  local GREEN='\033[0;32m'
-  local YELLOW='\033[0;33m'
-  local BLUE='\033[0;34m'
-  local RESET='\033[0m'
+  local RED="\033[0;31m"
+  local GREEN="\033[0;32m"
+  local YELLOW="\033[0;33m"
+  local BLUE="\033[0;34m"
+  local RESET="\033[0m"
 
   git_root
   isGit=$?
@@ -88,7 +88,7 @@ git_sync() {
   fi
 
   local dry=false
-  if [[ "$(echo ${3} | tr '[:upper:]' '[:lower:]')" == "dry" ]]; then
+  if [[ "$(echo ${3} | tr "[:upper:]" "[:lower:]")" == "dry" ]]; then
     dry=true
   fi
 
@@ -102,7 +102,7 @@ git_sync() {
   local toDelete=()
 
   local IFS=$'\n'
-  for gitFile in $(git status --porcelain); do
+  for gitFile in "$(git status --porcelain)"; do
     local prefix="${gitFile:0:2}"
     local trimmedPrefix="${prefix#[[:space:]]}"
 
@@ -116,8 +116,8 @@ git_sync() {
         ;;
 
       "R")
-        local originFile=$(echo -n "${gitFile}" | awk '{print $2}')
-        local destinationFile=$(echo -n "${gitFile}" | awk '{print $4}')
+        local originFile="$(echo -n "${gitFile}" | awk '{print $2}')"
+        local destinationFile="$(echo -n "${gitFile}" | awk '{print $4}')"
 
         toDelete=("${toDelete[@]}" "${REMOTE_PATH_PREFIX}/${originFile}")
         toSync=("${toSync[@]}" "${destinationFile}")

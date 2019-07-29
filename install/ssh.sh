@@ -2,11 +2,20 @@
 
 set -o nounset -o pipefail -o errexit
 
+clean() {
+  stop_ssh_agent
+
+  rm -rf "${HOME}/.ssh/environment"
+  rm -rf "${HOME}/.ssh/known_hosts"
+}
+
 main() {
-  local MAC_OS_SSH_CONFIG=""
+  clean
+
+  local EXTRA_CONFIG=""
 
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
-    MAC_OS_SSH_CONFIG="
+    EXTRA_CONFIG="
   UseKeyChain no"
   fi
 
@@ -16,7 +25,7 @@ main() {
   PasswordAuthentication no
   ChallengeResponseAuthentication no
   ForwardAgent yes
-  HashKnownHosts yes${MAC_OS_SSH_CONFIG}
+  HashKnownHosts yes${EXTRA_CONFIG}
   ServerAliveInterval 300
   ServerAliveCountMax 2
 " > "${HOME}/.ssh/config"
