@@ -3,7 +3,9 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
-  stop_ssh_agent
+  if command -v stop_ssh_agent > /dev/null 2>&1; then
+    stop_ssh_agent
+  fi
 
   rm -rf "${HOME}/.ssh/environment"
   rm -rf "${HOME}/.ssh/known_hosts"
