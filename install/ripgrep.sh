@@ -15,8 +15,6 @@ main() {
     if [[ "${ripgrep}" -eq 0 ]]; then
       sudo apt-get install -y -qq ripgrep
     fi
-  elif command -v pacman > /dev/null 2>&1; then
-    sudo pacman -S --noconfirm --needed ripgrep
   fi
 }
 
