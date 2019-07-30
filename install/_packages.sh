@@ -44,6 +44,7 @@ fi' > "${HOME}/.bash_profile"
     export DEBIAN_FRONTEND=noninteractive
 
     sudo apt-get update
+    sudo apt-get dist-upgrade -y -qq
     sudo apt-get upgrade -y -qq
     sudo apt-get install -y -qq apt-transport-https
 
