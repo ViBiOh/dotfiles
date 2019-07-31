@@ -5,7 +5,9 @@ set -o nounset -o pipefail -o errexit
 clean() {
   if command -v docker > /dev/null 2>&1; then
     docker system prune -f
+
     docker rmi $(docker images -q) || true
+    docker network rm $(docker network ls -q) || true
   fi
 }
 
