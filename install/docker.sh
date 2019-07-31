@@ -8,6 +8,7 @@ clean() {
 
     docker rmi $(docker images -q) || true
     docker network rm $(docker network ls -q) || true
+    docker volume rm $(docker volume ls -q) || true
   fi
 }
 
