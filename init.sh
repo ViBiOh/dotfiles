@@ -30,8 +30,10 @@ installTools() {
       continue
     fi
 
-    printTitle "install - ${basenameFile}"
-    [[ -r "${file}" ]] && [[ -x "${file}" ]] && "${file}"
+    if [[ -r "${file}" ]] && [[ -x "${file}" ]]; then
+      printTitle "install - ${basenameFile}"
+      "${file}"
+    fi
   done
 }
 
@@ -60,7 +62,6 @@ main() {
   set -u
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ install ]]; then
-    printTitle "install"
     installTools
   fi
 
