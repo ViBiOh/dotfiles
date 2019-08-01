@@ -35,7 +35,7 @@ dnsFlushCache() {
       sudo brew services restart dnsmasq
     fi
   else
-    sudo service network-manager restart
+    sudo systemd-resolve --flush-caches
 
     if command -v dnsmasq 2>&1 > /dev/null; then
       sudo /etc/init.d/dnsmasq restart
