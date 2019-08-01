@@ -73,15 +73,15 @@ main() {
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ install ]]; then
     browseInstall clean install
+    cleanPackages
   fi
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ credentials ]]; then
     browseInstall credentials
   fi
 
-  if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ clean ]]; then
-    printTitle "clean"
-    cleanPackages
+  if [[ "${ARGS}" =~ clean ]]; then
+    browseInstall clean
   fi
 }
 

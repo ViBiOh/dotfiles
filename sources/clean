@@ -20,8 +20,6 @@ os_clean() {
   rm -rf "${HOME}/.viminfo"
 
   sudo find / \( -name ".DS_Store" -o -name ".localized" \) -exec rm -f {} \; 2> /dev/null
-
-  memory_clean
 }
 
 brew_clean_all() {
