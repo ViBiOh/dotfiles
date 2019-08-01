@@ -29,6 +29,4 @@ install() {
   fi
 
   pip install --user ansible ansible-lint jmespath
-
-  credentials
 }
