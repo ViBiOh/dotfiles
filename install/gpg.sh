@@ -9,8 +9,6 @@ clean() {
 }
 
 install() {
-  clean
-
   if command -v brew > /dev/null 2>&1; then
     brew install gnupg
   elif command -v apt-get > /dev/null 2>&1; then

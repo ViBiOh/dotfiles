@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -o nounset -o pipefail -o errexit
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 printTitle() {
   local line="--------------------------------------------------------------------------------"
@@ -12,7 +12,7 @@ printTitle() {
 }
 
 createSymlinks() {
-  for file in "${SCRIPT_DIR}/symlinks"/*; do
+  for file in "${CURRENT_DIR}/symlinks"/*; do
     basenameFile="$(basename "${file}")"
     [[ -r "${file}" ]] && [[ -e "${file}" ]] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
   done
@@ -21,7 +21,7 @@ createSymlinks() {
 browseInstall() {
   local LANG="C"
 
-  for file in "${SCRIPT_DIR}/install"/*; do
+  for file in "${CURRENT_DIR}/install"/*; do
     local basenameFile="$(basename ${file%.*})"
     local upperCaseFilename="$(echo "${basenameFile}" | tr "[:lower:]" "[:upper:]")"
     local disableVariableName="DOTFILES_NO_${upperCaseFilename}"

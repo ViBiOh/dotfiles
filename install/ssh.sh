@@ -12,8 +12,6 @@ clean() {
 }
 
 install() {
-  clean
-
   local EXTRA_CONFIG=""
 
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
