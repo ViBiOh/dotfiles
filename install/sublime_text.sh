@@ -2,7 +2,7 @@
 
 set -o nounset -o pipefail -o errexit
 
-main() {
+install() {
   if [[ "${OSTYPE}" =~ ^darwin ]] && [[ -f "/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl" ]]; then
     ln -s "/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl" "${HOME}/opt/bin/subl"
   fi
@@ -13,5 +13,3 @@ main() {
     popd
   fi
 }
-
-main

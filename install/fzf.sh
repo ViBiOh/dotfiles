@@ -6,9 +6,7 @@ clean() {
   rm -rf "${HOME}/.fzf"*
 }
 
-main() {
-  clean
-
+install() {
   if ! command -v git > /dev/null 2>&1; then
     echo "git not found"
     exit
@@ -22,5 +20,3 @@ main() {
 
   "${HOME}/opt/fzf/install" --key-bindings --completion --no-zsh --no-fish --no-update-rc
 }
-
-main

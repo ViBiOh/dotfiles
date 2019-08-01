@@ -11,7 +11,7 @@ clean() {
   rm -rf "${HOME}/.ssh/known_hosts"
 }
 
-main() {
+install() {
   clean
 
   local EXTRA_CONFIG=""
@@ -34,5 +34,3 @@ main() {
 
   find "${HOME}/.ssh/" -name "config_*" -type f -exec cat {} + >> "${HOME}/.ssh/config"
 }
-
-main

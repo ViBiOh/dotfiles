@@ -8,7 +8,7 @@ clean() {
   fi
 }
 
-main() {
+install() {
   clean
 
   if command -v brew > /dev/null 2>&1; then
@@ -45,5 +45,3 @@ with-fingerprint
 require-cross-certification
 use-agent" > "${HOME}/.gnupg/gpg.conf"
 }
-
-main

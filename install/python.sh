@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
 set -o nounset -o pipefail -o errexit
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 clean() {
   rm -rf "${HOME}/.python_history"
 }
 
-main() {
-  clean
+install() {
+  local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
   if command -v brew > /dev/null 2>&1; then
     brew install python
@@ -29,5 +28,3 @@ main() {
 
   pip install --user --upgrade pip
 }
-
-main

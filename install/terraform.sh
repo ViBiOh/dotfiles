@@ -23,7 +23,7 @@ credentials() {
   fi
 }
 
-main() {
+install() {
   clean
 
   local TERRAFORM_VERSION="0.12.5"
@@ -45,5 +45,3 @@ main() {
 
   credentials
 }
-
-main

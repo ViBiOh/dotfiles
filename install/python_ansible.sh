@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -o nounset -o pipefail -o errexit
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 clean() {
   rm -rf "${HOME}/.ansible"*
@@ -20,9 +19,8 @@ credentials() {
   fi
 }
 
-main() {
-  clean
-
+install() {
+  local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   source "${SCRIPT_DIR}/../sources/_python"
 
   if ! command -v pip > /dev/null 2>&1; then
@@ -34,5 +32,3 @@ main() {
 
   credentials
 }
-
-main

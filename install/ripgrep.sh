@@ -2,7 +2,7 @@
 
 set -o nounset -o pipefail -o errexit
 
-main() {
+install() {
   if command -v brew > /dev/null 2>&1; then
     brew tap "burntsushi/ripgrep" "https://github.com/BurntSushi/ripgrep.git"
     brew install ripgrep-bin
@@ -10,5 +10,3 @@ main() {
     sudo apt-get install -y -qq ripgrep
   fi
 }
-
-main

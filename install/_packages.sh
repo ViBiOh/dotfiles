@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
 set -o nounset -o pipefail -o errexit
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-main() {
+install() {
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
+    local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
     if ! command -v brew > /dev/null 2>&1; then
       mkdir "${HOME}/homebrew" && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "${HOME}/homebrew"
       source "${SCRIPT_DIR}/../sources/_homebrew"
@@ -57,5 +58,3 @@ fi' > "${HOME}/.bash_profile"
       vim
   fi
 }
-
-main

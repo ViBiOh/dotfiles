@@ -2,7 +2,7 @@
 
 set -o nounset -o pipefail -o errexit
 
-main() {
+install() {
   if ! command -v git > /dev/null 2>&1; then
     echo "git is required"
     exit
@@ -44,5 +44,3 @@ main() {
 
   pass git pull
 }
-
-main

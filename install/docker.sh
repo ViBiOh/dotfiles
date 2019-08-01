@@ -12,9 +12,7 @@ clean() {
   fi
 }
 
-main() {
-  clean
-
+install() {
   if ! command -v docker > /dev/null 2>&1; then
     return
   fi
@@ -30,5 +28,3 @@ main() {
   curl -Lo "${HOME}/opt/bin/ctop" "https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-${OS}-${ARCH}"
   chmod +x "${HOME}/opt/bin/ctop"
 }
-
-main

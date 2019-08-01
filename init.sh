@@ -18,7 +18,7 @@ createSymlinks() {
   done
 }
 
-installTools() {
+browseInstall() {
   local LANG="C"
 
   for file in "${SCRIPT_DIR}/install"/*; do
@@ -30,9 +30,19 @@ installTools() {
       continue
     fi
 
-    if [[ -r "${file}" ]] && [[ -x "${file}" ]]; then
-      printTitle "install - ${basenameFile}"
-      "${file}"
+    if [[ -r "${file}" ]]; then
+      for action in "${@}"; do
+        unset -f "${action}"
+      done
+
+      source "${file}"
+
+      for action in "${@}"; do
+        if [[ "$(type -t ${action})" = "function" ]]; then
+          printTitle "${action} - ${basenameFile}"
+          "${action}"
+        fi
+      done
     fi
   done
 }
@@ -62,7 +72,11 @@ main() {
   set -u
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ install ]]; then
-    installTools
+    browseInstall clean install
+  fi
+
+  if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ credentials ]]; then
+    browseInstall credentials
   fi
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ clean ]]; then

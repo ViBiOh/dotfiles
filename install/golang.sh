@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -o nounset -o pipefail -o errexit
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 clean() {
   if [[ -n "${GOPATH-}" ]]; then
@@ -12,9 +11,7 @@ clean() {
   rm -rf "${HOME}/.dlv"
 }
 
-main() {
-  clean
-
+install() {
   local GO_VERSION=1.12.7
 
   local OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
@@ -34,6 +31,7 @@ main() {
     rm -rf "${GO_ARCHIVE}"
   fi
 
+  local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   source "${SCRIPT_DIR}/../sources/golang"
   mkdir -p "${GOPATH}"
 
@@ -47,5 +45,3 @@ main() {
     go get -u golang.org/x/tools/cmd/goimports
   fi
 }
-
-main

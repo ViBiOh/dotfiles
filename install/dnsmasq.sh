@@ -2,7 +2,7 @@
 
 set -o nounset -o pipefail -o errexit
 
-main() {
+install() {
   local DNSMASQ_CONF="/etc/dnsmasq.conf"
   local LISTEN_ADDRESS="127.0.0.1"
 
@@ -55,5 +55,3 @@ log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" > /dev/null
     sudo systemctl restart dnsmasq
   fi
 }
-
-main

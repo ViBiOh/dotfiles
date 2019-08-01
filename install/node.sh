@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -o nounset -o pipefail -o errexit
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 clean() {
   if command -v npm > /dev/null 2>&1; then
@@ -14,9 +13,7 @@ clean() {
   rm -rf "${HOME}/.v8flags."*
 }
 
-main() {
-  clean
-
+install() {
   if ! command -v git > /dev/null 2>&1; then
     echo "git is required"
     exit
@@ -27,6 +24,7 @@ main() {
     exit
   fi
 
+  local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   local NODE_VERSION="latest"
 
   rm -rf "${HOME}/n-install"
@@ -46,5 +44,3 @@ main() {
 
   npm install --ignore-scripts -g npm npm-check-updates node-gyp
 }
-
-main

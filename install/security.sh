@@ -2,7 +2,7 @@
 
 set -o nounset -o pipefail -o errexit
 
-main() {
+install() {
   cat \
     <(curl "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
     <(curl "https://someonewhocares.org/hosts/zero/hosts") \
@@ -69,5 +69,3 @@ main() {
     csrutil status
   fi
 }
-
-main
