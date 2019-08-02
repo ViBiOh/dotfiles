@@ -2,7 +2,7 @@
 
 set -o nounset -o pipefail -o errexit
 
-install() {
+clean() {
   sudo rm -rf "${HOME}/.config"
   sudo rm -rf "${HOME}/.vnc"
   sudo rm -rf "${HOME}/opt"
