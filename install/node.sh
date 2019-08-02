@@ -8,6 +8,7 @@ clean() {
   fi
 
   rm -rf "${HOME}/.babel.json"
+  rm -rf "${HOME}/.node-gyp"
   rm -rf "${HOME}/.node_repl_history"
   rm -rf "${HOME}/.npm"
   rm -rf "${HOME}/.v8flags."*
