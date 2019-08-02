@@ -21,7 +21,9 @@ start_ssh_agent() {
 }
 
 stop_ssh_agent() {
-  kill -0 "${SSH_AGENT_PID}" 2>/dev/null
+  if [[ -n "${SSH_AGENT_PID:-}" ]]; then
+    kill -0 "${SSH_AGENT_PID}" 2>/dev/null
+  fi
 }
 
 if [[ -f "${SSH_ENV}" ]]; then
