@@ -11,7 +11,7 @@ credentials() {
     exit
   fi
 
-  local PASS_DIR="${PASSWORD_STORE_DIR-~/.password-store}"
+  local PASS_DIR="${PASSWORD_STORE_DIR-${HOME}/.password-store}"
   local TERRAFORM_PASS="$(find "${PASS_DIR}" -name "*terraform.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|")"
 
   if [[ "$(echo "${TERRAFORM_PASS}" | wc -l)" -eq 1 ]]; then

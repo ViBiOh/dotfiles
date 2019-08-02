@@ -37,7 +37,7 @@ install() {
     return
   fi
 
-  local PASS_DIR=${PASSWORD_STORE_DIR-~/.password-store}
+  local PASS_DIR=${PASSWORD_STORE_DIR-${HOME}/.password-store}
   if [[ ! -d "${PASS_DIR}" ]]; then
     return
   fi

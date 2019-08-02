@@ -64,7 +64,7 @@ install() {
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsignedapp off
     sudo pkill -HUP socketfilterfw
 
-    chflags nohidden "~/Library"
+    chflags nohidden "${HOME}/Library"
 
     csrutil status
   fi
