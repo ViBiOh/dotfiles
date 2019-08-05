@@ -3,7 +3,8 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
-  rm -rf "${HOME}/.ansible"*
+  rm -rf "${HOME}/.ansible/"
+  rm -rf "${HOME}/.ansible-vault-pass"
 }
 
 credentials() {
