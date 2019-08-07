@@ -1,11 +1,96 @@
 #!/usr/bin/env bash
 
-if ! command -v docker > /dev/null 2>&1; then
-  return
-fi
+docker-registry-clean() {
+  if [[ "${#}" -lt 2 ]]; then
+    echo "Usage: docker-registry-clean [DOCKER_USER] [DOCKER_OWNER]"
+    return 1
+  fi
 
-docker-restart() {
-  docker start $(docker ps -a -q -f status=exited -f status=created 2>/dev/null) 2>/dev/null
+  local RED="\033[31m"
+  local GREEN="\033[32m"
+  local YELLOW="\033[33m"
+  local BLUE="\033[34m"
+  local RESET="\033[0m"
+
+  local DOCKER_USER="${1}"
+  local DOCKER_OWNER="${2}"
+
+  read -sp "DOCKER_PASSWORD: " DOCKER_PASSWORD
+  echo
+
+  local OUTPUT_TXT="output.txt"
+  local DOCKER_REGISTRY="${DOCKER_REGISTRY:-https://hub.docker.com/v2}"
+  local CLIENT_ARGS=("curl" "-q" "-sS" "-o" "${OUTPUT_TXT}" "-w" "%{http_code}")
+
+  # Login to registry
+  local LOGIN_STATUS="$("${CLIENT_ARGS[@]}" -X POST "${DOCKER_REGISTRY}/users/login/" \
+    --data "username=${DOCKER_USER}" \
+    --data "password=${DOCKER_PASSWORD}"
+  )"
+  unset DOCKER_PASSWORD
+
+  if [[ "${LOGIN_STATUS}" != "200" ]]; then
+    echo -e "${RED}Unable to login to registry ${DOCKER_REGISTRY}${RESET}"
+    cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
+    return
+  fi
+
+  CLIENT_ARGS+=("-H")
+  CLIENT_ARGS+=("Authorization: JWT $(python -c "import json; print(json.load(open('${OUTPUT_TXT}'))['token'])")")
+  rm "${OUTPUT_TXT}"
+
+  # Listing repositories
+  echo -e "${BLUE}Listing repositories for ${DOCKER_OWNER}...${RESET}"
+
+  local REPOSITORIES_STATUS="$("${CLIENT_ARGS[@]}" -X GET "${DOCKER_REGISTRY}/users/${DOCKER_OWNER}/repositories/?page_size=100")"
+  if [[ "${REPOSITORIES_STATUS}" != "200" ]]; then
+    echo -e "${RED}Unable to list images for ${DOCKER_OWNER}${RESET}"
+    cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
+    return
+  fi
+
+  local REPOSITORIES=($(python -c "import json; images = json.load(open('${OUTPUT_TXT}')); print(' '.join([image['name'] for image in images]))"))
+  rm "${OUTPUT_TXT}"
+
+  for repository in "${REPOSITORIES[@]}"; do
+
+    # Listing tags
+    echo -e "${BLUE}Listing tags for ${DOCKER_OWNER}/${repository}...${RESET}"
+
+    local TAGS_STATUS="$("${CLIENT_ARGS[@]}" -X GET "${DOCKER_REGISTRY}/repositories/${DOCKER_OWNER}/${repository}/tags/?page_size=100")"
+    if [[ "${TAGS_STATUS}" != "200" ]]; then
+      echo -e "${RED}Unable to list tags for ${DOCKER_OWNER}/${repository}${RESET}"
+      cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
+      continue
+    fi
+
+    local TAGS=($(python -c "import json; tags = json.load(open('${OUTPUT_TXT}')); print(' '.join([tag['name'] for tag in tags['results']]))"))
+    rm "${OUTPUT_TXT}"
+
+    for tag in "${TAGS[@]}"; do
+      if [[ "${tag}" != 'latest' ]] && [[ "${tag}" =~ ^[0-9A-Fa-f]{6,}$ ]]; then
+
+        # Deleting tags
+        local DELETE_STATUS="$("${CLIENT_ARGS[@]}" -X DELETE "${DOCKER_REGISTRY}/repositories/${DOCKER_OWNER}/${repository}/tags/${tag}/")"
+        if [[ "${DELETE_STATUS}" != "204" ]]; then
+          echo -e "${RED}Unable to delete tags for ${DOCKER_OWNER}/${repository}:${tag}${RESET}"
+          cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
+          continue
+        fi
+
+        rm "${OUTPUT_TXT}"
+        echo -e "${GREEN}${DOCKER_OWNER}/${repository}:${tag} deleted!${RESET}"
+
+      fi
+    done
+
+  done
 }
 
-export DOCKER_CONTENT_TRUST="1"
+if command -v docker > /dev/null 2>&1; then
+  docker-restart() {
+    docker start $(docker ps -a -q -f status=exited -f status=created 2>/dev/null) 2>/dev/null
+  }
+
+  export DOCKER_CONTENT_TRUST="1"
+fi
