@@ -70,11 +70,11 @@ git_sync() {
     return 1
   fi
 
-  local RED="\033[0;31m"
-  local GREEN="\033[0;32m"
-  local YELLOW="\033[0;33m"
   local BLUE="\033[0;34m"
+  local GREEN="\033[0;32m"
+  local RED="\033[0;31m"
   local RESET="\033[0m"
+  local YELLOW="\033[0;33m"
 
   git_root
   isGit=$?

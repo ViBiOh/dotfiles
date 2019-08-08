@@ -53,11 +53,11 @@ if command -v pgcli > /dev/null 2>&1; then
     fi
 
     FZF_COMPLETION_TRIGGER="" _fzf_complete "--ansi" "-1" "${@}" < <(
-      local RED="\033[31m"
-      local GREEN="\033[32m"
-      local YELLOW="\033[33m"
       local BLUE="\033[34m"
+      local GREEN="\033[32m"
+      local RED="\033[31m"
       local RESET="\033[0m"
+      local YELLOW="\033[33m"
 
       local comment=""
 
