@@ -2,5 +2,5 @@
 
 if [[ -d "${HOME}/opt/python" ]]; then
   export PYTHONUSERBASE="${HOME}/opt/python"
-  export PATH="${HOME}/opt/python/bin:${PATH}"
+  export PATH="${PYTHONUSERBASE}/bin:${PATH}"
 fi
