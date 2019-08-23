@@ -43,6 +43,11 @@ bump_deps() {
   fi
 }
 
+if command -v systemctl > /dev/null 2>&1; then
+  alias restart="sudo systemctl restart"
+  alias logs="sudo journalctl -u"
+fi
+
 mount_usb() {
   if [[ "${#}" -lt 2 ]]; then
     echo "Usage: mount_usb [DIRECTORY] [MOUNT_POINT]"
