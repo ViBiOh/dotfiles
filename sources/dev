@@ -44,8 +44,13 @@ bump_deps() {
 }
 
 if command -v systemctl > /dev/null 2>&1; then
-  alias restart="sudo systemctl restart"
-  alias logs="sudo journalctl -u"
+  restart() {
+    sudo systemctl restart ${@}
+  }
+
+  logs() {
+    sudo journalctl -u ${@}
+  }
 fi
 
 mount_usb() {

@@ -35,8 +35,8 @@ install() {
     | grep -v "0.0.0.0 reddit.map.fastly.net" \
     | sudo tee /etc/hosts > /dev/null
 
-  if command -v dnsFlushCache > /dev/null 2>&1; then
-    dnsFlushCache
+  if [[ "$(type -t dns_flush_cache)" = "function" ]]; then
+    dns_flush_cache
   fi
 
   if [[ "${OSTYPE}" =~ ^darwin ]]; then

@@ -26,7 +26,7 @@ forward_remote_port() {
   ssh -R "${1}:localhost:${2}" "${3}"
 }
 
-dnsFlushCache() {
+dns_flush_cache() {
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
     sudo dscacheutil -flushcache
     sudo killall -HUP mDNSResponder
