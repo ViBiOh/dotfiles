@@ -3,10 +3,6 @@
 SSH_ENV="${HOME}/.ssh/environment"
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 
-if [[ ! -e "${SSH_KEY}" ]]; then
-  SSH_KEY="${HOME}/.ssh/id_rsa"
-fi
-
 start_ssh_agent() {
   if [[ -e "${SSH_KEY}" ]]; then
     echo "Initializing new SSH agent..."
@@ -22,7 +18,8 @@ start_ssh_agent() {
 
 stop_ssh_agent() {
   if [[ -n "${SSH_AGENT_PID:-}" ]]; then
-    kill -0 "${SSH_AGENT_PID}" 2>/dev/null
+    ssh-agent -k
+    rm -rf "${SSH_ENV}"
   fi
 }
 
