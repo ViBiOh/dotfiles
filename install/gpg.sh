@@ -23,8 +23,8 @@ install() {
   chmod 700 "${HOME}/.gnupg/"
 
   echo "enable-ssh-support
-default-cache-ttl 43200
-max-cache-ttl 43200" > "${HOME}/.gnupg/gpg-agent.conf"
+default-cache-ttl 3600
+max-cache-ttl 3600" > "${HOME}/.gnupg/gpg-agent.conf"
 
   echo "personal-cipher-preferences AES256 AES192 AES CAST5
 personal-digest-preferences SHA512 SHA384 SHA256 SHA224

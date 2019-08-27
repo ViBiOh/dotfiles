@@ -16,7 +16,7 @@ start_ssh_agent() {
 
     ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
     source "${SSH_ENV}" > /dev/null
-    ssh-add -k "${SSH_KEY}"
+    ssh-add -t 1h -k "${SSH_KEY}"
   fi
 }
 
