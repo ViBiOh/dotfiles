@@ -3,19 +3,6 @@
 SSH_ENV="${HOME}/.ssh/environment"
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 
-start_ssh_agent() {
-  if [[ -e "${SSH_KEY}" ]]; then
-    echo "Initializing new SSH agent..."
-
-    touch "${SSH_ENV}"
-    chmod 600 "${SSH_ENV}"
-
-    ssh-agent -t 1h | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    source "${SSH_ENV}" > /dev/null
-    ssh-add -k "${SSH_KEY}"
-  fi
-}
-
 stop_ssh_agent() {
   if [[ -n "${SSH_AGENT_PID:-}" ]]; then
     ssh-agent -k
@@ -34,3 +21,18 @@ if [[ -f "${SSH_ENV}" ]]; then
 else
     start_ssh_agent
 fi
+
+start_ssh_agent() {
+  stop_ssh_agent
+
+  if [[ -e "${SSH_KEY}" ]]; then
+    echo "Initializing new SSH agent..."
+
+    touch "${SSH_ENV}"
+    chmod 600 "${SSH_ENV}"
+
+    ssh-agent -t 1h | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    source "${SSH_ENV}" > /dev/null
+    ssh-add -k "${SSH_KEY}"
+  fi
+}
