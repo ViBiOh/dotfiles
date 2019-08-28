@@ -10,18 +10,6 @@ stop_ssh_agent() {
   fi
 }
 
-if [[ -f "${SSH_ENV}" ]]; then
-  source "${SSH_ENV}" > /dev/null
-
-  if [[ -n "${SSH_AGENT_PID:-}" ]]; then
-    kill -0 "${SSH_AGENT_PID}" 2>/dev/null || {
-      start_ssh_agent
-    }
-  fi
-else
-    start_ssh_agent
-fi
-
 start_ssh_agent() {
   stop_ssh_agent
 
@@ -36,3 +24,15 @@ start_ssh_agent() {
     ssh-add -k "${SSH_KEY}"
   fi
 }
+
+if [[ -f "${SSH_ENV}" ]]; then
+  source "${SSH_ENV}" > /dev/null
+
+  if [[ -n "${SSH_AGENT_PID:-}" ]]; then
+    kill -0 "${SSH_AGENT_PID}" 2>/dev/null || {
+      start_ssh_agent
+    }
+  fi
+else
+    start_ssh_agent
+fi
