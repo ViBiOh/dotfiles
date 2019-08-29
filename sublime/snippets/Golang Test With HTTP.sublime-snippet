@@ -6,29 +6,36 @@ func Test${1:FuncName}(t *testing.T) {
 		request    *http.Request
 		want       string
 		wantStatus int
+		wantHeader http.Header
 	}{
 		{
 			"simple",
 			httptest.NewRequest(http.MethodGet, "/", nil),
 			"",
 			http.StatusOK,
+			http.Header{},
 		},
 	}
 
 	for _, testCase := range cases {
-			t.Run(testCase.intention, func(t *testing.T) {
-				writer := httptest.NewRecorder()
+		t.Run(testCase.intention, func(t *testing.T) {
+			writer := httptest.NewRecorder()
+			${1:FuncName}(writer, testCase.request)
 
-				${1:FuncName}(writer, testCase.request)
+			if result := writer.Code; result != testCase.wantStatus {
+				t.Errorf("Status %d, want %d", result, testCase.wantStatus)
+			}
 
-				if result := writer.Code; result != testCase.wantStatus {
-					t.Errorf("${1:FuncName}(%#v) = %d, want status %d", testCase.request, result, testCase.wantStatus)
+			if result, _ := request.ReadBody(writer.Result().Body); string(result) != testCase.want {
+				t.Errorf("Output `%s`, want `%s`", string(result), testCase.want)
+			}
+
+			for key := range testCase.wantHeader {
+				want := testCase.wantHeader.Get(key)
+				if result := writer.Header().Get(key); result != want {
+					t.Errorf("%s Header = `%s`, want `%s`", key, result, want)
 				}
-
-				if result, _ := request.ReadBody(writer.Result().Body); string(result) != testCase.want {
-					t.Errorf("${1:FuncName}(%#v) = `%s`, want `%s`", testCase.request, string(result), testCase.want)
-				}
-			})
+			}
 	}
 }
 
