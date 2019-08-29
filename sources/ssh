@@ -10,6 +10,10 @@ stop_ssh_agent() {
   fi
 }
 
+add_ssh_key() {
+  ssh-add -t 1h -k "${SSH_KEY}"
+}
+
 start_ssh_agent() {
   stop_ssh_agent
 
@@ -19,9 +23,10 @@ start_ssh_agent() {
     touch "${SSH_ENV}"
     chmod 600 "${SSH_ENV}"
 
-    ssh-agent -t 1h | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
     source "${SSH_ENV}" > /dev/null
-    ssh-add -k "${SSH_KEY}"
+
+    add_ssh_key
   fi
 }
 

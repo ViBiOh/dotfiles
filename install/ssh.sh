@@ -24,7 +24,6 @@ install() {
   echo "Host *
   PasswordAuthentication no
   ChallengeResponseAuthentication no
-  AddKeysToAgent yes
   ForwardAgent yes
   HashKnownHosts yes${EXTRA_CONFIG}
   ServerAliveInterval 300
