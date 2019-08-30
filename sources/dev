@@ -6,6 +6,10 @@ alias grep="grep --color=auto"
 export EDITOR=vim
 export TERM=xterm-256color
 
+random() {
+    openssl rand -base64 "${1:-30}"
+}
+
 github_last_release() {
   if [[ "${#}" -ne 1 ]]; then
     echo "Usage: github_last_release owner/repo"
