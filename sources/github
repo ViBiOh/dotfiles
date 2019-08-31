@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+
+github_last_release() {
+  if [[ "${#}" -ne 1 ]]; then
+    echo "Usage: github_last_release owner/repo"
+    return 1
+  fi
+
+  local RED="\033[31m"
+  local RESET="\033[0m"
+
+  local OUTPUT_TXT="output.txt"
+  local CLIENT_ARGS=("curl" "-q" "-sS" "-o" "${OUTPUT_TXT}" "-w" "%{http_code}")
+
+  local LATEST_RELEASE="$(curl -q -sS -o "${OUTPUT_TXT}" -w "%{http_code}" "https://api.github.com/repos/${1}/releases/latest")"
+  if [[ "${LATEST_RELEASE}" != "200" ]]; then
+    echo -e "${RED}Unable to list latest release for ${1}${RESET}"
+    cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
+    return
+  fi
+
+  python -c "import json; print(json.load(open('${OUTPUT_TXT}'))['tag_name'])"
+  rm "${OUTPUT_TXT}"
+}
+
+notify() {
+  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+    osascript -e "display notification \"${1:-}\" with title \"${2:-}\""
+  elif command -v notify-send > /dev/null 2>&1; then
+    notify-send -i "" "${2:-}" "${1:-}"
+  fi
+}
+
+github_events() {
+  if [[ "${#}" -ne 1 ]]; then
+    echo "Usage: github_events org"
+    return 1
+  fi
+
+  read_variable_if_required GITHUB_OAUTH_TOKEN
+
+  local RED='\033[0;31m'
+  local BLUE='\033[0;34m'
+  local RESET='\033[0m'
+
+  local EVENT_CONFIG_FILE="${HOME}/.github_last_event"
+  local OUTPUT_TXT="output.txt"
+  local GITHUB_ORG="${1}"
+  local CLIENT_ARGS=("curl" "-q" -"s" "-o" "${OUTPUT_TXT}" "-w" "%{http_code}" "-H" "Authorization: token ${GITHUB_OAUTH_TOKEN}")
+
+  echo -e "${BLUE}Get Github User...${RESET}"
+  local HTTP_STATUS="$("${CLIENT_ARGS[@]}" \
+    "https://api.github.com/user"
+  )"
+
+  if [[ "${HTTP_STATUS}" != "200" ]]; then
+     echo -e "${RED}Failed to get user detail${RESET}"
+     cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
+     return
+  fi
+
+  local GITHUB_USER=$(python -c "import json; data = json.load(open('${OUTPUT_TXT}')); print(data['login']);")
+  rm "${OUTPUT_TXT}"
+
+  echo -e "${BLUE}Fetch events for ${GITHUB_USER}...${RESET}"
+  local HTTP_STATUS="$("${CLIENT_ARGS[@]}" \
+    "https://api.github.com/users/${GITHUB_USER}/events/orgs/${GITHUB_ORG}"
+  )"
+
+  if [[ "${HTTP_STATUS}" != "200" ]]; then
+     echo -e "${RED}Failed to get events for ${GITHUB_USER}${RESET}"
+     cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
+     return
+  fi
+
+  local LAST_EVENT_ID="$(grep -i "${GITHUB_ORG}" "${EVENT_CONFIG_FILE}" | tail -1 | awk '{print $2}')"
+  local GITHUB_EVENTS=$(python -c "
+import json;
+
+prTitles = {}
+
+for event in json.load(open('${OUTPUT_TXT}')):
+    if event['id'] == '${LAST_EVENT_ID}':
+        break
+
+    type = event['type']
+    payload = event['payload']
+    actor = event['actor']
+
+    title = ''
+    summary = ''
+
+    if type == 'PullRequestEvent':
+        title = 'PR ' + payload['action'] + ' by ' + actor['login']
+        summary = payload['pull_request']['title']
+    elif type == 'PullRequestReviewCommentEvent':
+        summary = payload['pull_request']['title']
+        if not prTitles.get(summary):
+            prTitles[summary] = True
+            title = 'PR Comment'
+            summary = payload['pull_request']['title']
+
+    if title and summary:
+        print(title, '|', summary)
+")
+  local LAST_EVENT_ID=$(python -c "import json; data = json.load(open('${OUTPUT_TXT}')); print(data[0]['id']);")
+  rm "${OUTPUT_TXT}"
+
+  while read -r event; do
+    echo "${event}"
+  done <<< "${GITHUB_EVENTS}"
+
+  echo "${GITHUB_ORG} ${LAST_EVENT_ID}" >> "${EVENT_CONFIG_FILE}"
+}
