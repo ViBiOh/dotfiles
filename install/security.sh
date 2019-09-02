@@ -4,8 +4,8 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   cat \
-    <(curl "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
-    <(curl "https://someonewhocares.org/hosts/zero/hosts") \
+    <(curl -q -sS "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
+    <(curl -q -sS "https://someonewhocares.org/hosts/zero/hosts") \
     <(echo "0.0.0.0 cdn-eu.realytics.net") \
     <(echo "0.0.0.0 i.realytics.io") \
     <(echo "0.0.0.0 api.realytics.io") \

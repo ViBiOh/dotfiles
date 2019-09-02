@@ -5,5 +5,5 @@ if command -v python > /dev/null 2>&1; then
 fi
 
 meteo() {
-  curl -4 "wttr.in/${1:-France}?m"
+  curl -q -sS -4 "wttr.in/${1:-France}?m"
 }

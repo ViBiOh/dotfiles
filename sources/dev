@@ -7,7 +7,7 @@ export EDITOR=vim
 export TERM=xterm-256color
 
 random() {
-    openssl rand -base64 "${1:-30}"
+  openssl rand -base64 "${1:-30}"
 }
 
 bump_deps() {

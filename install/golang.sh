@@ -26,7 +26,7 @@ install() {
   if [[ ! -d "${HOME}/opt/go" ]]; then
     local GO_ARCHIVE="go${GO_VERSION}.${OS}-${ARCH}.tar.gz"
  
-    curl -O "https://dl.google.com/go/${GO_ARCHIVE}"
+    curl -q -sS -O "https://dl.google.com/go/${GO_ARCHIVE}"
     tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
     rm -rf "${GO_ARCHIVE}"
   fi
