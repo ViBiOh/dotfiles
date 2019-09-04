@@ -18,7 +18,7 @@ bump_deps() {
   fi
 
   if [[ -e "go.mod" ]]; then
-    go get -u
+    go get -u ...
     go mod tidy
     git diff go.mod
   fi
