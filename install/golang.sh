@@ -8,11 +8,12 @@ clean() {
     mkdir -p "${GOPATH}"
   fi
 
+  rm -rf "${HOME}/opt/go"
   rm -rf "${HOME}/.dlv"
 }
 
 install() {
-  local GO_VERSION=1.12.8
+  local GO_VERSION=1.13
 
   local OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
   local ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
