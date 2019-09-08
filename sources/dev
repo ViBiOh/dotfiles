@@ -25,6 +25,10 @@ bump_deps() {
 }
 
 if command -v systemctl > /dev/null 2>&1; then
+  status() {
+    sudo systemctl status ${@}
+  }
+
   restart() {
     sudo systemctl restart ${@}
   }
