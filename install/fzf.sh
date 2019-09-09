@@ -2,6 +2,11 @@
 
 set -o nounset -o pipefail -o errexit
 
+clean() {
+  rm -rf "${HOME}/.fzf.bash"
+  rm -rf "${HOME}/opt/fzf"
+}
+
 install() {
   if ! command -v git > /dev/null 2>&1; then
     echo "git not found"

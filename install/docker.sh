@@ -3,6 +3,8 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
+  sudo rm -rf "${HOME}/.docker"
+
   if command -v docker > /dev/null 2>&1; then
     docker system prune -f || true
 
