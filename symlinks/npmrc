@@ -2,3 +2,4 @@ prefix=~/opt/node
 save-exact=true
 strict-ssl=true
 registry=https://registry.npmjs.org/
+progress=false
