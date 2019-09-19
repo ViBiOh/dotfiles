@@ -15,13 +15,8 @@ type app struct {
 
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
-	docPrefix := prefix
-	if prefix == "" {
-		docPrefix = "${4:FlagPrefix}"
-	}
-
 	return Config{
-		${1:FlagName}: fs.String(tools.ToCamel(fmt.Sprintf("%s${2:FlagValue}", prefix)), "", fmt.Sprintf("[%s] ${3:FlagDesc}", docPrefix)),
+		${1:FlagName}: tools.NewFlag(prefix, "${4:FlagPrefix}").Name("${2:FlagValue}").Default("").Label("${3:FlagDesc}").ToString(fs),
 	}
 }
 
