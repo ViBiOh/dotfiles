@@ -21,15 +21,11 @@ git_browse() {
   done
 }
 
-git_pull() {
-  git_browse "git pull"
-}
-
-alias ...="git_root"
-
 git_root() {
   git rev-parse --is-inside-work-tree > /dev/null 2>&1 && cd "$(git rev-parse --show-toplevel)"
 }
+
+alias ...="git_root"
 
 head_sync() {
   if [[ "${#}" -ne 2 ]]; then

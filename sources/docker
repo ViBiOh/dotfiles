@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-docker-registry-clean() {
+docker_registry_clean() {
   if [[ "${#}" -lt 2 ]]; then
     echo "Usage: docker-registry-clean [DOCKER_USER] [DOCKER_OWNER]"
     return 1
@@ -87,7 +87,7 @@ docker-registry-clean() {
 }
 
 if command -v docker > /dev/null 2>&1; then
-  docker-restart() {
+  docker_restart() {
     docker start $(docker ps -a -q -f status=exited -f status=created 2>/dev/null) 2>/dev/null
   }
 

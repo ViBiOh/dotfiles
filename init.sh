@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 readonly CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-printTitle() {
+print_title() {
   local line="--------------------------------------------------------------------------------"
 
   printf "%s%s%s\n" "+-" "${line:0:${#1}}" "-+"
@@ -11,14 +11,14 @@ printTitle() {
   printf "%s%s%s\n" "+-" "${line:0:${#1}}" "-+"
 }
 
-createSymlinks() {
+create_symlinks() {
   for file in "${CURRENT_DIR}/symlinks"/*; do
     basenameFile="$(basename "${file}")"
     [[ -r "${file}" ]] && [[ -e "${file}" ]] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
   done
 }
 
-browseInstall() {
+browse_install() {
   local LANG="C"
 
   for file in "${CURRENT_DIR}/install"/*; do
@@ -39,7 +39,7 @@ browseInstall() {
 
       for action in "${@}"; do
         if [[ "$(type -t ${action})" = "function" ]]; then
-          printTitle "${action} - ${basenameFile}"
+          print_title "${action} - ${basenameFile}"
           "${action}"
         fi
       done
@@ -47,7 +47,7 @@ browseInstall() {
   done
 }
 
-cleanPackages() {
+clean_packages() {
   if command -v brew > /dev/null 2>&1; then
     brew cleanup
   elif command -v apt-get > /dev/null 2>&1; then
@@ -60,8 +60,8 @@ main() {
   local ARGS="${*}"
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ symlinks ]]; then
-    printTitle "symlinks"
-    createSymlinks
+    print_title "symlinks"
+    create_symlinks
   fi
 
   set +u
@@ -72,16 +72,16 @@ main() {
   set -u
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ install ]]; then
-    browseInstall clean install
-    cleanPackages
+    browse_install clean install
+    clean_packages
   fi
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ credentials ]]; then
-    browseInstall credentials
+    browse_install credentials
   fi
 
   if [[ "${ARGS}" =~ clean ]]; then
-    browseInstall clean
+    browse_install clean
   fi
 }
 
