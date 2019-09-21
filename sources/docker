@@ -23,8 +23,8 @@ docker-registry-clean() {
 
   # Login to registry
   local LOGIN_STATUS="$("${CLIENT_ARGS[@]}" -X POST "${DOCKER_REGISTRY}/users/login/" \
-    --data "username=${DOCKER_USER}" \
-    --data "password=${DOCKER_PASSWORD}"
+    -H "Content-Type: application/json" \
+    --data "{ \"username\": \"${DOCKER_USER}\", \"password\": \"${DOCKER_PASSWORD}\" }"
   )"
   unset DOCKER_PASSWORD
 
