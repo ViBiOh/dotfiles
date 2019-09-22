@@ -40,21 +40,72 @@ install() {
   fi
 
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
-    defaults write com.apple.CrashReporter DialogType none
     defaults write com.apple.finder AppleShowAllFiles -bool true
+    defaults write NSGlobalDomain AppleShowAllExtensions -bool true
     defaults write com.apple.finder ShowPathbar -bool true
+    defaults write com.apple.finder ShowStatusBar -bool true
+
     defaults write com.apple.Safari SuppressSearchSuggestions -bool true
     defaults write com.apple.Safari UniversalSearchEnabled -bool false
+
     defaults write com.apple.screensaver askForPassword -int 1
     defaults write com.apple.screensaver askForPasswordDelay -int 0
-    defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-    defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 
-    sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool YES
+    defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+    defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
+
+    defaults write com.apple.dock tilesize -int 36
+    defaults write com.apple.dock autohide -bool true
+    defaults write com.apple.dock autohide-delay -float 0
+    defaults write com.apple.dock autohide-time-modifier -float 0
+    defaults write com.apple.dock showhidden -bool true
+    defaults write com.apple.dock hide-mirror -bool true
+    defaults write com.apple.dock mineffect -string "scale"
+    defaults write com.apple.dock minimize-to-application -bool true
+    defaults write com.apple.dock launchanim -bool false
+
+    defaults write com.apple.Safari HomePage -string "about:blank"
+    defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
+    defaults write com.apple.Safari ShowSidebarInTopSites -bool false
+    defaults write com.apple.Safari DebugSnapshotsUpdatePolicy -int 2
+    defaults write com.apple.Safari IncludeDevelopMenu -bool true
+
+    defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+
+    sudo systemsetup -setwakeonnetworkaccess off
+    sudo systemsetup -setremoteappleevents off
+
+    # Disable the sudden motion sensor as it’s not useful for SSDs
+    sudo pmset -a sms 0
+
+    sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool true
     sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
 
-    sudo nvram SystemAudioVolume=%01
+    sudo defaults write /Library/Preferences/com.apple.loginwindow RetriesUntilHint -int 0
+    sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
+
+    defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 1
+    defaults write com.apple.CrashReporter DialogType none
+
+    defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+    defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+    defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+    defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+
+    defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
+    defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
+    defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+
+    defaults write com.apple.screencapture location -string "${HOME}/Downloads"
+    defaults write com.apple.screencapture type -string "png"
+    defaults write com.apple.screencapture disable-shadow -bool true
+
+    sudo launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
+    sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.SubmitDiagInfo.plist
+
+    sudo nvram SystemAudioVolume=" "
     sudo scutil --set ComputerName macbook
+    sudo scutil --set HostName macbook
     sudo scutil --set LocalHostName macbook
 
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
