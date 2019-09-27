@@ -13,7 +13,7 @@ clean() {
 }
 
 install() {
-  local GO_VERSION=1.13
+  local GO_VERSION=1.13.1
 
   local OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
   local ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
