@@ -23,7 +23,6 @@
 	co = "!f() { git checkout "$(git branch -vv --all | fzf --height 30 --ansi --reverse -1 -q ${1:-"remotes/"} | awk '{print $1}' | sed 's|^remotes/origin/||')"; }; f"
 	tidy = rebase -i master
 	rbm = pull --rebase origin master
-	plm = pull --rebase=false origin master
 	commend = commit --amend --no-edit
 	pushu = push -u
 	pushf = push --force-with-lease
