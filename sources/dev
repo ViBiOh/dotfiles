@@ -22,6 +22,10 @@ bump_deps() {
     go mod tidy
     git diff go.mod
   fi
+
+  if [[ -e "provider.tf" ]]; then
+    terraform init -upgrade
+  fi
 }
 
 if command -v systemctl > /dev/null 2>&1; then
