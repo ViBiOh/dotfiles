@@ -4,15 +4,20 @@ set nocompatible
 " Show status line
 set laststatus=2
 
+hi StatusLine ctermfg=235
+hi User1 ctermfg=11 ctermbg=238
+hi User2 ctermfg=232 ctermbg=154
+hi User3 ctermfg=2 ctermbg=235
+
 set statusline=
-set statusline+=\%f " Filename
-set statusline+=\%m " Modified
-set statusline+=\%R " Read-Only indicator
+set statusline+=%1*\ \%f " Filename
+set statusline+=%2*\%m" Modified
+set statusline+=%*\%R " Read-Only indicator
 set statusline+=%=
-set statusline+=\%y " Type of file
+set statusline+=%3*\%y " Type of file
 set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
 set statusline+=\[%{&fileformat}\]
-set statusline+=\ %p%% " Percentage of the file
+set statusline+=%1*\ %p%% " Percentage of the file
 set statusline+=\ %l:%c " Line Number and Total Line
 set statusline+=\  " Empty space at end
 
