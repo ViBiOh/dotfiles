@@ -68,6 +68,10 @@ set hlsearch
 nnoremap <esc> :noh<return><esc>
 nnoremap <esc>^[ <esc>^[
 
+" Keep search matches in the middle of the window.
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
 " Search as you type character
 set incsearch
 
@@ -86,6 +90,10 @@ set autoread
 
 " Disable folding
 set nofoldenable
+
+" No bell
+set visualbell
+set noerrorbells
 
 " Disable backup files
 set nobackup
