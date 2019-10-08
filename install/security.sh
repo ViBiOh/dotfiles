@@ -73,7 +73,6 @@ install() {
     defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
     sudo systemsetup -setwakeonnetworkaccess off
-    sudo systemsetup -setremoteappleevents off
 
     # Disable the sudden motion sensor as it’s not useful for SSDs
     sudo pmset -a sms 0
