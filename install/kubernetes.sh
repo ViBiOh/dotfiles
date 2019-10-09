@@ -12,7 +12,7 @@ install() {
     ARCH="arm"
   fi
 
-  local KUBERNETES_VERSION="$(curl -q -sS https://storage.googleapis.com/kubernetes-release/release/stable.txt)"
-  curl -q -sS -L -o "${HOME}/opt/bin/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl"
+  local KUBERNETES_VERSION="$(curl -q -sS -L https://storage.googleapis.com/kubernetes-release/release/stable.txt)"
+  curl -q -sS -Lo "${HOME}/opt/bin/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl"
   chmod +x "${HOME}/opt/bin/kubectl"
 }

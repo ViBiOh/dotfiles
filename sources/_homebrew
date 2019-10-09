@@ -10,5 +10,4 @@ fi
 
 if command -v brew > /dev/null 2>&1; then
   export PATH="$(brew --prefix)/opt/curl/bin:${PATH}"
-  export PATH="$(brew --prefix)/opt/python/libexec/bin:${PATH}"
 fi

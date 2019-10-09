@@ -10,7 +10,7 @@ set_locale() {
   local ALL_LOCALES="$(locale -a)"
 
   for locale in "${LOCALES[@]}"; do
-    if [[ "$(echo "${ALL_LOCALES}" | grep "${locale}" | wc -l)" -eq 1 ]]; then
+    if [[ "$(echo "${ALL_LOCALES}" | grep -c "${locale}")" -eq 1 ]]; then
       export LC_ALL="${locale}"
       export LANG="${locale}"
       export LANGUAGE="${locale}"

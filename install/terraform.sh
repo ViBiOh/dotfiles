@@ -37,7 +37,7 @@ install() {
 
   local TERRAFORM_ARCHIVE="terraform_${TERRAFORM_VERSION}_${OS}_${ARCH}.zip"
 
-  curl -q -sS -O "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/${TERRAFORM_ARCHIVE}"
+  curl -q -sS -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/${TERRAFORM_ARCHIVE}"
   unzip -o -d "${HOME}/opt/bin" "${TERRAFORM_ARCHIVE}"
   rm -rf "${TERRAFORM_ARCHIVE}"
 }

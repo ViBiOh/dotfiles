@@ -18,7 +18,7 @@ install() {
 
   local SYNCTHING_ARCHIVE="syncthing-${OS}-${ARCH}-v${SYNCTHING_VERSION}"
 
-  curl -q -sS -L -O "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/${SYNCTHING_ARCHIVE}.tar.gz"
+  curl -q -sS -LO "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/${SYNCTHING_ARCHIVE}.tar.gz"
 
   tar -xzf "${SYNCTHING_ARCHIVE}.tar.gz"
   cp "${SYNCTHING_ARCHIVE}/syncthing" "${HOME}/opt/bin/"
