@@ -9,7 +9,7 @@ main() {
   mkdir -p "${PROJECT_FOLDER}"
 
   for project in "${HOME}/code/"*; do
-    projectName="$(basename ${project})"
+    projectName="$(basename "${project}")"
     fileName="./${PROJECT_FOLDER}/${projectName}.sublime-project"
 
     echo "{

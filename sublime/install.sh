@@ -14,7 +14,7 @@ main() {
   local GO_PLUGIN_NAME="SublimeGo"
 
   mkdir -p "${PKG_USER}"
-  rm -rf "${PKG_USER}"/* "${PKG}/${GO_PLUGIN_NAME}"
+  rm -rf "${PKG_USER:?}"/* "${PKG:?}/${GO_PLUGIN_NAME}"
 
   cp -r "${SCRIPT_DIR}/${GO_PLUGIN_NAME}" "${PKG}/${GO_PLUGIN_NAME}"
   cp "${SCRIPT_DIR}/snippets/"* "${PKG_USER}/"
