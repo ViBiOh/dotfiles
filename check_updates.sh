@@ -14,7 +14,7 @@ github_last_release() {
   local OUTPUT_TXT="output.txt"
   local CLIENT_ARGS=("curl" "-q" "-sS" "-o" "${OUTPUT_TXT}" "-w" "%{http_code}")
 
-  local LATEST_RELEASE="$(curl -q -sS -o "${OUTPUT_TXT}" -w "%{http_code}" "https://api.github.com/repos/${1}/releases/latest")"
+  local LATEST_RELEASE="$("${CLIENT_ARGS[@]}" "https://api.github.com/repos/${1}/releases/latest")"
   if [[ "${LATEST_RELEASE}" != "200" ]]; then
     echo -e "${RED}Unable to list latest release for ${1}${RESET}"
     cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"

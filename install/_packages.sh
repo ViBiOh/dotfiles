@@ -21,7 +21,7 @@ install() {
       curl \
       fswatch
 
-    if [[ "$(cat "/etc/shells" | grep "$(brew --prefix)" | wc -l)" -eq 0 ]]; then
+    if [[ "$(grep -c "$(brew --prefix)" "/etc/shells")" -eq 0 ]]; then
       echo "+-------------------------+"
       echo "| changing shell for user |"
       echo "+-------------------------+"

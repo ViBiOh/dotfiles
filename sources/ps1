@@ -4,15 +4,14 @@ RED="\[\033[31m\]"
 GREEN="\[\033[32m\]"
 YELLOW="\[\033[33m\]"
 BLUE="\[\033[34m\]"
-PURPLE="\[\033[35m\]"
 RESET="\[\033[0m\]"
 
 PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
 
-GIT_PS1_SHOWDIRTYSTATE="true"
-GIT_PS1_STATESEPARATOR="|"
-GIT_PS1_SHOWSTASHSTATE="true"
-GIT_PS1_SHOWUNTRACKEDFILES="true"
+export GIT_PS1_SHOWDIRTYSTATE="true"
+export GIT_PS1_STATESEPARATOR="|"
+export GIT_PS1_SHOWSTASHSTATE="true"
+export GIT_PS1_SHOWUNTRACKEDFILES="true"
 
 if command -v git > /dev/null 2>&1 && [[ "$(type -t __git_ps1)" = "function" ]]; then
   PS1="${PS1}${YELLOW}\$(__git_ps1)${RESET}"

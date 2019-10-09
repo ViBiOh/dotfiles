@@ -29,7 +29,7 @@ install() {
     sudo apt-get install -y -qq libpq-dev
   fi
 
-  if [[ "$(pip install --help | grep prefer-binary | wc -l)" -eq 1 ]]; then
+  if [[ "$(pip install --help | grep -c prefer-binary)" -eq 1 ]]; then
     pip install --user --prefer-binary pgcli
   else
     pip install --user pgcli
