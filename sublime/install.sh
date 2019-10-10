@@ -3,6 +3,13 @@
 set -o nounset -o pipefail -o errexit
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+install_plugin() {
+  local PLUGIN_NAME="${1}"
+
+  rm -rf "${PKG:?}/${PLUGIN_NAME}"
+  cp -r "${SCRIPT_DIR}/${PLUGIN_NAME}" "${PKG}/${PLUGIN_NAME}"
+}
+
 main() {
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
     local PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
@@ -11,12 +18,12 @@ main() {
   fi
 
   local PKG_USER="${PKG}/User"
-  local GO_PLUGIN_NAME="SublimeGo"
-
+  rm -rf "${PKG_USER:?}"/*
   mkdir -p "${PKG_USER}"
-  rm -rf "${PKG_USER:?}"/* "${PKG:?}/${GO_PLUGIN_NAME}"
 
-  cp -r "${SCRIPT_DIR}/${GO_PLUGIN_NAME}" "${PKG}/${GO_PLUGIN_NAME}"
+  install_plugin SublimeGo
+  install_plugin SublimeTerraform
+
   cp "${SCRIPT_DIR}/snippets/"* "${PKG_USER}/"
   cp "${SCRIPT_DIR}/settings/"* "${PKG_USER}/"
 

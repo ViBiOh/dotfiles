@@ -1,0 +1,6 @@
+[
+  {
+    "caption": "Terraform Format",
+    "command": "terraform_fmt"
+  }
+]
