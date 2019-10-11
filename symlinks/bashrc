@@ -36,3 +36,6 @@ source_all
 if [[ -e "${HOME}/.localrc" ]]; then
   source "${HOME}/.localrc"
 fi
+
+unset -f set_locale
+unset -f source_all
