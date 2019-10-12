@@ -4,7 +4,8 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
-    local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
     if ! command -v brew > /dev/null 2>&1; then
       mkdir "${HOME}/homebrew" && curl -q -sS -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "${HOME}/homebrew"
@@ -38,7 +39,7 @@ install() {
       echo '#!/usr/bin/env bash
 
 if [[ -f "${HOME}/.bashrc" ]]; then
-  source ${HOME}/.bashrc
+  source "${HOME}/.bashrc"
 fi' > "${HOME}/.bash_profile"
     fi
   elif command -v apt-get > /dev/null 2>&1; then

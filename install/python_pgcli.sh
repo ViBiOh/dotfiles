@@ -8,7 +8,8 @@ credentials() {
   fi
 
   local PASS_DIR="${PASSWORD_STORE_DIR-${HOME}/.password-store}"
-  local PG_PASS="$(find "${PASS_DIR}" -name "*pgpass.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|")"
+  local PG_PASS
+  PG_PASS="$(find "${PASS_DIR}" -name "*pgpass.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|")"
 
   if [[ "$(echo "${PG_PASS}" | wc -l)" -eq 1 ]]; then
     pass show "${PG_PASS}" > "${HOME}/.pgpass"
@@ -17,7 +18,8 @@ credentials() {
 }
 
 install() {
-  local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   source "${SCRIPT_DIR}/../sources/_python"
 
   if ! command -v pip > /dev/null 2>&1; then

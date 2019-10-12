@@ -5,8 +5,10 @@ set -o nounset -o pipefail -o errexit
 install() {
   local SYNCTHING_VERSION=1.3.0
 
-  local OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
-  local ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
+  local OS
+  OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
+  local ARCH
+  ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
   if [[ "${OS}" = "darwin" ]]; then
     OS="macos"

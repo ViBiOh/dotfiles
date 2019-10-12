@@ -37,4 +37,4 @@ main() {
   fi
 }
 
-main
+main "${@:-}"

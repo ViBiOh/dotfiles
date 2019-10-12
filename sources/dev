@@ -53,7 +53,8 @@ semver() {
   local MINOR="0"
   local PATCH="0"
 
-  local CURRENT_VERSION="$(git describe --tag 2> /dev/null | awk -F "-" '{print $1}')"
+  local CURRENT_VERSION
+  CURRENT_VERSION="$(git describe --tag 2> /dev/null | awk -F "-" '{print $1}')"
   if [[ -n "${CURRENT_VERSION}" ]]; then
     if ! [[ "${CURRENT_VERSION}" =~ ([a-zA-Z]*)([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
       echo "invalid version ${CURRENT_VERSION}"

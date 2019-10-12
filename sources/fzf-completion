@@ -20,9 +20,7 @@ if command -v pass > /dev/null 2>&1; then
   [[ -n "${BASH}" ]] && complete -F _fzf_complete_pass -o default -o bashdefault pass
 
   passfor() {
-    pass -c "${1}"
-
-    if [[ "${?}" -eq 0 ]] && [[ "$(pass show "${1}" | grep -c "^otpauth:")" -eq 1 ]]; then
+    if pass -c "${1}" && [[ "$(pass show "${1}" | grep -c "^otpauth:")" -eq 1 ]]; then
       read -s -p "  Press enter for otp"
       echo ""
 

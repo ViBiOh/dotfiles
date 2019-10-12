@@ -9,5 +9,6 @@ if [[ -d "${HOME}/homebrew" ]]; then
 fi
 
 if command -v brew > /dev/null 2>&1; then
-  export PATH="$(brew --prefix)/opt/curl/bin:${PATH}"
+  CURL_PATH="$(brew --prefix)/opt/curl/bin"
+  export PATH="${CURL_PATH}:${PATH}"
 fi

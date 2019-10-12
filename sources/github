@@ -12,7 +12,8 @@ github_last_release() {
   local OUTPUT_TXT="output.txt"
   local CLIENT_ARGS=("curl" "-q" "-sS" "-o" "${OUTPUT_TXT}" "-w" "%{http_code}")
 
-  local REQUEST_STATUS="$("${CLIENT_ARGS[@]}" "https://api.github.com/repos/${1}/releases/latest")"
+  local REQUEST_STATUS
+  REQUEST_STATUS="$("${CLIENT_ARGS[@]}" "https://api.github.com/repos/${1}/releases/latest")"
   if [[ "${REQUEST_STATUS}" != "200" ]]; then
     echo -e "${RED}Unable to list latest release for ${1}${RESET}"
     cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
@@ -37,7 +38,8 @@ configure_repository() {
   local OUTPUT_TXT="output.txt"
   local CLIENT_ARGS=("curl" "-q" "-sS" "-o" "${OUTPUT_TXT}" "-w" "%{http_code}" "-H" "Authorization: token ${GITHUB_OAUTH_TOKEN}")
 
-  local REQUEST_STATUS="$("${CLIENT_ARGS[@]}" "-H" "Content-Type: application/json" "-X" "PATCH" "https://api.github.com/repos/${1}" "-d" '{
+  local REQUEST_STATUS
+  REQUEST_STATUS="$("${CLIENT_ARGS[@]}" "-H" "Content-Type: application/json" "-X" "PATCH" "https://api.github.com/repos/${1}" "-d" '{
     "default_branch": "master",
     "allow_merge_commit": false,
     "allow_squash_merge": false,
@@ -51,14 +53,14 @@ configure_repository() {
     return
   fi
 
-  local REQUEST_STATUS="$("${CLIENT_ARGS[@]}" "-H" "Accept: application/vnd.github.dorian-preview+json" "-X" "PUT" "https://api.github.com/repos/${1}/vulnerability-alerts")"
+  REQUEST_STATUS="$("${CLIENT_ARGS[@]}" "-H" "Accept: application/vnd.github.dorian-preview+json" "-X" "PUT" "https://api.github.com/repos/${1}/vulnerability-alerts")"
   if [[ "${REQUEST_STATUS}" != "204" ]]; then
     echo -e "${RED}Unable to enable vulnerability alerts for ${1}${RESET}"
     cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
     return
   fi
 
-  local REQUEST_STATUS="$("${CLIENT_ARGS[@]}" "-H" "Accept: application/vnd.github.london-preview+json" "-X" "PUT" "https://api.github.com/repos/${1}/automated-security-fixes")"
+  REQUEST_STATUS="$("${CLIENT_ARGS[@]}" "-H" "Accept: application/vnd.github.london-preview+json" "-X" "PUT" "https://api.github.com/repos/${1}/automated-security-fixes")"
   if [[ "${REQUEST_STATUS}" != "204" ]]; then
     echo -e "${RED}Unable to enable automated security fixes for ${1}${RESET}"
     cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"

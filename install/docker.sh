@@ -20,8 +20,10 @@ install() {
   fi
 
   local CTOP_VERSION="0.7.2"
-  local OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
-  local ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
+  local OS
+  OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
+  local ARCH
+  ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
   if [[ "${ARCH}" = "x86_64" ]]; then
     ARCH="amd64"

@@ -22,7 +22,8 @@ docker_registry_clean() {
   local CLIENT_ARGS=("curl" "-q" "-sS" "-o" "${OUTPUT_TXT}" "-w" "%{http_code}")
 
   # Login to registry
-  local LOGIN_STATUS="$("${CLIENT_ARGS[@]}" -X POST "${DOCKER_REGISTRY}/users/login/" \
+  local LOGIN_STATUS
+  LOGIN_STATUS="$("${CLIENT_ARGS[@]}" -X POST "${DOCKER_REGISTRY}/users/login/" \
     -H "Content-Type: application/json" \
     --data "{ \"username\": \"${DOCKER_USER}\", \"password\": \"${DOCKER_PASSWORD}\" }"
   )"
@@ -41,7 +42,8 @@ docker_registry_clean() {
   # Listing repositories
   echo -e "${BLUE}Listing repositories for ${DOCKER_OWNER}...${RESET}"
 
-  local REPOSITORIES_STATUS="$("${CLIENT_ARGS[@]}" -X GET "${DOCKER_REGISTRY}/users/${DOCKER_OWNER}/repositories/?page_size=100")"
+  local REPOSITORIES_STATUS
+  REPOSITORIES_STATUS="$("${CLIENT_ARGS[@]}" -X GET "${DOCKER_REGISTRY}/users/${DOCKER_OWNER}/repositories/?page_size=100")"
   if [[ "${REPOSITORIES_STATUS}" != "200" ]]; then
     echo -e "${RED}Unable to list images for ${DOCKER_OWNER}${RESET}"
     cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
@@ -56,7 +58,8 @@ docker_registry_clean() {
     # Listing tags
     echo -e "${BLUE}Listing tags for ${DOCKER_OWNER}/${repository}...${RESET}"
 
-    local TAGS_STATUS="$("${CLIENT_ARGS[@]}" -X GET "${DOCKER_REGISTRY}/repositories/${DOCKER_OWNER}/${repository}/tags/?page_size=100")"
+    local TAGS_STATUS
+    TAGS_STATUS="$("${CLIENT_ARGS[@]}" -X GET "${DOCKER_REGISTRY}/repositories/${DOCKER_OWNER}/${repository}/tags/?page_size=100")"
     if [[ "${TAGS_STATUS}" != "200" ]]; then
       echo -e "${RED}Unable to list tags for ${DOCKER_OWNER}/${repository}${RESET}"
       cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"
@@ -70,7 +73,8 @@ docker_registry_clean() {
       if [[ "${tag}" != 'latest' ]] && [[ "${tag}" =~ ^[0-9A-Fa-f]{6,}$ ]]; then
 
         # Deleting tags
-        local DELETE_STATUS="$("${CLIENT_ARGS[@]}" -X DELETE "${DOCKER_REGISTRY}/repositories/${DOCKER_OWNER}/${repository}/tags/${tag}/")"
+        local DELETE_STATUS
+        DELETE_STATUS="$("${CLIENT_ARGS[@]}" -X DELETE "${DOCKER_REGISTRY}/repositories/${DOCKER_OWNER}/${repository}/tags/${tag}/")"
         if [[ "${DELETE_STATUS}" != "204" ]]; then
           echo -e "${RED}Unable to delete tags for ${DOCKER_OWNER}/${repository}:${tag}${RESET}"
           cat "${OUTPUT_TXT}" && rm "${OUTPUT_TXT}"

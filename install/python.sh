@@ -7,7 +7,8 @@ clean() {
 }
 
 install() {
-  local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
   if command -v brew > /dev/null 2>&1; then
     brew install python

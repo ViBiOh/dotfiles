@@ -22,4 +22,4 @@ main() {
   done
 }
 
-main
+main "${@:-}"

@@ -13,8 +13,9 @@ print_title() {
 
 create_symlinks() {
   for file in "${CURRENT_DIR}/symlinks"/*; do
-    basenameFile="$(basename "${file}")"
-    [[ -r "${file}" ]] && [[ -e "${file}" ]] && rm -f "${HOME}/.${basenameFile}" && ln -s "${file}" "${HOME}/.${basenameFile}"
+    local BASENAME_FILE
+    BASENAME_FILE="$(basename "${file}")"
+    [[ -r "${file}" ]] && [[ -e "${file}" ]] && rm -f "${HOME}/.${BASENAME_FILE}" && ln -s "${file}" "${HOME}/.${BASENAME_FILE}"
   done
 }
 
@@ -22,11 +23,13 @@ browse_install() {
   local LANG="C"
 
   for file in "${CURRENT_DIR}/install"/*; do
-    local basenameFile="$(basename ${file%.*})"
-    local upperCaseFilename="$(echo "${basenameFile}" | tr "[:lower:]" "[:upper:]")"
-    local disableVariableName="DOTFILES_NO_${upperCaseFilename}"
+    local BASENAME_FILE
+    BASENAME_FILE="$(basename "${file%.*}")"
+    local UPPERCASE_FILENAME
+    UPPERCASE_FILENAME="$(echo "${BASENAME_FILE}" | tr "[:lower:]" "[:upper:]")"
+    local DISABLE_VARIABLE_NAME="DOTFILES_NO_${UPPERCASE_FILENAME}"
 
-    if [[ "${!disableVariableName:-}" == "true" ]]; then
+    if [[ "${!DISABLE_VARIABLE_NAME:-}" == "true" ]]; then
       continue
     fi
 
@@ -38,8 +41,8 @@ browse_install() {
       source "${file}"
 
       for action in "${@}"; do
-        if [[ "$(type -t ${action})" = "function" ]]; then
-          print_title "${action} - ${basenameFile}"
+        if [[ "$(type -t "${action}")" = "function" ]]; then
+          print_title "${action} - ${BASENAME_FILE}"
           "${action}"
         fi
       done
