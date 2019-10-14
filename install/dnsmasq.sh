@@ -11,6 +11,8 @@ install() {
     DNSMASQ_CONF="$(brew --prefix)/etc/dnsmasq.conf"
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get install -y -qq dnsmasq
+  elif command -v pacman > /dev/null 2>&1; then
+    sudo pacman -S --noconfirm --needed dnsmasq
   fi
 
   if ! command -v dnsmasq > /dev/null 2>&1; then

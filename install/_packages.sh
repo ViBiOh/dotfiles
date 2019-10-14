@@ -57,5 +57,16 @@ fi' > "${HOME}/.bash_profile"
       openssl \
       curl \
       vim
+  elif command -v pacman > /dev/null 2>&1; then
+    sudo pacman -Syuq --noconfirm
+    sudo pacman -S --noconfirm --needed \
+      make \
+      binutils \
+      bash \
+      bash-completion \
+      htop \
+      openssl \
+      curl \
+      vim
   fi
 }
