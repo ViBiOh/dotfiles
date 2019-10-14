@@ -37,6 +37,7 @@ install() {
 
   if command -v systemd > /dev/null 2>&1; then
     sudo systemctl enable systemd-resolved.service
+    sudo systemctl restart systemd-resolved.service
   fi
 
   if [[ "$(type -t dns_flush_cache)" = "function" ]]; then
