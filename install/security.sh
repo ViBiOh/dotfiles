@@ -35,6 +35,10 @@ install() {
     | grep -v "0.0.0.0 reddit.map.fastly.net" \
     | sudo tee /etc/hosts > /dev/null
 
+  if command -v systemd > /dev/null 2>&1; then
+    sudo systemctl enable systemd-resolved.service
+  fi
+
   if [[ "$(type -t dns_flush_cache)" = "function" ]]; then
     dns_flush_cache
   fi
