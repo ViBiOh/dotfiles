@@ -58,6 +58,10 @@ fi' > "${HOME}/.bash_profile"
       curl \
       vim
   elif command -v pacman > /dev/null 2>&1; then
+    # Enabling fn key as f1..f12 instead of media on macbook keyboard
+    echo options hid_apple fnmode=2 | sudo tee -a /etc/modprobe.d/hid_apple.conf
+    sudo update-initramfs -u -k all
+
     sudo pacman -Syuq --noconfirm
     sudo pacman -S --noconfirm --needed \
       make \
