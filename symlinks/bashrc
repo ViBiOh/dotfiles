@@ -6,7 +6,7 @@ readonly BASHRC_PATH="$(python -c 'import sys; import os.path; print(os.path.rea
 readonly DOTFILES_PATH="$(dirname "${BASHRC_PATH}")"
 
 set_locale() {
-  local LOCALES=("en_US.UTF-8" "C.UTF-8" "C")
+  local LOCALES=("en_US.UTF-8" "en_US.utf8" "C.UTF-8" "C")
   local ALL_LOCALES
   ALL_LOCALES="$(locale -a)"
 

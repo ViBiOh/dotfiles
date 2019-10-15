@@ -65,6 +65,7 @@ fi' > "${HOME}/.bash_profile"
     sudo pacman -Syuq --noconfirm
     sudo pacman -S --noconfirm --needed \
       make \
+      gcc \
       binutils \
       bash \
       bash-completion \

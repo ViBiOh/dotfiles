@@ -40,10 +40,6 @@ install() {
     sudo systemctl restart systemd-resolved.service
   fi
 
-  if [[ "$(type -t dns_flush_cache)" = "function" ]]; then
-    dns_flush_cache
-  fi
-
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
     defaults write com.apple.finder AppleShowAllFiles -bool true
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
