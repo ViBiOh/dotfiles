@@ -74,9 +74,4 @@ fi' > "${HOME}/.bash_profile"
       curl \
       vim
   fi
-
-  if command -v systemctl > /dev/null 2>&1; then
-    sudo systemctl enable systemd-resolved.service
-    sudo systemctl restart systemd-resolved.service
-  fi
 }
