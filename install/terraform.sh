@@ -44,4 +44,6 @@ install() {
   curl -q -sS -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/${TERRAFORM_ARCHIVE}"
   unzip -o -d "${HOME}/opt/bin" "${TERRAFORM_ARCHIVE}"
   rm -rf "${TERRAFORM_ARCHIVE}"
+
+  curl -q -sS -L "https://raw.githubusercontent.com/MeilleursAgents/terraform-provider-ansiblevault/master/install.sh" | bash
 }
