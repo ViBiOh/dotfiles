@@ -2,9 +2,6 @@
 
 [[ -z "${PS1:-}" ]] && return
 
-readonly BASHRC_PATH="$(python -c 'import sys; import os.path; print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")"
-readonly DOTFILES_PATH="$(dirname "${BASHRC_PATH}")"
-
 set_locale() {
   local LOCALES=("en_US.UTF-8" "en_US.utf8" "C.UTF-8" "C")
   local ALL_LOCALES
@@ -24,6 +21,11 @@ set_locale() {
 }
 
 source_all() {
+  local BASHRC_PATH
+  BASHRC_PATH="$(python -c 'import sys; import os.path; print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")"
+  local DOTFILES_PATH
+  DOTFILES_PATH="$(dirname "${BASHRC_PATH}")"
+
   local LANG="C"
 
   for file in "${DOTFILES_PATH}/../sources/"*; do
