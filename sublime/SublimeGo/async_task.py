@@ -1,11 +1,12 @@
 import subprocess, os, threading
 
+
 class AsyncTask:
     encoding = 'utf-8'
     killed = False
     proc = None
 
-    def __init__(self, command = ['echo', 'Hello World'], cwd=None, output=print):
+    def __init__(self, command=['echo', 'Hello World'], cwd=None, output=print):
         self.output = output
 
         if self.proc is not None:
@@ -52,7 +53,7 @@ class AsyncTask:
 
             except (UnicodeDecodeError) as e:
                 msg = 'Error decoding output using %s - %s'
-                self.write(msg  % (self.encoding, str(e)))
+                self.write(msg % (self.encoding, str(e)))
                 break
 
             except (IOError):

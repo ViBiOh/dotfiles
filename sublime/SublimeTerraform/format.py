@@ -1,4 +1,7 @@
-import sublime, sublime_plugin, subprocess
+import sublime
+import sublime_plugin
+import subprocess
+
 
 class TerraformFmt(sublime_plugin.TextCommand):
     def run(self, edit):

@@ -1,5 +1,8 @@
-import sublime, sublime_plugin, threading
+import sublime
+import sublime_plugin
+import threading
 from . async_task import AsyncTask
+
 
 class DebugTest(sublime_plugin.WindowCommand):
     panel = None
