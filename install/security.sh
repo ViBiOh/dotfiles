@@ -35,11 +35,6 @@ install() {
     | grep -v "0.0.0.0 reddit.map.fastly.net" \
     | sudo tee /etc/hosts > /dev/null
 
-  if command -v systemd > /dev/null 2>&1; then
-    sudo systemctl enable systemd-resolved.service
-    sudo systemctl restart systemd-resolved.service
-  fi
-
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
     defaults write com.apple.finder AppleShowAllFiles -bool true
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true

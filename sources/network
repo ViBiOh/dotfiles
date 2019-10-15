@@ -31,14 +31,14 @@ dns_flush_cache() {
     sudo dscacheutil -flushcache
     sudo killall -HUP mDNSResponder
 
-    if command -v dnsmasq > /dev/null 2>&1; then
+    if [[ "$(brew services list | grep -c dnsmasq)" -eq 1 ]]; then
       sudo brew services restart dnsmasq
     fi
   else
     sudo systemd-resolve --flush-caches
 
-    if command -v dnsmasq > /dev/null 2>&1; then
-      sudo /etc/init.d/dnsmasq restart
+    if [[ "$(systemctl list-unit-files dnsmasq* | wc -l)" -gt 2 ]]; then
+      sudo systemctl restart dnsmasq
     fi
   fi
 }
