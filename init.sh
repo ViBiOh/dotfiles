@@ -20,8 +20,8 @@ create_symlinks() {
 }
 
 browse_install() {
-  local LANG="C"
   local LC_ALL="C"
+  local LANG="C"
 
   for file in "${CURRENT_DIR}/install"/*; do
     local BASENAME_FILE

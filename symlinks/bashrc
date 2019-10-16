@@ -26,6 +26,7 @@ source_all() {
   local DOTFILES_PATH
   DOTFILES_PATH="$(dirname "${BASHRC_PATH}")"
 
+  local LC_ALL="C"
   local LANG="C"
 
   for file in "${DOTFILES_PATH}/../sources/"*; do
