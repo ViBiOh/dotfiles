@@ -2,6 +2,11 @@
 
 set -o nounset -o pipefail -o errexit
 
+clean() {
+  sudo rm -rf "${HOME}/.pgpass"
+  sudo rm -rf "${HOME}/.config/pgcli"
+}
+
 credentials() {
   if ! command -v pass > /dev/null 2>&1; then
     exit

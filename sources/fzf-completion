@@ -21,7 +21,7 @@ if command -v pass > /dev/null 2>&1; then
 
   passfor() {
     if pass -c "${1}" && [[ "$(pass show "${1}" | grep -c "^otpauth:")" -eq 1 ]]; then
-      read -s -p "  Press enter for otp"
+      read -s -r -p "  Press enter for otp"
       echo ""
 
       pass otp -c "${1}"
@@ -59,7 +59,7 @@ if command -v pgcli > /dev/null 2>&1; then
 
       local comment=""
 
-      while IFS=":" read -r host port db user pass
+      while IFS=":" read -r host port db user
       do
         if [[ ! "${host}" =~ ^\s*# ]] && [[ ! "${host}" =~ ^\s*$ ]]; then
           echo -e "host: ${BLUE}${host}${RESET} port: ${YELLOW}${port}${RESET} db: ${RED}${db}${RESET} user: ${GREEN}${user}${RESET} ${BLUE}${comment}${RESET}"

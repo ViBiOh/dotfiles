@@ -4,7 +4,7 @@ if ! command -v git > /dev/null 2>&1; then
   return
 fi
 
-if command -v perl > /dev/null 2>&1 && [[ -f "${HOME}/opt/bin/diff-so-fancy" ]]; then
+if [[ -f "${HOME}/opt/bin/diff-so-fancy" ]]; then
   export GIT_PAGER="${HOME}/opt/bin/diff-so-fancy | less --tabs=4 -RFX"
 fi
 
@@ -115,7 +115,7 @@ git_sync() {
   fi
 
   if [[ "${#toDelete[@]}" -ne 0 ]]; then
-    ! ${dry} && ssh "${1}" "rm -rf ${toDelete[@]}"
+    ! ${dry} && ssh "${1}" "rm -rf ${toDelete[*]}"
     echo -e "${RED} - Deleted\n${toDelete[*]}${RESET}\n"
   fi
 
@@ -135,7 +135,7 @@ watch_sync() {
 
   git_sync "${@}"
 
-  fswatch -0 -o --exclude=.git/ . | while read -d "" event
+  fswatch -0 -o --exclude=.git/ . | while read -r -d ""
   do
     git_sync "${@}"
   done

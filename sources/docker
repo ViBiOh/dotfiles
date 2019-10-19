@@ -14,7 +14,7 @@ docker_registry_clean() {
   local DOCKER_USER="${1}"
   local DOCKER_OWNER="${2}"
 
-  read -sp "DOCKER_PASSWORD: " DOCKER_PASSWORD
+  read -s -p -r "DOCKER_PASSWORD: " DOCKER_PASSWORD
   echo
 
   local OUTPUT_TXT="output.txt"
@@ -50,7 +50,8 @@ docker_registry_clean() {
     return
   fi
 
-  local REPOSITORIES=($(python -c "import json; images = json.load(open('${OUTPUT_TXT}')); print(' '.join([image['name'] for image in images]))"))
+  local REPOSITORIES
+  mapfile -t REPOSITORIES < <(python -c "import json; images = json.load(open('${OUTPUT_TXT}')); print(' '.join([image['name'] for image in images]))")
   rm "${OUTPUT_TXT}"
 
   for repository in "${REPOSITORIES[@]}"; do
@@ -66,7 +67,8 @@ docker_registry_clean() {
       continue
     fi
 
-    local TAGS=($(python -c "import json; tags = json.load(open('${OUTPUT_TXT}')); print(' '.join([tag['name'] for tag in tags['results']]))"))
+    local TAGS
+    mapfile -t TAGS < <(python -c "import json; tags = json.load(open('${OUTPUT_TXT}')); print(' '.join([tag['name'] for tag in tags['results']]))")
     rm "${OUTPUT_TXT}"
 
     for tag in "${TAGS[@]}"; do

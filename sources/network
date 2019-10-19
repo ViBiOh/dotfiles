@@ -35,11 +35,11 @@ dns_flush_cache() {
       sudo brew services restart dnsmasq
     fi
   else
-    if [[ "$(systemctl list-unit-files systemd-resolve* | wc -l)" -gt 2 ]]; then
+    if [[ "$(systemctl list-units systemd-resolve* | wc -l)" -gt 2 ]]; then
       sudo systemd-resolve --flush-caches
     fi
 
-    if [[ "$(systemctl list-unit-files dnsmasq* | wc -l)" -gt 2 ]]; then
+    if [[ "$(systemctl list-units dnsmasq* | wc -l)" -gt 2 ]]; then
       sudo systemctl restart dnsmasq
     fi
   fi

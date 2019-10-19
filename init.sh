@@ -75,17 +75,18 @@ main() {
   set -e
   set -u
 
+  if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ clean ]]; then
+    browse_install clean
+    clean_packages
+  fi
+
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ install ]]; then
-    browse_install clean install
+    browse_install install
     clean_packages
   fi
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ credentials ]]; then
     browse_install credentials
-  fi
-
-  if [[ "${ARGS}" =~ clean ]]; then
-    browse_install clean
   fi
 }
 

@@ -1,7 +1,10 @@
 {
   "clients": {
-    "lsp-go": {
+    "gopls": {
       "enabled": true,
+    },
+    "pyls": {
+      "enabled": true
     },
     "lsp-js": {
       "command": [
@@ -21,9 +24,6 @@
           ]
         }
       ]
-    },
-    "pyls": {
-      "enabled": true
     }
   }
 }
