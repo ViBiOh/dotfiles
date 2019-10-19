@@ -2,16 +2,6 @@
   "clients": {
     "lsp-go": {
       "enabled": true,
-      "command": [
-        "gopls"
-      ],
-      "scopes": [
-        "source.go"
-      ],
-      "syntaxes": [
-        "Packages/Go/Go.sublime-syntax"
-      ],
-      "languageId": "go"
     },
     "lsp-js": {
       "command": [

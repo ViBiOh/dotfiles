@@ -28,7 +28,7 @@ main() {
   cp "${SCRIPT_DIR}/settings/"* "${PKG_USER}/"
 
   if command -v go > /dev/null 2>&1; then
-    go get -u golang.org/x/tools/cmd/gopls
+    GO111MODULE=on go get golang.org/x/tools/cmd/gopls@latest
     go get -u golang.org/x/tools/cmd/gotype
   fi
 
