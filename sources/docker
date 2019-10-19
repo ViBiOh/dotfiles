@@ -14,7 +14,7 @@ docker_registry_clean() {
   local DOCKER_USER="${1}"
   local DOCKER_OWNER="${2}"
 
-  read -s -p -r "DOCKER_PASSWORD: " DOCKER_PASSWORD
+  read -s -r -p "DOCKER_PASSWORD: " DOCKER_PASSWORD
   echo
 
   local OUTPUT_TXT="output.txt"
@@ -51,12 +51,10 @@ docker_registry_clean() {
   fi
 
   local REPOSITORIES
-  mapfile -t REPOSITORIES < <(python -c "import json; images = json.load(open('${OUTPUT_TXT}')); print(' '.join([image['name'] for image in images]))")
+  IFS=" " read -r -a REPOSITORIES <<< "$(python -c "import json; images = json.load(open('${OUTPUT_TXT}')); print(' '.join([image['name'] for image in images]))")"
   rm "${OUTPUT_TXT}"
 
   for repository in "${REPOSITORIES[@]}"; do
-
-    # Listing tags
     echo -e "${BLUE}Listing tags for ${DOCKER_OWNER}/${repository}...${RESET}"
 
     local TAGS_STATUS
@@ -68,13 +66,11 @@ docker_registry_clean() {
     fi
 
     local TAGS
-    mapfile -t TAGS < <(python -c "import json; tags = json.load(open('${OUTPUT_TXT}')); print(' '.join([tag['name'] for tag in tags['results']]))")
+    IFS=" " read -r -a TAGS <<< "$(python -c "import json; tags = json.load(open('${OUTPUT_TXT}')); print(' '.join([tag['name'] for tag in tags['results']]))")"
     rm "${OUTPUT_TXT}"
 
     for tag in "${TAGS[@]}"; do
       if [[ "${tag}" != 'latest' ]] && [[ "${tag}" =~ ^[0-9A-Fa-f]{6,}$ ]]; then
-
-        # Deleting tags
         local DELETE_STATUS
         DELETE_STATUS="$("${CLIENT_ARGS[@]}" -X DELETE "${DOCKER_REGISTRY}/repositories/${DOCKER_OWNER}/${repository}/tags/${tag}/")"
         if [[ "${DELETE_STATUS}" != "204" ]]; then
