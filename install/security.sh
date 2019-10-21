@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -o nounset -o pipefail -o errexit
+set -o nounset -o pipefail
 
 install() {
   cat \
@@ -36,18 +36,81 @@ install() {
     | sudo tee /etc/hosts > /dev/null
 
   if [[ "${OSTYPE}" =~ ^darwin ]]; then
-    defaults write com.apple.finder AppleShowAllFiles -bool true
+    defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+    defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
+    defaults write NSGlobalDomain AppleFontSmoothing -int 1
+    defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
+    defaults write NSGlobalDomain AppleLanguages -array "en"
+    defaults write NSGlobalDomain AppleLocale -string "en_US@currency=EUR"
+    defaults write NSGlobalDomain AppleMeasurementUnits -string "Centimeters"
+    defaults write NSGlobalDomain AppleMetricUnits -bool true
+    defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-    defaults write com.apple.finder ShowPathbar -bool true
-    defaults write com.apple.finder ShowStatusBar -bool true
+    defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+    defaults write NSGlobalDomain com.apple.swipescrolldirection -bool true
+    defaults write NSGlobalDomain InitialKeyRepeat -int 10
+    defaults write NSGlobalDomain KeyRepeat -int 1
+    defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+    defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+    defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+    defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+    defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+    defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true
+    defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+    defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+    defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+    defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
 
+    defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
+
+    defaults write com.apple.finder AppleShowAllFiles -bool true
+    defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+    defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+    defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
+    defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
+    defaults write com.apple.finder ShowPathbar -bool true
+    defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+    defaults write com.apple.finder ShowStatusBar -bool true
+    defaults write com.apple.finder DisableAllAnimations -bool true
+
+    defaults write com.apple.Safari AutoFillCreditCardData -bool false
+    defaults write com.apple.Safari AutoFillFromAddressBook -bool false
+    defaults write com.apple.Safari AutoFillMiscellaneousForms -bool false
+    defaults write com.apple.Safari AutoFillPasswords -bool false
+    defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
+    defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
+    defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabled -bool false
+    defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabledForLocalFiles -bool false
+    defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically -bool false
+    defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2PluginsEnabled -bool false
+    defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2TabsToLinks -bool true
+    defaults write com.apple.Safari DebugSnapshotsUpdatePolicy -int 2
+    defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
+    defaults write com.apple.Safari HomePage -string "about:blank"
+    defaults write com.apple.Safari IncludeDevelopMenu -bool true
+    defaults write com.apple.Safari IncludeDevelopMenu -bool true
+    defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
+    defaults write com.apple.Safari ShowFavoritesBar -bool false
+    defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
+    defaults write com.apple.Safari ShowSidebarInTopSites -bool false
+    defaults write com.apple.Safari ShowSidebarInTopSites -bool false
     defaults write com.apple.Safari SuppressSearchSuggestions -bool true
     defaults write com.apple.Safari UniversalSearchEnabled -bool false
+    defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
+    defaults write com.apple.Safari WebAutomaticSpellingCorrectionEnabled -bool false
+    defaults write com.apple.Safari WebContinuousSpellCheckingEnabled -bool false
+    defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
+    defaults write com.apple.Safari WebKitJavaEnabled -bool false
+    defaults write com.apple.Safari WebKitJavaScriptCanOpenWindowsAutomatically -bool false
+    defaults write com.apple.Safari WebKitPluginsEnabled -bool false
+    defaults write com.apple.Safari WebKitTabToLinksPreferenceKey -bool true
 
     defaults write com.apple.screensaver askForPassword -int 1
     defaults write com.apple.screensaver askForPasswordDelay -int 0
 
     defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+    defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
     defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
 
     defaults write com.apple.dock tilesize -int 36
@@ -60,43 +123,51 @@ install() {
     defaults write com.apple.dock minimize-to-application -bool true
     defaults write com.apple.dock launchanim -bool false
 
-    defaults write com.apple.Safari HomePage -string "about:blank"
-    defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
-    defaults write com.apple.Safari ShowSidebarInTopSites -bool false
-    defaults write com.apple.Safari DebugSnapshotsUpdatePolicy -int 2
-    defaults write com.apple.Safari IncludeDevelopMenu -bool true
-
     defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
+    defaults write com.apple.ActivityMonitor ShowCategory -int 0
+    defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
+    defaults write com.apple.ActivityMonitor SortDirection -int 0
+
+    defaults write com.apple.DiskUtility DUDebugMenuEnabled -bool true
+    defaults write com.apple.DiskUtility advanced-image-options -bool true
+
+    defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+    defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 1
+    defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
+    defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
+
+    defaults write com.apple.CrashReporter DialogType none
+
+    defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+
+    defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
+
+    defaults write com.apple.screencapture disable-shadow -bool true
+    defaults write com.apple.screencapture location -string "${HOME}/Downloads"
+    defaults write com.apple.screencapture type -string "png"
+
+    sudo systemsetup -setrestartfreeze on
     sudo systemsetup -setwakeonnetworkaccess off
 
     # Disable the sudden motion sensor as it’s not useful for SSDs
+    sudo pmset -a hibernatemode 0
+    sudo pmset -a lidwake 1
     sudo pmset -a sms 0
+    sudo pmset -b displaysleep 5
+    sudo pmset -b sleep 10
+    sudo pmset -c displaysleep 10
+    sudo pmset -c sleep 15
 
+    sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
+    sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
+    sudo defaults write /Library/Preferences/com.apple.loginwindow RetriesUntilHint -int 0
+    sudo defaults write /Library/Preferences/com.apple.loginwindow showInputMenu -bool true
     sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool true
     sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
 
-    sudo defaults write /Library/Preferences/com.apple.loginwindow RetriesUntilHint -int 0
-    sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
-
-    defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 1
-    defaults write com.apple.CrashReporter DialogType none
-
-    defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-    defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
-    defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
-    defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-
-    defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
-    defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
-    defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
-
-    defaults write com.apple.screencapture location -string "${HOME}/Downloads"
-    defaults write com.apple.screencapture type -string "png"
-    defaults write com.apple.screencapture disable-shadow -bool true
-
+    sudo launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
     sudo launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
-    sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.SubmitDiagInfo.plist
 
     sudo nvram SystemAudioVolume=" "
     sudo scutil --set ComputerName macbook
