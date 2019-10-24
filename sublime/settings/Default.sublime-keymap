@@ -41,7 +41,7 @@
     ]
   },
   {
-    "keys": ["super+m"],
+    "keys": ["super+ù"],
     "command": "set_layout",
     "args": {
       "cols": [0.0, 1.0],
@@ -50,7 +50,7 @@
     }
   },
   {
-    "keys": ["super+l"],
+    "keys": ["super+;"],
     "command": "set_layout",
     "args": {
       "cols": [0.0, 0.5, 1.0],
