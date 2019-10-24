@@ -4,18 +4,10 @@
 # $2 : Label for prompt
 # $3 : Default value
 read_variable_if_required() {
-  local PROMPT="${2:-${1}}"
-  if [[ -n "${3}" ]]; then
-    PROMPT="${PROMPT} [${3}]"
-  fi
-  PROMPT="${PROMPT}="
-
   if [[ -z "${!1:-}" ]]; then
-    read -r -p "${PROMPT}" READ_VALUE
+    read -r -p "${2:-${1}}${3:+ [${3}]}=" READ_VALUE
     eval "${1}=${READ_VALUE:-${3}}"
   else
     echo "${1}=${!1}"
   fi
 }
-
-export -f read_variable_if_required
