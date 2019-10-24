@@ -54,6 +54,17 @@ log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" > /dev/null
     scutil --dns
     networksetup -getdnsservers "Wi-Fi"
   elif command -v apt-get > /dev/null 2>&1; then
+    sudo systemctl enable dnsmasq
     sudo systemctl restart dnsmasq
+  fi
+
+  if command -v resolvconf > /dev/null 2>&1; then
+    if [[ -d "/etc/NetworkManager/" ]]; then
+      echo "dns=none" | sudo tee "/etc/NetworkManager/NetworkManager.conf" > /dev/null
+    fi
+
+    echo "resolv_conf=/etc/resolv.conf
+name_servers=127.0.0.1" | sudo tee "/etc/resolvconf.conf" > /dev/null
+    sudo resolvconf -u
   fi
 }

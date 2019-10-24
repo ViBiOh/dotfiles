@@ -52,6 +52,6 @@ END_OF_BASH_PROFILE
     fi
 
     sudo pacman -Syuq --noconfirm
-    sudo pacman -S --noconfirm --needed "${PACKAGES[@]}" make gcc binutils
+    sudo pacman -S --noconfirm --needed "${PACKAGES[@]}" make gcc binutils dnsutils iproute2
   fi
 }
