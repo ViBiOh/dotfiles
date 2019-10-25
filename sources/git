@@ -61,7 +61,7 @@ git_sync() {
     return ${isGit}
   fi
 
-  local REMOTE_PATH_PREFIX="${HOME}/${2}"
+  local REMOTE_PATH_PREFIX="~/${2}"
   if [[ "${2:0:1}" == "/" ]]; then
     REMOTE_PATH_PREFIX="${2}"
   fi
