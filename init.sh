@@ -11,6 +11,22 @@ print_title() {
   printf "%s%s%s\n" "+-" "${line:0:${#1}}" "-+"
 }
 
+usage() {
+    printf "Usage of %s\n" "${0}"
+    printf "symlinks\n"
+    printf "\t Create symlink of dotfiles into \${HOME}\n"
+    printf "clean\n"
+    printf "\t Clean installation and temporary files\n"
+    printf "install\n"
+    printf "\t Install required softwares\n"
+    printf "credentials\n"
+    printf "\t Extract credentials into dotfiles in \${HOME}\n"
+    printf "[blank]\n"
+    printf "\t Run all stages\n"
+    printf "help\n"
+    printf "\t Print this help\n"
+}
+
 create_symlinks() {
   for file in "${CURRENT_DIR}/symlinks"/*; do
     local BASENAME_FILE
@@ -62,6 +78,11 @@ clean_packages() {
 
 main() {
   local ARGS="${*}"
+
+  if [[ "${ARGS}" =~ help ]]; then
+    usage
+    return 1
+  fi
 
   if [[ -z "${ARGS}" ]] || [[ "${ARGS}" =~ symlinks ]]; then
     print_title "symlinks"
