@@ -44,7 +44,7 @@ END_OF_BASH_PROFILE
     sudo apt-get upgrade -y -qq
     sudo apt-get install -y -qq apt-transport-https
 
-    sudo apt-get install -y -qq "${PACKAGES[@]}"
+    sudo apt-get install -y -qq "${PACKAGES[@]}" dnsutils
   elif command -v pacman > /dev/null 2>&1; then
     # Enabling fn key as f1..f12 instead of media on macbook keyboard
     if [[ "$(grep -c "hid_apple" /etc/modprobe.d/hid_apple.conf)" -eq 0 ]]; then
