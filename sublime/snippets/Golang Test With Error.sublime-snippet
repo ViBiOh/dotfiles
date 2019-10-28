@@ -21,11 +21,7 @@ func Test${1:FuncName}(t *testing.T) {
 
 			failed := false
 
-			if err == nil && testCase.wantErr != nil {
-				failed = true
-			} else if err != nil && testCase.wantErr == nil {
-				failed = true
-			} else if err != nil && err.Error() != testCase.wantErr.Error() {
+			if testCase.wantErr != nil && errors.Is(err, testCase.wantErr) {
 				failed = true
 			} else if result != testCase.want {
 				failed = true
