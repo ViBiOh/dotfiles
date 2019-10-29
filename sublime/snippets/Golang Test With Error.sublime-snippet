@@ -21,7 +21,7 @@ func Test${1:FuncName}(t *testing.T) {
 
 			failed := false
 
-			if testCase.wantErr != nil && errors.Is(err, testCase.wantErr) {
+			if testCase.wantErr != nil && !errors.Is(err, testCase.wantErr) {
 				failed = true
 			} else if result != testCase.want {
 				failed = true
