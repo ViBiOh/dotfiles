@@ -1,13 +1,25 @@
 #!/usr/bin/env bash
 
 # $1 : Variable name
-# $2 : Label for prompt
-# $3 : Default value
+# $2 : Default value
+# $3 : "secret" if variable should not be printed
+
 read_variable_if_required() {
+  local SECRET_ARG=""
+  if [[ "${3:-}" == "secret" ]]; then
+    SECRET_ARG="-s"
+  fi
+
   if [[ -z "${!1:-}" ]]; then
-    read -r -p "${2:-${1}}${3:+ [${3}]}=" READ_VALUE
-    eval "${1}=${READ_VALUE:-${3}}"
+    read ${SECRET_ARG} -r -p "${1}${2:+ [${2}]}=" READ_VALUE
+    eval "${1}=${READ_VALUE:-${2}}"
+
+    if [[ "${SECRET_ARG}" == "-s" ]]; then
+      printf "\n"
+    fi
+  elif [[ "${SECRET_ARG}" != "-s" ]]; then
+    printf "%s=%s\n" "${1}" "${!1}"
   else
-    echo "${1}=${!1}"
+    printf "Using secret %s\n" "${1}"
   fi
 }
