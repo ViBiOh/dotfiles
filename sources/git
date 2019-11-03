@@ -10,14 +10,7 @@ fi
 
 git_browse() {
   for dir in "$(pwd)"/*; do
-    pushd "${dir}" || return
-
-    if [[ "$(git rev-parse --is-inside-work-tree 2>&1)" == "true" ]]; then
-      echo "${dir}"
-      eval "${@}"
-    fi
-
-    popd || return
+    (cd "${dir}"  && git rev-parse --is-inside-work-tree > /dev/null 2>&1 && echo "${dir}" && eval "${@}")
   done
 }
 
@@ -33,14 +26,9 @@ head_sync() {
     return 1
   fi
 
-  local REMOTE_PATH_PREFIX="~/${2}"
-  if [[ "${2:0:1}" == "/" ]]; then
-    REMOTE_PATH_PREFIX="${2}"
-  fi
-
   local branch
   branch="$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')"
-  ssh "${1}" "cd ${REMOTE_PATH_PREFIX} && git reset HEAD . && git clean -f && git status -u -s | awk '{print $2}' | xargs rm -rf && git checkout -- . && git fetch && git checkout ${branch} && git pull"
+  ssh "${1}" "cd ${2} && git reset HEAD . && git clean -f && git status -u -s | awk '{print $2}' | xargs rm -rf && git checkout -- . && git fetch && git checkout ${branch} && git pull"
 }
 
 git_sync() {

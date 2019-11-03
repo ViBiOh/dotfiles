@@ -13,11 +13,13 @@ install() {
     exit
   fi
 
-  if [[ ! -d "${HOME}/opt/fzf" ]]; then
-    git clone --depth 1 https://github.com/junegunn/fzf.git "${HOME}/opt/fzf"
+  local FZF_INSTALL_DIR="${HOME}/opt/fzf"
+
+  if [[ ! -d "${FZF_INSTALL_DIR}" ]]; then
+    git clone --depth 1 https://github.com/junegunn/fzf.git "${FZF_INSTALL_DIR}"
   else
-    pushd "${HOME}/opt/fzf" && git pull && popd
+    (cd "${FZF_INSTALL_DIR}" && git pull)
   fi
 
-  "${HOME}/opt/fzf/install" --key-bindings --completion --no-zsh --no-fish --no-update-rc
+  "${FZF_INSTALL_DIR}/install" --key-bindings --completion --no-zsh --no-fish --no-update-rc
 }

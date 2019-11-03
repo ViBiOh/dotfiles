@@ -27,8 +27,7 @@ install() {
   if command -v subl > /dev/null 2>&1; then
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    pushd "${SCRIPT_DIR}/../sublime"
-    ./install.sh
-    popd
+
+    "${SCRIPT_DIR}/../sublime/install.sh"
   fi
 }
