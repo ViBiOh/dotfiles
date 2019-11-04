@@ -19,7 +19,7 @@
 [alias]
 	web = "!f() { [[ "$(git remote get-url --push $(git remote show | head -1))" =~ ^.*@(.*):(.*)$ ]] && open "https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"; }; f"
 	pr = "!f() { [[ "$(git remote get-url --push $(git remote show | head -1))" =~ ^.*@(.*):(.*)$ ]] && open "https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]%.git}/compare/master...$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')?expand=1"; }; f"
-	sweep = "!f() { git prune && git gc && git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d; }; f"
+	sweep = "!f() { git prune && git remote prune origin && git gc && git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d; }; f"
 	co = "!f() { git checkout "$(git branch -vv --all | fzf --height 30 --ansi --reverse -1 -q ${1:-"remotes/"} | awk '{print $1}' | sed 's|^remotes/origin/||')"; }; f"
 	tidy = rebase -i master
 	rbm = pull --rebase origin master
