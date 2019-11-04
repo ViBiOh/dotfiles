@@ -1,4 +1,5 @@
 {
+  "prefer_label_over_filter_text": true,
   "clients": {
     "gopls": {
       "enabled": true,
