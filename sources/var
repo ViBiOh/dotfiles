@@ -11,7 +11,7 @@ read_variable_if_required() {
   fi
 
   if [[ -z "${!1:-}" ]]; then
-    read ${SECRET_ARG} -r -p "${1}${2:+ [${2}]}=" READ_VALUE
+    read ${SECRET_ARG?} -r -p "${1}${2:+ [${2}]}=" READ_VALUE
     eval "${1}=${READ_VALUE:-${2}}"
 
     if [[ "${SECRET_ARG}" == "-s" ]]; then
