@@ -28,6 +28,6 @@ install() {
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-    "${SCRIPT_DIR}/../sublime/install.sh"
+    "${SCRIPT_DIR}/../sublime/init"
   fi
 }
