@@ -6,7 +6,7 @@
 mkdir -p ${HOME}/code/
 cd ${HOME}/code/
 git clone https://github.com/ViBiOh/dotfiles.git
-./dotfiles/init.sh
+./dotfiles/init
 ```
 
 ### Configuration
