@@ -6,12 +6,6 @@ install() {
   cat \
     <(curl -q -sS -L "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
     <(curl -q -sS -L "https://someonewhocares.org/hosts/zero/hosts") \
-    <(echo "0.0.0.0 cdn-eu.realytics.net") \
-    <(echo "0.0.0.0 i.realytics.io") \
-    <(echo "0.0.0.0 api.realytics.io") \
-    <(echo "0.0.0.0 lead-the-way.fr") \
-    <(echo "0.0.0.0 www.lead-the-way.fr") \
-    <(echo "0.0.0.0 gl.hostcg.com") \
     <(echo "127.0.0.1 $(hostname)") \
     | egrep -v '^\s*#' \
     | egrep -v '^$' \
