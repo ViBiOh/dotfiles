@@ -25,7 +25,7 @@
     "*.jar",
     "*.zip",
     "*.gzip",
-    "*.js.map"
+    "*.js.map",
     "*.tar",
     "*.tar.gz",
     ".cache/",
@@ -39,7 +39,7 @@
     "node_modules/",
     "release/",
     "vendor/",
-    "vendors/",
+    "vendors/"
   ],
   "close_windows_when_empty": false,
   "default_line_ending": "unix",
