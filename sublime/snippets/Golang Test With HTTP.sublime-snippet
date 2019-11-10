@@ -26,7 +26,7 @@ func Test${1:FuncName}(t *testing.T) {
 				t.Errorf("Status %d, want %d", result, testCase.wantStatus)
 			}
 
-			if result, _ := request.ReadBody(writer.Result().Body); string(result) != testCase.want {
+			if result, _ := request.ReadBodyResponse(writer.Result().Body); string(result) != testCase.want {
 				t.Errorf("Output `%s`, want `%s`", string(result), testCase.want)
 			}
 
@@ -36,6 +36,7 @@ func Test${1:FuncName}(t *testing.T) {
 					t.Errorf("%s Header = `%s`, want `%s`", key, result, want)
 				}
 			}
+		})
 	}
 }
 
