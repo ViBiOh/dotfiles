@@ -3,7 +3,6 @@
   "in_process_packages": [],
   "installed_packages": [
     "DocBlockr",
-    "Git",
     "JsPrettier",
     "LSP",
     "Naomi",

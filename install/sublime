@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   if command -v brew > /dev/null 2>&1; then
-    brew cask reinstall sublime-text
+    brew cask reinstall sublime-text sublime-merge
     ln -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" "${HOME}/opt/bin/subl"
   elif command -v pacman > /dev/null 2>&1; then
     if [[ "$(grep -c "sublime-text" "/etc/pacman.conf")" -eq 0 ]]; then
@@ -21,7 +21,7 @@ install() {
       sudo pacman -Syuq --noconfirm
     fi
 
-    sudo pacman -S --noconfirm --needed sublime-text
+    sudo pacman -S --noconfirm --needed sublime-text sublime-merge
   fi
 
   if command -v subl > /dev/null 2>&1; then
