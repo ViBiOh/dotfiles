@@ -41,9 +41,9 @@ install() {
 
   local TERRAFORM_ARCHIVE="terraform_${TERRAFORM_VERSION}_${OS}_${ARCH}.zip"
 
-  curl -sS -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/${TERRAFORM_ARCHIVE}"
+  curl -sSqL --max-time 10 -o "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/${TERRAFORM_ARCHIVE}"
   unzip -o -d "${HOME}/opt/bin" "${TERRAFORM_ARCHIVE}"
   rm -rf "${TERRAFORM_ARCHIVE}"
 
-  curl -sS -L "https://raw.githubusercontent.com/MeilleursAgents/terraform-provider-ansiblevault/master/install.sh" | bash
+  curl -sSqL --max-time 10 "https://raw.githubusercontent.com/MeilleursAgents/terraform-provider-ansiblevault/master/install.sh" | bash
 }

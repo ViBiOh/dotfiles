@@ -14,7 +14,7 @@ docker_registry_clean() {
   local HTTP_OUTPUT="http_output.txt"
   local HTTP_STATUS
 
-  local CLIENT_ARGS=("curl" "-q" "-sS" "-o" "${HTTP_OUTPUT}" "-w" "%{http_code}")
+  local CLIENT_ARGS=("curl" "-sSqL" "--max-time" "10" "-o" "${HTTP_OUTPUT}" "-w" "%{http_code}")
 
   # Login to registry
   HTTP_STATUS="$("${CLIENT_ARGS[@]}" -X POST "${DOCKER_REGISTRY}/users/login/" \
