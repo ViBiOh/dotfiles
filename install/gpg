@@ -22,7 +22,7 @@ install() {
   fi
 
   mkdir -p "${HOME}/.gnupg"
-  chmod 700 "${HOME}/.gnupg/"
+  chmod 700 $!
 
   echo "enable-ssh-support
 default-cache-ttl 3600

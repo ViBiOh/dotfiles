@@ -21,7 +21,7 @@ start_ssh_agent() {
     echo "Initializing new SSH agent..."
 
     touch "${SSH_ENV}"
-    chmod 600 "${SSH_ENV}"
+    chmod 600 $!
 
     ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
     source "${SSH_ENV}" > /dev/null
