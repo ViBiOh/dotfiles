@@ -7,8 +7,9 @@ install() {
     <(curl -sS -L "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
     <(curl -sS -L "https://someonewhocares.org/hosts/zero/hosts") \
     <(echo "127.0.0.1 $(hostname)") \
-    | egrep -v '^\s*#' \
-    | egrep -v '^$' \
+    | grep -E -v '^$' \
+    | grep -E -v '^\s*#' \
+    | grep -E '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' \
     | sort \
     | uniq \
     | grep -v "0.0.0.0 www.linkedin.com" \
