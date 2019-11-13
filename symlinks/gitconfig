@@ -70,3 +70,10 @@
 	old = red bold
 	new = green bold
 	whitespace = red reverse
+
+[merge]
+	tool = smerge
+
+[mergetool "smerge"]
+	cmd = smerge mergetool \"$BASE\" \"$LOCAL\" \"$REMOTE\" -o \"$MERGED\"
+	trustExitCode = true
