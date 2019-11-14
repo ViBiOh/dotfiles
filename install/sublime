@@ -11,7 +11,7 @@ install() {
       local SUBLIME_TEXT_SIGN_KEY="8A8F901A"
       local SUBLIME_TEXT_KEY_FILE="sublimehq-pub.gpg"
 
-      curl -q -sSL -O "https://download.sublimetext.com/${SUBLIME_TEXT_KEY_FILE}"
+      curl -q -sSL --max-time 10 -O "https://download.sublimetext.com/${SUBLIME_TEXT_KEY_FILE}"
       sudo pacman-key --add "${SUBLIME_TEXT_KEY_FILE}"
       sudo pacman-key --lsign-key "${SUBLIME_TEXT_SIGN_KEY}"
       rm "${SUBLIME_TEXT_KEY_FILE}"
