@@ -15,7 +15,7 @@ install() {
   fi
 
   local KUBERNETES_VERSION
-  KUBERNETES_VERSION="$(curl -sSqL --max-time 10 https://storage.googleapis.com/kubernetes-release/release/stable.txt)"
-  curl -sSqL --max-time 10 -o "${HOME}/opt/bin/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl"
+  KUBERNETES_VERSION="$(curl -q -sSL --max-time 10 https://storage.googleapis.com/kubernetes-release/release/stable.txt)"
+  curl -q -sSL --max-time 10 -o "${HOME}/opt/bin/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl"
   chmod +x "${HOME}/opt/bin/kubectl"
 }

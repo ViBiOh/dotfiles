@@ -10,7 +10,7 @@ github_last_release() {
   local RESET="\033[0m"
 
   local HTTP_OUTPUT="http_output.txt"
-  local CLIENT_ARGS=("curl" "-sSqL" "--max-time" "10" "-o" "${HTTP_OUTPUT}" "-w" "%{http_code}")
+  local CLIENT_ARGS=("curl" "-q" "-sSL" "--max-time" "10" "-o" "${HTTP_OUTPUT}" "-w" "%{http_code}")
 
   local REQUEST_STATUS
   REQUEST_STATUS="$("${CLIENT_ARGS[@]}" "https://api.github.com/repos/${1}/releases/latest")"
@@ -36,7 +36,7 @@ configure_repository() {
   local RESET="\033[0m"
 
   local HTTP_OUTPUT="http_output.txt"
-  local CLIENT_ARGS=("curl" "-sSqL" "--max-time" "10" "-o" "${HTTP_OUTPUT}" "-w" "%{http_code}" "-H" "Authorization: token ${GITHUB_OAUTH_TOKEN}")
+  local CLIENT_ARGS=("curl" "-q" "-sSL" "--max-time" "10" "-o" "${HTTP_OUTPUT}" "-w" "%{http_code}" "-H" "Authorization: token ${GITHUB_OAUTH_TOKEN}")
 
   local REQUEST_STATUS
   REQUEST_STATUS="$("${CLIENT_ARGS[@]}" "-H" "Content-Type: application/json" "-X" "PATCH" "https://api.github.com/repos/${1}" "-d" '{
