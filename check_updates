@@ -2,11 +2,20 @@
 
 set -o nounset -o pipefail -o errexit
 
-rg "CTOP_VERSION=" install/
-github_last_release bcicen/ctop
+main() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-rg "SYNCTHING_VERSION=" install/
-github_last_release syncthing/syncthing
+  source "${SCRIPT_DIR}/scripts/meta" && meta_init "github"
 
-rg "TERRAFORM_VERSION=" install/
-github_last_release hashicorp/terraform
+  rg "CTOP_VERSION=" install/
+  github_last_release bcicen/ctop
+
+  rg "SYNCTHING_VERSION=" install/
+  github_last_release syncthing/syncthing
+
+  rg "TERRAFORM_VERSION=" install/
+  github_last_release hashicorp/terraform
+}
+
+main

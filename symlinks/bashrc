@@ -32,6 +32,10 @@ source_all() {
   for file in "${DOTFILES_PATH}/../sources/"*; do
     [[ -r "${file}" ]] && [[ -f "${file}" ]] && source "${file}"
   done
+
+  if [[ -e "${DOTFILES_PATH}/../scripts/meta" ]]; then
+    source "${DOTFILES_PATH}/../scripts/meta" && meta_init "git" "github" "version" "docker_registry_cleanup"
+  fi
 }
 
 set_locale

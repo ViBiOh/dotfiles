@@ -18,7 +18,9 @@ git_root() {
   git rev-parse --is-inside-work-tree > /dev/null 2>&1 && cd "$(git rev-parse --show-toplevel)" || return
 }
 
-alias ...="git_root"
+...() {
+  cd "$(git_root)" || return 1
+}
 
 head_sync() {
   if [[ "${#}" -ne 2 ]]; then
@@ -37,11 +39,7 @@ git_sync() {
     return 1
   fi
 
-  local BLUE="\033[0;34m"
-  local GREEN="\033[0;32m"
-  local RED="\033[0;31m"
-  local RESET="\033[0m"
-  local YELLOW="\033[0;33m"
+  var_color
 
   git_root
   isGit=$?

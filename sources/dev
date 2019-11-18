@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-alias dev="cd ${HOME}/code/"
-alias grep="grep --color=auto"
+alias dev='cd ${HOME}/code/'
+alias grep='grep --color=auto'
 
-export EDITOR=vim
 alias vi="vim"
-export TERM=xterm-256color
+export EDITOR="vim"
+export TERM="xterm-256color"
 
 if command -v xdg-open > /dev/null 2>&1; then
   alias open="xdg-open"
@@ -13,24 +13,6 @@ fi
 
 random() {
   openssl rand -base64 "${1:-30}"
-}
-
-bump_deps() {
-  if [[ -e "package.json" ]]; then
-    ncu -u
-    npm install --ignore-scripts
-    npm audit fix
-  fi
-
-  if [[ -e "go.mod" ]]; then
-    go get -u ./...
-    go mod tidy
-    git diff go.mod
-  fi
-
-  if [[ -e "provider.tf" ]]; then
-    terraform init -upgrade
-  fi
 }
 
 if command -v systemctl > /dev/null 2>&1; then
@@ -46,55 +28,3 @@ if command -v systemctl > /dev/null 2>&1; then
     sudo journalctl -u "${@}"
   }
 fi
-
-semver() {
-  if [[ "${#}" -ne 1 ]]; then
-    echo "Usage: semver [major|minor|patch]"
-    return 1
-  fi
-
-  local PREFIX="v"
-  local MAJOR="0"
-  local MINOR="0"
-  local PATCH="0"
-
-  local CURRENT_VERSION
-  CURRENT_VERSION="$(git describe --tag 2> /dev/null | awk -F "-" '{print $1}')"
-  if [[ -n "${CURRENT_VERSION}" ]]; then
-    if ! [[ "${CURRENT_VERSION}" =~ ([a-zA-Z]*)([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-      echo "invalid version ${CURRENT_VERSION}"
-      return 1
-    fi
-
-    local PREFIX="${BASH_REMATCH[1]}"
-    local MAJOR="${BASH_REMATCH[2]}"
-    local MINOR="${BASH_REMATCH[3]}"
-    local PATCH="${BASH_REMATCH[4]}"
-  fi
-
-  case "${1}" in
-    "major")
-      MAJOR="$(( ${MAJOR}+1 ))"
-      MINOR="0"
-      PATCH="0"
-      ;;
-
-    "minor")
-      MINOR="$(( ${MINOR}+1 ))"
-      PATCH="0"
-      ;;
-
-    "patch")
-      PATCH="$(( ${PATCH}+1 ))"
-      ;;
-
-    *)
-      echo "unknown version name %{1}"
-      return 1
-  esac
-
-  local NEW_VERSION="${PREFIX}${MAJOR}.${MINOR}.${PATCH}"
-
-  echo "New version is: ${NEW_VERSION}"
-  git tag "${NEW_VERSION}"
-}
