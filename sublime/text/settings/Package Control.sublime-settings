@@ -14,6 +14,7 @@
     "SublimeLinter-golint",
     "SublimeLinter-gotype",
     "SublimeLinter-shellcheck",
+    "SublimeLinter-contrib-yamllint",
     "Terraform"
   ]
 }
