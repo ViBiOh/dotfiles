@@ -8,7 +8,7 @@ install() {
 
   (
     cd "${SCRIPT_DIR}/../"
-    curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash
+    curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash
     source "scripts/meta" && meta_init "git" "github" "version" "docker_registry_cleanup"
   )
 }

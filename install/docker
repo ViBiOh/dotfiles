@@ -29,6 +29,6 @@ install() {
     ARCH="amd64"
   fi
 
-  curl -q -sSL --max-time 60 -o "${HOME}/opt/bin/ctop" "https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-${OS}-${ARCH}"
+  curl -q -sSL --max-time 300 -o "${HOME}/opt/bin/ctop" "https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-${OS}-${ARCH}"
   chmod +x "${HOME}/opt/bin/ctop"
 }

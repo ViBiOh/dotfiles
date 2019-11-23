@@ -4,8 +4,8 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   cat \
-    <(curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
-    <(curl -q -sSL --max-time 10 "https://someonewhocares.org/hosts/zero/hosts") \
+    <(curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
+    <(curl -q -sSL --max-time 30 "https://someonewhocares.org/hosts/zero/hosts") \
     <(echo "127.0.0.1 $(hostname)") \
     | grep -E -v '^$' \
     | grep -E -v '^\s*#' \
