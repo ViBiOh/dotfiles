@@ -18,7 +18,7 @@ start_ssh_agent() {
   stop_ssh_agent
 
   if [[ -e "${SSH_KEY}" ]]; then
-    echo "Initializing new SSH agent..."
+    printf "Initializing new SSH agent...\n"
 
     touch "${SSH_ENV}"
     chmod 600 "${SSH_ENV}"

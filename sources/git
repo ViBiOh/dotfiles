@@ -24,7 +24,7 @@ git_root() {
 
 head_sync() {
   if [[ "${#}" -ne 2 ]]; then
-    echo "Usage: head_sync [REMOTE_SERVER] [REMOTE_PATH]"
+    printf "%bUsage: head_sync [REMOTE_SERVER] [REMOTE_PATH]%b\n" "${RED}" "${RESET}"
     return 1
   fi
 
@@ -35,7 +35,7 @@ head_sync() {
 
 git_sync() {
   if [[ "${#}" -lt 2 ]]; then
-    echo "Usage: git_sync [REMOTE_SERVER] [REMOTE_PATH] [DRY]?"
+    printf "%bUsage: git_sync [REMOTE_SERVER] [REMOTE_PATH] [DRY]?%b\n" "${RED}" "${RESET}"
     return 1
   fi
 
@@ -58,13 +58,13 @@ git_sync() {
   fi
 
   if [[ "${dry}" == true ]]; then
-    echo -e "${BLUE}Dry run of syncing files...${RESET}\n"
+    printf "%bDry run of syncing files...%b\n" "${BLUE}" "${RESET}"
   else
-    echo -e "${BLUE}Syncing files...${RESET}\n"
+    printf "%bSyncing files...%b\n" "${BLUE}" "${RESET}"
   fi
 
-  local toSync=()
-  local toDelete=()
+  declare -a toSync
+  declare -a toDelete
 
   local IFS=$'\n'
   for gitFile in $(git status --porcelain); do
@@ -73,45 +73,44 @@ git_sync() {
 
     case "${trimmedPrefix:0:1}" in
       "M" | "A" | "?")
-        toSync=("${toSync[@]}" "${gitFile:3}")
+        toSync+=("${gitFile:3}")
         ;;
 
       "D")
-        toDelete=("${toDelete[@]}" "${REMOTE_PATH_PREFIX}/${gitFile:3}")
+        toDelete+=("${REMOTE_PATH_PREFIX}/${gitFile:3}")
         ;;
 
       "R")
         local originFile
-        originFile="$(echo -n "${gitFile}" | awk '{print $2}')"
+        originFile="$(printf "%s" "${gitFile}" | awk '{print $2}')"
         local destinationFile
-        destinationFile="$(echo -n "${gitFile}" | awk '{print $4}')"
+        destinationFile="$(printf "%s" "${gitFile}" | awk '{print $4}')"
 
-        toDelete=("${toDelete[@]}" "${REMOTE_PATH_PREFIX}/${originFile}")
-        toSync=("${toSync[@]}" "${destinationFile}")
+        toDelete+=("${REMOTE_PATH_PREFIX}/${originFile}")
+        toSync+=("${destinationFile}")
         ;;
 
       *)
-        echo -e "${BLUE} ¯\_(ツ)_/¯ Don't know how to handle ${gitFile}${RESET}"
+        printf "%b¯\_(ツ)_/¯ Don't know how to handle ${gitFile}%b\n" "${BLUE}" "${RESET}"
     esac
   done
 
   if ! ${dry}; then
-    echo -e "${YELLOW}Cleaning remote${RESET}\n"
+    printf "%bCleaning remote%b\n" "${YELLOW}" "${RESET}"
     ssh "${1}" "cd ${REMOTE_PATH_PREFIX} && git clean -f && git checkout -- ."
   fi
 
   if [[ "${#toDelete[@]}" -ne 0 ]]; then
     ! ${dry} && ssh "${1}" "rm -rf ${toDelete[*]}"
-    echo -e "${RED} - Deleted\n${toDelete[*]}${RESET}\n"
+    printf "%b - Deleted\n%s%b\n" "${RED}" "${toDelete[*]}" "${RESET}"
   fi
 
   if [[ "${#toSync[@]}" -ne 0 ]]; then
     ! ${dry} && rsync -raR "${toSync[@]}" "${1}:${REMOTE_PATH_PREFIX}/"
-    echo -e "${GREEN} + Copied\n${toSync[*]}${RESET}\n"
+    printf "%b + Copied\n%s%b\n" "${GREEN}" "${toSync[*]}" "${RESET}"
   fi
 
-  echo -e "${BLUE}Done!${RESET}"
-  echo
+  printf "%bDone!%b\n\n" "${BLUE}" "${RESET}"
 }
 
 watch_sync() {
