@@ -3,6 +3,7 @@
   "in_process_packages": [],
   "installed_packages": [
     "DocBlockr",
+    "EditorConfig",
     "JsPrettier",
     "LSP",
     "Naomi",
@@ -10,11 +11,11 @@
     "Pretty JSON",
     "SideBarEnhancements",
     "SublimeLinter",
+    "SublimeLinter-contrib-yamllint",
     "SublimeLinter-eslint",
     "SublimeLinter-golint",
     "SublimeLinter-gotype",
     "SublimeLinter-shellcheck",
-    "SublimeLinter-contrib-yamllint",
     "Terraform"
   ]
 }
