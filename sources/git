@@ -10,12 +10,8 @@ fi
 
 git_browse() {
   for dir in "$(pwd)"/*; do
-    (cd "${dir}"  && git rev-parse --is-inside-work-tree > /dev/null 2>&1 && echo "${dir}" && eval "${@}")
+    (cd "${dir}" && [[ $(git_is_inside) = "true" ]] && echo "${dir}" && eval "${@}")
   done
-}
-
-git_root() {
-  git rev-parse --is-inside-work-tree > /dev/null 2>&1 && cd "$(git rev-parse --show-toplevel)" || return
 }
 
 ...() {
