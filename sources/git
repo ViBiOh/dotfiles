@@ -56,7 +56,7 @@ git_sync() {
   if [[ "${dry}" == true ]]; then
     printf "%bDry run of syncing files...%b\n" "${BLUE}" "${RESET}"
   else
-    printf "%bSyncing files...%b\n" "${BLUE}" "${RESET}"
+    printf "%bSyncing files at %s...%b\n" "${BLUE}" "$(date +'%H:%M:%S')" "${RESET}"
   fi
 
   declare -a toSync
@@ -106,7 +106,7 @@ git_sync() {
     printf "%b + Copied\n%s%b\n" "${GREEN}" "${toSync[*]}" "${RESET}"
   fi
 
-  printf "%bDone!%b\n\n" "${BLUE}" "${RESET}"
+  printf "%bDone at %s!%b\n\n" "${BLUE}" "$(date +'%H:%M:%S')" "${RESET}"
 }
 
 watch_sync() {
