@@ -98,12 +98,12 @@ git_sync() {
 
   if [[ "${#toDelete[@]}" -ne 0 ]]; then
     ! ${dry} && ssh "${1}" "rm -rf ${toDelete[*]}"
-    printf "%b - Deleted\n%s%b\n" "${RED}" "${toDelete[*]}" "${RESET}"
+    printf "%b- Deleted\n%s%b\n" "${RED}" "${toDelete[*]}" "${RESET}"
   fi
 
   if [[ "${#toSync[@]}" -ne 0 ]]; then
     ! ${dry} && rsync -raR "${toSync[@]}" "${1}:${REMOTE_PATH_PREFIX}/"
-    printf "%b + Copied\n%s%b\n" "${GREEN}" "${toSync[*]}" "${RESET}"
+    printf "%b+ Copied\n%s%b\n" "${GREEN}" "${toSync[*]}" "${RESET}"
   fi
 
   printf "%bDone at %s!%b\n\n" "${BLUE}" "$(date +'%H:%M:%S')" "${RESET}"
