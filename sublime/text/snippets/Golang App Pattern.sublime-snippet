@@ -16,7 +16,7 @@ type app struct {
 // Flags adds flags for configuring package
 func Flags(fs *flag.FlagSet, prefix string) Config {
 	return Config{
-		${1:FlagName}: tools.NewFlag(prefix, "${4:FlagPrefix}").Name("${2:FlagValue}").Default("").Label("${3:FlagDesc}").ToString(fs),
+		${1:FlagName}: flags.New(prefix, "${4:FlagPrefix}").Name("${2:FlagValue}").Default("").Label("${3:FlagDesc}").ToString(fs),
 	}
 }
 
