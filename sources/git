@@ -78,9 +78,9 @@ git_sync() {
 
       "R")
         local originFile
-        originFile="$(printf "%s" "${gitFile}" | awk '{print $2}')"
+        originFile="$(echo "${gitFile}" | awk '{print $2}')"
         local destinationFile
-        destinationFile="$(printf "%s" "${gitFile}" | awk '{print $4}')"
+        destinationFile="$(echo "${gitFile}" | awk '{print $4}')"
 
         toDelete+=("${REMOTE_PATH_PREFIX}/${originFile}")
         toSync+=("${destinationFile}")
