@@ -20,6 +20,7 @@ You can set following environment variables for customizing installation behavio
 # Server configuration example
 
 export DOTFILES_NO_ALACRITTY="true"
+export DOTFILES_NO_FIREFOX="true"
 export DOTFILES_NO_GOLANG="true"
 export DOTFILES_NO_GPG="true"
 export DOTFILES_NO_KUBERNETES="true"
