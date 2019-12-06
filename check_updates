@@ -16,6 +16,9 @@ main() {
 
   rg "TERRAFORM_VERSION=" install/
   github_last_release hashicorp/terraform
+
+  rg "PGCLI_VERSION=" install/
+  github_last_release dbcli/pgcli
 }
 
 main
