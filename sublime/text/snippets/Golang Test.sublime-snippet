@@ -16,7 +16,7 @@ func Test${2:FuncName}(t *testing.T) {
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
 			if result := ${2:FuncName}(testCase.input); result != testCase.want {
-				t.Errorf("${2:FuncName}() = %#v, want %#v", result, testCase.want)
+				t.Errorf("${2:FuncName}() = %v, want %v", result, testCase.want)
 			}
 		})
 	}

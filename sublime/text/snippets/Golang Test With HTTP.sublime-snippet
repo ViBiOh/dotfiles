@@ -23,11 +23,11 @@ func Test${1:FuncName}(t *testing.T) {
 			${1:FuncName}(writer, testCase.request)
 
 			if result := writer.Code; result != testCase.wantStatus {
-				t.Errorf("Status %d, want %d", result, testCase.wantStatus)
+				t.Errorf("${1:FuncName} = %d, want %d", result, testCase.wantStatus)
 			}
 
-			if result, _ := request.ReadBodyResponse(writer.Result().Body); string(result) != testCase.want {
-				t.Errorf("Output `%s`, want `%s`", string(result), testCase.want)
+			if result, _ := request.ReadBodyResponse(writer.Result()); string(result) != testCase.want {
+				t.Errorf("${1:FuncName} = `%s`, want `%s`", string(result), testCase.want)
 			}
 
 			for key := range testCase.wantHeader {
