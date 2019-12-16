@@ -31,6 +31,11 @@ create_symlinks() {
   for file in "${CURRENT_DIR}/symlinks"/*; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
+
+    if [[ -n "${FILE_LIMIT}" ]] && [[ "${BASENAME_FILE}" != "${FILE_LIMIT}" ]]; then
+      continue
+    fi
+
     [[ -r "${file}" ]] && [[ -e "${file}" ]] && rm -f "${HOME}/.${BASENAME_FILE}" && ln -s "${file}" "${HOME}/.${BASENAME_FILE}"
   done
 }
@@ -42,6 +47,11 @@ browse_install() {
   for file in "${CURRENT_DIR}/install"/*; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file%.*}")"
+
+    if [[ -n "${FILE_LIMIT}" ]] && [[ "${BASENAME_FILE}" != "${FILE_LIMIT}" ]]; then
+      continue
+    fi
+
     local UPPERCASE_FILENAME
     UPPERCASE_FILENAME="$(echo "${BASENAME_FILE}" | tr "[:lower:]" "[:upper:]")"
     local DISABLE_VARIABLE_NAME="DOTFILES_NO_${UPPERCASE_FILENAME}"
@@ -77,8 +87,22 @@ clean_packages() {
 }
 
 main() {
-  local ARGS="${*}"
+  local FILE_LIMIT=""
+  while getopts "l:" options; do
+    case "${options}" in
+      l)
+        FILE_LIMIT="${OPTARG}"
+        printf "Limiting to %s\n" "${FILE_LIMIT}"
+        ;;
+      \?)
+        printf "unknown option %s\n" "${options}"
+        ;;
+    esac
+  done
 
+  shift $(( OPTIND - 1 ))
+
+  local ARGS="${*}"
   if [[ "${ARGS}" =~ help ]]; then
     usage
     return 1
