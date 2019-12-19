@@ -33,7 +33,7 @@ func Test${1:FuncName}(t *testing.T) {
 			for key := range testCase.wantHeader {
 				want := testCase.wantHeader.Get(key)
 				if result := writer.Header().Get(key); result != want {
-					t.Errorf("%s Header = `%s`, want `%s`", key, result, want)
+					t.Errorf("`%s` Header = `%s`, want `%s`", key, result, want)
 				}
 			}
 		})

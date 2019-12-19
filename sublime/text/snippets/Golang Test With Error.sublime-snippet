@@ -28,7 +28,7 @@ func Test${1:FuncName}(t *testing.T) {
 			}
 
 			if failed {
-				t.Errorf("${1:FuncName}() = (%v, `%s`), want (%v, `%s`)", result, err, testCase.want, testCase.wantErr)
+				t.Errorf("${1:FuncName}() = (%t, `%s`), want (%t, `%s`)", result, err, testCase.want, testCase.wantErr)
 			}
 		})
 	}
