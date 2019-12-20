@@ -1,3 +1,7 @@
+# Include system-wide inputrc, which is ignored by default when
+# a user has their own .inputrc file.
+$include /etc/inputrc
+
 # Perform file completion in a case insensitive fashion
 set completion-ignore-case on
 
