@@ -17,12 +17,10 @@
 	default = current
 
 [alias]
-	web = "!f() { [[ "$(git remote get-url --push $(git remote show | head -1))" =~ ^.*@(.*):(.*)$ ]] && open "https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"; }; f"
-	pr = "!f() { [[ "$(git remote get-url --push $(git remote show | head -1))" =~ ^.*@(.*):(.*)$ ]] && open "https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]%.git}/compare/master...$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')?expand=1"; }; f"
-	sweep = "!f() { git prune && git remote prune origin && git gc && git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d; }; f"
-	fco = "!f() { git checkout "$(git branch -vv --all | fzf --height 30 --ansi --reverse -1 -q ${1:-"remotes/"} | awk '{print $1}' | sed 's|^remotes/origin/||')"; }; f"
-	tidy = rebase -i origin/master
+	pr = "! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@(.*):(.*)$ ]] && \"${DEFAULT_OPENER}\" \"https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]%.git}/compare/master...$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')?expand=1\""
+	fco = "! git checkout \"$(git branch -vv --all | fzf --height 30 --ansi --reverse -1 -q ${1:-"remotes/"} | awk '{print $1}' | sed 's|^remotes/origin/||')\""
 	rbm = pull --rebase origin master
+	tidy = rebase -i origin/master
 	commend = commit --amend --no-edit
 	pushu = push -u
 	pushf = push --force-with-lease
@@ -30,9 +28,10 @@
 	d = diff -w
 	s = status -sb
 	unstage = reset HEAD --
-	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --all
 	filehistory = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --
 	linehistory = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' -L
+	sweep = "! git prune && git remote prune origin && git gc && git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d"
 
 [log]
 	abbrevCommit = true
