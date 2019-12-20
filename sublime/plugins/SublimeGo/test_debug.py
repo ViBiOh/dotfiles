@@ -3,7 +3,7 @@ import sublime_plugin
 import threading
 
 
-class DebugTest(sublime_plugin.WindowCommand):
+class GoTestDebug(sublime_plugin.WindowCommand):
     panel = None
     panel_lock = threading.Lock()
 
@@ -15,8 +15,8 @@ class DebugTest(sublime_plugin.WindowCommand):
         working_dir = vars['file_path']
 
         with self.panel_lock:
-            self.panel = self.window.create_output_panel('debugtest')
-            self.window.run_command('show_panel', {'panel': 'output.debugtest'})
+            self.panel = self.window.create_output_panel('gotestdebug')
+            self.window.run_command('show_panel', {'panel': 'output.gotestdebug'})
 
         self.queue_write('For debugging golang test, run the following command\n\n\tcd {} && dlv test || cd -'.format(working_dir))
 

@@ -8,7 +8,7 @@
     "command": "go_test"
   },
   {
-    "caption": "Debug Test",
-    "command": "debug_test"
+    "caption": "Go Test Debug",
+    "command": "go_test_debug"
   }
 ]
