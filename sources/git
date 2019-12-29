@@ -4,7 +4,7 @@ if ! command -v git > /dev/null 2>&1; then
   return
 fi
 
-if [[ -f "${HOME}/opt/bin/diff-so-fancy" ]]; then
+if [[ -f ${HOME}/opt/bin/diff-so-fancy ]]; then
   export GIT_PAGER="${HOME}/opt/bin/diff-so-fancy | less --tabs=4 -RFX"
 fi
 
@@ -19,7 +19,7 @@ git_browse() {
 }
 
 head_sync() {
-  if [[ "${#}" -ne 2 ]]; then
+  if [[ ${#} -ne 2 ]]; then
     printf "%bUsage: head_sync [REMOTE_SERVER] [REMOTE_PATH]%b\n" "${RED}" "${RESET}"
     return 1
   fi
@@ -30,7 +30,7 @@ head_sync() {
 }
 
 git_sync() {
-  if [[ "${#}" -lt 2 ]]; then
+  if [[ ${#} -lt 2 ]]; then
     printf "%bUsage: git_sync [REMOTE_SERVER] [REMOTE_PATH] [DRY]?%b\n" "${RED}" "${RESET}"
     return 1
   fi
@@ -44,16 +44,16 @@ git_sync() {
   fi
 
   local REMOTE_PATH_PREFIX="~/${2}"
-  if [[ "${2:0:1}" == "/" ]]; then
+  if [[ ${2:0:1} == "/" ]]; then
     REMOTE_PATH_PREFIX="${2}"
   fi
 
   local dry=false
-  if [[ "$(echo "${3}" | tr "[:upper:]" "[:lower:]")" == "dry" ]]; then
+  if [[ $(echo "${3}" | tr "[:upper:]" "[:lower:]") == "dry" ]]; then
     dry=true
   fi
 
-  if [[ "${dry}" == true ]]; then
+  if [[ ${dry} == true ]]; then
     printf "%bDry run of syncing files...%b\n" "${BLUE}" "${RESET}"
   else
     printf "%bSyncing files at %s...%b\n" "${BLUE}" "$(date +'%H:%M:%S')" "${RESET}"
@@ -96,12 +96,12 @@ git_sync() {
     ssh "${1}" "cd ${REMOTE_PATH_PREFIX} && git clean -f && git checkout -- ."
   fi
 
-  if [[ "${#toDelete[@]}" -ne 0 ]]; then
+  if [[ ${#toDelete[@]} -ne 0 ]]; then
     ! ${dry} && ssh "${1}" "rm -rf ${toDelete[*]}"
     printf "%b- Deleted\n%s%b\n" "${RED}" "${toDelete[*]}" "${RESET}"
   fi
 
-  if [[ "${#toSync[@]}" -ne 0 ]]; then
+  if [[ ${#toSync[@]} -ne 0 ]]; then
     ! ${dry} && rsync -raR "${toSync[@]}" "${1}:${REMOTE_PATH_PREFIX}/"
     printf "%b+ Copied\n%s%b\n" "${GREEN}" "${toSync[*]}" "${RESET}"
   fi
@@ -110,7 +110,7 @@ git_sync() {
 }
 
 watch_sync() {
-  if [[ -z "${NO_HEAD_SYNC:-}" ]]; then
+  if [[ -z ${NO_HEAD_SYNC:-} ]]; then
     head_sync "${@}"
   fi
 

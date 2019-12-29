@@ -10,12 +10,12 @@ install() {
   cat > "${HOME}/.bash_profile" << END_OF_BASH_PROFILE
 #!/usr/bin/env bash
 
-if [[ -f "${HOME}/.bashrc" ]]; then
+if [[ -f ${HOME}/.bashrc ]]; then
   source "${HOME}/.bashrc"
 fi
 END_OF_BASH_PROFILE
 
-  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -28,7 +28,7 @@ END_OF_BASH_PROFILE
     brew upgrade
     brew install "${PACKAGES[@]}" fswatch
 
-    if [[ "$(grep -c "$(brew --prefix)" "/etc/shells")" -eq 0 ]]; then
+    if [[ $(grep -c "$(brew --prefix)" "/etc/shells") -eq 0 ]]; then
       echo "+-------------------------+"
       echo "| changing shell for user |"
       echo "+-------------------------+"
@@ -47,7 +47,7 @@ END_OF_BASH_PROFILE
     sudo apt-get install -y -qq "${PACKAGES[@]}" dnsutils
   elif command -v pacman > /dev/null 2>&1; then
     # Enabling fn key as f1..f12 instead of media on macbook keyboard
-    if [[ "$(grep -c "hid_apple" /etc/modprobe.d/hid_apple.conf)" -eq 0 ]]; then
+    if [[ $(grep -c "hid_apple" /etc/modprobe.d/hid_apple.conf) -eq 0 ]]; then
       echo options hid_apple fnmode=2 | sudo tee -a /etc/modprobe.d/hid_apple.conf
     fi
 

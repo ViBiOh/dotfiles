@@ -15,7 +15,7 @@ credentials() {
   local TERRAFORM_PASS
   TERRAFORM_PASS="$(find "${PASS_DIR}" -name "*terraform.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|")"
 
-  if [[ -n "${TERRAFORM_PASS:-}" ]]; then
+  if [[ -n ${TERRAFORM_PASS:-} ]]; then
     local TERRAFORM_TOKEN
     TERRAFORM_TOKEN="$(pass show "${TERRAFORM_PASS}" | grep token | awk '{print $2}')"
 
@@ -33,9 +33,9 @@ install() {
   local ARCH
   ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
-  if [[ "${ARCH}" = "x86_64" ]]; then
+  if [[ ${ARCH} = "x86_64" ]]; then
     ARCH="amd64"
-  elif [[ "${ARCH}" =~ ^armv.l$ ]]; then
+  elif [[ ${ARCH} =~ ^armv.l$ ]]; then
     ARCH="arm"
   fi
 

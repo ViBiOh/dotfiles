@@ -4,7 +4,7 @@ SSH_ENV="${HOME}/.ssh/environment"
 SSH_KEY="${HOME}/.ssh/id_ed25519"
 
 stop_ssh_agent() {
-  if [[ -n "${SSH_AGENT_PID:-}" ]]; then
+  if [[ -n ${SSH_AGENT_PID:-} ]]; then
     ssh-agent -k
     rm -rf "${SSH_ENV}"
   fi
@@ -17,7 +17,7 @@ add_ssh_key() {
 start_ssh_agent() {
   stop_ssh_agent
 
-  if [[ -e "${SSH_KEY}" ]]; then
+  if [[ -e ${SSH_KEY} ]]; then
     printf "Initializing new SSH agent...\n"
 
     touch "${SSH_ENV}"
@@ -30,10 +30,10 @@ start_ssh_agent() {
   fi
 }
 
-if [[ -f "${SSH_ENV}" ]]; then
+if [[ -f ${SSH_ENV} ]]; then
   source "${SSH_ENV}" > /dev/null
 
-  if [[ -n "${SSH_AGENT_PID:-}" ]]; then
+  if [[ -n ${SSH_AGENT_PID:-} ]]; then
     kill -0 "${SSH_AGENT_PID}" 2>/dev/null || {
       start_ssh_agent
     }

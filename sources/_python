@@ -5,7 +5,7 @@ if command -v brew > /dev/null 2>&1; then
   export PATH="${PYTHON_PATH}:${PATH}"
 fi
 
-if [[ -d "${HOME}/opt/python" ]]; then
+if [[ -d ${HOME}/opt/python ]]; then
   export PYTHONUSERBASE="${HOME}/opt/python"
   export PATH="${PYTHONUSERBASE}/bin:${PATH}"
 fi

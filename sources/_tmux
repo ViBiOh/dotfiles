@@ -4,7 +4,7 @@ if ! command -v tmux > /dev/null 2>&1; then
   return
 fi
 
-if [[ -z "${TMUX}" ]] && [[ -z "${SSH_CLIENT}" ]]; then
+if [[ -z ${TMUX} ]] && [[ -z ${SSH_CLIENT} ]]; then
   LC_ALL="$(locale -a | grep -i en_us.utf)" tmux new-session -A -s "$(whoami)" && exit
 fi
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 open_ports() {
-  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo lsof -PniTCP -sTCP:LISTEN
   elif command -v ss > /dev/null 2<&1; then
     sudo ss -plant
@@ -11,7 +11,7 @@ open_ports() {
 }
 
 forward_local_port() {
-  if [[ "${#}" -ne 3 ]]; then
+  if [[ ${#} -ne 3 ]]; then
     echo "Usage: forward_local_port [LOCAL_PORT] [REMOTE_PORT] [SSH_PART]"
     return 1
   fi
@@ -20,7 +20,7 @@ forward_local_port() {
 }
 
 forward_remote_port() {
-  if [[ "${#}" -ne 3 ]]; then
+  if [[ ${#} -ne 3 ]]; then
     echo "Usage: forward_remote_port [REMOTE_PORT] [LOCAL_PORT] [SSH_PART]"
     return 1
   fi
@@ -29,19 +29,19 @@ forward_remote_port() {
 }
 
 dns_flush_cache() {
-  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo dscacheutil -flushcache
     sudo killall -HUP mDNSResponder
 
-    if [[ "$(brew services list | grep -c dnsmasq)" -eq 1 ]]; then
+    if [[ $(brew services list | grep -c dnsmasq) -eq 1 ]]; then
       sudo brew services restart dnsmasq
     fi
   else
-    if [[ "$(systemctl list-units systemd-resolve* | wc -l)" -gt 2 ]]; then
+    if [[ $(systemctl list-units systemd-resolve* | wc -l) -gt 2 ]]; then
       sudo systemd-resolve --flush-caches
     fi
 
-    if [[ "$(systemctl list-units dnsmasq* | wc -l)" -gt 2 ]]; then
+    if [[ $(systemctl list-units dnsmasq* | wc -l) -gt 2 ]]; then
       sudo systemctl restart dnsmasq
     fi
   fi

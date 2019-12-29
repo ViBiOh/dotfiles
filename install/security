@@ -30,7 +30,7 @@ install() {
     | grep -v "0.0.0.0 reddit.map.fastly.net" \
     | sudo tee /etc/hosts > /dev/null
 
-  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
     defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
     defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
     defaults write NSGlobalDomain AppleFontSmoothing -int 1

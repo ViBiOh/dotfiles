@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
     brew install git
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get install -y -qq git

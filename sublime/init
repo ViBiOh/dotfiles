@@ -15,17 +15,17 @@ copy_settings() {
   rm -rf "${USER_SETTINGS:?}"/*
   mkdir -p "${USER_SETTINGS}"
 
-  if [[ -d "${SCRIPT_DIR}/${2}/settings/" ]]; then
+  if [[ -d ${SCRIPT_DIR}/${2}/settings/ ]]; then
     cp "${SCRIPT_DIR}/${2}/settings/"* "${USER_SETTINGS}/"
   fi
 
-  if [[ -d "${SCRIPT_DIR}/${2}/snippets/" ]]; then
+  if [[ -d ${SCRIPT_DIR}/${2}/snippets/ ]]; then
     cp "${SCRIPT_DIR}/${2}/snippets/"* "${USER_SETTINGS}/"
   fi
 }
 
 main() {
-  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
     local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
     local MERGE_PKG="${HOME}/Library/Application Support/Sublime Merge/Packages"
   else

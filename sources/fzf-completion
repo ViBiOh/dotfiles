@@ -46,7 +46,7 @@ fi
 
 if command -v pgcli > /dev/null 2>&1; then
   _fzf_complete_pgcli() {
-    if [[ ! -f "${PGPASSFILE-${HOME}/.pgpass}" ]]; then
+    if [[ ! -f ${PGPASSFILE-${HOME}/.pgpass} ]]; then
       return
     fi
 
@@ -57,10 +57,10 @@ if command -v pgcli > /dev/null 2>&1; then
 
       while IFS=":" read -r host port db user pass
       do
-        if [[ ! "${host}" =~ ^\s*# ]] && [[ ! "${host}" =~ ^\s*$ ]]; then
+        if [[ ! ${host} =~ ^\s*# ]] && [[ ! ${host} =~ ^\s*$ ]]; then
           echo -e "host: ${BLUE}${host}${RESET} port: ${YELLOW}${port}${RESET} db: ${RED}${db}${RESET} user: ${GREEN}${user}${RESET} ${BLUE}${comment}${RESET}"
           comment=""
-        elif [[ "${host}" =~ ^\s*# ]]; then
+        elif [[ ${host} =~ ^\s*# ]]; then
           comment="${host}"
         fi
       done < "${PGPASSFILE-${HOME}/.pgpass}"

@@ -14,7 +14,7 @@ clean() {
 install() {
   local EXTRA_CONFIG=""
 
-  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
     EXTRA_CONFIG="
   UseKeyChain no"
   fi

@@ -15,7 +15,7 @@ install() {
 
   local FZF_INSTALL_DIR="${HOME}/opt/fzf"
 
-  if [[ ! -d "${FZF_INSTALL_DIR}" ]]; then
+  if [[ ! -d ${FZF_INSTALL_DIR} ]]; then
     git clone --depth 1 https://github.com/junegunn/fzf.git "${FZF_INSTALL_DIR}"
   else
     (cd "${FZF_INSTALL_DIR}" && git pull)

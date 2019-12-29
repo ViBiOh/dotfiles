@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 sed_inplace() {
-  if [[ "${OSTYPE}" =~ ^darwin ]]; then
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
     sed -i '' "${@}"
   else
     sed -i "${@}"
