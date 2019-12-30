@@ -13,4 +13,12 @@ fi
 
 PROMPT_DIRTRIM="3"
 
-export PS1="${PS1}\n> "
+_previous_status() {
+  if [[ $? -eq 0 ]]; then
+    printf -- "%b✔%b" "${GREEN}" "${RESET}"
+  else
+    printf -- "%bx%b" "${RED}" "${RESET}"
+  fi
+}
+
+export PS1="${PS1}\n\$(_previous_status) "
