@@ -21,13 +21,6 @@ set statusline+=%1*\ %p%% " Percentage of the file
 set statusline+=\ %l:%c " Line Number and Total Line
 set statusline+=\  " Empty space at end
 
-" Hightlight current window with line number
-augroup BgHighlight
-    autocmd!
-    autocmd WinEnter * set number
-    autocmd WinLeave * set nonumber
-augroup END
-
 " Line highlight
 set cursorline
 
