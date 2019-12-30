@@ -40,7 +40,7 @@ main() {
   install_plugin SublimeTerraform
 
   if command -v go > /dev/null 2>&1; then
-    GO111MODULE=on go get golang.org/x/tools/cmd/gopls@latest
+    GO111MODULE=on go get golang.org/x/tools/gopls@latest
     go get -u golang.org/x/tools/cmd/gotype
   fi
 
