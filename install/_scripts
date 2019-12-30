@@ -2,6 +2,13 @@
 
 set -o nounset -o pipefail -o errexit
 
+clean() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  rm -rf "${SCRIPT_DIR}/../scripts"
+}
+
 install() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
