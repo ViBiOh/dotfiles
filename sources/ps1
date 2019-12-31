@@ -21,4 +21,4 @@ _previous_status() {
   fi
 }
 
-export PS1="${PS1}\n\$(_previous_status) "
+export PS1="${PS1} \$(_previous_status)\n> "
