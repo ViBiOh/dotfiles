@@ -19,7 +19,7 @@ install() {
     return
   fi
 
-  local CTOP_VERSION="0.7.2"
+  local CTOP_VERSION="0.7.3"
   local OS
   OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
   local ARCH
