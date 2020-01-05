@@ -3,14 +3,15 @@
 set -o nounset -o pipefail -o errexit
 
 main() {
-  local PROJECT_FOLDER="projects"
+  readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local PROJECT_FOLDER="${SCRIPT_DIR}/projects"
 
   rm -rf "${PROJECT_FOLDER}"
   mkdir -p "${PROJECT_FOLDER}"
 
   for project in "${HOME}/code/"*; do
     projectName="$(basename "${project}")"
-    fileName="./${PROJECT_FOLDER}/${projectName}.sublime-project"
+    fileName="${PROJECT_FOLDER}/${projectName}.sublime-project"
 
     echo "{
   \"folders\": [{
