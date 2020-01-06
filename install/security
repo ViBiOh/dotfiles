@@ -83,7 +83,6 @@ install() {
     defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
     defaults write com.apple.Safari HomePage -string "about:blank"
     defaults write com.apple.Safari IncludeDevelopMenu -bool true
-    defaults write com.apple.Safari IncludeDevelopMenu -bool true
     defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
     defaults write com.apple.Safari ShowFavoritesBar -bool false
     defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
