@@ -7,20 +7,21 @@ install_plugin() {
   local PLUGIN_NAME="${1}"
 
   rm -rf "${TEXT_PKG:?}/${PLUGIN_NAME}"
-  cp -r "${SCRIPT_DIR}/plugins/${PLUGIN_NAME}" "${TEXT_PKG}/${PLUGIN_NAME}"
+  ln -s "${SCRIPT_DIR}/plugins/${PLUGIN_NAME}" "${TEXT_PKG}/${PLUGIN_NAME}"
 }
 
-copy_settings() {
+symlink_settings() {
   local USER_SETTINGS="${1}/User"
+
   rm -rf "${USER_SETTINGS:?}"/*
   mkdir -p "${USER_SETTINGS}"
 
   if [[ -d ${SCRIPT_DIR}/${2}/settings/ ]]; then
-    cp "${SCRIPT_DIR}/${2}/settings/"* "${USER_SETTINGS}/"
+    ln -s "${SCRIPT_DIR}/${2}/settings/"* "${USER_SETTINGS}/"
   fi
 
   if [[ -d ${SCRIPT_DIR}/${2}/snippets/ ]]; then
-    cp "${SCRIPT_DIR}/${2}/snippets/"* "${USER_SETTINGS}/"
+    ln -s "${SCRIPT_DIR}/${2}/snippets/"* "${USER_SETTINGS}/"
   fi
 }
 
@@ -33,8 +34,8 @@ main() {
     local MERGE_PKG="${HOME}/.config/sublime-merge/Packages"
   fi
 
-  copy_settings "${TEXT_PKG}" "text"
-  copy_settings "${MERGE_PKG}" "merge"
+  symlink_settings "${TEXT_PKG}" "text"
+  symlink_settings "${MERGE_PKG}" "merge"
 
   install_plugin SublimeGo
   install_plugin SublimeTerraform
