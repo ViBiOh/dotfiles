@@ -1,0 +1,10 @@
+[
+  {
+    "keys": ["ctrl+;"],
+    "command": "reset_layout",
+  },
+  {
+    "keys": ["ctrl+:"],
+    "command": "split_vertically"
+  }
+]

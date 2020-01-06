@@ -1,0 +1,10 @@
+[
+  {
+    "caption": "Split vertically",
+    "command": "split_vertically"
+  },
+  {
+    "caption": "Reset layout",
+    "command": "reset_layout"
+  }
+]
