@@ -1,4 +1,6 @@
-import subprocess, os, threading
+import os
+import subprocess
+import threading
 
 
 class AsyncTask:
