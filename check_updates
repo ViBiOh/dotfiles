@@ -8,14 +8,9 @@ main() {
 
   source "${SCRIPT_DIR}/scripts/meta" && meta_init "github"
 
-  rg "CTOP_VERSION=" install/
-  github_last_release bcicen/ctop
-
-  rg "SYNCTHING_VERSION=" install/
-  github_last_release syncthing/syncthing
-
-  rg "TERRAFORM_VERSION=" install/
-  github_last_release hashicorp/terraform
+  github_last_release bcicen/ctop "v$(rg 'CTOP_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
+  github_last_release syncthing/syncthing "v$(rg 'SYNCTHING_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
+  github_last_release hashicorp/terraform "v$(rg 'TERRAFORM_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
 }
 
 main
