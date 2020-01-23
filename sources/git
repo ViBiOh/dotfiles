@@ -4,8 +4,8 @@ if ! command -v git > /dev/null 2>&1; then
   return
 fi
 
-if [[ -f ${HOME}/opt/bin/diff-so-fancy ]]; then
-  export GIT_PAGER="${HOME}/opt/bin/diff-so-fancy | less --tabs=4 -RFX"
+if [[ -f ${HOME}/opt/bin/delta ]]; then
+  export GIT_PAGER="delta --dark --highlight-removed"
 fi
 
 git_browse() {

@@ -11,6 +11,7 @@ main() {
   github_last_release bcicen/ctop "v$(rg 'CTOP_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
   github_last_release syncthing/syncthing "v$(rg 'SYNCTHING_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
   github_last_release hashicorp/terraform "v$(rg 'TERRAFORM_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
+  github_last_release dandavison/delta "$(rg 'DELTA_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
 }
 
 main
