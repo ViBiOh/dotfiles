@@ -11,6 +11,10 @@ if command -v xdg-open > /dev/null 2>&1; then
   alias open="xdg-open"
 fi
 
+if command -v bat > /dev/null 2>&1; then
+  alias cat="bat"
+fi
+
 random() {
   openssl rand -base64 "${1:-30}"
 }
