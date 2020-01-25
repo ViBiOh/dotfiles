@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  local PACKAGES=('bash' 'bash-completion' 'htop' 'openssl' 'curl' 'vim' 'bat')
+  local PACKAGES=('bash' 'bash-completion' 'htop' 'openssl' 'curl' 'vim')
 
   mkdir -p "${HOME}/opt/bin"
 
@@ -26,7 +26,7 @@ END_OF_BASH_PROFILE
 
     brew update
     brew upgrade
-    brew install "${PACKAGES[@]}" fswatch
+    brew install "${PACKAGES[@]}" fswatch bat
 
     if [[ $(grep -c "$(brew --prefix)" "/etc/shells") -eq 0 ]]; then
       echo "+-------------------------+"
@@ -52,6 +52,6 @@ END_OF_BASH_PROFILE
     fi
 
     sudo pacman -Syuq --noconfirm
-    sudo pacman -S --noconfirm --needed "${PACKAGES[@]}" make gcc binutils dnsutils iproute2
+    sudo pacman -S --noconfirm --needed "${PACKAGES[@]}" make gcc binutils dnsutils iproute2 bat
   fi
 }
