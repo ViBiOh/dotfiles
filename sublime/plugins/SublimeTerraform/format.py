@@ -18,7 +18,7 @@ class TerraformFmt(sublime_plugin.TextCommand):
         terraform_format = subprocess.Popen(['terraform', 'fmt', '-'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_dir)
         terraform_format_out, terraform_format_err = terraform_format.communicate(src.encode())
         if terraform_format.returncode != 0:
-            print(goimports_err.decode(), end="")
+            print(terraform_format_err.decode(), end="")
             return
 
         view.replace(edit, region, terraform_format_out.decode())
