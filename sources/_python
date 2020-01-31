@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if command -v brew > /dev/null 2>&1; then
-  PYTHON_PATH="$(brew --prefix)/opt/python/libexec/bin"
+  PYTHON_PATH="${BREW_PREFIX}/opt/python/libexec/bin"
   export PATH="${PYTHON_PATH}:${PATH}"
 fi
 

@@ -3,6 +3,9 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
   local OS
   OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
   local ARCH
@@ -18,4 +21,6 @@ install() {
   KUBERNETES_VERSION="$(curl -q -sSL --max-time 30 "https://storage.googleapis.com/kubernetes-release/release/stable.txt")"
   curl -q -sSL --max-time 300 -o "${HOME}/opt/bin/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl"
   chmod +x "${HOME}/opt/bin/kubectl"
+
+  kubectl completion bash > "${SCRIPT_DIR}/../sources/kubectl-completion"
 }
