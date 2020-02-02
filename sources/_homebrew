@@ -6,7 +6,5 @@ export HOMEBREW_CASK_OPTS=--require-sha
 
 if [[ -d ${HOME}/homebrew ]]; then
   export PATH="${HOME}/homebrew/sbin:${HOME}/homebrew/bin:${PATH}"
-
-  export BREW_PREFIX="${HOME}/homebrew/opt"
-  export PATH="${BREW_PREFIX}/curl/bin:${PATH}"
+  export PATH="$(brew --prefix)/curl/bin:${PATH}"
 fi
