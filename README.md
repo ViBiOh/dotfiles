@@ -43,6 +43,15 @@ export DOTFILES_NO_TERRAFORM="true"
 ssh-keygen -t ed25519 -a 100 -C "$(whoami)@$(hostname)" -f ~/.ssh/id_ed25519
 ```
 
+## Command Line Tools (macOS)
+
+Reinstall them by running following command:
+
+```bash
+sudo rm -rf $(xcode-select -print-path)
+xcode-select --install
+```
+
 ## Brew
 
 Fix it with following command when it's broken.
