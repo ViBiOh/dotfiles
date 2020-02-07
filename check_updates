@@ -6,12 +6,12 @@ main() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-  source "${SCRIPT_DIR}/scripts/meta" && meta_init "github"
+  source "${SCRIPT_DIR}/scripts/meta" && meta_init "github" "version"
 
-  github_last_release bcicen/ctop "v$(rg 'CTOP_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
-  github_last_release syncthing/syncthing "v$(rg 'SYNCTHING_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
-  github_last_release hashicorp/terraform "v$(rg 'TERRAFORM_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
-  github_last_release dandavison/delta "$(rg 'DELTA_VERSION="(\S+)"' -r '$1' -N --no-filename -o install/)"
+  github_last_release bcicen/ctop "v$(version_value 'CTOP_VERSION="(.*)"' install/)"
+  github_last_release syncthing/syncthing "v$(version_value 'SYNCTHING_VERSION="(.*)"' install/)"
+  github_last_release hashicorp/terraform "v$(version_value 'TERRAFORM_VERSION="(.*)"' install/)"
+  github_last_release dandavison/delta "$(version_value 'DELTA_VERSION="(.*)"' install/)"
 }
 
 main
