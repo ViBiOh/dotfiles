@@ -9,6 +9,7 @@ clean() {
     docker system prune -f || true
 
     docker rmi -f $(docker images -q) || true
+    docker rmi -f $(docker images --format '{{ .Repository }}:{{ .Tag}}') || true
     docker network rm $(docker network ls -q) || true
     docker volume rm $(docker volume ls -q) || true
   fi
