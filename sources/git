@@ -30,12 +30,12 @@ head_sync() {
 }
 
 git_sync() {
+  var_color
+
   if [[ ${#} -lt 2 ]]; then
     printf "%bUsage: git_sync [REMOTE_SERVER] [REMOTE_PATH] [DRY]?%b\n" "${RED}" "${RESET}"
     return 1
   fi
-
-  var_color
 
   git_root
   isGit=$?
