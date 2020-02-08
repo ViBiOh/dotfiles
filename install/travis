@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+clean() {
+  sudo rm -rf "${HOME}/.travis"
+}
+
+install() {
+  if ! command -v gem > /dev/null 2>&1; then
+    printf "gem is required\n"
+    exit
+  fi
+
+  local TRAVIS_VERSION="1.8.8"
+
+  gem install travis -v "${TRAVIS_VERSION}" --no-document
+}
