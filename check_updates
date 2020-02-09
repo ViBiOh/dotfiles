@@ -12,7 +12,6 @@ main() {
   github_last_release syncthing/syncthing "v$(version_value 'SYNCTHING_VERSION="(.*)"' install/)"
   github_last_release hashicorp/terraform "v$(version_value 'TERRAFORM_VERSION="(.*)"' install/)"
   github_last_release dandavison/delta "$(version_value 'DELTA_VERSION="(.*)"' install/)"
-  github_last_release travis-ci/travis.rb "$(version_value 'TRAVIS_VERSION="(.*)"' install/)"
 }
 
 main
