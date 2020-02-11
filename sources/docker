@@ -6,4 +6,5 @@ if command -v docker > /dev/null 2>&1; then
   }
 
   export DOCKER_CONTENT_TRUST="1"
+  export DOCKER_CLI_EXPERIMENTAL="enabled"
 fi
