@@ -15,6 +15,10 @@ if command -v bat > /dev/null 2>&1; then
   alias cat="bat"
 fi
 
+if command -v siege > /dev/null 2>&1; then
+  alias siege_kind="siege --concurrent 10 --delay 5 -v"
+fi
+
 random() {
   openssl rand -base64 "${1:-30}"
 }
