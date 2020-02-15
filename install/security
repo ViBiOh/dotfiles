@@ -12,6 +12,7 @@ install() {
     | grep -E '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' \
     | sort \
     | uniq \
+    | grep -v "ɢ" \
     | grep -v "0.0.0.0 www.linkedin.com" \
     | grep -v "0.0.0.0 static.licdn.com" \
     | grep -v "0.0.0.0 media.licdn.com" \
