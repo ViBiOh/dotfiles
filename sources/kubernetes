@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if command -v kubectl > /dev/null 2>&1; then
+  kube_restart() {
+    kubectl rollout restart deployment "${@:-}"
+  }
+fi
