@@ -11,5 +11,3 @@ it('should return initial state', () => {
     <scope>source.js,source.jsx</scope>
     <description>Redux Reducer Test</description>
 </snippet>
-
-
