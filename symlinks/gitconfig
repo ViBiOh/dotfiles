@@ -42,6 +42,7 @@
 	commend = commit --amend --no-edit
 	pushu = push -u
 	pushf = push --force-with-lease
+	pur = "! git pushu && git pr"
 	co = checkout
 	d = diff -w
 	s = status -sb
