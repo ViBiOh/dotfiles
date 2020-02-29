@@ -48,7 +48,6 @@ log-dhcp
 log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" > /dev/null
 
   if command -v brew > /dev/null 2>&1; then
-    sudo brew services restart dnsmasq
     sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
 
     scutil --dns
