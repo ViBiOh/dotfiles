@@ -33,6 +33,7 @@
 		".cache/",
 		".git/",
 		".nyc_output/",
+		".terraform/"
 		"bin/",
 		"build/",
 		"coverage/",
@@ -41,7 +42,7 @@
 		"node_modules/",
 		"release/",
 		"vendor/",
-		"vendors/"
+		"vendors/",
 	],
 	"close_windows_when_empty": false,
 	"default_line_ending": "unix",
