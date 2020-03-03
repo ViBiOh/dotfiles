@@ -36,9 +36,9 @@
 
 [alias]
 	pr = "! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@(.*):(.*)$ ]] && \"${DEFAULT_OPENER}\" \"https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]%.git}/compare/master...$(git current-branch)?expand=1\""
-	fco = "! git checkout \"$(git branch -vv --all | fzf --height 20 --ansi --reverse -1 -q ${1:-"remotes/"} | cut -d ' ' -f 1 | sed 's|^remotes/origin/||')\""
+	fco = "! git checkout \"$(git branch -vv --all | fzf --height 20 --ansi --reverse -1 -q ${1:-remotes/} | cut -d ' ' -f 1 | sed 's|^remotes/origin/||')\""
 	fixup = "! git commit --fixup $(git log-pretty master..$(git current-branch) | fzf --height 20 --ansi --reverse | cut -d ' ' -f 1)"
-	cc = "!git log --format=format: --name-only | grep -E -v '^$' | sort | uniq -c | sort -rg | head -10"
+	cc = "! git log --format=format: --name-only | grep -E -v '^$' | sort | uniq -c | sort -rg | head -10"
 	rbm = pull --rebase origin master
 	tidy = rebase -i origin/master
 	commend = commit --amend --no-edit
@@ -56,7 +56,7 @@
 	find = log-pretty -S
 	filehistory = log-pretty --
 	linehistory = log-pretty -L
-	sweep = "! git prune && git remote prune origin && git gc && git branch --merged | egrep -v '(^\\*|master)' | xargs git branch -d"
+	sweep = "! git prune && git remote prune origin && git branch --list --format '%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' | grep -E -v '^$' | xargs git branch -D && git gc"
 	unshallow = "! git remote set-branches origin '*' && git pull --unshallow"
 
 [merge]
