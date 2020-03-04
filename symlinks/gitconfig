@@ -50,7 +50,7 @@
 	s = status -sb
 	unstage = reset HEAD --
 	current-branch = rev-parse --abbrev-ref HEAD
-	log-pretty = log --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+	log-pretty = log --color --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 	lg = log-pretty --graph
 	changelog = ! git log --no-merges --pretty=format:'%Cred%h%Creset %s' "${2:-HEAD}...${1}"
 	find = log-pretty -S
