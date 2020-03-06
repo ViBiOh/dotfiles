@@ -16,8 +16,7 @@ os_clean() {
   rm -rf "${HOME}/.CFUserTextEncoding"
   rm -rf "${HOME}/.cups/"
   rm -rf "${HOME}/.local/"
-  rm -rf "${HOME}/.vim/"
-  rm -rf "${HOME}/.viminfo"
+  rm -rf "${HOME}/.siege/"
 
   sudo find / \( -name ".DS_Store" -o -name ".localized" \) -exec rm -f {} \; 2> /dev/null
 }
