@@ -19,7 +19,7 @@ install() {
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   curl -q -sSL --max-time 30 -o "${SCRIPT_DIR}/../sources/git-prompt" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{print $3}')/contrib/completion/git-prompt.sh"
 
-  local DELTA_VERSION="0.0.16"
+  local DELTA_VERSION="0.0.17"
   local DELTA_ARCHIVE="delta-${DELTA_VERSION}-x86_64"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
