@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  local PACKAGES=('bash' 'bash-completion' 'htop' 'openssl' 'curl' 'vim' 'ncdu' 'siege')
+  local PACKAGES=('bash' 'bash-completion' 'htop' 'openssl' 'curl' 'vim' 'ncdu')
 
   mkdir -p "${HOME}/opt/bin"
 

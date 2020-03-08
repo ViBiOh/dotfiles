@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+clean() {
+  rm -rf "${HOME}/.siege"
+}
+
+install() {
+  if command -v brew > /dev/null 2>&1; then
+    brew install siege
+  elif command -v apt-get > /dev/null 2>&1; then
+    sudo apt-get install -y -qq siege
+  elif command -v pacman > /dev/null 2>&1; then
+    sudo pacman -S --noconfirm --needed siege
+  fi
+
+  mkdir -p "${HOME}/.siege"
+
+  echo "
+verbose = true
+color = on
+json_output = false
+gmethod = GET
+parser = true
+cache = false
+concurrent = 10
+delay = 5
+internet = false
+benchmark = false
+" > "${HOME}/.siege/siege.conf"
+}
