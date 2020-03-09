@@ -1,10 +1,6 @@
 " Turnoff vi backward compatibility
 set nocompatible
 
-call plug#begin('~/.vim/plug')
-Plug 'editorconfig/editorconfig-vim'
-call plug#end()
-
 " Show status line
 set laststatus=2
 
