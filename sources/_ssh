@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 SSH_ENV="${HOME}/.ssh/environment"
-SSH_KEY="${HOME}/.ssh/id_ed25519"
 
 stop_ssh_agent() {
   if [[ -n ${SSH_AGENT_PID:-} ]]; then
@@ -11,23 +10,37 @@ stop_ssh_agent() {
 }
 
 add_ssh_key() {
-  ssh-add -t 1h -k "${SSH_KEY}"
+  ssh-add -t 1h -k "${1:-${HOME}/.ssh/id_ed25519}"
+}
+
+init_ssh_agent() {
+  printf "Initializing new SSH agent...\n"
+
+  touch "${SSH_ENV}"
+  chmod 600 "${SSH_ENV}"
+
+  ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+  source "${SSH_ENV}" > /dev/null
 }
 
 start_ssh_agent() {
   stop_ssh_agent
 
-  if [[ -e ${SSH_KEY} ]]; then
-    printf "Initializing new SSH agent...\n"
+  local SSH_NAMES=('ed25519' 'ecdsa' 'rsa')
+  local INITIALIZED="false"
 
-    touch "${SSH_ENV}"
-    chmod 600 "${SSH_ENV}"
+  for type in "${SSH_NAMES[@]}"; do
+    local KEY_NAME="${HOME}/.ssh/id_${type}"
 
-    ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    source "${SSH_ENV}" > /dev/null
+    if [[ -e ${KEY_NAME} ]]; then
+      if [[ ${INITIALIZED} != "true" ]]; then
+        init_ssh_agent
+        INITIALIZED="true"
+      fi
 
-    add_ssh_key
-  fi
+      add_ssh_key "${KEY_NAME}"
+    fi
+  done
 }
 
 if [[ -f ${SSH_ENV} ]]; then

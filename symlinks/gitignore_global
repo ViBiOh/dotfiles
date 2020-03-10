@@ -1,6 +1,13 @@
-#
-# macOS
-#
+#------#
+# Diff #
+#------#
+
+*.patch
+*.diff
+
+#-------#
+# macOS #
+#-------#
 
 # General
 .DS_Store
@@ -29,9 +36,27 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-#
-# SublimeText
-#
+#-------#
+# Linux #
+#-------#
+
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+#-------------#
+# SublimeText #
+#-------------#
 
 # Cache files for Sublime Text
 *.tmlanguage.cache
@@ -47,6 +72,7 @@ Temporary Items
 
 # SFTP configuration file
 sftp-config.json
+sftp-config-alt*.json
 
 # Package control specific files
 Package Control.last-run

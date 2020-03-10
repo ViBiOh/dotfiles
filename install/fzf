@@ -9,7 +9,7 @@ clean() {
 
 install() {
   if ! command -v git > /dev/null 2>&1; then
-    echo "git not found"
+    printf "git not found\n"
     exit
   fi
 

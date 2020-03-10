@@ -145,7 +145,6 @@ install() {
     sudo systemsetup -setrestartfreeze on
     sudo systemsetup -setwakeonnetworkaccess off
 
-    # Disable the sudden motion sensor as it’s not useful for SSDs
     sudo pmset -a hibernatemode 0
     sudo pmset -a lidwake 1
     sudo pmset -a sms 0

@@ -13,11 +13,7 @@ main() {
     projectName="$(basename "${project}")"
     fileName="${PROJECT_FOLDER}/${projectName}.sublime-project"
 
-    echo "{
-  \"folders\": [{
-      \"path\": \"${project}\"
-  }]
-}" > "${fileName}"
+    printf '{\n  "folders": [{\n    "path": "%s"\n  }]\n}\n' "${project}" > "${fileName}"
 
     subl --project "${fileName}"
   done
