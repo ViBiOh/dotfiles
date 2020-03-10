@@ -19,6 +19,7 @@ You can set following environment variables for customizing installation behavio
 
 ```bash
 #!/usr/bin/env bash
+
 # Server configuration example
 
 export DOTFILES_NO_ALACRITTY="true"
@@ -32,7 +33,8 @@ export DOTFILES_NO_PYTHON="true"
 export DOTFILES_NO_PYTHON_ANSIBLE="true"
 export DOTFILES_NO_PYTHON_PGCLI="true"
 export DOTFILES_NO_SHELLCHECK="true"
-export DOTFILES_NO_SUBLIME_TEXT="true"
+export DOTFILES_NO_SIEGE="true"
+export DOTFILES_NO_SUBLIME="true"
 export DOTFILES_NO_SYNCTHING="true"
 export DOTFILES_NO_TERRAFORM="true"
 ```
@@ -40,7 +42,13 @@ export DOTFILES_NO_TERRAFORM="true"
 ## SSH
 
 ```bash
-ssh-keygen -t ed25519 -a 100 -C "$(whoami)@$(hostname)" -f ~/.ssh/id_ed25519
+ssh-keygen -t ed25519 -a 100 -C "$(whoami)@$(hostname)" -f "${HOME}/.ssh/id_ed25519"
+```
+
+## GPG
+
+```bash
+gpg --full-generate-key
 ```
 
 ## Command Line Tools (macOS)
@@ -52,7 +60,7 @@ sudo rm -rf $(xcode-select -print-path)
 xcode-select --install
 ```
 
-## Brew
+### Brew
 
 Fix it with following command when it's broken.
 

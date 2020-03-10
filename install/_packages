@@ -29,9 +29,9 @@ END_OF_BASH_PROFILE
     brew install "${PACKAGES[@]}" fswatch bat
 
     if [[ $(grep -c "$(brew --prefix)" "/etc/shells") -eq 0 ]]; then
-      echo "+-------------------------+"
-      echo "| changing shell for user |"
-      echo "+-------------------------+"
+      printf "+-------------------------+\n"
+      printf "| changing shell for user |\n"
+      printf "+-------------------------+\n"
 
       echo "$(brew --prefix)/bin/bash" | sudo tee -a "/etc/shells" > /dev/null
       chsh -s "$(brew --prefix)/bin/bash" -u "$(whoami)"
@@ -48,7 +48,7 @@ END_OF_BASH_PROFILE
   elif command -v pacman > /dev/null 2>&1; then
     # Enabling fn key as f1..f12 instead of media on macbook keyboard
     if [[ $(grep -c "hid_apple" /etc/modprobe.d/hid_apple.conf) -eq 0 ]]; then
-      echo options hid_apple fnmode=2 | sudo tee -a /etc/modprobe.d/hid_apple.conf
+      echo "options hid_apple fnmode=2" | sudo tee -a /etc/modprobe.d/hid_apple.conf
     fi
 
     sudo pacman -Syuq --noconfirm
