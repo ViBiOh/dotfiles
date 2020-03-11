@@ -9,10 +9,6 @@ stop_ssh_agent() {
   fi
 }
 
-add_ssh_key() {
-  ssh-add -t 1h -k "${1:-${HOME}/.ssh/id_ed25519}"
-}
-
 init_ssh_agent() {
   printf "Initializing new SSH agent...\n"
 
@@ -25,32 +21,15 @@ init_ssh_agent() {
 
 start_ssh_agent() {
   stop_ssh_agent
+  init_ssh_agent
 
-  local SSH_NAMES=('ed25519' 'ecdsa' 'rsa')
-  local INITIALIZED="false"
-
-  for type in "${SSH_NAMES[@]}"; do
-    local KEY_NAME="${HOME}/.ssh/id_${type}"
-
-    if [[ -e ${KEY_NAME} ]]; then
-      if [[ ${INITIALIZED} != "true" ]]; then
-        init_ssh_agent
-        INITIALIZED="true"
-      fi
-
-      add_ssh_key "${KEY_NAME}"
-    fi
+  for key in "${HOME}/.ssh/"*.pub; do
+    ssh-add -k "${key%.pub}"
   done
 }
 
 if [[ -f ${SSH_ENV} ]]; then
   source "${SSH_ENV}" > /dev/null
-
-  if [[ -n ${SSH_AGENT_PID:-} ]]; then
-    kill -0 "${SSH_AGENT_PID}" 2>/dev/null || {
-      start_ssh_agent
-    }
-  fi
 else
-    start_ssh_agent
+  start_ssh_agent
 fi
