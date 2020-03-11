@@ -1,3 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ $(type -t stop_ssh_agent) == "function" ]]; then
+  stop_ssh_agent
+fi
+
+if [[ $(type -t stop_gpg_agent) == "function" ]]; then
+  stop_gpg_agent
+fi
+
 clear
