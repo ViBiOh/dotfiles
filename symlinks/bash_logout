@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-if [[ $(type -t stop_ssh_agent) == "function" ]]; then
-  stop_ssh_agent
-fi
+if [[ -z ${TMUX} ]] && [[ -z ${SSH_CLIENT} ]]; then
+  if [[ $(type -t stop_ssh_agent) == "function" ]]; then
+    stop_ssh_agent
+  fi
 
-if [[ $(type -t stop_gpg_agent) == "function" ]]; then
-  stop_gpg_agent
+  if [[ $(type -t stop_gpg_agent) == "function" ]]; then
+    stop_gpg_agent
+  fi
 fi
 
 clear
