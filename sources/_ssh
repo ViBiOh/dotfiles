@@ -23,9 +23,11 @@ start_ssh_agent() {
   stop_ssh_agent
   init_ssh_agent
 
-  for key in "${HOME}/.ssh/"*.pub; do
-    ssh-add -k "${key%.pub}"
-  done
+  if [[ -d ${HOME}/.ssh/ ]]; then
+    for key in "${HOME}/.ssh/"*.pub; do
+      ssh-add -k "${key%.pub}"
+    done
+  fi
 }
 
 if [[ -f ${SSH_ENV} ]]; then
