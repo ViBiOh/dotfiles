@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # IMPORTANT: You will need to run this script from Recovery. In fact, macOS Catalina brings read-only filesystem which prevent this script from working from the main OS.
+# from https://gist.github.com/pwnsdx/1217727ca57de2dd2a372afdd7a0fc21
 
 # Get active services: launchctl list | grep -v "\-\t0"
 # Find a service: grep -lR [service] /System/Library/Launch* /Library/Launch* ~/Library/LaunchAgents
@@ -8,16 +9,16 @@
 TODISABLE=()
 
 # iCloud
-#TODISABLE+=('com.apple.security.cloudkeychainproxy3' \
-# 'com.apple.iCloudUserNotifications' \
-# 'com.apple.icloud.findmydeviced.findmydevice-user-agent' \
-# 'com.apple.icloud.fmfd' \
-# 'com.apple.icloud.searchpartyuseragent' \
-# 'com.apple.cloudd' \
-# 'com.apple.cloudpaird' \
-# 'com.apple.cloudphotod' \
-# 'com.apple.followupd' \
-# 'com.apple.protectedcloudstorage.protectedcloudkeysyncing')
+# TODISABLE+=('com.apple.security.cloudkeychainproxy3' \
+#   'com.apple.iCloudUserNotifications' \
+#   'com.apple.icloud.findmydeviced.findmydevice-user-agent' \
+#   'com.apple.icloud.fmfd' \
+#   'com.apple.icloud.searchpartyuseragent' \
+#   'com.apple.cloudd' \
+#   'com.apple.cloudpaird' \
+#   'com.apple.cloudphotod' \
+#   'com.apple.followupd' \
+#   'com.apple.protectedcloudstorage.protectedcloudkeysyncing')
 
 # Safari useless stuff
 TODISABLE+=('com.apple.SafariBookmarksSyncAgent' \
