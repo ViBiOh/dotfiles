@@ -123,7 +123,9 @@ TODISABLE+=('com.apple.telephonyutilities.callservicesd' \
   'com.apple.remindd')
 
 for agent in "${TODISABLE[@]}"; do
-  mv "./System/Library/LaunchAgents/${agent}.plist" "./System/Library/LaunchAgents/${agent}.plist.bak"
+  if [[ -e "./System/Library/LaunchAgents/${agent}.plist" ]]; then
+    mv "./System/Library/LaunchAgents/${agent}.plist" "./System/Library/LaunchAgents/${agent}.plist.bak"
+  fi
   printf "[OK] Agent %s disabled\n" "${agent}"
 done
 
@@ -154,6 +156,8 @@ TODISABLE+=('com.apple.netbiosd' \
   'com.apple.mediaremoted')
 
 for daemon in "${TODISABLE[@]}"; do
-  mv "./System/Library/LaunchDaemons/${daemon}.plist" "./System/Library/LaunchDaemons/${daemon}.plist.bak"
+  if [[ -e "./System/Library/LaunchDaemons/${daemon}.plist" ]]; then
+    mv "./System/Library/LaunchDaemons/${daemon}.plist" "./System/Library/LaunchDaemons/${daemon}.plist.bak"
+  fi
   printf "[OK] Daemon %s disabled\n" "${daemon}"
 done
