@@ -112,6 +112,8 @@ TODISABLE+=('com.apple.telephonyutilities.callservicesd' \
   'com.apple.macos.studentd' \
   'com.apple.KeyboardAccessAgent' \
   'com.apple.exchange.exchangesyncd' \
+  'com.apple.notificationcenterui' \
+  'com.apple.rcd' \
   'com.apple.suggestd' \
   'com.apple.AddressBook.abd' \
   'com.apple.helpd' \
@@ -144,6 +146,7 @@ TODISABLE+=('com.apple.netbiosd' \
   'com.apple.ManagedClient.enroll' \
   'com.apple.ManagedClient' \
   'com.apple.ManagedClient.startup' \
+  'com.apple.metadata.mds' \
   'com.apple.locate' \
   'com.apple.locationd' \
   'com.apple.eapolcfg_auth' \

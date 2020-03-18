@@ -153,15 +153,16 @@ install() {
     sudo pmset -c displaysleep 10
     sudo pmset -c sleep 15
 
+    sudo mdutil -a -d -i off
+    sudo mdutil -X "/"
+    sudo mdutil -X "/System/Volumes/Data"
+
     sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
     sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
     sudo defaults write /Library/Preferences/com.apple.loginwindow RetriesUntilHint -int 0
     sudo defaults write /Library/Preferences/com.apple.loginwindow showInputMenu -bool true
     sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool true
     sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
-
-    sudo launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
-    sudo launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
 
     sudo nvram SystemAudioVolume=" "
     sudo scutil --set ComputerName macbook

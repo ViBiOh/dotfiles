@@ -39,7 +39,7 @@ fi
 
 if command -v ssh > /dev/null 2>&1; then
   _fzf_complete_ssh_notrigger() {
-    FZF_COMPLETION_TRIGGER="" _fzf_complete_ssh
+    FZF_COMPLETION_TRIGGER="" _fzf_host_completion
   }
   [[ -n "${BASH}" ]] && complete -F _fzf_complete_ssh_notrigger -o default -o bashdefault ssh
 fi
