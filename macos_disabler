@@ -144,10 +144,10 @@ TODISABLE+=('com.apple.netbiosd' \
   'com.apple.screensharing' \
   'com.apple.appleseed.fbahelperd' \
   'com.apple.apsd' \
-  'com.apple.ManagedClient.cloudconfigurationd' \
-  'com.apple.ManagedClient.enroll' \
-  'com.apple.ManagedClient' \
-  'com.apple.ManagedClient.startup' \
+  # Needed for .mobileconfig files 'com.apple.ManagedClient.cloudconfigurationd' \
+  # Needed for .mobileconfig files 'com.apple.ManagedClient.enroll' \
+  # Needed for .mobileconfig files 'com.apple.ManagedClient' \
+  # Needed for .mobileconfig files 'com.apple.ManagedClient.startup' \
   'com.apple.metadata.mds' \
   'com.apple.locate' \
   'com.apple.locationd' \
