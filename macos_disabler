@@ -9,16 +9,16 @@
 TODISABLE=()
 
 # iCloud
-# TODISABLE+=('com.apple.security.cloudkeychainproxy3' \
-#   'com.apple.iCloudUserNotifications' \
-#   'com.apple.icloud.findmydeviced.findmydevice-user-agent' \
-#   'com.apple.icloud.fmfd' \
-#   'com.apple.icloud.searchpartyuseragent' \
-#   'com.apple.cloudd' \
-#   'com.apple.cloudpaird' \
-#   'com.apple.cloudphotod' \
-#   'com.apple.followupd' \
-#   'com.apple.protectedcloudstorage.protectedcloudkeysyncing')
+TODISABLE+=('com.apple.security.cloudkeychainproxy3' \
+  'com.apple.iCloudUserNotifications' \
+  'com.apple.icloud.findmydeviced.findmydevice-user-agent' \
+  'com.apple.icloud.fmfd' \
+  'com.apple.icloud.searchpartyuseragent' \
+  'com.apple.cloudd' \
+  'com.apple.cloudpaird' \
+  'com.apple.cloudphotod' \
+  'com.apple.followupd' \
+  'com.apple.protectedcloudstorage.protectedcloudkeysyncing')
 
 # Safari useless stuff
 TODISABLE+=('com.apple.SafariBookmarksSyncAgent' \
