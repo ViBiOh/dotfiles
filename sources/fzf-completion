@@ -13,7 +13,7 @@ fi
 if command -v pass > /dev/null 2>&1; then
   _fzf_complete_pass() {
     FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(
-      local PASS_DIR=${PASSWORD_STORE_DIR-${HOME}/.password-store}
+      local PASS_DIR=${PASSWORD_STORE_DIR:-${HOME}/.password-store}
       find "${PASS_DIR}" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"
     )
   }

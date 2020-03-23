@@ -12,7 +12,7 @@ credentials() {
     exit
   fi
 
-  local PASS_DIR="${PASSWORD_STORE_DIR-${HOME}/.password-store}"
+  local PASS_DIR="${PASSWORD_STORE_DIR:-${HOME}/.password-store}"
   local PG_PASS
   PG_PASS="$(find "${PASS_DIR}" -name "*pgpass.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|")"
 
