@@ -11,7 +11,7 @@ credentials() {
     exit
   fi
 
-  local PASS_DIR="${PASSWORD_STORE_DIR-${HOME}/.password-store}"
+  local PASS_DIR="${PASSWORD_STORE_DIR:-${HOME}/.password-store}"
   local ANSIBLE_PASS
   ANSIBLE_PASS="$(find "${PASS_DIR}" -name "*ansible.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|")"
 
