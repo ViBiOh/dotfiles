@@ -34,6 +34,7 @@ source_all() {
     var_color
   fi
 
+  shopt -s nullglob
   for file in "${DOTFILES_PATH}/../sources/"*; do
     [[ -r "${file}" ]] && [[ -f "${file}" ]] && source "${file}"
   done

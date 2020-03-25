@@ -9,6 +9,7 @@ if [[ -f ${HOME}/opt/bin/delta ]]; then
 fi
 
 git_browse() {
+  shopt -s nullglob
   for dir in "$(pwd)"/*; do
     (cd "${dir}" && [[ $(git_is_inside) = "true" ]] && echo "${dir}" && eval "${@}")
   done

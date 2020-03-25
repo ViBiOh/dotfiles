@@ -28,6 +28,7 @@ usage() {
 }
 
 create_symlinks() {
+  shopt -s nullglob
   for file in "${CURRENT_DIR}/symlinks"/*; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
@@ -44,6 +45,7 @@ browse_install() {
   local LC_ALL="C"
   local LANG="C"
 
+  shopt -s nullglob
   for file in "${CURRENT_DIR}/install"/*; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file%.*}")"
