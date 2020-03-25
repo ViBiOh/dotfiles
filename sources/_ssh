@@ -34,6 +34,7 @@ start_ssh_agent() {
 
       ssh-add -k "${key%.pub}"
     done
+    shopt -u nullglob
   fi
 }
 

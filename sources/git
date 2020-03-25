@@ -13,6 +13,7 @@ git_browse() {
   for dir in "$(pwd)"/*; do
     (cd "${dir}" && [[ $(git_is_inside) = "true" ]] && echo "${dir}" && eval "${@}")
   done
+  shopt -u nullglob
 }
 
 ...() {
