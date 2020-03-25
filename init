@@ -39,6 +39,7 @@ create_symlinks() {
 
     [[ -r ${file} ]] && [[ -e ${file} ]] && rm -f "${HOME}/.${BASENAME_FILE}" && ln -s "${file}" "${HOME}/.${BASENAME_FILE}"
   done
+  shopt -u nullglob
 }
 
 browse_install() {
@@ -77,6 +78,7 @@ browse_install() {
       done
     fi
   done
+  shopt -u nullglob
 }
 
 clean_packages() {

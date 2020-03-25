@@ -38,6 +38,7 @@ source_all() {
   for file in "${DOTFILES_PATH}/../sources/"*; do
     [[ -r "${file}" ]] && [[ -f "${file}" ]] && source "${file}"
   done
+  shopt -u nullglob
 }
 
 set_locale
