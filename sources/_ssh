@@ -21,10 +21,17 @@ init_ssh_agent() {
 
 start_ssh_agent() {
   stop_ssh_agent
-  init_ssh_agent
 
   if [[ -d ${HOME}/.ssh/ ]]; then
+    local AGENT_INITIALIZED="false"
+
+    shopt -s nullglob
     for key in "${HOME}/.ssh/"*.pub; do
+      if [[ ${AGENT_INITIALIZED} == "false" ]]; then
+        AGENT_INITIALIZED="true"
+        init_ssh_agent
+      fi
+
       ssh-add -k "${key%.pub}"
     done
   fi
