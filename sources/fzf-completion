@@ -32,7 +32,8 @@ fi
 
 if command -v make > /dev/null 2>&1; then
   _fzf_complete_make() {
-    FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(make -rpn | sed -n -e '/^$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$// ; p ; } ; }')
+    # From https://unix.stackexchange.com/a/230050
+    FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(make -pqr 2> /dev/null | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | grep -v Makefile | sort -u)
   }
   [[ -n "${BASH}" ]] && complete -F _fzf_complete_make -o default -o bashdefault make
 fi
