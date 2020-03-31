@@ -7,4 +7,13 @@ if command -v docker > /dev/null 2>&1; then
 
   export DOCKER_CONTENT_TRUST="1"
   export DOCKER_CLI_EXPERIMENTAL="enabled"
+
+  docker_clean() {
+    docker system prune -f
+
+    docker rmi -f $(docker images -q)
+    docker rmi -f $(docker images --format '{{ .Repository }}:{{ .Tag}}')
+    docker network rm $(docker network ls -q)
+    docker volume rm $(docker volume ls -q)
+  }
 fi
