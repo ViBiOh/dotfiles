@@ -10,6 +10,7 @@ install() {
     | grep -E -v '^$' \
     | grep -E -v '^\s*#' \
     | grep -E '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' \
+    | tr -s '[:blank:]' ' ' \
     | sort \
     | uniq \
     | grep -v "ɢ" \
@@ -29,6 +30,7 @@ install() {
     | grep -v "0.0.0.0 v.redd.it" \
     | grep -v "0.0.0.0 styles.redditmedia.com" \
     | grep -v "0.0.0.0 reddit.map.fastly.net" \
+    | sed $'s|0.0.0.0 \(.*\)|0.0.0.0 \\1\\\n0:0:0:0:0:0:0:0 \\1|g' \
     | sudo tee /etc/hosts > /dev/null
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
