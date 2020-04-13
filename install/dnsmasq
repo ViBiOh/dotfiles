@@ -36,6 +36,7 @@ stop-dns-rebind
 rebind-localhost-ok
 
 # Query servers in order
+no-resolv
 strict-order
 
 # Set the size of the cache
