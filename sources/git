@@ -8,14 +8,6 @@ if [[ -f ${HOME}/opt/bin/delta ]]; then
   export GIT_PAGER="delta --dark --highlight-removed"
 fi
 
-git_browse() {
-  shopt -s nullglob
-  for dir in "$(pwd)"/*; do
-    (cd "${dir}" && [[ $(git_is_inside) = "true" ]] && echo "${dir}" && eval "${@}")
-  done
-  shopt -u nullglob
-}
-
 ...() {
   cd "$(git_root)" || return 1
 }
