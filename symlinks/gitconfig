@@ -39,6 +39,7 @@
 	fco = "! git checkout \"$(git branch -vv --all | fzf --height 20 --ansi --reverse -q 'remotes/' | awk '{print $1}' | sed 's|^remotes/origin/||')\""
 	fixup = "! git commit --fixup $(git log-pretty master..$(git current-branch) | fzf --height 20 --ansi --reverse | awk '{print $1}')"
 	cc = "! git log --format=format: --name-only | grep -E -v '^$' | sort | uniq -c | sort -rg | head -10"
+	copr = !sh -c 'git fetch origin "pull/${1}/head:pr/${1}" && git checkout "pr/${1}"' -
 	rbm = pull --rebase origin master
 	tidy = rebase -i origin/master
 	commend = commit --amend --no-edit
