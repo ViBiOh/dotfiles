@@ -26,7 +26,7 @@ END_OF_BASH_PROFILE
 
     brew update
     brew upgrade
-    brew install "${PACKAGES[@]}" fswatch bat pcre
+    brew install "${PACKAGES[@]}" fswatch pcre
 
     if [[ $(grep -c "$(brew --prefix)" "/etc/shells") -eq 0 ]]; then
       printf "+-------------------------+\n"
@@ -52,6 +52,6 @@ END_OF_BASH_PROFILE
     fi
 
     sudo pacman -Syuq --noconfirm
-    sudo pacman -S --noconfirm --needed "${PACKAGES[@]}" make gcc binutils dnsutils iproute2 bat
+    sudo pacman -S --noconfirm --needed "${PACKAGES[@]}" make gcc binutils dnsutils iproute2
   fi
 }
