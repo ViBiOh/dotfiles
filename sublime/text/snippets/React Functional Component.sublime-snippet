@@ -1,5 +1,5 @@
 <snippet>
-		<content><![CDATA[
+	<content><![CDATA[
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -18,7 +18,7 @@ ${1:ComponentName}.propTypes = {
 };
 
 ]]></content>
-		<tabTrigger>rfc</tabTrigger>
-		<scope>source.js,source.jsx</scope>
-		<description>React Functional Component</description>
+	<tabTrigger>rfc</tabTrigger>
+	<scope>source.js,source.jsx</scope>
+	<description>React Functional Component</description>
 </snippet>

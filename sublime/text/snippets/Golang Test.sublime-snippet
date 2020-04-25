@@ -1,29 +1,35 @@
 <snippet>
-		<content><![CDATA[
+	<content><![CDATA[
 func Test${2:FuncName}(t *testing.T) {
+	type args struct {
+		content string
+	}
+
 	var cases = []struct {
 		intention string
-		input     string
+		args      args
 		want      bool
 	}{
 		{
 			"simple",
-			"test",
+			args{
+				content: "test",
+			},
 			true,
 		},
 	}
 
-	for _, testCase := range cases {
-		t.Run(testCase.intention, func(t *testing.T) {
-			if result := ${2:FuncName}(testCase.input); result != testCase.want {
-				t.Errorf("${2:FuncName}() = %t, want %t", result, testCase.want)
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			if got := ${2:FuncName}(tc.args.content); got != tc.want {
+				t.Errorf("${2:FuncName}() = %t, want %t", got, tc.want)
 			}
 		})
 	}
 }
 
 ]]></content>
-		<tabTrigger>gt</tabTrigger>
-		<scope>source.go</scope>
-		<description>Golang Test</description>
+	<tabTrigger>gt</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang Test</description>
 </snippet>

@@ -1,5 +1,5 @@
 <snippet>
-    <content><![CDATA[
+	<content><![CDATA[
 /**
  * React lifecycle.
  */
@@ -8,7 +8,7 @@ componentDidMount() {
 }
 
 ]]></content>
-    <tabTrigger>cdm</tabTrigger>
-    <scope>source.js</scope>
-    <description>React: componentDidMount() {…}</description>
+	<tabTrigger>cdm</tabTrigger>
+	<scope>source.js</scope>
+	<description>React: componentDidMount() {…}</description>
 </snippet>

@@ -1,41 +1,47 @@
 <snippet>
-		<content><![CDATA[
+	<content><![CDATA[
 func Test${1:FuncName}(t *testing.T) {
+	type args struct {
+		content string
+	}
+
 	var cases = []struct {
 		intention string
-		input   string
-		want    bool
-		wantErr error
+		args      args
+		want      bool
+		wantErr   error
 	}{
 		{
 			"simple",
-			"test",
+			args{
+				content: "test",
+			},
 			false,
 			errors.New("Error while testing"),
 		},
 	}
 
-	for _, testCase := range cases {
-		t.Run(testCase.intention, func(t *testing.T) {
-			result, err := ${1:FuncName}(testCase.input)
+	for _, tc := range cases {
+		t.Run(tc.intention, func(t *testing.T) {
+			got, err := ${1:FuncName}(tc.args.content)
 
 			failed := false
 
-			if testCase.wantErr != nil && !errors.Is(err, testCase.wantErr) {
+			if tc.wantErr != nil && !errors.Is(err, tc.wantErr) {
 				failed = true
-			} else if result != testCase.want {
+			} else if got != tc.want {
 				failed = true
 			}
 
 			if failed {
-				t.Errorf("${1:FuncName}() = (%t, `%s`), want (%t, `%s`)", result, err, testCase.want, testCase.wantErr)
+				t.Errorf("${1:FuncName}() = (%t, `%s`), want (%t, `%s`)", got, err, tc.want, tc.wantErr)
 			}
 		})
 	}
 }
 
 ]]></content>
-		<tabTrigger>gte</tabTrigger>
-		<scope>source.go</scope>
-		<description>Golang Test with Error</description>
+	<tabTrigger>gte</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang Test with Error</description>
 </snippet>

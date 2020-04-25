@@ -1,8 +1,8 @@
 <snippet>
-    <content><![CDATA[
+	<content><![CDATA[
 console.log('${1:var}', typeof ${1}, ${1});
 ]]></content>
-    <tabTrigger>csl</tabTrigger>
-    <scope>source.js,source.jsx</scope>
-    <description>console.log</description>
+	<tabTrigger>csl</tabTrigger>
+	<scope>source.js,source.jsx</scope>
+	<description>console.log</description>
 </snippet>
