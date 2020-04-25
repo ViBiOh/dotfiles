@@ -1,5 +1,5 @@
 <snippet>
-    <content><![CDATA[
+	<content><![CDATA[
 /**
  * React lifecycle.
  */
@@ -8,7 +8,7 @@ componentWillUnmount() {
 }
 
 ]]></content>
-    <tabTrigger>cwun</tabTrigger>
-    <scope>source.js</scope>
-    <description>React: componentWillUnmount() {…}</description>
+	<tabTrigger>cwun</tabTrigger>
+	<scope>source.js</scope>
+	<description>React: componentWillUnmount() {…}</description>
 </snippet>

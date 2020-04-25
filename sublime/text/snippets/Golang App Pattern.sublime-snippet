@@ -1,5 +1,5 @@
 <snippet>
-		<content><![CDATA[
+	<content><![CDATA[
 // App of package
 type App interface {
 }
@@ -28,7 +28,7 @@ func New(config Config) App {
 }
 
 ]]></content>
-		<tabTrigger>gap</tabTrigger>
-		<scope>source.go</scope>
-		<description>Golang App Pattern</description>
+	<tabTrigger>gap</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang App Pattern</description>
 </snippet>

@@ -1,5 +1,5 @@
 <snippet>
-		<content><![CDATA[
+	<content><![CDATA[
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -57,7 +57,7 @@ const mapDispatchToProps = {
 export default connect(mapStateToProps, mapDispatchToProps)(${1:ComponentName}Component);
 
 ]]></content>
-		<tabTrigger>rrc</tabTrigger>
-		<scope>source.js,source.jsx</scope>
-		<description>React Redux Component</description>
+	<tabTrigger>rrc</tabTrigger>
+	<scope>source.js,source.jsx</scope>
+	<description>React Redux Component</description>
 </snippet>

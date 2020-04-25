@@ -1,5 +1,5 @@
 <snippet>
-		<content><![CDATA[
+	<content><![CDATA[
 if strings.HasPrefix(r.URL.Path, "/debug/pprof") {
 	if strings.HasPrefix(r.URL.Path, "/debug/pprof/cmdline") {
 		pprof.Cmdline(w, r)
@@ -23,7 +23,7 @@ if strings.HasPrefix(r.URL.Path, "/debug/pprof") {
 }
 
 ]]></content>
-		<tabTrigger>gph</tabTrigger>
-		<scope>source.go</scope>
-		<description>Golang Pprof Handler</description>
+	<tabTrigger>gph</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang Pprof Handler</description>
 </snippet>

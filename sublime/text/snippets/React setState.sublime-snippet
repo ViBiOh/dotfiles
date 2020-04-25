@@ -1,8 +1,8 @@
 <snippet>
-    <content><![CDATA[
+	<content><![CDATA[
 this.setState({ ${1}: ${2} });
 ]]></content>
-    <tabTrigger>rss</tabTrigger>
-    <scope>source.js</scope>
-    <description>React: this.setState(…)</description>
+	<tabTrigger>rss</tabTrigger>
+	<scope>source.js</scope>
+	<description>React: this.setState(…)</description>
 </snippet>

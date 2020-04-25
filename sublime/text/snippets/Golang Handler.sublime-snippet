@@ -1,13 +1,14 @@
 <snippet>
-    <content><![CDATA[
+	<content><![CDATA[
 // Handler for request. Should be use with net/http
 func (a app) Handler() http.Handler {
-  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-  })
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		${1}
+	})
 }
 
 ]]></content>
-    <tabTrigger>gh</tabTrigger>
-    <scope>source.go</scope>
-    <description>Golang Handler</description>
+	<tabTrigger>gh</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang Handler</description>
 </snippet>

@@ -1,5 +1,5 @@
 <snippet>
-    <content><![CDATA[
+	<content><![CDATA[
 import React from 'react';
 import { shallow } from 'enzyme';
 import ${1:ComponentName} from './index';
@@ -16,7 +16,7 @@ it('should always render as a div', () => {
 });
 
 ]]></content>
-    <tabTrigger>rct</tabTrigger>
-    <scope>source.js,source.jsx</scope>
-    <description>React Component Test</description>
+	<tabTrigger>rct</tabTrigger>
+	<scope>source.js,source.jsx</scope>
+	<description>React Component Test</description>
 </snippet>

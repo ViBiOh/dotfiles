@@ -1,5 +1,5 @@
 <snippet>
-    <content><![CDATA[
+	<content><![CDATA[
 import reducer, { initialState } from './${1:ReducerName}';
 
 it('should return initial state', () => {
@@ -7,7 +7,7 @@ it('should return initial state', () => {
 });
 
 ]]></content>
-    <tabTrigger>rrt</tabTrigger>
-    <scope>source.js,source.jsx</scope>
-    <description>Redux Reducer Test</description>
+	<tabTrigger>rrt</tabTrigger>
+	<scope>source.js,source.jsx</scope>
+	<description>Redux Reducer Test</description>
 </snippet>

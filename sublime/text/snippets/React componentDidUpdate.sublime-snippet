@@ -1,5 +1,5 @@
 <snippet>
-    <content><![CDATA[
+	<content><![CDATA[
 /**
  * React lifecycle.
  * @param {Object} prevProps Previous props
@@ -10,7 +10,7 @@ componentDidUpdate(prevProps, prevState) {
 }
 
 ]]></content>
-    <tabTrigger>cdup</tabTrigger>
-    <scope>source.js</scope>
-    <description>React: componentDidUpdate(pp, ps) {…}</description>
+	<tabTrigger>cdup</tabTrigger>
+	<scope>source.js</scope>
+	<description>React: componentDidUpdate(pp, ps) {…}</description>
 </snippet>

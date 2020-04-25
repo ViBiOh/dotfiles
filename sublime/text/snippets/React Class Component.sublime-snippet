@@ -1,5 +1,5 @@
 <snippet>
-		<content><![CDATA[
+	<content><![CDATA[
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
@@ -29,7 +29,7 @@ ${1:ComponentName}.propTypes = {
 };
 
 ]]></content>
-		<tabTrigger>rcc</tabTrigger>
-		<scope>source.js,source.jsx</scope>
-		<description>React Class Component</description>
+	<tabTrigger>rcc</tabTrigger>
+	<scope>source.js,source.jsx</scope>
+	<description>React Class Component</description>
 </snippet>

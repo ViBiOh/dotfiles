@@ -1,5 +1,5 @@
 <snippet>
-		<content><![CDATA[
+	<content><![CDATA[
 /**
  * ${1:ReducerName} reducer initial state.
  * @type {Object}
@@ -24,7 +24,7 @@ export default function (state = initialState, action) {
 };
 
 ]]></content>
-		<tabTrigger>rrr</tabTrigger>
-		<scope>source.js,source.jsx</scope>
-		<description>Redux ReduceR</description>
+	<tabTrigger>rrr</tabTrigger>
+	<scope>source.js,source.jsx</scope>
+	<description>Redux ReduceR</description>
 </snippet>
