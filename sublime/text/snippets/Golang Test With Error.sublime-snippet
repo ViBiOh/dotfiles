@@ -23,18 +23,18 @@ func Test${1:FuncName}(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.intention, func(t *testing.T) {
-			got, err := ${1:FuncName}(tc.args.content)
+			got, gotErr := ${1:FuncName}(tc.args.content)
 
 			failed := false
 
-			if tc.wantErr != nil && !errors.Is(err, tc.wantErr) {
+			if tc.wantErr != nil && !errors.Is(gotErr, tc.wantErr) {
 				failed = true
 			} else if got != tc.want {
 				failed = true
 			}
 
 			if failed {
-				t.Errorf("${1:FuncName}() = (%t, `%s`), want (%t, `%s`)", got, err, tc.want, tc.wantErr)
+				t.Errorf("${1:FuncName}() = (%t, `%s`), want (%t, `%s`)", got, gotErr, tc.want, tc.wantErr)
 			}
 		})
 	}
