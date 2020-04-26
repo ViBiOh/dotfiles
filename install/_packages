@@ -26,7 +26,7 @@ END_OF_BASH_PROFILE
 
     brew update
     brew upgrade
-    brew install "${PACKAGES[@]}" fswatch pcre
+    brew install "${PACKAGES[@]}" fswatch
 
     if [[ $(grep -c "$(brew --prefix)" "/etc/shells") -eq 0 ]]; then
       printf "+-------------------------+\n"
