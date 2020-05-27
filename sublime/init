@@ -37,8 +37,9 @@ main() {
   symlink_settings "${TEXT_PKG}" "text"
   symlink_settings "${MERGE_PKG}" "merge"
 
-  install_plugin SublimeLayout
+  install_plugin SublimeBlame
   install_plugin SublimeGo
+  install_plugin SublimeLayout
   install_plugin SublimeTerraform
 
   if command -v go > /dev/null 2>&1; then
