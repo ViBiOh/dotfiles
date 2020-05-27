@@ -4,19 +4,19 @@ import subprocess
 
 from datetime import datetime, timedelta
 
-new_file_regex = re.compile("fatal: no such path '.*' in HEAD")
-not_git_regex = re.compile("fatal: not a git repository \\(or any of the parent directories\\): .git")
-author_regex = re.compile("author\\s(.*)")
-time_regex = re.compile("author-time\\s(.*)")
-summary_regex = re.compile("summary\\s(.*)")
+new_file_regex = re.compile('fatal: no such path \'.*\' in HEAD')
+not_git_regex = re.compile('fatal: not a git repository \\(or any of the parent directories\\): .git')
+author_regex = re.compile('author\\s(.*)')
+time_regex = re.compile('author-time\\s(.*)')
+summary_regex = re.compile('summary\\s(.*)')
 
 # From https://gist.github.com/jonlabelle/7d306575cbbd34b154f87b1853d532cc
 def relative_time(date):
     def formatn(n, s):
         if n == 1:
-            return "1 %s" % s
+            return '1 %s' % s
         elif n > 1:
-            return "%d %ss" % (n, s)
+            return '%d %ss' % (n, s)
 
     def qnr(a, b):
         return a / b, a % b
@@ -37,18 +37,24 @@ def relative_time(date):
                 n = getattr(self, period)
                 if n >= 1:
                     return '{0} ago'.format(formatn(n, period))
-            return "just now"
+            return 'just now'
 
     return FormatDelta(date).format()
 
-class GitBlameSelection(sublime_plugin.EventListener):
-    _last_filename = ""
+class SublimeGitBlame(sublime_plugin.EventListener):
+    _status_key = 'git_blame'
+
+    _last_filename = ''
     _last_linenumber = 0
 
     def on_selection_modified_async(self, view):
-        vars = view.window().extract_variables()
+        window = view.window()
+        if not window:
+            return
+
+        vars = window.extract_variables()
         file_name = vars['file_name']
-        line_number = view.rowcol(view.sel()[0].begin())[0]
+        line_number = view.rowcol(view.sel()[0].begin())[0] + 1 # index start at 0
 
         if file_name == self._last_filename and line_number == self._last_linenumber:
             return
@@ -58,23 +64,27 @@ class GitBlameSelection(sublime_plugin.EventListener):
 
         working_dir = vars['file_path']
 
-        gitblame = subprocess.Popen(['git', 'blame', '-p', '-L', '{},{}'.format(line_number, line_number), '--', file_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_dir)
-        gitblame_out, gitblame_err = gitblame.communicate("")
-        if gitblame.returncode != 0:
-            err_content = gitblame_err.decode()
+        try:
+            git_blame = subprocess.check_output(['git', 'blame', '-p', '-L', '{},{}'.format(line_number, line_number), '--', file_name], stderr=subprocess.STDOUT, cwd=working_dir)
+        except subprocess.CalledProcessError as e:
+            err_content = e.output.decode('utf8')
 
             if new_file_regex.match(err_content):
-                view.set_status("git_blame", "Blame: new file")
+                view.set_status(self._status_key, 'Blame: new file')
             elif not_git_regex.match(err_content):
-                view.set_status("git_blame", "Blame: not in git")
+                view.set_status(self._status_key, 'Blame: not in git')
             else:
-                print(err_content, end="")
+                print(err_content, end='')
             return
 
-        blame_content = gitblame_out.decode()
+        blame_content = git_blame.decode('utf8')
 
         author = author_regex.findall(blame_content)[0]
+        if author == 'Not Committed Yet':
+            view.erase_status(self._status_key)
+            return
+
         moment = datetime.fromtimestamp(int(time_regex.findall(blame_content)[0]))
         description = summary_regex.findall(blame_content)[0]
 
-        view.set_status("git_blame", '{} by {}: {}'.format(relative_time(moment), author, description))
+        view.set_status(self._status_key, '{} by {}: {}'.format(relative_time(moment), author, description))

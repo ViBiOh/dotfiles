@@ -18,13 +18,13 @@ class GoFormat(sublime_plugin.TextCommand):
         goimports = subprocess.Popen(['goimports'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_dir)
         goimports_out, goimports_err = goimports.communicate(src.encode())
         if goimports.returncode != 0:
-            print(goimports_err.decode(), end="")
+            print(goimports_err.decode(), end='')
             return
 
         gofmt = subprocess.Popen(['gofmt', '-s'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         gofmt_out, gofmt_err = gofmt.communicate(goimports_out)
         if goimports.returncode != 0:
-            print(gofmt_err.decode(), end="")
+            print(gofmt_err.decode(), end='')
             return
 
         view.replace(edit, region, gofmt_out.decode())
