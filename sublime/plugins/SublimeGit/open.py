@@ -1,0 +1,44 @@
+import re
+import sublime_plugin
+import subprocess
+
+
+origin_regex = re.compile('^.*@(.*):(.*).git\\n?$')
+
+class SublimeGitOpen(sublime_plugin.WindowCommand):
+    def run(self):
+        window = self.window
+        if not window:
+            return
+
+        vars = window.extract_variables()
+        file_name = vars['file_name']
+        working_dir = vars['file_path']
+
+        view = window.active_view()
+        line_number = view.rowcol(view.sel()[0].begin())[0] + 1 # index start at 0
+
+        is_git = subprocess.call(['git', 'rev-parse', '--is-inside-work-tree'], cwd=working_dir)
+        if is_git != 0:
+            return
+
+        try:
+            git_remote_url = subprocess.check_output(['git', 'remote', 'get-url', '--push', 'origin'], stderr=subprocess.STDOUT, cwd=working_dir)
+        except subprocess.CalledProcessError as e:
+            print('unable to get remote push url: {}'.format(e.output.decode('utf8')))
+            return
+
+        try:
+            git_root = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], stderr=subprocess.STDOUT, cwd=working_dir)
+        except subprocess.CalledProcessError as e:
+            print('unable to get root path: {}'.format(e.output.decode('utf8')))
+            return
+
+        remote = git_remote_url.decode('utf8').strip()
+        root = git_root.decode('utf8').strip()
+        git_path = working_dir.replace(root, '')
+
+        paths = origin_regex.findall(remote)
+        url = 'https://{}/{}/blob/master{}/{}#L{}'.format(paths[0][0], paths[0][1], git_path, file_name, line_number)
+
+        subprocess.call(['open', url], cwd=working_dir)
