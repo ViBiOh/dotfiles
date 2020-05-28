@@ -34,11 +34,18 @@ class SublimeGitOpen(sublime_plugin.WindowCommand):
             print('unable to get root path: {}'.format(e.output.decode('utf8')))
             return
 
-        remote = git_remote_url.decode('utf8').strip()
-        root = git_root.decode('utf8').strip()
+        try:
+            git_branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], stderr=subprocess.STDOUT, cwd=working_dir)
+        except subprocess.CalledProcessError as e:
+            print('unable to get branch: {}'.format(e.output.decode('utf8')))
+            return
+
+        remote = git_remote_url.decode('utf8').rstrip()
+        root = git_root.decode('utf8').rstrip()
         git_path = working_dir.replace(root, '')
+        branch = git_branch.decode('utf8').rstrip()
 
         paths = origin_regex.findall(remote)
-        url = 'https://{}/{}/blob/master{}/{}#L{}'.format(paths[0][0], paths[0][1], git_path, file_name, line_number)
+        url = 'https://{}/{}/blob/{}{}/{}#L{}'.format(paths[0][0], paths[0][1], branch, git_path, file_name, line_number)
 
         subprocess.call(['open', url], cwd=working_dir)
