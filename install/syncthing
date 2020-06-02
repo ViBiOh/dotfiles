@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  local SYNCTHING_VERSION="1.6.0"
+  local SYNCTHING_VERSION="1.6.1"
 
   local OS
   OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
@@ -20,9 +20,9 @@ install() {
 
   local SYNCTHING_ARCHIVE="syncthing-${OS}-${ARCH}-v${SYNCTHING_VERSION}"
 
-  curl -q -sSL --max-time 300 -O "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/${SYNCTHING_ARCHIVE}.tar.gz"
+  curl -q -sSL --max-time 300 -O "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/${SYNCTHING_ARCHIVE}.zip"
 
-  tar -xzf "${SYNCTHING_ARCHIVE}.tar.gz"
+  unzip "${SYNCTHING_ARCHIVE}.zip"
   cp "${SYNCTHING_ARCHIVE}/syncthing" "${HOME}/opt/bin/"
-  rm -rf "${SYNCTHING_ARCHIVE}" "${SYNCTHING_ARCHIVE}.tar.gz"
+  rm -rf "${SYNCTHING_ARCHIVE}" "${SYNCTHING_ARCHIVE}.zip"
 }
