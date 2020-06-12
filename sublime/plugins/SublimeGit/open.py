@@ -1,11 +1,13 @@
 import re
+import sublime
 import sublime_plugin
 import subprocess
 
 
 origin_regex = re.compile('^.*@(.*):(.*).git\\n?$')
 
-class SublimeGitOpen(sublime_plugin.WindowCommand):
+
+class SublimeGitWeb(sublime_plugin.WindowCommand):
     def run(self):
         window = self.window
         if not window:
@@ -48,4 +50,4 @@ class SublimeGitOpen(sublime_plugin.WindowCommand):
         paths = origin_regex.findall(remote)
         url = 'https://{}/{}/blob/{}{}/{}#L{}'.format(paths[0][0], paths[0][1], branch, git_path, file_name, line_number)
 
-        subprocess.call(['open', url], cwd=working_dir)
+        sublime.set_clipboard(url)

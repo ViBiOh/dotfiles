@@ -1,6 +1,6 @@
 [
   {
-    "caption": "View in web Git",
-    "command": "sublime_git_open"
+    "caption": "Copy git web url",
+    "command": "sublime_git_web"
   }
 ]
