@@ -10,6 +10,7 @@ author_regex = re.compile('author\\s(.*)')
 time_regex = re.compile('author-time\\s(.*)')
 summary_regex = re.compile('summary\\s(.*)')
 
+
 # From https://gist.github.com/jonlabelle/7d306575cbbd34b154f87b1853d532cc
 def relative_time(date):
     def formatn(n, s):
@@ -40,6 +41,7 @@ def relative_time(date):
             return 'just now'
 
     return FormatDelta(date).format()
+
 
 class SublimeGitBlame(sublime_plugin.EventListener):
     _status_key = 'git_blame'
