@@ -5,6 +5,7 @@
 	],
 	"installed_packages":
 	[
+		"Babel",
 		"DocBlockr",
 		"EditorConfig",
 		"JsPrettier",

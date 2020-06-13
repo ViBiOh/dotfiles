@@ -7,24 +7,8 @@
     "pyls": {
       "enabled": true
     },
-    "lsp-js": {
-      "command": [
-        "javascript-typescript-stdio"
-      ],
-      "enabled": true,
-      "languages": [
-        {
-          "languageId": "javascript",
-          "scopes": [
-            "source.js",
-            "source.jsx"
-          ],
-          "syntaxes": [
-            "Javascript",
-            "Packages/Naomi/syntaxes/naomi.fjsx15.sublime-syntax"
-          ]
-        }
-      ]
+    "javascript-typescript-langserver": {
+      "enabled": true
     }
   }
 }
