@@ -21,7 +21,8 @@ credentials() {
 
     echo "credentials \"app.terraform.io\" {
   token = \"${TERRAFORM_TOKEN}\"
-}" > "${HOME}/.terraformrc"
+}
+" >> "${HOME}/.terraformrc"
   fi
 }
 
@@ -45,5 +46,10 @@ install() {
   unzip -o -d "${HOME}/opt/bin" "${TERRAFORM_ARCHIVE}"
   rm -rf "${TERRAFORM_ARCHIVE}"
 
-  curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/MeilleursAgents/terraform-provider-ansiblevault/master/install.sh" | bash
+  mkdir -p "${HOME}/.terraform.d/plugin-cache"
+
+  echo "plugin_cache_dir = \"${HOME}/.terraform.d/plugin-cache\"
+" > "${HOME}/.terraformrc"
+
+  curl -q -sSL --max-time 300 "https://raw.githubusercontent.com/MeilleursAgents/terraform-provider-ansiblevault/master/install.sh" | bash
 }
