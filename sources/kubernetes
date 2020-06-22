@@ -6,11 +6,11 @@ if command -v kubectl > /dev/null 2>&1; then
   }
 
   if command -v kubectl > /dev/null 2>&1; then
-    kube_switch() {
+    kubens() {
       kubectl config get-contexts -o name | fzf --ansi --reverse | xargs kubectl config use-context
     }
 
-    kube_logs() {
+    kubelogs() {
       kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace} {.metadata.name}{"\n"}{end}' | fzf --ansi --reverse -q "${1}" | xargs -n 2 bash -c 'kubectl -n ${0} logs deployments/${1} -f'
     }
   fi
