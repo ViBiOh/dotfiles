@@ -44,19 +44,24 @@ def relative_time(date):
 
 
 class SublimeGitBlame(sublime_plugin.EventListener):
-    _status_key = 'git_blame'
+    _blame_key = 'git_blame'
 
     _last_filename = ''
     _last_linenumber = 0
 
     def on_selection_modified_async(self, view):
+        selections = view.sel()
+        if len(selections) > 1:
+            view.erase_regions(self._blame_key)
+            return
+
         window = view.window()
         if not window:
             return
 
         vars = window.extract_variables()
         file_name = vars['file_name']
-        line_number = view.rowcol(view.sel()[0].begin())[0] + 1 # index start at 0
+        line_number = view.rowcol(selections[0].begin())[0] + 1 # index start at 0
 
         if file_name == self._last_filename and line_number == self._last_linenumber:
             return
@@ -70,23 +75,18 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             git_blame = subprocess.check_output(['git', 'blame', '-p', '-L', '{},{}'.format(line_number, line_number), '--', file_name], stderr=subprocess.STDOUT, cwd=working_dir)
         except subprocess.CalledProcessError as e:
             err_content = e.output.decode('utf8')
-
-            if new_file_regex.match(err_content):
-                view.set_status(self._status_key, 'Blame: new file')
-            elif not_git_regex.match(err_content):
-                view.set_status(self._status_key, 'Blame: not in git')
-            else:
+            if not new_file_regex.match(err_content) and not not_git_regex.match(err_content):
                 print(err_content, end='')
             return
 
         blame_content = git_blame.decode('utf8')
-
         author = author_regex.findall(blame_content)[0]
         if author == 'Not Committed Yet':
-            view.erase_status(self._status_key)
+            view.erase_regions(self._blame_key)
             return
 
         moment = datetime.fromtimestamp(int(time_regex.findall(blame_content)[0]))
         description = summary_regex.findall(blame_content)[0]
+        blame = '<strong>{}</strong> <em>{}</em> {}'.format(author, relative_time(moment), description)
 
-        view.set_status(self._status_key, '{} by {}: {}'.format(relative_time(moment), author, description))
+        view.add_regions(self._blame_key, [selections[0]], annotations=[blame], annotation_color="royalblue")
