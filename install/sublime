@@ -4,7 +4,15 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   if command -v brew > /dev/null 2>&1; then
-    brew cask reinstall sublime-text sublime-merge
+    brew cask reinstall sublime-merge
+
+    local SUBLIME_TEXT_VERSION="4074"
+    local SUBLIME_TEXT_FILENAME="sublime_text_build_${SUBLIME_TEXT_VERSION}_mac.zip"
+
+    curl -q -sSL --max-time 300 -O "https://download.sublimetext.com/${SUBLIME_TEXT_FILENAME}"
+    unzip -o "${SUBLIME_TEXT_FILENAME}" -d /Applications/
+    rm -rf "${SUBLIME_TEXT_FILENAME}"
+
     ln -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" "${HOME}/opt/bin/subl"
   elif command -v pacman > /dev/null 2>&1; then
     if [[ $(grep -c "sublime-text" "/etc/pacman.conf") -eq 0 ]]; then
