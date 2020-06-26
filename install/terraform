@@ -27,7 +27,7 @@ credentials() {
 }
 
 install() {
-  local TERRAFORM_VERSION="0.12.27"
+  local TERRAFORM_VERSION="0.12.28"
 
   local OS
   OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
