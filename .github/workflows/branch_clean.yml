@@ -1,7 +1,7 @@
 ---
 
 name: Git
-on: [pull_request]
+on: pull_request
 jobs:
   build:
     name: Branch is clean
