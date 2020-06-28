@@ -11,4 +11,4 @@ if ! command -v node > /dev/null 2>&1; then
 fi
 
 export PATH="${HOME}/opt/node/bin:${PATH}"
-alias npmi="npm install --ignore-scripts"
+alias npmi='npm install --ignore-scripts'
