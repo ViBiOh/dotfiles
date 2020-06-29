@@ -20,7 +20,7 @@ def relative_time(date):
             return '%d %ss' % (n, s)
 
     def qnr(a, b):
-        return a / b, a % b
+        return int(a / b), a % b
 
     class FormatDelta:
         def __init__(self, dt):
