@@ -50,10 +50,10 @@ class SublimeGitBlame(sublime_plugin.EventListener):
     _last_linenumber = 0
 
     def clear_blame(self, view):
-        view.erase_regions(self._blame_key)
+        view.erase_status(self._blame_key)
 
     def print_blame(self, view, selection, value):
-        view.add_regions(self._blame_key, selection, annotations=[value], annotation_color="royalblue")
+        view.set_status(self._blame_key, value)
 
     def on_selection_modified_async(self, view):
         file_name = view.file_name()
@@ -102,6 +102,6 @@ class SublimeGitBlame(sublime_plugin.EventListener):
 
         moment = datetime.fromtimestamp(int(time_regex.findall(blame_content)[0]))
         description = summary_regex.findall(blame_content)[0]
-        blame = '<strong>{}</strong> <em>{}</em> {}'.format(author, relative_time(moment), description)
+        blame = '{}|{}: {}'.format(author, relative_time(moment), description)
 
         self.print_blame(view, [selections[0]], blame)
