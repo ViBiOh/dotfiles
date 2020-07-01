@@ -27,7 +27,7 @@ symlink_settings() {
 
 main() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text/Packages"
+    local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
     local MERGE_PKG="${HOME}/Library/Application Support/Sublime Merge/Packages"
   else
     local TEXT_PKG="${HOME}/.config/sublime-text-3/Packages"

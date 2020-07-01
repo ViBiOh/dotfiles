@@ -4,11 +4,11 @@
 	[
 		{
 			"characters": "<",
-			"selector": "text.html",
+			"selector": "text.html"
 		},
 		{
 			"characters": ".",
-			"selector": "source.js,source.jsx,source.go,source.python",
+			"selector": "source.js,source.jsx,source.go,source.python"
 		}
 	],
 	"binary_file_patterns":
@@ -54,7 +54,7 @@
 	"highlight_modified_tabs": true,
 	"ignored_packages":
 	[
-		"Vintage",
+		"Vintage"
 	],
 	"overlay_scroll_bars": "enabled",
 	"show_encoding": true,
@@ -64,5 +64,5 @@
 	"theme": "Adaptive.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"tree_animation_enabled": false,
-	"word_wrap": true,
+	"word_wrap": true
 }
