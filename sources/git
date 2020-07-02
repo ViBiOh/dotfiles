@@ -5,7 +5,7 @@ if ! command -v git > /dev/null 2>&1; then
 fi
 
 if [[ -f ${HOME}/opt/bin/delta ]]; then
-  export GIT_PAGER="delta --dark --highlight-removed"
+  export GIT_PAGER="delta --dark"
 fi
 
 ...() {
