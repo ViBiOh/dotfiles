@@ -14,7 +14,7 @@ fi
 PROMPT_DIRTRIM="3"
 
 _previous_status() {
-  if [[ $? -eq 0 ]]; then
+  if [[ ${?} -eq 0 ]]; then
     printf -- "%b✔%b" "${GREEN}" "${RESET}"
   else
     printf -- "%bx%b" "${RED}" "${RESET}"

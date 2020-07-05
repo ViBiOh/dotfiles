@@ -29,7 +29,7 @@ source_all() {
   local LC_ALL="C"
   local LANG="C"
 
-  if [[ -e ${DOTFILES_PATH}/../scripts/meta ]]; then
+  if [[ -e "${DOTFILES_PATH}/../scripts/meta" ]]; then
     source "${DOTFILES_PATH}/../scripts/meta" && meta_init "var" "git" "github" "version"
     var_color
   fi
@@ -44,7 +44,7 @@ source_all() {
 set_locale
 source_all
 
-if [[ -e ${HOME}/.localrc ]]; then
+if [[ -e "${HOME}/.localrc" ]]; then
   source "${HOME}/.localrc"
 fi
 

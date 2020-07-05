@@ -22,7 +22,7 @@ init_ssh_agent() {
 start_ssh_agent() {
   stop_ssh_agent
 
-  if [[ -d ${HOME}/.ssh/ ]]; then
+  if [[ -d "${HOME}/.ssh/" ]]; then
     local AGENT_INITIALIZED="false"
 
     shopt -s nullglob

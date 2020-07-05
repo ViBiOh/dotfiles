@@ -16,11 +16,11 @@ symlink_settings() {
   rm -rf "${USER_SETTINGS:?}"/*
   mkdir -p "${USER_SETTINGS}"
 
-  if [[ -d ${SCRIPT_DIR}/${2}/settings/ ]]; then
+  if [[ -d "${SCRIPT_DIR}/${2}/settings/" ]]; then
     ln -s "${SCRIPT_DIR}/${2}/settings/"* "${USER_SETTINGS}/"
   fi
 
-  if [[ -d ${SCRIPT_DIR}/${2}/snippets/ ]]; then
+  if [[ -d "${SCRIPT_DIR}/${2}/snippets/" ]]; then
     ln -s "${SCRIPT_DIR}/${2}/snippets/"* "${USER_SETTINGS}/"
   fi
 }
