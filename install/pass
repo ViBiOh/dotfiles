@@ -15,7 +15,7 @@ install() {
     return
   fi
 
-  if [[ ! -d ${PASSWORD_STORE_DIR:-${HOME}/.password-store} ]]; then
+  if [[ ! -d "${PASSWORD_STORE_DIR:-${HOME}/.password-store}" ]]; then
     return
   fi
 
