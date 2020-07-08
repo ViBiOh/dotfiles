@@ -1,7 +1,7 @@
 <snippet>
 	<content><![CDATA[
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render } from '@testing-library/react';
 import ${1:ComponentName} from './index';
 
 function defaultProps() {
@@ -11,8 +11,8 @@ function defaultProps() {
 
 it('should always render as a div', () => {
   const props = defaultProps();
-  const wrapper = shallow(<${1:ComponentName} {...props} />);
-  expect(wrapper.type()).toEqual('div');
+  const { container } = render(<${1:ComponentName} {...props} />);
+  expect(container.firstChild.nodeName).toBe('DIV');
 });
 
 ]]></content>
