@@ -7,11 +7,11 @@ if command -v kubectl > /dev/null 2>&1; then
 
   if command -v kubectl > /dev/null 2>&1; then
     kube_switch() {
-      kubectl config get-contexts -o name | fzf --ansi --reverse | xargs kubectl config use-context
+      kubectl config get-contexts -o name | fzf --ansi --reverse -1 -q "${1:-}" | xargs kubectl config use-context
     }
 
     kube_logs() {
-      kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace} {.metadata.name}{"\n"}{end}' | fzf --ansi --reverse -q "${1}" | xargs -n 2 bash -c 'kubectl -n ${0} logs deployments/${1} -f'
+      kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace} {.metadata.name}{"\n"}{end}' | fzf --ansi --reverse -1 -q "${1:-}" | xargs -n 2 bash -c 'kubectl -n ${0} logs deployments/${1} -f'
     }
   fi
 fi
