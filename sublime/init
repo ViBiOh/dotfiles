@@ -54,6 +54,20 @@ main() {
   if command -v python > /dev/null 2>&1; then
     pip install --user python-language-server pycodestyle
   fi
+
+  if command -v terraform > /dev/null 2>&1; then
+    local TERRAFORM_LSP_VERSION="0.0.10"
+    local TERRAFORM_LSP_OS="linux"
+    if [[ ${OSTYPE} =~ ^darwin ]]; then
+      TERRAFORM_LSP_OS="darwin"
+    fi
+    local TERRAFORM_LSP_ARCHIVE="terraform-lsp_${TERRAFORM_LSP_VERSION}_${TERRAFORM_LSP_OS}_amd64"
+
+    curl -q -sSL --max-time 30 -O "https://github.com/juliosueiras/terraform-lsp/releases/download/v${TERRAFORM_LSP_VERSION}/${TERRAFORM_LSP_ARCHIVE}.tar.gz"
+    tar xzf "${TERRAFORM_LSP_ARCHIVE}.tar.gz"
+    mv "${TERRAFORM_LSP_ARCHIVE}/terraform-lsp" "${HOME}/opt/bin/terraform-lsp"
+    rm -rf "${TERRAFORM_LSP_ARCHIVE}.tar.gz" "${TERRAFORM_LSP_ARCHIVE}"
+  fi
 }
 
 main "${@:-}"
