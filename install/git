@@ -30,6 +30,6 @@ install() {
 
   curl -q -sSL --max-time 30 -O "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/${DELTA_ARCHIVE}.tar.gz"
   tar xzf "${DELTA_ARCHIVE}.tar.gz"
-  mv "${DELTA_ARCHIVE}/delta" "${HOME}/opt/bin/delta"
+  mv "${DELTA_ARCHIVE}/delta" "${HOME}/opt/bin/"
   rm -rf "${DELTA_ARCHIVE}.tar.gz" "${DELTA_ARCHIVE}"
 }

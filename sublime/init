@@ -25,13 +25,32 @@ symlink_settings() {
   fi
 }
 
+install_terraform_lsp() {
+  local TERRAFORM_LSP_VERSION="0.0.10"
+  local TERRAFORM_LSP_OS="linux"
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    TERRAFORM_LSP_OS="darwin"
+  fi
+
+  local EXTRACT_FILENAME="terraform-lsp_${TERRAFORM_LSP_VERSION}_${TERRAFORM_LSP_OS}_amd64"
+  local EXTRACT_URL="https://github.com/juliosueiras/terraform-lsp/releases/download/v${TERRAFORM_LSP_VERSION}/${EXTRACT_FILENAME}.tar.gz"
+  local EXTRACT_FOLDER="/tmp"
+  local EXTRACT_PATH="${EXTRACT_FOLDER}/${EXTRACT_FILENAME}.tar.gz"
+
+  curl -q -sSL --max-time 300 -o "${EXTRACT_PATH}" "${EXTRACT_URL}"
+  (
+    cd "${EXTRACT_FOLDER}"
+    mkdir -p "${EXTRACT_FILENAME}"
+    tar xzf "${EXTRACT_PATH}" -C "${EXTRACT_FILENAME}"
+    mv "${EXTRACT_FILENAME}/terraform-lsp" "${HOME}/opt/bin/"
+    rm -rf "${EXTRACT_PATH}" "${EXTRACT_FILENAME}"
+  )
+}
+
 main() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
+    local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text/Packages"
     local MERGE_PKG="${HOME}/Library/Application Support/Sublime Merge/Packages"
-  else
-    local TEXT_PKG="${HOME}/.config/sublime-text-3/Packages"
-    local MERGE_PKG="${HOME}/.config/sublime-merge/Packages"
   fi
 
   symlink_settings "${TEXT_PKG}" "text"
@@ -56,17 +75,7 @@ main() {
   fi
 
   if command -v terraform > /dev/null 2>&1; then
-    local TERRAFORM_LSP_VERSION="0.0.10"
-    local TERRAFORM_LSP_OS="linux"
-    if [[ ${OSTYPE} =~ ^darwin ]]; then
-      TERRAFORM_LSP_OS="darwin"
-    fi
-    local TERRAFORM_LSP_ARCHIVE="terraform-lsp_${TERRAFORM_LSP_VERSION}_${TERRAFORM_LSP_OS}_amd64"
-
-    curl -q -sSL --max-time 30 -O "https://github.com/juliosueiras/terraform-lsp/releases/download/v${TERRAFORM_LSP_VERSION}/${TERRAFORM_LSP_ARCHIVE}.tar.gz"
-    tar xzf "${TERRAFORM_LSP_ARCHIVE}.tar.gz"
-    mv "${TERRAFORM_LSP_ARCHIVE}/terraform-lsp" "${HOME}/opt/bin/terraform-lsp"
-    rm -rf "${TERRAFORM_LSP_ARCHIVE}.tar.gz" "${TERRAFORM_LSP_ARCHIVE}"
+    install_terraform_lsp
   fi
 }
 
