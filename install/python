@@ -12,6 +12,7 @@ install() {
 
   if command -v brew > /dev/null 2>&1; then
     brew install python
+    brew link "python@3.8"
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get install -y -qq python
   elif command -v pacman > /dev/null 2>&1; then
