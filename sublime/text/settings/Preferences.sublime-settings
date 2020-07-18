@@ -1,5 +1,6 @@
 {
 	"animation_enabled": false,
+	"tree_animation_enabled": false,
 	"auto_complete_triggers":
 	[
 		{
@@ -11,39 +12,7 @@
 			"selector": "source.js,source.jsx,source.go,source.python",
 		}
 	],
-	"binary_file_patterns":
-	[
-		"*.jpg",
-		"*.jpeg",
-		"*.png",
-		"*.gif",
-		"*.ttf",
-		"*.tga",
-		"*.dds",
-		"*.ico",
-		"*.eot",
-		"*.pdf",
-		"*.swf",
-		"*.jar",
-		"*.zip",
-		"*.gzip",
-		"*.js.map",
-		"*.tar",
-		"*.tar.gz",
-		".cache/",
-		".git/",
-		".nyc_output/",
-		".terraform/",
-		"bin/",
-		"build/",
-		"coverage/",
-		"dist/",
-		"esdoc/",
-		"node_modules/",
-		"release/",
-		"vendor/",
-		"vendors/"
-	],
+	"index_skip_unknown_extensions": false,
 	"close_windows_when_empty": false,
 	"default_line_ending": "unix",
 	"drag_text": false,
@@ -63,6 +32,5 @@
 	"tab_size": 2,
 	"theme": "Adaptive.sublime-theme",
 	"translate_tabs_to_spaces": true,
-	"tree_animation_enabled": false,
 	"word_wrap": true,
 }
