@@ -33,4 +33,5 @@
 	"theme": "Adaptive.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"word_wrap": true,
+	"hardware_acceleration": "opengl",
 }

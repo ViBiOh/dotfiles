@@ -17,7 +17,7 @@ func Test${1:FuncName}(t *testing.T) {
 				content: "test",
 			},
 			false,
-			errors.New("Error while testing"),
+			errors.New("testing error"),
 		},
 	}
 
@@ -27,7 +27,11 @@ func Test${1:FuncName}(t *testing.T) {
 
 			failed := false
 
-			if !errors.Is(gotErr, tc.wantErr) {
+			if tc.wantErr == nil && gotErr != nil {
+				failed = true
+			} else if tc.wantErr != nil && gotErr == nil {
+				failed = true
+			} else if tc.wantErr != nil && !strings.Contains(gotErr.Error(), tc.wantErr.Error()) {
 				failed = true
 			} else if got != tc.want {
 				failed = true
