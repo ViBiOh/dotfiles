@@ -42,16 +42,7 @@ END_OF_BASH_PROFILE
     sudo apt-get update
     sudo apt-get dist-upgrade -y -qq
     sudo apt-get upgrade -y -qq
-    sudo apt-get install -y -qq apt-transport-https
-
-    sudo apt-get install -y -qq "${PACKAGES[@]}" dnsutils
-  elif command -v pacman > /dev/null 2>&1; then
-    # Enabling fn key as f1..f12 instead of media on macbook keyboard
-    if [[ $(grep -c "hid_apple" /etc/modprobe.d/hid_apple.conf) -eq 0 ]]; then
-      echo "options hid_apple fnmode=2" | sudo tee -a /etc/modprobe.d/hid_apple.conf
-    fi
-
-    sudo pacman -Syuq --noconfirm
-    sudo pacman -S --noconfirm --needed "${PACKAGES[@]}" make gcc binutils dnsutils iproute2
+    sudo apt-get install -y -qq --no-install-recommends apt-transport-https
+    sudo apt-get install -y -qq --no-install-recommends "${PACKAGES[@]}" dnsutils
   fi
 }
