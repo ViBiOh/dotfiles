@@ -83,7 +83,7 @@ browse_install() {
 
 clean_packages() {
   if command -v brew > /dev/null 2>&1; then
-    brew cleanup
+    brew cleanup -s
   elif command -v apt-get > /dev/null 2>&1; then
     sudo apt-get autoremove -y
     sudo apt-get clean all
