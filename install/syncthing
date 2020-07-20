@@ -18,11 +18,5 @@ install() {
     ARCH="amd64"
   fi
 
-  local SYNCTHING_ARCHIVE="syncthing-${OS}-${ARCH}-v${SYNCTHING_VERSION}"
-
-  curl -q -sSL --max-time 300 -O "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/${SYNCTHING_ARCHIVE}.zip"
-
-  unzip "${SYNCTHING_ARCHIVE}.zip"
-  cp "${SYNCTHING_ARCHIVE}/syncthing" "${HOME}/opt/bin/"
-  rm -rf "${SYNCTHING_ARCHIVE}" "${SYNCTHING_ARCHIVE}.zip"
+  archive_to_binary "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/syncthing-${OS}-${ARCH}-v${SYNCTHING_VERSION}.zip" "syncthing"
 }
