@@ -1,8 +1,4 @@
 {
-	"bootstrapped": true,
-	"in_process_packages":
-	[
-	],
 	"installed_packages":
 	[
 		"DocBlockr",
@@ -11,6 +7,7 @@
 		"LSP",
 		"Package Control",
 		"Pretty JSON",
+		"SideBarEnhancements",
 		"SublimeLinter",
 		"SublimeLinter-contrib-yamllint",
 		"SublimeLinter-eslint",

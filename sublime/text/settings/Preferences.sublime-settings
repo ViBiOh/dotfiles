@@ -5,15 +5,13 @@
 	[
 		{
 			"characters": "<",
-			"selector": "text.html",
+			"selector": "text.html"
 		},
 		{
 			"characters": ".",
-			"selector": "source.js,source.jsx,source.go,source.python",
+			"selector": "source.js,source.jsx,source.go,source.python"
 		}
 	],
-	"index_skip_unknown_extensions": false,
-	"close_windows_when_empty": false,
 	"default_line_ending": "unix",
 	"drag_text": false,
 	"draw_white_space": "all",
@@ -21,17 +19,45 @@
 	"fold_buttons": false,
 	"highlight_line": true,
 	"highlight_modified_tabs": true,
-	"ignored_packages":
-	[
-		"Vintage",
-	],
-	"overlay_scroll_bars": "enabled",
 	"show_encoding": true,
-	"show_full_path": true,
 	"show_line_endings": true,
 	"tab_size": 2,
 	"theme": "Adaptive.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"word_wrap": true,
 	"hardware_acceleration": "opengl",
+	"index_skip_unknown_extensions": false,
+	"binary_file_patterns":
+	[
+		"*.jpg",
+		"*.jpeg",
+		"*.png",
+		"*.gif",
+		"*.ttf",
+		"*.tga",
+		"*.dds",
+		"*.ico",
+		"*.eot",
+		"*.pdf",
+		"*.swf",
+		"*.jar",
+		"*.zip",
+		"*.gzip",
+		"*.js.map",
+		"*.tar",
+		"*.tar.gz",
+		".cache/",
+		".git/",
+		".nyc_output/",
+		".terraform/",
+		"bin/",
+		"build/",
+		"coverage/",
+		"dist/",
+		"esdoc/",
+		"node_modules/",
+		"release/",
+		"vendor/",
+		"vendors/"
+	]
 }
