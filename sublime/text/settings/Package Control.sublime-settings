@@ -16,4 +16,5 @@
 		"SublimeLinter-shellcheck",
 		"Terraform",
 	],
+	"bootstrapped": true,
 }
