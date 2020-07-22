@@ -40,11 +40,7 @@ install() {
     ARCH="arm"
   fi
 
-  local TERRAFORM_ARCHIVE="terraform_${TERRAFORM_VERSION}_${OS}_${ARCH}.zip"
-
-  curl -q -sSL --max-time 300 -O "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/${TERRAFORM_ARCHIVE}"
-  unzip -o -d "${HOME}/opt/bin" "${TERRAFORM_ARCHIVE}"
-  rm -rf "${TERRAFORM_ARCHIVE}"
+  archive_to_binary "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${OS}_${ARCH}.zip" "terraform"
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
 

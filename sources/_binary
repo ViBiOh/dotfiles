@@ -28,7 +28,7 @@ archive_to_binary() {
     if [[ ${ARCHIVE_EXTENSION} == "tar.gz" ]]; then
       tar xzf "${ARCHIVE_PATH}" -C "${ARCHIVE_FILENAME}"
     elif [[ ${ARCHIVE_EXTENSION} == "zip" ]]; then
-      unzip "${ARCHIVE_PATH}"
+      unzip "${ARCHIVE_PATH}" -d "${ARCHIVE_FILENAME}"
     fi
 
     mv "${ARCHIVE_FILENAME}/${2}" "${HOME}/opt/bin/"

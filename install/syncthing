@@ -18,5 +18,6 @@ install() {
     ARCH="amd64"
   fi
 
-  archive_to_binary "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/syncthing-${OS}-${ARCH}-v${SYNCTHING_VERSION}.zip" "syncthing"
+  local SYNCTHING_RELEASE="syncthing-${OS}-${ARCH}-v${SYNCTHING_VERSION}"
+  archive_to_binary "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/${SYNCTHING_RELEASE}.zip" "${SYNCTHING_RELEASE}/syncthing"
 }
