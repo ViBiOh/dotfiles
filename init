@@ -124,13 +124,18 @@ main() {
   set -e
   set -u
 
+  local ACTIONS=()
+
   if [[ -z ${ARGS} ]] || [[ ${ARGS} =~ clean ]]; then
-    browse_install clean
-    clean_packages
+    ACTIONS+=("clean")
   fi
 
   if [[ -z ${ARGS} ]] || [[ ${ARGS} =~ install ]]; then
-    browse_install install
+    ACTIONS+=("install")
+  fi
+
+  if [[ ${#ACTIONS[@]} -ne 0 ]]; then
+    browse_install "${ACTIONS[@]}"
     clean_packages
   fi
 

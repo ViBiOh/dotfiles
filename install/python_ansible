@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
-  rm -rf "${HOME}/.ansible"*
+  rm -rf ls "${HOME}/.ansible"*[^.cfg]
 }
 
 credentials() {
