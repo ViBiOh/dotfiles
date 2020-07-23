@@ -60,13 +60,11 @@ main() {
     npm install -g prettier javascript-typescript-langserver
   fi
 
-  if command -v python > /dev/null 2>&1; then
+  if command -v pip > /dev/null 2>&1; then
     pip install --user python-language-server pycodestyle
   fi
 
-  if command -v terraform > /dev/null 2>&1; then
-    install_terraform_lsp
-  fi
+  install_terraform_lsp
 }
 
 main "${@:-}"
