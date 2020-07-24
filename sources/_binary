@@ -2,7 +2,7 @@
 
 archive_to_binary() {
   if [[ ${#} -ne 2 ]]; then
-    printf "%bUsage: download_tar [URL] [BINARY_PATH]%b\n" "${RED}" "${RESET}"
+    printf "%bUsage: archive_to_binary [URL] [BINARY_PATH]%b\n" "${RED}" "${RESET}"
     return 1
   fi
 

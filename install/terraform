@@ -26,6 +26,17 @@ credentials() {
   fi
 }
 
+install_provider() {
+  local PLUGIN_DIR="${HOME}/.terraform.d/plugins/${OS}_${ARCH}/"
+  local BINARY_NAME="${1}_${2}"
+
+  printf "%bInstalling %s into %s%b\n" "${BLUE}" "${BINARY_NAME}" "${PLUGIN_DIR}" "${RESET}"
+
+  mkdir -p "${PLUGIN_DIR}"
+  curl -q -sSL --max-time 300 -o "${PLUGIN_DIR}/${BINARY_NAME}" "${3}"
+  chmod +x "${PLUGIN_DIR}/${BINARY_NAME}"
+}
+
 install() {
   local TERRAFORM_VERSION="0.12.29"
 
@@ -43,9 +54,9 @@ install() {
   archive_to_binary "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${OS}_${ARCH}.zip" "terraform"
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
-
   echo "plugin_cache_dir = \"${HOME}/.terraform.d/plugin-cache\"
 " > "${HOME}/.terraformrc"
 
-  curl -q -sSL --max-time 300 "https://raw.githubusercontent.com/MeilleursAgents/terraform-provider-ansiblevault/master/install.sh" | bash
+  local ANSIBLEVAULT_VERSION="v2.1.0"
+  install_provider "terraform-provider-ansiblevault" "${ANSIBLEVAULT_VERSION}" "https://github.com/MeilleursAgents/terraform-provider-ansiblevault/releases/download/${ANSIBLEVAULT_VERSION}/terraform-provider-ansiblevault_${OS}_${ARCH}_${ANSIBLEVAULT_VERSION}"
 }
