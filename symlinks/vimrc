@@ -43,6 +43,7 @@ set wrap
 set tabstop=2 shiftwidth=2
 if exists(':filetype')
   filetype indent on
+  filetype plugin on
 endif
 
 " Show matching parenthesis
