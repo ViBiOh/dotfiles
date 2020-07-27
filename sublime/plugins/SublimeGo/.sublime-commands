@@ -1,9 +1,5 @@
 [
   {
-    "caption": "Go Format",
-    "command": "go_format"
-  },
-  {
     "caption": "Go Test",
     "command": "go_test"
   },

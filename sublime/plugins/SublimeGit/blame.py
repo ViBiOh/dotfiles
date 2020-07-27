@@ -69,7 +69,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         if not window:
             return
 
-        line_number = view.rowcol(selections[0].begin())[0] + 1 # index start at 0
+        line_number = view.rowcol(selections[0].begin())[0] + 1  # index start at 0
 
         if file_name == self._last_filename and line_number == self._last_linenumber:
             return
@@ -77,8 +77,8 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         self._last_filename = file_name
         self._last_linenumber = line_number
 
-        vars = window.extract_variables()
-        working_dir = vars['file_path']
+        variables = window.extract_variables()
+        working_dir = variables['file_path']
 
         try:
             git_blame = subprocess.check_output(['git', 'blame', '-p', '-L', '{},{}'.format(line_number, line_number), '--', file_name], stderr=subprocess.STDOUT, cwd=working_dir)
