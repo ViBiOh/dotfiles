@@ -1,0 +1,13 @@
+{
+  "commands": {
+    "source.terraform": [["terraform", "fmt", "-"]],
+    "source.go": [["goimports"], ["gofmt", "-s"]],
+    "source.json": [["prettier", "--stdin-filepath", "file.json"]],
+    "source.yaml": [["prettier", "--stdin-filepath", "file.yml"]],
+    "text.html.markdown": [["prettier", "--stdin-filepath", "file.md"]]
+  },
+  // Controls when format_on_save in run
+  // - "all": All the times, if a selector is found
+  // - "source.terraform,source.go": Only for given selector
+  "format_on_save": "all"
+}
