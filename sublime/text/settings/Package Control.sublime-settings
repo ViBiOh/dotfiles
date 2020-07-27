@@ -3,10 +3,8 @@
 	[
 		"DocBlockr",
 		"EditorConfig",
-		"JsPrettier",
 		"LSP",
 		"Package Control",
-		"Pretty JSON",
 		"SideBarEnhancements",
 		"SublimeLinter",
 		"SublimeLinter-contrib-yamllint",

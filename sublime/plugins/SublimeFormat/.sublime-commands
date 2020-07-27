@@ -1,0 +1,6 @@
+[
+  {
+    "caption": "Format file",
+    "command": "sublime_format"
+  },
+]
