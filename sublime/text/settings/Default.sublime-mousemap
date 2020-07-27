@@ -1,16 +1,12 @@
 [
   {
-    "modifiers": [
-      "super"
-    ],
+    "modifiers": ["super"],
     "button": "button1",
     "press_command": "drag_select",
     "command": "goto_definition"
   },
   {
-    "modifiers": [
-      "super"
-    ],
+    "modifiers": ["super"],
     "button": "button1",
     "command": "lsp_symbol_definition",
     "context": [

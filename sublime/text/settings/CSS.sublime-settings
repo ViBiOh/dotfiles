@@ -1,6 +1,3 @@
 {
-  "extensions": [
-    "less",
-    "scss"
-  ]
+  "extensions": ["less", "scss"]
 }

@@ -1,20 +1,14 @@
 [
   {
-    "keys": [
-      "super+left"
-    ],
+    "keys": ["super+left"],
     "command": "jump_back"
   },
   {
-    "keys": [
-      "super+right"
-    ],
+    "keys": ["super+right"],
     "command": "goto_definition"
   },
   {
-    "keys": [
-      "super+right"
-    ],
+    "keys": ["super+right"],
     "command": "lsp_symbol_definition",
     "context": [
       {
@@ -25,23 +19,7 @@
     ]
   },
   {
-    "keys": [
-      "super+option+f"
-    ],
-    "command": "js_prettier",
-    "context": [
-      {
-        "key": "selector",
-        "operator": "equal",
-        "operand": "(source.js, source.jsx)"
-      }
-    ]
-  },
-  {
-    "keys": [
-      "super+k",
-      "super+z"
-    ],
+    "keys": ["super+k", "super+z"],
     "command": "revert_hunk"
   }
 ]

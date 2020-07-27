@@ -4,20 +4,22 @@ import subprocess
 
 from datetime import datetime, timedelta
 
-new_file_regex = re.compile('fatal: no such path \'.*\' in HEAD')
-not_git_regex = re.compile('fatal: not a git repository \\(or any of the parent directories\\): .git')
-author_regex = re.compile('author\\s(.*)')
-time_regex = re.compile('author-time\\s(.*)')
-summary_regex = re.compile('summary\\s(.*)')
+new_file_regex = re.compile("fatal: no such path '.*' in HEAD")
+not_git_regex = re.compile(
+    "fatal: not a git repository \\(or any of the parent directories\\): .git"
+)
+author_regex = re.compile("author\\s(.*)")
+time_regex = re.compile("author-time\\s(.*)")
+summary_regex = re.compile("summary\\s(.*)")
 
 
 # From https://gist.github.com/jonlabelle/7d306575cbbd34b154f87b1853d532cc
 def relative_time(date):
     def formatn(n, s):
         if n == 1:
-            return '1 %s' % s
+            return "1 %s" % s
         elif n > 1:
-            return '%d %ss' % (n, s)
+            return "%d %ss" % (n, s)
 
     def qnr(a, b):
         return int(a / b), a % b
@@ -34,19 +36,19 @@ def relative_time(date):
             self.minute, self.second = qnr(self.second, 60)
 
         def format(self):
-            for period in ['year', 'month', 'day', 'hour', 'minute', 'second']:
+            for period in ["year", "month", "day", "hour", "minute", "second"]:
                 n = getattr(self, period)
                 if n >= 1:
-                    return '{0} ago'.format(formatn(n, period))
-            return 'just now'
+                    return "{0} ago".format(formatn(n, period))
+            return "just now"
 
     return FormatDelta(date).format()
 
 
 class SublimeGitBlame(sublime_plugin.EventListener):
-    _blame_key = 'git_blame'
+    _blame_key = "git_blame"
 
-    _last_filename = ''
+    _last_filename = ""
     _last_linenumber = 0
 
     def clear_blame(self, view):
@@ -78,30 +80,42 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         self._last_linenumber = line_number
 
         variables = window.extract_variables()
-        working_dir = variables['file_path']
+        working_dir = variables["file_path"]
 
         try:
-            git_blame = subprocess.check_output(['git', 'blame', '-p', '-L', '{},{}'.format(line_number, line_number), '--', file_name], stderr=subprocess.STDOUT, cwd=working_dir)
+            git_blame = subprocess.check_output(
+                [
+                    "git",
+                    "blame",
+                    "-p",
+                    "-L",
+                    "{},{}".format(line_number, line_number),
+                    "--",
+                    file_name,
+                ],
+                stderr=subprocess.STDOUT,
+                cwd=working_dir,
+            )
         except subprocess.CalledProcessError as e:
-            err_content = e.output.decode('utf8')
+            err_content = e.output.decode("utf8")
 
             if new_file_regex.match(err_content):
                 self.print_blame(view, [selections[0]], "New file")
             elif not_git_regex.match(err_content):
                 self.print_blame(view, [selections[0]], "Not in git")
             else:
-                print(err_content, end='')
+                print(err_content, end="")
 
             return
 
-        blame_content = git_blame.decode('utf8')
+        blame_content = git_blame.decode("utf8")
         author = author_regex.findall(blame_content)[0]
-        if author == 'Not Committed Yet':
+        if author == "Not Committed Yet":
             self.clear_blame(view)
             return
 
         moment = datetime.fromtimestamp(int(time_regex.findall(blame_content)[0]))
         description = summary_regex.findall(blame_content)[0]
-        blame = '{}|{}: {}'.format(author, relative_time(moment), description)
+        blame = "{}|{}: {}".format(author, relative_time(moment), description)
 
         self.print_blame(view, [selections[0]], blame)
