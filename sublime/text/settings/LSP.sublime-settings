@@ -1,7 +1,7 @@
 {
   "clients": {
     "gopls": {
-      "enabled": true,
+      "enabled": true
     },
     "pyls": {
       "enabled": true
@@ -14,7 +14,7 @@
       "enabled": true,
       "languageId": "terraform",
       "scopes": ["source.terraform"],
-      "syntaxes":  ["Packages/Terraform/Terraform.sublime-syntax"]
+      "syntaxes": ["Packages/Terraform/Terraform.sublime-syntax"]
     }
   }
 }

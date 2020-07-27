@@ -61,7 +61,7 @@ main() {
   fi
 
   if command -v pip > /dev/null 2>&1; then
-    pip install --user python-language-server pycodestyle
+    pip install --user python-language-server black pycodestyle
   fi
 
   install_terraform_lsp

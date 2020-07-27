@@ -2,8 +2,8 @@ import sublime
 import sublime_plugin
 import subprocess
 
-PLUGIN_NAME = 'Formatter'
-PLUGIN_SETTINGS = '{}.sublime-settings'.format(PLUGIN_NAME)
+PLUGIN_NAME = "Formatter"
+PLUGIN_SETTINGS = "{}.sublime-settings".format(PLUGIN_NAME)
 
 
 def plugin_loaded() -> None:
@@ -16,15 +16,17 @@ def format(view, region, working_dir, commands):
     value = view.substr(region)
 
     for command in commands:
-        process = subprocess.Popen(command,
-                                   stdin=subprocess.PIPE,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE,
-                                   cwd=working_dir)
+        process = subprocess.Popen(
+            command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=working_dir,
+        )
 
         process_out, process_err = process.communicate(value.encode())
         if process.returncode != 0:
-            print(process_err.decode(), end='')
+            print(process_err.decode(), end="")
             return
 
         value = process_out.decode()
@@ -36,11 +38,11 @@ def get_allowed_selectors(file):
     if not file:
         return None
 
-    format_on_save = _settings_obj.get('format_on_save')
-    if format_on_save == 'all':
+    format_on_save = _settings_obj.get("format_on_save")
+    if format_on_save == "all":
         return None
 
-    return format_on_save.split(',')
+    return format_on_save.split(",")
 
 
 def get_commands(view, point, commands, allowed_selectors):
@@ -63,9 +65,9 @@ class Formatter(sublime_plugin.TextCommand):
             return
 
         variables = window.extract_variables()
-        working_dir = variables['file_path']
+        working_dir = variables["file_path"]
 
-        commands = _settings_obj.get('commands', {})
+        commands = _settings_obj.get("commands", {})
 
         regions = view.sel()
         if file or len(regions) == 1 and regions[0].a == regions[0].b:
@@ -81,4 +83,4 @@ class Formatter(sublime_plugin.TextCommand):
 
 class SublimeFormatOnSave(sublime_plugin.EventListener):
     def on_pre_save(self, view):
-        view.run_command('formatter', {'file': True})
+        view.run_command("formatter", {"file": True})
