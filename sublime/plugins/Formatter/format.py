@@ -45,15 +45,23 @@ def get_allowed_selectors(file):
     return format_on_save.split(",")
 
 
-def get_commands(view, point, commands, allowed_selectors):
+def get_commands(view, point, commands):
     for selector in commands:
-        if allowed_selectors is not None and selector not in allowed_selectors:
-            continue
-
         if view.match_selector(point, selector):
             return commands[selector]
 
     return []
+
+
+def get_regions(view, file):
+    if file:
+        return [sublime.Region(0, view.size())]
+
+    regions = view.sel()
+    if len(regions) == 1 and regions[0].a == regions[0].b:
+        return [sublime.Region(0, view.size())]
+
+    return regions
 
 
 class Formatter(sublime_plugin.TextCommand):
@@ -67,17 +75,16 @@ class Formatter(sublime_plugin.TextCommand):
         variables = window.extract_variables()
         working_dir = variables["file_path"]
 
-        commands = _settings_obj.get("commands", {})
-
-        regions = view.sel()
-        if file or len(regions) == 1 and regions[0].a == regions[0].b:
-            regions = [sublime.Region(0, view.size())]
-
         allowed_selectors = get_allowed_selectors(file)
 
-        for region in regions:
-            region_commands = get_commands(view, region.a, commands, allowed_selectors)
-            formatted = format(view, region, working_dir, region_commands)
+        selectors = {}
+        for selector, commands in _settings_obj.get("selectors", {}).items():
+            if allowed_selectors is None or selector in allowed_selectors:
+                selectors[selector] = commands
+
+        for region in get_regions(view, file):
+            commands = get_commands(view, region.a, selectors)
+            formatted = format(view, region, working_dir, commands)
             view.replace(edit, region, formatted)
 
 
