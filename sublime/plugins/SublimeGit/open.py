@@ -13,16 +13,15 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
         if not window:
             return
 
-        view = window.active_view()
+        variables = window.extract_variables()
+        working_dir = variables["file_path"]
+        file_name = variables["file_name"]
 
-        file_name = view.file_name()
         if not file_name or len(file_name) == 0:
             return
 
-        variables = window.extract_variables()
-        working_dir = variables["file_path"]
-
-        line_number = view.rowcol(view.sel()[0].begin())[0] + 1  # index start at 0
+        view = window.active_view()
+        line_number = view.rowcol(view.sel()[0].begin())[0] + 1
 
         is_git = subprocess.call(
             ["git", "rev-parse", "--is-inside-work-tree"], cwd=working_dir
