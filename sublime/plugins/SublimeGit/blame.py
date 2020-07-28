@@ -71,13 +71,18 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         if not window:
             return
 
-        line_number = view.rowcol(selections[0].begin())[0] + 1  # index start at 0
+        current_point = selections[0].begin()
+        line_number = view.rowcol(current_point)[0] + 1  # index start at 0
 
         if file_name == self._last_filename and line_number == self._last_linenumber:
             return
 
         self._last_filename = file_name
         self._last_linenumber = line_number
+
+        if current_point == view.size():
+            self.clear_blame(view)
+            return
 
         variables = window.extract_variables()
         working_dir = variables["file_path"]

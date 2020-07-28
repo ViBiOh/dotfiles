@@ -3,4 +3,12 @@
     "caption": "Formatter: Format code",
     "command": "formatter"
   },
+  {
+    "caption": "Formatter: Disable format on save",
+    "command": "formatter_disable_on_save"
+  },
+  {
+    "caption": "Formatter: Enable format on save",
+    "command": "formatter_enable_on_save"
+  },
 ]

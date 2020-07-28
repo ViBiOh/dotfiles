@@ -64,6 +64,16 @@ def get_regions(view, file):
     return regions
 
 
+class FormatterDisableOnSave(sublime_plugin.WindowCommand):
+    def run(self):
+        _settings_obj.set("format_on_save", "")
+
+
+class FormatterEnableOnSave(sublime_plugin.WindowCommand):
+    def run(self):
+        _settings_obj.set("format_on_save", "all")
+
+
 class Formatter(sublime_plugin.TextCommand):
     def run(self, edit, file=False):
         view = self.view
