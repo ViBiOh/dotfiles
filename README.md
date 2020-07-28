@@ -20,7 +20,7 @@ You can set following environment variables for customizing installation behavio
 ```bash
 #!/usr/bin/env bash
 
-# Server configuration example
+#  Server configuration example
 
 export DOTFILES_NO_ALACRITTY="true"
 export DOTFILES_NO_FIREFOX="true"
