@@ -7,7 +7,7 @@ clean() {
 }
 
 credentials() {
-  if ! command -v pass > /dev/null 2>&1; then
+  if ! command -v pass >/dev/null 2>&1; then
     exit
   fi
 
@@ -22,7 +22,7 @@ credentials() {
     echo "credentials \"app.terraform.io\" {
   token = \"${TERRAFORM_TOKEN}\"
 }
-" >> "${HOME}/.terraformrc"
+" >>"${HOME}/.terraformrc"
   fi
 }
 
@@ -45,7 +45,7 @@ install() {
   local ARCH
   ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
-  if [[ ${ARCH} = "x86_64" ]]; then
+  if [[ ${ARCH} == "x86_64" ]]; then
     ARCH="amd64"
   elif [[ ${ARCH} =~ ^armv.l$ ]]; then
     ARCH="arm"
@@ -55,7 +55,7 @@ install() {
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
   echo "plugin_cache_dir = \"${HOME}/.terraform.d/plugin-cache\"
-" > "${HOME}/.terraformrc"
+" >"${HOME}/.terraformrc"
 
   local ANSIBLEVAULT_VERSION="v2.1.0"
   install_provider "terraform-provider-ansiblevault" "${ANSIBLEVAULT_VERSION}" "https://github.com/MeilleursAgents/terraform-provider-ansiblevault/releases/download/${ANSIBLEVAULT_VERSION}/terraform-provider-ansiblevault_${OS}_${ARCH}_${ANSIBLEVAULT_VERSION}"

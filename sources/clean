@@ -6,7 +6,8 @@ memory_clean() {
   elif [[ $(sudo which sysctl | wc -l) -ne 0 ]] && [[ $(sudo sysctl -a 2>/dev/null | grep -c vm.drop_caches) -ne 0 ]]; then
     sudo sysctl vm.drop_caches=3
   else
-    sudo sync; echo "3" > "/proc/sys/vm/drop_caches"
+    sudo sync
+    echo "3" >"/proc/sys/vm/drop_caches"
   fi
 }
 
@@ -17,7 +18,7 @@ os_clean() {
   rm -rf "${HOME}/.cups/"
   rm -rf "${HOME}/.local/"
 
-  sudo find / \( -name ".DS_Store" -o -name ".localized" \) -exec rm -f {} \; 2> /dev/null
+  sudo find / \( -name ".DS_Store" -o -name ".localized" \) -exec rm -f {} \; 2>/dev/null
 }
 
 brew_clean_all() {

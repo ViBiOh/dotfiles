@@ -6,14 +6,14 @@ install() {
   local DNSMASQ_CONF="/etc/dnsmasq.conf"
   local LISTEN_ADDRESS="127.0.0.1"
 
-  if command -v brew > /dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then
     brew install dnsmasq
     DNSMASQ_CONF="$(brew --prefix)/etc/dnsmasq.conf"
-  elif command -v apt-get > /dev/null 2>&1; then
+  elif command -v apt-get >/dev/null 2>&1; then
     sudo apt-get install -y -qq --no-install-recommends dnsmasq
   fi
 
-  if ! command -v dnsmasq > /dev/null 2>&1; then
+  if ! command -v dnsmasq >/dev/null 2>&1; then
     return
   fi
 
@@ -44,26 +44,26 @@ cache-size=8192
 # Optional logging directives
 log-async
 log-dhcp
-log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" > /dev/null
+log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" >/dev/null
 
-  if command -v brew > /dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then
     sudo brew services start dnsmasq
     sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
 
     scutil --dns
     networksetup -getdnsservers "Wi-Fi"
-  elif command -v apt-get > /dev/null 2>&1; then
+  elif command -v apt-get >/dev/null 2>&1; then
     sudo systemctl enable dnsmasq
     sudo systemctl restart dnsmasq
   fi
 
-  if command -v resolvconf > /dev/null 2>&1; then
+  if command -v resolvconf >/dev/null 2>&1; then
     if [[ -d /etc/NetworkManager/ ]]; then
-      echo "dns=none" | sudo tee "/etc/NetworkManager/NetworkManager.conf" > /dev/null
+      echo "dns=none" | sudo tee "/etc/NetworkManager/NetworkManager.conf" >/dev/null
     fi
 
     echo "resolv_conf=/etc/resolv.conf
-name_servers=127.0.0.1" | sudo tee "/etc/resolvconf.conf" > /dev/null
+name_servers=127.0.0.1" | sudo tee "/etc/resolvconf.conf" >/dev/null
     sudo resolvconf -u
   fi
 }

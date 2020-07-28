@@ -6,32 +6,32 @@ install() {
   cat \
     <(curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
     <(curl -q -sSL --max-time 30 "https://someonewhocares.org/hosts/zero/hosts") \
-    <(echo "127.0.0.1 $(hostname)") \
-    | grep -E -v '^$' \
-    | grep -E -v '^\s*#' \
-    | grep -E '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' \
-    | tr -s '[:blank:]' ' ' \
-    | sort \
-    | uniq \
-    | grep -v "ɢ" \
-    | grep -v "0.0.0.0 www.linkedin.com" \
-    | grep -v "0.0.0.0 static.licdn.com" \
-    | grep -v "0.0.0.0 media.licdn.com" \
-    | grep -v "0.0.0.0 reddit.com" \
-    | grep -v "0.0.0.0 www.reddit.com" \
-    | grep -v "0.0.0.0 oauth.reddit.com" \
-    | grep -v "0.0.0.0 www.redditstatic.com" \
-    | grep -v "0.0.0.0 alb.reddit.com" \
-    | grep -v "0.0.0.0 redditmedia.com" \
-    | grep -v "0.0.0.0 www.redditmedia.com" \
-    | grep -v "thumbs.redditmedia.com" \
-    | grep -v "0.0.0.0 preview.redd.it" \
-    | grep -v "0.0.0.0 external-preview.redd.it" \
-    | grep -v "0.0.0.0 v.redd.it" \
-    | grep -v "0.0.0.0 styles.redditmedia.com" \
-    | grep -v "0.0.0.0 reddit.map.fastly.net" \
-    | sed $'s|0.0.0.0 \(.*\)|0.0.0.0 \\1\\\n0:0:0:0:0:0:0:0 \\1|g' \
-    | sudo tee /etc/hosts > /dev/null
+    <(echo "127.0.0.1 $(hostname)") |
+    grep -E -v '^$' |
+    grep -E -v '^\s*#' |
+    grep -E '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' |
+    tr -s '[:blank:]' ' ' |
+    sort |
+    uniq |
+    grep -v "ɢ" |
+    grep -v "0.0.0.0 www.linkedin.com" |
+    grep -v "0.0.0.0 static.licdn.com" |
+    grep -v "0.0.0.0 media.licdn.com" |
+    grep -v "0.0.0.0 reddit.com" |
+    grep -v "0.0.0.0 www.reddit.com" |
+    grep -v "0.0.0.0 oauth.reddit.com" |
+    grep -v "0.0.0.0 www.redditstatic.com" |
+    grep -v "0.0.0.0 alb.reddit.com" |
+    grep -v "0.0.0.0 redditmedia.com" |
+    grep -v "0.0.0.0 www.redditmedia.com" |
+    grep -v "thumbs.redditmedia.com" |
+    grep -v "0.0.0.0 preview.redd.it" |
+    grep -v "0.0.0.0 external-preview.redd.it" |
+    grep -v "0.0.0.0 v.redd.it" |
+    grep -v "0.0.0.0 styles.redditmedia.com" |
+    grep -v "0.0.0.0 reddit.map.fastly.net" |
+    sed $'s|0.0.0.0 \(.*\)|0.0.0.0 \\1\\\n0:0:0:0:0:0:0:0 \\1|g' |
+    sudo tee /etc/hosts >/dev/null
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1

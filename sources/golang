@@ -4,7 +4,7 @@ if [[ -d "${HOME}/opt/go/bin" ]]; then
   export PATH="${HOME}/opt/go/bin:${PATH}"
 fi
 
-if ! command -v go > /dev/null 2>&1; then
+if ! command -v go >/dev/null 2>&1; then
   return
 fi
 

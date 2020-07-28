@@ -8,7 +8,7 @@ clean() {
 }
 
 install() {
-  if ! command -v git > /dev/null 2>&1; then
+  if ! command -v git >/dev/null 2>&1; then
     printf "git not found\n"
     exit
   fi

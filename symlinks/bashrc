@@ -36,7 +36,7 @@ source_all() {
 
   shopt -s nullglob
   for file in "${DOTFILES_PATH}/../sources/"*; do
-    [[ -r "${file}" ]] && [[ -f "${file}" ]] && source "${file}"
+    [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
   done
   shopt -u nullglob
 }

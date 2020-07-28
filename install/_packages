@@ -7,7 +7,7 @@ install() {
 
   mkdir -p "${HOME}/opt/bin"
 
-  cat > "${HOME}/.bash_profile" << END_OF_BASH_PROFILE
+  cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
 #!/usr/bin/env bash
 
 if [[ -f "${HOME}/.bashrc" ]]; then
@@ -19,7 +19,7 @@ END_OF_BASH_PROFILE
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-    if ! command -v brew > /dev/null 2>&1; then
+    if ! command -v brew >/dev/null 2>&1; then
       mkdir "${HOME}/homebrew" && curl -q -sSL --max-time 300 "https://github.com/Homebrew/brew/tarball/master" | tar xz --strip 1 -C "${HOME}/homebrew"
       source "${SCRIPT_DIR}/../sources/_homebrew"
     fi
@@ -33,10 +33,10 @@ END_OF_BASH_PROFILE
       printf "| changing shell for user |\n"
       printf "+-------------------------+\n"
 
-      echo "$(brew --prefix)/bin/bash" | sudo tee -a "/etc/shells" > /dev/null
+      echo "$(brew --prefix)/bin/bash" | sudo tee -a "/etc/shells" >/dev/null
       chsh -s "$(brew --prefix)/bin/bash" -u "$(whoami)"
     fi
-  elif command -v apt-get > /dev/null 2>&1; then
+  elif command -v apt-get >/dev/null 2>&1; then
     export DEBIAN_FRONTEND=noninteractive
 
     sudo apt-get update

@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  if command -v brew > /dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then
     brew cask reinstall sublime-merge
 
     local SUBLIME_TEXT_VERSION
@@ -17,7 +17,7 @@ install() {
     ln -f -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" "${HOME}/opt/bin/subl"
   fi
 
-  if command -v subl > /dev/null 2>&1; then
+  if command -v subl >/dev/null 2>&1; then
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

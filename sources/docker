@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if command -v docker > /dev/null 2>&1; then
+if command -v docker >/dev/null 2>&1; then
   docker_restart() {
     docker start $(docker ps -a -q -f status=exited -f status=created 2>/dev/null) 2>/dev/null
   }

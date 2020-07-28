@@ -71,7 +71,7 @@ browse_install() {
       source "${file}"
 
       for action in "${@}"; do
-        if [[ $(type -t "${action}") = "function" ]]; then
+        if [[ $(type -t "${action}") == "function" ]]; then
           print_title "${action} - ${BASENAME_FILE}"
           "${action}"
         fi
@@ -82,9 +82,9 @@ browse_install() {
 }
 
 clean_packages() {
-  if command -v brew > /dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then
     brew cleanup -s
-  elif command -v apt-get > /dev/null 2>&1; then
+  elif command -v apt-get >/dev/null 2>&1; then
     sudo apt-get autoremove -y
     sudo apt-get clean all
   fi
@@ -94,17 +94,17 @@ main() {
   local FILE_LIMIT=""
   while getopts "l:" options; do
     case "${options}" in
-      l)
-        FILE_LIMIT="${OPTARG}"
-        printf "Limiting to %s\n" "${FILE_LIMIT}"
-        ;;
-      \?)
-        printf "unknown option %s\n" "${options}"
-        ;;
+    l)
+      FILE_LIMIT="${OPTARG}"
+      printf "Limiting to %s\n" "${FILE_LIMIT}"
+      ;;
+    \?)
+      printf "unknown option %s\n" "${options}"
+      ;;
     esac
   done
 
-  shift $(( OPTIND - 1 ))
+  shift $((OPTIND - 1))
 
   local ARGS="${*}"
   if [[ ${ARGS} =~ help ]]; then

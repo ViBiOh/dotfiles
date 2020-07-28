@@ -7,7 +7,7 @@ alias vi="vim"
 export EDITOR="vim"
 export TERM="xterm-256color"
 
-if command -v xdg-open > /dev/null 2>&1; then
+if command -v xdg-open >/dev/null 2>&1; then
   alias open='xdg-open'
 fi
 
@@ -16,12 +16,12 @@ urlencode() {
   LC_COLLATE=C
 
   local length="${#1}"
-  for (( i = 0; i < length; i++ )); do
+  for ((i = 0; i < length; i++)); do
     local c="${1:i:1}"
     case "${c}" in
-      [a-zA-Z0-9.~_-]) printf "%s" "${c}" ;;
-      ' ') printf "%%20" ;;
-      *) printf '%%%02X' "'$c" ;;
+    [a-zA-Z0-9.~_-]) printf "%s" "${c}" ;;
+    ' ') printf "%%20" ;;
+    *) printf '%%%02X' "'$c" ;;
     esac
   done
 
@@ -32,7 +32,7 @@ random() {
   openssl rand -hex "${1:-30}"
 }
 
-if command -v systemctl > /dev/null 2>&1; then
+if command -v systemctl >/dev/null 2>&1; then
   status() {
     sudo systemctl status "${@}"
   }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if ! command -v tmux > /dev/null 2>&1; then
+if ! command -v tmux >/dev/null 2>&1; then
   return
 fi
 

@@ -3,9 +3,9 @@
 open_ports() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo lsof -PniTCP -sTCP:LISTEN
-  elif command -v ss > /dev/null 2<&1; then
+  elif command -v ss >/dev/null 2<&1; then
     sudo ss -plant
-  elif command -v netstat > /dev/null 2<&1; then
+  elif command -v netstat >/dev/null 2<&1; then
     sudo netstat -pluton
   fi
 }

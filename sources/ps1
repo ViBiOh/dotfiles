@@ -7,7 +7,7 @@ export GIT_PS1_STATESEPARATOR="|"
 export GIT_PS1_SHOWSTASHSTATE="true"
 export GIT_PS1_SHOWUNTRACKEDFILES="true"
 
-if command -v git > /dev/null 2>&1 && [[ "$(type -t __git_ps1)" = "function" ]]; then
+if command -v git >/dev/null 2>&1 && [[ "$(type -t __git_ps1)" == "function" ]]; then
   PS1="${PS1}${YELLOW}\$(__git_ps1)${RESET}"
 fi
 

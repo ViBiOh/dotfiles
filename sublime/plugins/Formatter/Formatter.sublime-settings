@@ -7,6 +7,7 @@
     "source.jsx": [["prettier", "--stdin-filepath", "file.jsx"]],
     "source.json": [["prettier", "--stdin-filepath", "file.json"]],
     "source.yaml": [["prettier", "--stdin-filepath", "file.yml"]],
+    "source.shell.bash": [["shfmt", "-s", "-"]],
     "text.html.markdown": [["prettier", "--stdin-filepath", "file.md"]]
   },
   // Controls when format_on_save in run

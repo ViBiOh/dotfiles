@@ -7,9 +7,9 @@ clean() {
 }
 
 install() {
-  if command -v brew > /dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then
     brew install siege
-  elif command -v apt-get > /dev/null 2>&1; then
+  elif command -v apt-get >/dev/null 2>&1; then
     sudo apt-get install -y -qq --no-install-recommends siege
   fi
 
@@ -26,5 +26,5 @@ concurrent = 10
 delay = 5
 internet = false
 benchmark = false
-" > "${HOME}/.siege/siege.conf"
+" >"${HOME}/.siege/siege.conf"
 }

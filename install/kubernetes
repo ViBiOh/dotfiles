@@ -11,7 +11,7 @@ install() {
   local ARCH
   ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
-  if [[ ${ARCH} = "x86_64" ]]; then
+  if [[ ${ARCH} == "x86_64" ]]; then
     ARCH="amd64"
   elif [[ ${ARCH} =~ ^armv.l$ ]]; then
     ARCH="arm"
@@ -22,5 +22,5 @@ install() {
   curl -q -sSL --max-time 300 -o "${HOME}/opt/bin/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl"
   chmod +x "${HOME}/opt/bin/kubectl"
 
-  kubectl completion bash > "${SCRIPT_DIR}/../sources/kubectl-completion"
+  kubectl completion bash >"${SCRIPT_DIR}/../sources/kubectl-completion"
 }

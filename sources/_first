@@ -5,6 +5,6 @@ if [[ -d "${HOME}/opt/bin" ]]; then
 fi
 
 export DEFAULT_OPENER="xdg-open"
-if command -v open > /dev/null 2>&1; then
+if command -v open >/dev/null 2>&1; then
   DEFAULT_OPENER="open"
 fi

@@ -35,6 +35,17 @@ install_terraform_lsp() {
   archive_to_binary "https://github.com/juliosueiras/terraform-lsp/releases/download/v${TERRAFORM_LSP_VERSION}/terraform-lsp_${TERRAFORM_LSP_VERSION}_${TERRAFORM_LSP_OS}_amd64.tar.gz" "terraform-lsp"
 }
 
+install_shfmt() {
+  local SHFMT_VERSION="3.1.2"
+  local SHFMT_OS="linux"
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    SHFMT_OS="darwin"
+  fi
+
+  curl -q -sSL --max-time 300 -o "${HOME}/opt/bin/shfmt" "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_${SHFMT_OS}_amd64"
+  chmod +x "${HOME}/opt/bin/shfmt"
+}
+
 main() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text/Packages"
@@ -51,20 +62,21 @@ main() {
   install_plugin SublimeLayout
   install_plugin Formatter
 
-  if command -v go > /dev/null 2>&1; then
+  if command -v go >/dev/null 2>&1; then
     GO111MODULE=on go get golang.org/x/tools/gopls@latest
     go get -u golang.org/x/tools/cmd/gotype
   fi
 
-  if command -v npm > /dev/null 2>&1; then
+  if command -v npm >/dev/null 2>&1; then
     npm install -g prettier eslint javascript-typescript-langserver
   fi
 
-  if command -v pip > /dev/null 2>&1; then
+  if command -v pip >/dev/null 2>&1; then
     pip install --user python-language-server black pycodestyle
   fi
 
   install_terraform_lsp
+  install_shfmt
 }
 
 main "${@:-}"

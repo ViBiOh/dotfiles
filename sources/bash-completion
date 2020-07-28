@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if command -v brew > /dev/null 2>&1; then
+if command -v brew >/dev/null 2>&1; then
   if [[ -f "${BREW_PREFIX}/etc/bash_completion" ]]; then
     source "${BREW_PREFIX}/etc/bash_completion"
   fi

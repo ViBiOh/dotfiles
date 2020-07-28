@@ -15,8 +15,8 @@ init_ssh_agent() {
   touch "${SSH_ENV}"
   chmod 600 "${SSH_ENV}"
 
-  ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-  source "${SSH_ENV}" > /dev/null
+  ssh-agent | sed 's/^echo/#echo/' >"${SSH_ENV}"
+  source "${SSH_ENV}" >/dev/null
 }
 
 start_ssh_agent() {
@@ -39,7 +39,7 @@ start_ssh_agent() {
 }
 
 if [[ -f ${SSH_ENV} ]]; then
-  source "${SSH_ENV}" > /dev/null
+  source "${SSH_ENV}" >/dev/null
 else
   start_ssh_agent
 fi
