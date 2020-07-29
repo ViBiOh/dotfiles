@@ -31,13 +31,5 @@ install() {
   ServerAliveCountMax 2
 " >"${HOME}/.ssh/config"
 
-  if ! [[ ${OSTYPE} =~ ^darwin ]]; then
-    echo '#!/usr/bin/env bash
-
-export MY_TTY="$(tty | sed '"'"'s|/dev/||'"'"')"
-who -T | grep -v "${MY_TTY}" | grep + | awk '"'"'{print $1 " " $3}'"'"' | xargs -r -I {} -n 2 write
-' | sudo tee /etc/ssh/sshrc >/dev/null
-  fi
-
   find "${HOME}/.ssh/" -name "config_*" -type f -exec cat {} + >>"${HOME}/.ssh/config"
 }
