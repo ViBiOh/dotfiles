@@ -16,7 +16,7 @@ forward_local_port() {
     return 1
   fi
 
-  ssh -L "${1}:localhost:${2}" "${3}"
+  ssh -N -L "${1}:localhost:${2}" "${3}"
 }
 
 forward_remote_port() {
@@ -25,7 +25,7 @@ forward_remote_port() {
     return 1
   fi
 
-  ssh -R "${1}:localhost:${2}" "${3}"
+  ssh -N -R "${1}:localhost:${2}" "${3}"
 }
 
 dns_flush_cache() {
