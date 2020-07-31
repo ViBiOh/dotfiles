@@ -16,13 +16,37 @@ if command -v kubectl >/dev/null 2>&1; then
 
       export KUBE_PS1="true"
 
+      get_kube_deployment() {
+        kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}' | fzf --ansi --reverse -1 -q "${1:-}"
+      }
+
+      get_kube_service() {
+        kubectl get services --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}' | fzf --ansi --reverse -1 -q "${1:-}"
+      }
+
       case ${1:-} in
       "restart")
-        kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace} {.metadata.name}{"\n"}{end}' | fzf --ansi --reverse -1 -q "${2:-}" | xargs -n 2 bash -c 'kubectl -n ${0} rollout restart deployment ${1}'
+        IFS='/' read -r -a parts <<<"$(get_kube_deployment "${2:-}")"
+        kubectl -n "${parts[0]}" rollout restart deployment "${parts[1]}"
         ;;
 
       "logs")
-        kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace} {.metadata.name}{"\n"}{end}' | fzf --ansi --reverse -1 -q "${2:-}" | xargs -n 2 bash -c 'kubectl -n ${0} logs deployments/${1} -f'
+        IFS='/' read -r -a parts <<<"$(get_kube_deployment "${2:-}")"
+        printf "%bTailing log for %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}" "${RESET}"
+        kubectl -n "${parts[0]}" logs "deployments/${parts[1]}" -f
+        ;;
+
+      "forward")
+        IFS='/' read -r -a parts <<<"$(get_kube_service "${2:-}")"
+
+        local KUBE_PORT
+        KUBE_PORT="$(kubectl -n "${parts[0]}" get services "${parts[1]}" -o=jsonpath='{range .spec.ports[*]}{.port}/{.protocol}{"\n"}{end}' | fzf --ansi --reverse -1 -q "${3:-}")"
+
+        if [[ -n ${KUBE_PORT:-} ]]; then
+          IFS='/' read -r -a ports <<<"${KUBE_PORT}"
+          printf "%bForwarding %s from 4000 to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}" "${ports[0]}" "${RESET}"
+          kubectl -n "${parts[0]}" port-forward "services/${parts[1]}" "4000:${ports[0]}"
+        fi
         ;;
 
       "watch")
