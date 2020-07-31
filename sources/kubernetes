@@ -1,31 +1,39 @@
 #!/usr/bin/env bash
 
 if command -v kubectl >/dev/null 2>&1; then
-  kube() {
-    if [[ -z ${KUBE_PS1:-} ]]; then
-      export KUBE_PS1="true"
-    else
-      unset KUBE_PS1
-    fi
-  }
-
   __kube_ps1() {
     if [[ -n ${KUBE_PS1:-} ]]; then
       printf " ☸️ %s" "$(kubectl config current-context)"
     fi
   }
 
-  kube_restart() {
-    kubectl rollout restart deployment "${@:-}"
-  }
-
   if command -v fzf >/dev/null 2>&1; then
-    kube_switch() {
-      kubectl config get-contexts -o name | fzf --ansi --reverse -1 -q "${1:-}" | xargs kubectl config use-context
-    }
+    kube() {
+      if [[ ${#} -eq 0 ]] && [[ -n ${KUBE_PS1:-} ]]; then
+        unset KUBE_PS1
+        return
+      fi
 
-    kube_logs() {
-      kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace} {.metadata.name}{"\n"}{end}' | fzf --ansi --reverse -1 -q "${1:-}" | xargs -n 2 bash -c 'kubectl -n ${0} logs deployments/${1} -f'
+      export KUBE_PS1="true"
+
+      case ${1:-} in
+      "restart")
+        kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace} {.metadata.name}{"\n"}{end}' | fzf --ansi --reverse -1 -q "${2:-}" | xargs -n 2 bash -c 'kubectl -n ${0} rollout restart deployment ${1}'
+        ;;
+
+      "logs")
+        kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace} {.metadata.name}{"\n"}{end}' | fzf --ansi --reverse -1 -q "${2:-}" | xargs -n 2 bash -c 'kubectl -n ${0} logs deployments/${1} -f'
+        ;;
+
+      "watch")
+        kubectl get pods -A -w
+        ;;
+
+      *)
+        kubectl config get-contexts -o name | fzf --ansi --reverse -1 -q "${1:-}" | xargs kubectl config use-context
+        ;;
+      esac
     }
   fi
+
 fi
