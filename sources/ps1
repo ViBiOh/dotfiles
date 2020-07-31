@@ -11,6 +11,10 @@ if command -v git >/dev/null 2>&1 && [[ "$(type -t __git_ps1)" == "function" ]];
   PS1="${PS1}${YELLOW}\$(__git_ps1)${RESET}"
 fi
 
+if command -v kubectl >/dev/null 2>&1 && [[ "$(type -t __kube_ps1)" == "function" ]]; then
+  PS1="${PS1}${BLUE}\$(__kube_ps1)${RESET}"
+fi
+
 PROMPT_DIRTRIM="3"
 
 _previous_status() {

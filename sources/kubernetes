@@ -1,11 +1,25 @@
 #!/usr/bin/env bash
 
 if command -v kubectl >/dev/null 2>&1; then
+  kube() {
+    if [[ -z ${KUBE_PS1:-} ]]; then
+      export KUBE_PS1="true"
+    else
+      unset KUBE_PS1
+    fi
+  }
+
+  __kube_ps1() {
+    if [[ -n ${KUBE_PS1:-} ]]; then
+      printf " ⎈ %s" "$(kubectl config current-context)"
+    fi
+  }
+
   kube_restart() {
     kubectl rollout restart deployment "${@:-}"
   }
 
-  if command -v kubectl >/dev/null 2>&1; then
+  if command -v fzf >/dev/null 2>&1; then
     kube_switch() {
       kubectl config get-contexts -o name | fzf --ansi --reverse -1 -q "${1:-}" | xargs kubectl config use-context
     }
