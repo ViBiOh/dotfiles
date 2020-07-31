@@ -7,7 +7,3 @@ fi
 if [[ -z ${TMUX} ]] && [[ -z ${SSH_CLIENT} ]]; then
   LC_ALL="$(locale -a | grep -i en_us.utf)" tmux new-session -A -s "$(whoami)" && exit
 fi
-
-tmux_split_cmd() {
-  tmux split-window -hd -t "${TMUX_PANE}" "bash --rcfile <(echo '. ~/.bashrc;${*}')" && tmux select-layout tiled
-}
