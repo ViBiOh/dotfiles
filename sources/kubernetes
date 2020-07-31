@@ -11,7 +11,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
   __kube_ps1() {
     if [[ -n ${KUBE_PS1:-} ]]; then
-      printf " ⎈ %s" "$(kubectl config current-context)"
+      printf " ☸️ %s" "$(kubectl config current-context)"
     fi
   }
 
