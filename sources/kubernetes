@@ -33,7 +33,7 @@ if command -v kubectl >/dev/null 2>&1; then
       "logs")
         IFS='/' read -r -a parts <<<"$(get_kube_deployment "${2:-}")"
         printf "%bTailing log for %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}" "${RESET}"
-        kubectl -n "${parts[0]}" logs "deployments/${parts[1]}" -f
+        kubectl -n "${parts[0]}" logs --all-containers=true "deployments/${parts[1]}" -f
         ;;
 
       "forward")
