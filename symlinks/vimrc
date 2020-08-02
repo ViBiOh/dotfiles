@@ -116,9 +116,6 @@ set lazyredraw
 set rtp+=~/opt/fzf
 noremap <C-p> :FZF<return>
 
-" Redirecting output to shell to null
-set shellpipe=>
-
 " Using ripgrep for searching
 if executable("rg")
   set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case

@@ -27,7 +27,7 @@ def format(view, region, working_dir, commands):
         process_out, process_err = process.communicate(value.encode())
         if process.returncode != 0:
             print(process_err.decode(), end="")
-            return
+            return value
 
         value = process_out.decode()
 
