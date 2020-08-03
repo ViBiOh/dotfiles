@@ -1,6 +1,14 @@
 " Turnoff vi backward compatibility
 set nocompatible
 
+" vim-plug
+call plug#begin('~/.vim/plugged')
+
+Plug 'editorconfig/editorconfig-vim'
+Plug 'airblade/vim-gitgutter'
+
+call plug#end()
+
 " Show status line
 set laststatus=2
 
@@ -57,6 +65,10 @@ set backspace=indent,eol,start
 
 " Hightlight search
 set hlsearch
+
+" SignColumn configuration
+set signcolumn=number
+highlight clear SignColumn
 
 " Clear highlight when pressing escape
 nnoremap <esc> :noh<return><esc>
@@ -115,6 +127,11 @@ set lazyredraw
 " Search using ctrl-p and fzf
 set rtp+=~/opt/fzf
 noremap <C-p> :FZF<return>
+
+" vim-gutter configuration
+highlight GitGutterAdd    guifg=#009900 ctermfg=2
+highlight GitGutterChange guifg=#bbbb00 ctermfg=3
+highlight GitGutterDelete guifg=#ff2222 ctermfg=1
 
 " Using ripgrep for searching
 if executable("rg")

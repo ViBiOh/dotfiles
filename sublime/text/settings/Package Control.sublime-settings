@@ -14,5 +14,6 @@
     "Terraform"
   ],
   "bootstrapped": true,
-  "in_process_packages": []
+  "in_process_packages": [
+  ],
 }

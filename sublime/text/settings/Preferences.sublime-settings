@@ -4,11 +4,11 @@
   "auto_complete_triggers": [
     {
       "characters": "<",
-      "selector": "text.html"
+      "selector": "text.html",
     },
     {
       "characters": ".",
-      "selector": "source.js,source.jsx,source.go,source.python"
+      "selector": "source.js,source.jsx,source.go,source.python",
     }
   ],
   "default_line_ending": "unix",
@@ -58,6 +58,7 @@
     "vendor/",
     "vendors/"
   ],
-  "ignored_packages": ["Vintage"],
-  "show_rel_path": true
+  "ignored_packages": ["Vintage",
+  ],
+  "show_rel_path": true,
 }
