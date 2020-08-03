@@ -1,4 +1,8 @@
 ---
+colors:
+  primary:
+    background: "#000000"
+
 window:
   startup_mode: Maximized
 
