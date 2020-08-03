@@ -10,11 +10,10 @@
       "enabled": true
     },
     "terraform": {
-      "command": ["terraform-lsp"],
       "enabled": true,
+      "command": ["terraform-lsp"],
       "languageId": "terraform",
-      "scopes": ["source.terraform"],
-      "syntaxes": ["Packages/Terraform/Terraform.sublime-syntax"]
+      "document_selector": "source.terraform"
     }
   }
 }

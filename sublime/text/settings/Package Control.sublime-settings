@@ -1,4 +1,5 @@
 {
+  "in_process_packages": [],
   "installed_packages": [
     "DocBlockr",
     "EditorConfig",
@@ -12,8 +13,5 @@
     "SublimeLinter-gotype",
     "SublimeLinter-shellcheck",
     "Terraform"
-  ],
-  "bootstrapped": true,
-  "in_process_packages": [
-  ],
+  ]
 }

@@ -11,6 +11,8 @@ install() {
 
     local SUBLIME_TEXT_FILENAME="sublime_text_build_${SUBLIME_TEXT_VERSION}_mac.zip"
     curl -q -sSL --max-time 300 -O "https://download.sublimetext.com/${SUBLIME_TEXT_FILENAME}"
+
+    rm -rf "/Applications/Sublime Text.app"
     unzip -o "${SUBLIME_TEXT_FILENAME}" -d /Applications/
     rm -rf "${SUBLIME_TEXT_FILENAME}"
 
