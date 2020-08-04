@@ -75,7 +75,7 @@ set hlsearch
 set signcolumn=number
 
 " Clear highlight when pressing escape
-nnoremap <esc> :noh<return><esc>
+nnoremap <esc> :nohlsearch<return><esc>
 nnoremap <esc>^[ <esc>^[
 
 " Keep search matches in the middle of the window.
