@@ -1,6 +1,6 @@
 {
   "selectors": {
-    "source.terraform": [["terraform", "fmt", "-"]],
+    "source.terraform": [["terraform", "fmt", "-no-color", "-"]],
     "source.go": [["goimports"], ["gofmt", "-s"]],
     "source.python": [["black", "--quiet", "-"]],
     "source.js": [["prettier", "--stdin-filepath", "file.js"]],
