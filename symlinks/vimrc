@@ -6,16 +6,21 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'editorconfig/editorconfig-vim'
 Plug 'airblade/vim-gitgutter'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
+
+" Give more space for displaying messages.
+set cmdheight=2
 
 " Show status line
 set laststatus=2
 
-hi StatusLine ctermfg=235
-hi User1 ctermfg=11 ctermbg=238
-hi User2 ctermfg=232 ctermbg=154
-hi User3 ctermfg=2 ctermbg=235
+highlight StatusLine ctermfg=235 ctermbg=11
+highlight User1 ctermfg=11 ctermbg=238
+highlight User2 ctermfg=232 ctermbg=154
+highlight User3 ctermfg=2 ctermbg=235
+highlight clear SignColumn
 
 set statusline=
 set statusline+=%1*\ \%f " Filename
@@ -68,7 +73,6 @@ set hlsearch
 
 " SignColumn configuration
 set signcolumn=number
-highlight clear SignColumn
 
 " Clear highlight when pressing escape
 nnoremap <esc> :noh<return><esc>
@@ -103,7 +107,11 @@ set noerrorbells
 
 " Disable backup files
 set nobackup
+set nowritebackup
 set noswapfile
+
+" Increase update time
+set updatetime=300
 
 " Enable syntax color if exist
 if exists(":syntax")
@@ -115,6 +123,9 @@ if exists(":let")
   let mapleader=","
 endif
 
+" Navigation shortcut
+nmap <silent> gb <C-o>
+
 " Disabling viminfo
 set viminfo=""
 
@@ -124,9 +135,31 @@ set wildmenu
 " Be lazy when redrawing screen
 set lazyredraw
 
+" Printing whitespace characters differently
+set list
+set listchars=tab:>.,trail:.,extends:#,nbsp:.
+
 " Search using ctrl-p and fzf
 set rtp+=~/opt/fzf
 noremap <C-p> :FZF<return>
+
+" coc.nvim configuration
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
 
 " vim-gutter configuration
 highlight GitGutterAdd    guifg=#009900 ctermfg=2
