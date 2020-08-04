@@ -3,12 +3,16 @@
     "source.terraform": [["terraform", "fmt", "-no-color", "-"]],
     "source.go": [["goimports"], ["gofmt", "-s"]],
     "source.python": [["black", "--quiet", "-"]],
-    "source.js": [["prettier", "--stdin-filepath", "file.js"]],
-    "source.jsx": [["prettier", "--stdin-filepath", "file.jsx"]],
-    "source.json": [["prettier", "--stdin-filepath", "file.json"]],
-    "source.yaml": [["prettier", "--stdin-filepath", "file.yml"]],
+    "source.js": [["prettier", "--no-color", "--stdin-filepath", "file.js"]],
+    "source.jsx": [["prettier", "--no-color", "--stdin-filepath", "file.jsx"]],
+    "source.json": [
+      ["prettier", "--no-color", "--stdin-filepath", "file.json"]
+    ],
+    "source.yaml": [["prettier", "--no-color", "--stdin-filepath", "file.yml"]],
     "source.shell.bash": [["shfmt", "-s", "-"]],
-    "text.html.markdown": [["prettier", "--stdin-filepath", "file.md"]]
+    "text.html.markdown": [
+      ["prettier", "--no-color", "--stdin-filepath", "file.md"]
+    ]
   },
   // Controls when format_on_save in run
   // - "all": All the times, if a selector is found
