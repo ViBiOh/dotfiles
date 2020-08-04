@@ -2,14 +2,12 @@
 set nocompatible
 
 " vim-plug
-if exists(':plug')
-  call plug#begin('~/.vim/plugged')
+call plug#begin('~/.vim/plugged')
 
-  Plug 'editorconfig/editorconfig-vim'
-  Plug 'airblade/vim-gitgutter'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'airblade/vim-gitgutter'
 
-  call plug#end()
-endif
+call plug#end()
 
 " Show status line
 set laststatus=2
