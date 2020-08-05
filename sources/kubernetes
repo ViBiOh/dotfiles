@@ -18,16 +18,16 @@ if command -v kubectl >/dev/null 2>&1; then
 
       get_kube_restart() {
         cat \
-          <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}deployment/{.metadata.namespace}/{.metadata.name}{"\n"}{end}') \
-          <(kubectl get daemonsets --all-namespaces -o=jsonpath='{range .items[*]}daemonset/{.metadata.namespace}/{.metadata.name}{"\n"}{end}') \
-          <(kubectl get statefulsets --all-namespaces -o=jsonpath='{range .items[*]}statefulset/{.metadata.namespace}/{.metadata.name}{"\n"}{end}') |
+          <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/deployment/{.metadata.name}{"\n"}{end}') \
+          <(kubectl get daemonsets --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/daemonset/{.metadata.name}{"\n"}{end}') \
+          <(kubectl get statefulsets --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/statefulset/{.metadata.name}{"\n"}{end}') |
           fzf --ansi --reverse -1 -q "${1:-}"
       }
 
       get_kube_log() {
         cat \
-          <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}deployment/{.metadata.namespace}/{.metadata.name}{"\n"}{end}') \
-          <(kubectl get jobs --all-namespaces -o=jsonpath='{range .items[*]}job/{.metadata.namespace}/{.metadata.name}{"\n"}{end}') |
+          <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/deployment/{.metadata.name}{"\n"}{end}') \
+          <(kubectl get jobs --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/job/{.metadata.name}{"\n"}{end}') |
           fzf --ansi --reverse -1 -q "${1:-}"
       }
 
@@ -39,15 +39,23 @@ if command -v kubectl >/dev/null 2>&1; then
       "restart")
         IFS='/' read -r -a parts <<<"$(get_kube_restart "${2:-}")"
         if [[ -n ${parts[0]} ]]; then
-          kubectl rollout restart "${parts[0]}" -n "${parts[1]}" "${parts[2]}"
+          kubectl -n "${parts[0]}" rollout restart "${parts[1]}" "${parts[2]}"
         fi
         ;;
 
       "logs")
         IFS='/' read -r -a parts <<<"$(get_kube_log "${2:-}")"
         if [[ -n ${parts[0]} ]]; then
-          printf "%bTailing log for %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}" "${RESET}"
-          kubectl logs --all-containers=true -n "${parts[1]}" "${parts[0]}/${parts[2]}" -f
+          local PODS_LABELS
+          PODS_LABELS="$(kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o json | jq --raw-output '.spec.selector.matchLabels | to_entries[] | .key + "=" + .value' | paste -sd, -)"
+
+          local POD
+          POD=$(kubectl -n "${parts[0]}" get pods -l "${PODS_LABELS}" -o name | fzf --ansi --reverse -1 -q "${3:-}")
+
+          if [[ -n ${POD} ]]; then
+            printf "%bTailing log for %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}/${POD}" "${RESET}"
+            kubectl -n "${parts[0]}" logs --all-containers=true "${POD}" -f
+          fi
         fi
         ;;
 
@@ -58,7 +66,7 @@ if command -v kubectl >/dev/null 2>&1; then
           local KUBE_PORT
           KUBE_PORT="$(kubectl -n "${parts[0]}" get services "${parts[1]}" -o=jsonpath='{range .spec.ports[*]}{.port}/{.protocol}{"\n"}{end}' | fzf --ansi --reverse -1 -q "${3:-}")"
 
-          if [[ -n ${KUBE_PORT:-} ]]; then
+          if [[ -n ${KUBE_PORT} ]]; then
             IFS='/' read -r -a ports <<<"${KUBE_PORT}"
             printf "%bForwarding %s from 4000 to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}" "${ports[0]}" "${RESET}"
             kubectl -n "${parts[0]}" port-forward "services/${parts[1]}" "4000:${ports[0]}"
