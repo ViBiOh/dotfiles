@@ -4,6 +4,7 @@ set nocompatible
 " vim-plug
 call plug#begin('~/.vim/plugged')
 
+Plug 'junegunn/fzf.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
