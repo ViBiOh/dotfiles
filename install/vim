@@ -15,19 +15,20 @@ install() {
     "go": {
       "command": "gopls",
       "filetypes": ["go"]
-  },
-  "python": {
-    "command": "pyls",
-    "rootPatterns": ["go.mod"],
-    "filetypes": ["python"]
-  },
-  "javascript": {
-    "command": "javascript-typescript-stdio",
-    "filetypes": ["javascript", "javascriptreact"]
-  },
-  "terraform": {
-    "command": "terraform-lsp",
-    "filetypes": ["terraform"]
+    },
+    "python": {
+      "command": "pyls",
+      "rootPatterns": ["go.mod"],
+      "filetypes": ["python"]
+    },
+    "javascript": {
+      "command": "javascript-typescript-stdio",
+      "filetypes": ["javascript", "javascriptreact"]
+    },
+    "terraform": {
+      "command": "terraform-lsp",
+      "filetypes": ["terraform"]
+    }
   }
 }' >"${HOME}/.vim/coc-settings.json"
 }
