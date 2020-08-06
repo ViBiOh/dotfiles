@@ -14,9 +14,6 @@ call plug#end()
 " Show status line
 set laststatus=2
 
-" Give more space for displaying messages.
-set cmdheight=2
-
 highlight StatusLine ctermfg=235 ctermbg=11
 highlight User1 ctermfg=11 ctermbg=238
 highlight User2 ctermfg=232 ctermbg=154
