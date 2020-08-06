@@ -4,17 +4,18 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   if command -v brew >/dev/null 2>&1; then
-    brew cask reinstall sublime-merge
+    brew cask reinstall sublime-text sublime-merge
 
-    local SUBLIME_TEXT_VERSION
-    SUBLIME_TEXT_VERSION="$(curl -q -sSL --max-time 30 "https://www.sublimetext.com/updates/4/dev_update_check" | jq .latest_version)"
+    # Sublime Text 4
+    # local SUBLIME_TEXT_VERSION
+    # SUBLIME_TEXT_VERSION="$(curl -q -sSL --max-time 30 "https://www.sublimetext.com/updates/4/dev_update_check" | jq .latest_version)"
 
-    local SUBLIME_TEXT_FILENAME="sublime_text_build_${SUBLIME_TEXT_VERSION}_mac.zip"
-    curl -q -sSL --max-time 300 -O "https://download.sublimetext.com/${SUBLIME_TEXT_FILENAME}"
+    # local SUBLIME_TEXT_FILENAME="sublime_text_build_${SUBLIME_TEXT_VERSION}_mac.zip"
+    # curl -q -sSL --max-time 300 -O "https://download.sublimetext.com/${SUBLIME_TEXT_FILENAME}"
 
-    rm -rf "/Applications/Sublime Text.app"
-    unzip -o "${SUBLIME_TEXT_FILENAME}" -d /Applications/
-    rm -rf "${SUBLIME_TEXT_FILENAME}"
+    # rm -rf "/Applications/Sublime Text.app"
+    # unzip -o "${SUBLIME_TEXT_FILENAME}" -d /Applications/
+    # rm -rf "${SUBLIME_TEXT_FILENAME}"
 
     ln -f -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" "${HOME}/opt/bin/subl"
   fi

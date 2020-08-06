@@ -48,7 +48,7 @@ install_shfmt() {
 
 main() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text/Packages"
+    local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
     local MERGE_PKG="${HOME}/Library/Application Support/Sublime Merge/Packages"
   fi
 
