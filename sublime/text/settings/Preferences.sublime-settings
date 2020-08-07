@@ -65,4 +65,5 @@
 	"translate_tabs_to_spaces": true,
 	"tree_animation_enabled": false,
 	"word_wrap": true,
+	"color_scheme": "Packages/Color Scheme - Default/Monokai.sublime-color-scheme",
 }
