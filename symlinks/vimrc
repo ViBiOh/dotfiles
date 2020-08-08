@@ -137,6 +137,62 @@ set lazyredraw
 set list
 set listchars=tab:>.,trail:.,extends:#,nbsp:.
 
+" Autoformat code with ctrl+f
+noremap <C-f> gg=G<return>
+
+" Smarter tab completion trigger
+function! Smart_TabComplete()
+  let line = getline('.')
+
+  let substr = strpart(line, -1, col('.')+1)
+  let substr = matchstr(substr, "[^ \t]*$")
+
+  if (strlen(substr)==0)
+    return "\<tab>"
+  endif
+
+  if (match(substr, '\/') != -1)
+    return "\<C-X>\<C-F>"
+  endif
+
+  return "\<C-X>\<C-O>"
+endfunction
+
+inoremap <tab> <c-r>=Smart_TabComplete()<CR>
+
+" Using ripgrep for searching
+if executable("rg")
+  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+  nnoremap <Leader>g :silent lgrep -P<Space>
+endif
+
+if exists(':autocmd') && exists(':augroup')
+  augroup quick_fix
+    " Opening quickfix automatically
+    autocmd QuickFixCmdPost [^l]* nested cwindow
+    autocmd QuickFixCmdPost    l* nested lwindow
+  augroup END
+
+  " Format using external program
+  augroup format_config
+    autocmd!
+    autocmd FileType tf setlocal equalprg=terraform\ fmt\ -no-color\ -\ 2>/dev/null
+    autocmd FileType python setlocal equalprg=black\ --quiet\ -\ 2>/dev/null
+    autocmd FileType markdown setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.md\ 2>/dev/null
+    autocmd FileType yaml setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.yml\ 2>/dev/null
+    autocmd FileType json setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.json\ 2>/dev/null
+    autocmd FileType js setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.js\ 2>/dev/null
+    autocmd FileType jsx setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.jsx\ 2>/dev/null
+    autocmd FileType go setlocal equalprg=goimports\ 2>/dev/null
+    autocmd FileType sh setlocal equalprg=shfmt\ -s \- 2>/dev/null
+  augroup END
+endif
+
+" Save file with sudo permission
+if exists(':execute')
+  command W :execute ':silent w !sudo tee % > /dev/null' | :edit!
+endif
+
 " Search using ctrl-p and fzf
 set rtp+=~/opt/fzf
 noremap <C-p> :FZF<return>
@@ -193,43 +249,7 @@ if exists(":let")
   let g:lsp_diagnostics_float_delay = 300
 endif
 
-function! Smart_TabComplete()
-  let line = getline('.')
-
-  let substr = strpart(line, -1, col('.')+1)
-  let substr = matchstr(substr, "[^ \t]*$")
-
-  if (strlen(substr)==0)
-    return "\<tab>"
-  endif
-
-  if (match(substr, '\/') != -1)
-    return "\<C-X>\<C-F>"
-  endif
-
-  return "\<C-X>\<C-O>"
-endfunction
-
-inoremap <tab> <c-r>=Smart_TabComplete()<CR>
-
 augroup lsp_install
   au!
   autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
 augroup END
-
-" Using ripgrep for searching
-if executable("rg")
-  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
-  nnoremap <Leader>g :silent lgrep -P<Space>
-endif
-
-" Opening quickfix automatically
-if exists(':autocmd')
-  autocmd QuickFixCmdPost [^l]* nested cwindow
-  autocmd QuickFixCmdPost    l* nested lwindow
-endif
-
-" Save file with sudo permission
-if exists(':execute')
-  command W :execute ':silent w !sudo tee % > /dev/null' | :edit!
-endif
