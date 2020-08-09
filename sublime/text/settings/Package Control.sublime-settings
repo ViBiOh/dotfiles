@@ -13,6 +13,7 @@
 		"SublimeLinter",
 		"SublimeLinter-eslint",
 		"SublimeLinter-shellcheck",
+"		"SublimeLinter-golint",
 		"Terraform"
 	],
 }

@@ -90,7 +90,7 @@ set ignorecase
 set smartcase
 
 " Omni completion
-set completeopt=longest,menuone
+set completeopt=longest,menuone,noselect
 set omnifunc=syntaxcomplete#Complete
 
 " Enter select completion
