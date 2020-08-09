@@ -93,6 +93,9 @@ set smartcase
 set completeopt=longest,menuone
 set omnifunc=syntaxcomplete#Complete
 
+" Enter select completion
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
 " Auto reload file
 set autoread
 

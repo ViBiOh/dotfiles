@@ -11,10 +11,7 @@
 		"Package Control",
 		"SideBarEnhancements",
 		"SublimeLinter",
-		"SublimeLinter-contrib-yamllint",
 		"SublimeLinter-eslint",
-		"SublimeLinter-golint",
-		"SublimeLinter-gotype",
 		"SublimeLinter-shellcheck",
 		"Terraform"
 	],
