@@ -1,19 +1,18 @@
 {
-	"bootstrapped": true,
-	"in_process_packages":
-	[
-	],
-	"installed_packages":
-	[
-		"DocBlockr",
-		"EditorConfig",
-		"LSP",
-		"Package Control",
-		"SideBarEnhancements",
-		"SublimeLinter",
-		"SublimeLinter-eslint",
-		"SublimeLinter-shellcheck",
-"		"SublimeLinter-golint",
-		"Terraform"
-	],
+  "bootstrapped": true,
+  "installed_packages": [
+    "DocBlockr",
+    "EditorConfig",
+    "LSP",
+    "Package Control",
+    "SideBarEnhancements",
+    "SublimeLinter",
+    "SublimeLinter-eslint",
+    "SublimeLinter-shellcheck",
+    "SublimeLinter-golint",
+    "Terraform"
+  ],
+  "in_process_packages":
+  [
+  ],
 }
