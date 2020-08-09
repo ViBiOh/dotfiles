@@ -168,6 +168,7 @@ endif
 
 if exists(':autocmd') && exists(':augroup')
   augroup quick_fix
+    autocmd!
     " Opening quickfix automatically
     autocmd QuickFixCmdPost [^l]* nested cwindow
     autocmd QuickFixCmdPost    l* nested lwindow
@@ -176,15 +177,30 @@ if exists(':autocmd') && exists(':augroup')
   " Format using external program
   augroup format_config
     autocmd!
-    autocmd FileType tf setlocal equalprg=terraform\ fmt\ -no-color\ -\ 2>/dev/null
-    autocmd FileType python setlocal equalprg=black\ --quiet\ -\ 2>/dev/null
-    autocmd FileType markdown setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.md\ 2>/dev/null
-    autocmd FileType yaml setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.yml\ 2>/dev/null
-    autocmd FileType json setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.json\ 2>/dev/null
-    autocmd FileType js setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.js\ 2>/dev/null
-    autocmd FileType jsx setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.jsx\ 2>/dev/null
-    autocmd FileType go setlocal equalprg=goimports\ 2>/dev/null
-    autocmd FileType sh setlocal equalprg=shfmt\ -s \- 2>/dev/null
+
+    if executable('terraform')
+      autocmd FileType tf setlocal equalprg=terraform\ fmt\ -no-color\ -\ 2>/dev/null
+    endif
+
+    if executable('black')
+      autocmd FileType python setlocal equalprg=black\ --quiet\ -\ 2>/dev/null
+    endif
+
+    if executable('prettier')
+      autocmd FileType markdown setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.md\ 2>/dev/null
+      autocmd FileType yaml setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.yml\ 2>/dev/null
+      autocmd FileType json setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.json\ 2>/dev/null
+      autocmd FileType js setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.js\ 2>/dev/null
+      autocmd FileType jsx setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.jsx\ 2>/dev/null
+    endif
+
+    if executable('goimports')
+      autocmd FileType go setlocal equalprg=goimports\ 2>/dev/null
+    endif
+
+    if executable('shfmt')
+      autocmd FileType sh setlocal equalprg=shfmt\ -s\ -\ 2>/dev/null
+    endif
   augroup END
 endif
 
@@ -205,26 +221,26 @@ highlight GitGutterDelete guifg=#ff2222 ctermfg=1
 " vim-lsp configuration
 if executable('pyls')
   au User lsp_setup call lsp#register_server({
-      \ 'name': 'pyls',
-      \ 'cmd': {server_info->['pyls']},
-      \ 'allowlist': ['python'],
-      \ })
+        \ 'name': 'pyls',
+        \ 'cmd': {server_info->['pyls']},
+        \ 'allowlist': ['python'],
+        \ })
 endif
 
 if executable('gopls')
   au User lsp_setup call lsp#register_server({
-      \ 'name': 'gopls',
-      \ 'cmd': {server_info->['gopls']},
-      \ 'allowlist': ['go'],
-      \ })
+        \ 'name': 'gopls',
+        \ 'cmd': {server_info->['gopls']},
+        \ 'allowlist': ['go'],
+        \ })
 endif
 
 if executable('javascript-typescript-stdio')
   au User lsp_setup call lsp#register_server({
-      \ 'name': 'javascript-typescript-stdio',
-      \ 'cmd': {server_info->['javascript-typescript-stdio']},
-      \ 'allowlist': ['javascript', 'javascriptreact'],
-      \ })
+        \ 'name': 'javascript-typescript-stdio',
+        \ 'cmd': {server_info->['javascript-typescript-stdio']},
+        \ 'allowlist': ['javascript', 'javascriptreact'],
+        \ })
 endif
 
 function! s:on_lsp_buffer_enabled() abort
@@ -250,6 +266,6 @@ if exists(":let")
 endif
 
 augroup lsp_install
-  au!
+  autocmd!
   autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
 augroup END
