@@ -249,6 +249,7 @@ endif
 function! s:on_lsp_buffer_enabled() abort
   setlocal omnifunc=lsp#complete
   setlocal signcolumn=yes
+
   if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
   nmap <buffer> gd <plug>(lsp-definition)
   nmap <buffer> gr <plug>(lsp-references)
@@ -268,7 +269,9 @@ if exists(":let")
   let g:lsp_diagnostics_float_delay = 300
 endif
 
-augroup lsp_install
-  autocmd!
-  autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
-augroup END
+if exists(':autocmd') && exists(':augroup')
+  augroup lsp_install
+    autocmd!
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+  augroup END
+endif
