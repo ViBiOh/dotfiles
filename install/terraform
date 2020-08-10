@@ -30,7 +30,7 @@ install_provider() {
   local PLUGIN_DIR="${HOME}/.terraform.d/plugins/${OS}_${ARCH}/"
   local BINARY_NAME="${1}_${2}"
 
-  printf "%bInstalling %s into %s%b\n" "${BLUE}" "${BINARY_NAME}" "${PLUGIN_DIR}" "${RESET}"
+  printf "Installing %s into %s\n" "${BINARY_NAME}" "${PLUGIN_DIR}"
 
   mkdir -p "${PLUGIN_DIR}"
   curl -q -sSL --max-time 300 -o "${PLUGIN_DIR}/${BINARY_NAME}" "${3}"
