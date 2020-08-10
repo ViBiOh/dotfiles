@@ -8,6 +8,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'prabirshrestha/vim-lsp'
+Plug 'vim-syntastic/syntastic'
 
 call plug#end()
 
@@ -220,6 +221,11 @@ noremap <C-p> :FZF<return>
 highlight GitGutterAdd    guifg=#009900 ctermfg=2
 highlight GitGutterChange guifg=#bbbb00 ctermfg=3
 highlight GitGutterDelete guifg=#ff2222 ctermfg=1
+nmap <Leader>hu <Plug>(GitGutterUndoHunk)
+nmap <Leader>hv <Plug>(GitGutterPreviewHunk)
+if exists(':let')
+  let g:gitgutter_map_keys = 0
+endif
 
 " vim-lsp configuration
 if executable('pyls')
@@ -274,4 +280,12 @@ if exists(':autocmd') && exists(':augroup')
     autocmd!
     autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
   augroup END
+endif
+
+" syntastic configuration
+if exists(":let")
+  let g:syntastic_always_populate_loc_list = 1
+  let g:syntastic_auto_loc_list = 1
+  let g:syntastic_check_on_open = 1
+  let g:syntastic_check_on_wq = 0
 endif
