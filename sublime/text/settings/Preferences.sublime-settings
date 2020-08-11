@@ -4,11 +4,11 @@
 	[
 		{
 			"characters": "<",
-			"selector": "text.html",
+			"selector": "text.html"
 		},
 		{
 			"characters": ".",
-			"selector": "source.js,source.jsx,source.go,source.python",
+			"selector": "source.js,source.jsx,source.go,source.python"
 		}
 	],
 	"binary_file_patterns":
@@ -49,14 +49,12 @@
 	"draw_white_space": "all",
 	"enable_tab_scrolling": false,
 	"fold_buttons": false,
-	"hardware_acceleration": "opengl",
 	"highlight_line": true,
 	"highlight_modified_tabs": true,
 	"ignored_packages":
 	[
-		"Vintage",
+		"Vintage"
 	],
-	"index_skip_unknown_extensions": false,
 	"show_encoding": true,
 	"show_line_endings": true,
 	"show_rel_path": true,
@@ -64,6 +62,5 @@
 	"theme": "Adaptive.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"tree_animation_enabled": false,
-	"word_wrap": true,
-	"color_scheme": "Packages/Color Scheme - Default/Monokai.sublime-color-scheme",
+	"word_wrap": true
 }

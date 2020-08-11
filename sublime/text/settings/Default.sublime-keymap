@@ -17,9 +17,5 @@
         "operand": "(source.go, source.js, source.python)"
       }
     ]
-  },
-  {
-    "keys": ["super+k", "super+z"],
-    "command": "revert_hunk"
   }
 ]

@@ -48,7 +48,7 @@ install_shfmt() {
 
 main() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text/Packages"
+    local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text 3/Packages"
     local MERGE_PKG="${HOME}/Library/Application Support/Sublime Merge/Packages"
   fi
 
@@ -64,6 +64,7 @@ main() {
 
   if command -v go >/dev/null 2>&1; then
     GO111MODULE=on go get golang.org/x/tools/gopls@latest
+    go get -u golang.org/x/tools/cmd/gotype
   fi
 
   if command -v npm >/dev/null 2>&1; then
