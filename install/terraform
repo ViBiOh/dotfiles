@@ -26,19 +26,8 @@ credentials() {
   fi
 }
 
-install_provider() {
-  local PLUGIN_DIR="${HOME}/.terraform.d/plugins/${OS}_${ARCH}/"
-  local BINARY_NAME="${1}_${2}"
-
-  printf "Installing %s into %s\n" "${BINARY_NAME}" "${PLUGIN_DIR}"
-
-  mkdir -p "${PLUGIN_DIR}"
-  curl -q -sSL --max-time 300 -o "${PLUGIN_DIR}/${BINARY_NAME}" "${3}"
-  chmod +x "${PLUGIN_DIR}/${BINARY_NAME}"
-}
-
 install() {
-  local TERRAFORM_VERSION="0.12.29"
+  local TERRAFORM_VERSION="0.13.0"
 
   local OS
   OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
@@ -56,7 +45,4 @@ install() {
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
   echo "plugin_cache_dir = \"${HOME}/.terraform.d/plugin-cache\"
 " >"${HOME}/.terraformrc"
-
-  local ANSIBLEVAULT_VERSION="v2.1.0"
-  install_provider "terraform-provider-ansiblevault" "${ANSIBLEVAULT_VERSION}" "https://github.com/MeilleursAgents/terraform-provider-ansiblevault/releases/download/${ANSIBLEVAULT_VERSION}/terraform-provider-ansiblevault_${OS}_${ARCH}_${ANSIBLEVAULT_VERSION}"
 }
