@@ -13,7 +13,7 @@
 		"SublimeLinter",
 		"SublimeLinter-eslint",
 		"SublimeLinter-golint",
-		"SublimeLinter-gotype",
+		"SublimeLinter-govet",
 		"SublimeLinter-shellcheck",
 		"Terraform"
 	]
