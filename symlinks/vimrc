@@ -71,7 +71,9 @@ set backspace=indent,eol,start
 set hlsearch
 
 " SignColumn configuration
-set signcolumn=number
+if has(':signcolumn')
+  set signcolumn=number
+endif
 
 " Clear highlight when pressing escape
 nnoremap <esc> :nohlsearch<return><esc>
