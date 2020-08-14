@@ -93,7 +93,7 @@ set ignorecase
 set smartcase
 
 " Omni completion
-set completeopt=longest,menuone,noselect
+set completeopt=longest,menuone,noselect,noinsert
 set omnifunc=syntaxcomplete#Complete
 
 " Enter select completion
@@ -147,24 +147,20 @@ set listchars=tab:>.,trail:.,extends:#,nbsp:.
 noremap <C-f> gg=G<return>
 
 " Smarter tab completion trigger
-function! Smart_TabComplete()
-  let line = getline('.')
-
-  let substr = strpart(line, -1, col('.')+1)
-  let substr = matchstr(substr, "[^ \t]*$")
-
-  if (strlen(substr)==0)
-    return "\<tab>"
+function! SuperTab()
+  let l:part = strpart(getline('.'),col('.')-2,1)
+  if (l:part =~ '^\s\?$')
+    return "\<Tab>"
   endif
 
-  if (match(substr, '\/') != -1)
+  if (l:part =~ '\/')
     return "\<C-X>\<C-F>"
   endif
 
   return "\<C-X>\<C-O>"
 endfunction
 
-inoremap <tab> <c-r>=Smart_TabComplete()<CR>
+inoremap <Tab> <C-R>=SuperTab()<CR>
 
 " Using ripgrep for searching
 if executable("rg")
