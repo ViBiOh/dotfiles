@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 archive_to_binary() {
-  if [[ ${#} -ne 2 ]]; then
-    printf "%bUsage: archive_to_binary [URL] [BINARY_PATH]%b\n" "${RED}" "${RESET}"
+  if [[ ${#} -lt 2 ]]; then
+    printf "%bUsage: archive_to_binary [URL] [BINARY_PATH] [BINARY_DESTINATION=${HOME}/opt/bin/]%b\n" "${RED}" "${RESET}"
     return 1
   fi
 
@@ -31,7 +31,7 @@ archive_to_binary() {
       unzip "${ARCHIVE_PATH}" -d "${ARCHIVE_FILENAME}"
     fi
 
-    mv "${ARCHIVE_FILENAME}/${2}" "${HOME}/opt/bin/"
+    mv "${ARCHIVE_FILENAME}/${2}" "${3:-${HOME}/opt/bin/}"
     rm -rf "${ARCHIVE_PATH}" "${ARCHIVE_FILENAME}"
   )
 }
