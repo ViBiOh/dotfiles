@@ -55,7 +55,7 @@
 	current-branch = rev-parse --abbrev-ref HEAD
 	log-pretty = log --color --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 	lg = log-pretty --graph
-	changelog = ! git log --no-merges --pretty=format:'%Cred%h%Creset %s' "${2:-HEAD}...${1}"
+	changelog = ! git log --no-merges --pretty=format:'%Cred%h%Creset %s' "${2:-HEAD}...${1:-$(git last-tag)}"
 	find = log-pretty -S
 	filehistory = log-pretty --
 	linehistory = log-pretty -L
