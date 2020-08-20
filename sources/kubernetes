@@ -2,9 +2,14 @@
 
 if command -v kubectl >/dev/null 2>&1; then
   __kube_ps1() {
+    # preserve exit status
+    local exit="${?}"
+
     if [[ -n ${KUBE_PS1:-} ]]; then
       printf " ☸️ %s" "$(kubectl config current-context)"
     fi
+
+    return "${exit}"
   }
 
   if command -v fzf >/dev/null 2>&1; then

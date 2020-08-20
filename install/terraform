@@ -19,7 +19,8 @@ credentials() {
     local TERRAFORM_TOKEN
     TERRAFORM_TOKEN="$(pass show "${TERRAFORM_PASS}" | grep token | awk '{print $2}')"
 
-    echo "credentials \"app.terraform.io\" {
+    echo "
+credentials \"app.terraform.io\" {
   token = \"${TERRAFORM_TOKEN}\"
 }
 " >>"${HOME}/.terraformrc"
