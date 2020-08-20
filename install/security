@@ -19,6 +19,7 @@ install() {
     grep -v "0.0.0.0 media.licdn.com" |
     grep -v "0.0.0.0 reddit.com" |
     grep -v "0.0.0.0 www.reddit.com" |
+    grep -v "0.0.0.0 gateway.reddit.com" |
     grep -v "0.0.0.0 oauth.reddit.com" |
     grep -v "0.0.0.0 www.redditstatic.com" |
     grep -v "0.0.0.0 alb.reddit.com" |
