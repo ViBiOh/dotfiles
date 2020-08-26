@@ -1,45 +1,7 @@
 #!/usr/bin/env bash
 
-SSH_ENV="${HOME}/.ssh/environment"
-
-stop_ssh_agent() {
-  if [[ -n ${SSH_AGENT_PID:-} ]]; then
-    ssh-agent -k
-    rm -rf "${SSH_ENV}"
-  fi
-}
-
-init_ssh_agent() {
-  printf "Initializing new SSH agent...\n"
-
-  touch "${SSH_ENV}"
-  chmod 600 "${SSH_ENV}"
-
-  ssh-agent | sed 's/^echo/#echo/' >"${SSH_ENV}"
-  source "${SSH_ENV}" >/dev/null
-}
-
-start_ssh_agent() {
-  stop_ssh_agent
-
-  if [[ -d "${HOME}/.ssh/" ]]; then
-    local AGENT_INITIALIZED="false"
-
-    shopt -s nullglob
-    for key in "${HOME}/.ssh/"*.pub; do
-      if [[ ${AGENT_INITIALIZED} == "false" ]]; then
-        AGENT_INITIALIZED="true"
-        init_ssh_agent
-      fi
-
-      ssh-add -k "${key%.pub}"
-    done
-    shopt -u nullglob
-  fi
-}
-
-if [[ -f ${SSH_ENV} ]]; then
-  source "${SSH_ENV}" >/dev/null
+if [[ -f ${SSH_ENV:-} ]]; then
+  source "${SSH_ENV}"
 else
-  start_ssh_agent
+  ssh_agent_init
 fi

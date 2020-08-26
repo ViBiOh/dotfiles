@@ -9,11 +9,5 @@
     "javascript-typescript-langserver": {
       "enabled": true,
     },
-    "terraform": {
-      "enabled": true,
-      "command": ["terraform-lsp"],
-      "languageId": "terraform",
-      "document_selector": "source.terraform",
-    },
   },
 }

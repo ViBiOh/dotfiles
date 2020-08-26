@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 if command -v docker >/dev/null 2>&1; then
+  export DOCKER_CONTENT_TRUST="1"
+  export DOCKER_CLI_EXPERIMENTAL="enabled"
+
   docker_restart() {
     docker start $(docker ps -a -q -f status=exited -f status=created 2>/dev/null) 2>/dev/null
   }
-
-  export DOCKER_CONTENT_TRUST="1"
-  export DOCKER_CLI_EXPERIMENTAL="enabled"
 
   docker_clean() {
     docker system prune -f

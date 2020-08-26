@@ -15,6 +15,6 @@ install() {
 
   (
     cd "${SCRIPT_DIR}/../"
-    curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "var" "git" "git_hooks" "github" "version" "release" "docker_registry_cleanup" "slack_cleaner" "release"
+    curl -q -sSL --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "var" "git" "git_hooks" "github" "version" "release" "ssh" "docker_registry_cleanup" "slack_cleaner" "release"
   )
 }

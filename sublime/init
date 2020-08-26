@@ -25,16 +25,6 @@ symlink_settings() {
   fi
 }
 
-install_terraform_lsp() {
-  local TERRAFORM_LSP_VERSION="0.0.10"
-  local TERRAFORM_LSP_OS="linux"
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    TERRAFORM_LSP_OS="darwin"
-  fi
-
-  archive_to_binary "https://github.com/juliosueiras/terraform-lsp/releases/download/v${TERRAFORM_LSP_VERSION}/terraform-lsp_${TERRAFORM_LSP_VERSION}_${TERRAFORM_LSP_OS}_amd64.tar.gz" "terraform-lsp"
-}
-
 install_shfmt() {
   local SHFMT_VERSION="3.1.2"
   local SHFMT_OS="linux"
@@ -74,7 +64,6 @@ main() {
     pip install --user python-language-server black pycodestyle
   fi
 
-  install_terraform_lsp
   install_shfmt
 }
 

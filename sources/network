@@ -10,24 +10,6 @@ open_ports() {
   fi
 }
 
-forward_local_port() {
-  if [[ ${#} -ne 3 ]]; then
-    printf "Usage: forward_local_port [LOCAL_PORT] [REMOTE_PORT] [SSH_PART]\n"
-    return 1
-  fi
-
-  ssh -N -L "${1}:localhost:${2}" "${3}"
-}
-
-forward_remote_port() {
-  if [[ ${#} -ne 3 ]]; then
-    printf "Usage: forward_remote_port [REMOTE_PORT] [LOCAL_PORT] [SSH_PART]\n"
-    return 1
-  fi
-
-  ssh -N -R "${1}:localhost:${2}" "${3}"
-}
-
 dns_flush_cache() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo dscacheutil -flushcache
