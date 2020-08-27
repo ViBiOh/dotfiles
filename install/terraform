@@ -28,7 +28,7 @@ credentials \"app.terraform.io\" {
 }
 
 install() {
-  local TERRAFORM_VERSION="0.13.0"
+  local TERRAFORM_VERSION="0.13.1"
 
   local OS
   OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
