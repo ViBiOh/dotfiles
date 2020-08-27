@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-if [[ -z ${TMUX} ]] && [[ -z ${SSH_CLIENT} ]]; then
-  if [[ $(type -t stop_ssh_agent) == "function" ]]; then
-    stop_ssh_agent
+if [[ -z ${TMUX:-} ]] && [[ -z ${SSH_CLIENT:-} ]]; then
+  if [[ $(type -t ssh_agent_stop) == "function" ]]; then
+    ssh_agent_stop
   fi
 
   if [[ $(type -t stop_gpg_agent) == "function" ]]; then
