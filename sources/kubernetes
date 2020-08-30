@@ -23,21 +23,21 @@ if command -v kubectl >/dev/null 2>&1; then
 
       get_kube_restart() {
         cat \
-          <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/deployment/{.metadata.name}{"\n"}{end}') \
-          <(kubectl get daemonsets --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/daemonset/{.metadata.name}{"\n"}{end}') \
-          <(kubectl get statefulsets --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/statefulset/{.metadata.name}{"\n"}{end}') |
+          <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/deployment/{.name}{"\n"}{end}') \
+          <(kubectl get daemonsets --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/daemonset/{.name}{"\n"}{end}') \
+          <(kubectl get statefulsets --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/statefulset/{.name}{"\n"}{end}') |
           fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
 
       get_kube_log() {
         cat \
-          <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/deployment/{.metadata.name}{"\n"}{end}') \
-          <(kubectl get jobs --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/job/{.metadata.name}{"\n"}{end}') |
+          <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/deployment/{.name}{"\n"}{end}') \
+          <(kubectl get jobs --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/job/{.name}{"\n"}{end}') |
           fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
 
       get_kube_service() {
-        kubectl get services --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}' | fzf --height 20 --ansi --reverse -1 -q "${1:-}"
+        kubectl get services --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/{.name}{"\n"}{end}' | fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
 
       case ${1:-} in
