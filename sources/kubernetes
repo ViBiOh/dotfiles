@@ -69,7 +69,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
         if [[ -n ${parts[0]} ]]; then
           local KUBE_PORT
-          KUBE_PORT="$(kubectl -n "${parts[0]}" get services "${parts[1]}" -o=jsonpath='{range .spec.ports[*]}{.port}/{.protocol}{"\n"}{end}' | fzf --height 20 --ansi --reverse -1 -q "${3:-}")"
+          KUBE_PORT="$(kubectl -n "${parts[0]}" get services "${parts[1]}" -o=jsonpath='{range .spec.ports[]}{.port}/{.protocol}{"\n"}{end}' | fzf --height 20 --ansi --reverse -1 -q "${3:-}")"
 
           if [[ -n ${KUBE_PORT} ]]; then
             IFS='/' read -r -a ports <<<"${KUBE_PORT}"
