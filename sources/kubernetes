@@ -32,6 +32,7 @@ if command -v kubectl >/dev/null 2>&1; then
       get_kube_log() {
         cat \
           <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/deployment/{.name}{"\n"}{end}') \
+          <(kubectl get daemonsets --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/daemonset/{.name}{"\n"}{end}') \
           <(kubectl get jobs --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/job/{.name}{"\n"}{end}') |
           fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
