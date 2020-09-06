@@ -84,13 +84,19 @@ if command -v kubectl >/dev/null 2>&1; then
         kubectl get pods -A -w
         ;;
 
+      "ns")
+        local KUBE_NAMESPACE
+        KUBE_NAMESPACE="$(kubectl get namespaces -o=jsonpath='{range .items[*].metadata}{.name}{"\n"}{end}' | fzf --height 20 --ansi --reverse -1 -q "${2:-}")"
+        kubectl config set-context --current --namespace="${KUBE_NAMESPACE}"
+        ;;
+
       *)
         kubectl config get-contexts -o name | fzf --height 20 --ansi --reverse -1 -q "${1:-}" | xargs kubectl config use-context
         ;;
       esac
     }
 
-    [[ -n ${BASH} ]] && complete -W "restart logs forward watch" -o default -o bashdefault kube
+    [[ -n ${BASH} ]] && complete -W "restart logs forward watch ns" -o default -o bashdefault kube
   fi
 
 fi
