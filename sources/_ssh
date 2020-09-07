@@ -2,6 +2,6 @@
 
 if [[ -f ${SSH_ENV:-} ]]; then
   source "${SSH_ENV}"
-else
+elif [[ $(type -t ssh_agent_init) == "function" ]]; then
   ssh_agent_init
 fi
