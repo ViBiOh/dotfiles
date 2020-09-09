@@ -23,22 +23,22 @@ if command -v kubectl >/dev/null 2>&1; then
 
       get_kube_restart() {
         cat \
-          <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/deployment/{.name}{"\n"}{end}') \
-          <(kubectl get daemonsets --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/daemonset/{.name}{"\n"}{end}') \
-          <(kubectl get statefulsets --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/statefulset/{.name}{"\n"}{end}') |
+          <(kubectl get deployments --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
+          <(kubectl get daemonsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
+          <(kubectl get statefulsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/statefulset/" + .name') |
           fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
 
       get_kube_log() {
         cat \
-          <(kubectl get deployments --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/deployment/{.name}{"\n"}{end}') \
-          <(kubectl get daemonsets --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/daemonset/{.name}{"\n"}{end}') \
-          <(kubectl get jobs --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/job/{.name}{"\n"}{end}') |
+          <(kubectl get deployments --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
+          <(kubectl get daemonsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
+          <(kubectl get jobs --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/job/" + .name') |
           fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
 
       get_kube_service() {
-        kubectl get services --all-namespaces -o=jsonpath='{range .items[*].metadata}{.namespace}/{.name}{"\n"}{end}' | fzf --height 20 --ansi --reverse -1 -q "${1:-}"
+        kubectl get services --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/" + .name' | fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
 
       case ${1:-} in
@@ -53,7 +53,7 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(get_kube_log "${2:-}")"
         if [[ -n ${parts[0]} ]]; then
           local PODS_LABELS
-          PODS_LABELS="$(kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o json | jq --raw-output '.spec.selector.matchLabels | to_entries[] | .key + "=" + .value' | paste -sd, -)"
+          PODS_LABELS="$(kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o json | jq -r '.spec.selector.matchLabels | to_entries[] | .key + "=" + .value' | paste -sd, -)"
 
           local POD
           POD=$(kubectl -n "${parts[0]}" get pods -l "${PODS_LABELS}" -o name | fzf --height 20 --ansi --reverse -1 -q "${3:-}")
@@ -70,7 +70,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
         if [[ -n ${parts[0]} ]]; then
           local KUBE_PORT
-          KUBE_PORT="$(kubectl -n "${parts[0]}" get services "${parts[1]}" -o=jsonpath='{range .spec.ports[]}{.port}/{.protocol}{"\n"}{end}' | fzf --height 20 --ansi --reverse -1 -q "${3:-}")"
+          KUBE_PORT="$(kubectl -n "${parts[0]}" get services "${parts[1]}" -o=json | jq -r '.spec.ports[] | (.port|tostring) + "/" + .protocol' | fzf --height 20 --ansi --reverse -1 -q "${3:-}")"
 
           if [[ -n ${KUBE_PORT} ]]; then
             IFS='/' read -r -a ports <<<"${KUBE_PORT}"
@@ -86,7 +86,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
       "ns")
         local KUBE_NAMESPACE
-        KUBE_NAMESPACE="$(kubectl get namespaces -o=jsonpath='{range .items[*].metadata}{.name}{"\n"}{end}' | fzf --height 20 --ansi --reverse -1 -q "${2:-}")"
+        KUBE_NAMESPACE="$(kubectl get namespaces -o=json | jq -r '.items[].metadata.name' | fzf --height 20 --ansi --reverse -1 -q "${2:-}")"
         kubectl config set-context --current --namespace="${KUBE_NAMESPACE}"
         ;;
 
