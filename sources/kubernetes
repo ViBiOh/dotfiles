@@ -37,6 +37,15 @@ if command -v kubectl >/dev/null 2>&1; then
           fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
 
+      get_kube_info() {
+        cat \
+          <(kubectl get deployments --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
+          <(kubectl get daemonsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
+          <(kubectl get jobs --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/job/" + .name') \
+          <(kubectl get pods --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/pods/" + .name') |
+          fzf --height 20 --ansi --reverse -1 -q "${1:-}"
+      }
+
       get_kube_service() {
         kubectl get services --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/" + .name' | fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
@@ -77,6 +86,14 @@ if command -v kubectl >/dev/null 2>&1; then
             printf "%bForwarding %s from 4000 to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}" "${ports[0]}" "${RESET}"
             kubectl -n "${parts[0]}" port-forward "services/${parts[1]}" "4000:${ports[0]}"
           fi
+        fi
+        ;;
+
+      "info")
+        IFS='/' read -r -a parts <<<"$(get_kube_info "${2:-}")"
+
+        if [[ -n ${parts[0]} ]]; then
+          kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o yaml
         fi
         ;;
 
