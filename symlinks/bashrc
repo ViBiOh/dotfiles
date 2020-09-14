@@ -30,7 +30,7 @@ source_all() {
   local LANG="C"
 
   if [[ -e "${DOTFILES_PATH}/../scripts/meta" ]]; then
-    source "${DOTFILES_PATH}/../scripts/meta" && meta_init "var" "git" "github" "version" "ssh"
+    source "${DOTFILES_PATH}/../scripts/meta" && meta_init "var" "git" "github" "version" "ssh" "tmux"
     var_color
   fi
 

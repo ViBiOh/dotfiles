@@ -64,13 +64,14 @@ if command -v kubectl >/dev/null 2>&1; then
           local PODS_LABELS
           PODS_LABELS="$(kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o json | jq -r '.spec.selector.matchLabels | to_entries[] | .key + "=" + .value' | paste -sd, -)"
 
-          local POD
-          POD=$(kubectl -n "${parts[0]}" get pods -l "${PODS_LABELS}" -o name | fzf --height 20 --ansi --reverse -1 -q "${3:-}")
-
-          if [[ -n ${POD} ]]; then
-            printf "%bTailing log for %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}/${POD}" "${RESET}"
-            kubectl -n "${parts[0]}" logs --all-containers=true "${POD}" -f
-          fi
+          local PODS
+          PODS=$(kubectl -n "${parts[0]}" get pods -l "${PODS_LABELS}" -o name)
+          for POD in ${PODS}; do
+            SCRIPT_DIR="${PWD}" tmux_split_cmd "
+              printf \"%bTailing log for %s%b\n\" \"${BLUE}\" \"${parts[0]}/${parts[1]}/${parts[2]}/${POD}\" \"${RESET}\"
+              kubectl -n \"${parts[0]}\" logs --all-containers=true \"${POD}\" -f
+            "
+          done
         fi
         ;;
 
