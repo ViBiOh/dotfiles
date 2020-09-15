@@ -33,6 +33,7 @@ if command -v kubectl >/dev/null 2>&1; then
         cat \
           <(kubectl get deployments --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
           <(kubectl get daemonsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
+          <(kubectl get statefulsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/statefulset/" + .name') \
           <(kubectl get jobs --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/job/" + .name') |
           fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
@@ -45,10 +46,12 @@ if command -v kubectl >/dev/null 2>&1; then
         cat \
           <(kubectl get deployments --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
           <(kubectl get daemonsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
+          <(kubectl get statefulsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/statefulsets/" + .name') \
+          <(kubectl get cronjobs --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/cronjob/" + .name') \
           <(kubectl get jobs --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/job/" + .name') \
-          <(kubectl get pods --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/pods/" + .name') \
-          <(kubectl get configmaps --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/configmaps/" + .name') \
-          <(kubectl get secrets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/secrets/" + .name') |
+          <(kubectl get pods --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/pod/" + .name') \
+          <(kubectl get configmaps --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/configmap/" + .name') \
+          <(kubectl get secrets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/secret/" + .name') |
           fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
 
@@ -58,18 +61,18 @@ if command -v kubectl >/dev/null 2>&1; then
       case ${ACTION} in
       "restart")
         IFS='/' read -r -a parts <<<"$(get_kube_restart "${*}")"
-        if [[ -n ${parts[0]} ]]; then
+        if [[ -n ${parts[0]:-} ]]; then
           kubectl -n "${parts[0]}" rollout restart "${parts[1]}" "${parts[2]}"
         fi
         ;;
 
       "log" | "logs")
         IFS='/' read -r -a parts <<<"$(get_kube_log "${*}")"
-        if [[ -n ${parts[0]} ]]; then
+        if [[ -n ${parts[0]:-} ]]; then
           local PODS_LABELS
           PODS_LABELS="$(kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o json | jq -r '.spec.selector.matchLabels | to_entries[] | .key + "=" + .value' | paste -sd, -)"
 
-          printf "%bTailing log for %s where labels are %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}" "${PODS_LABELS}" "${RESET}"
+          printf "%bTailing log for %s where labels are %b%s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
           kubectl -n "${parts[0]}" logs --ignore-errors --prefix --max-log-requests=12 --all-containers=true --selector "${PODS_LABELS}" -f
         fi
         ;;
@@ -77,11 +80,11 @@ if command -v kubectl >/dev/null 2>&1; then
       "forward")
         IFS='/' read -r -a parts <<<"$(get_kube_service "${*}")"
 
-        if [[ -n ${parts[0]} ]]; then
+        if [[ -n ${parts[0]:-} ]]; then
           local KUBE_PORT
           KUBE_PORT="$(kubectl -n "${parts[0]}" get services "${parts[1]}" -o=json | jq -r '.spec.ports[] | (.port|tostring) + "/" + .protocol' | fzf --height 20 --ansi --reverse -1 -q "${2:-}")"
 
-          if [[ -n ${KUBE_PORT} ]]; then
+          if [[ -n ${KUBE_PORT:-} ]]; then
             IFS='/' read -r -a ports <<<"${KUBE_PORT}"
             printf "%bForwarding %s from 4000 to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}" "${ports[0]}" "${RESET}"
             kubectl -n "${parts[0]}" port-forward "services/${parts[1]}" "4000:${ports[0]}"
@@ -92,7 +95,7 @@ if command -v kubectl >/dev/null 2>&1; then
       "info")
         IFS='/' read -r -a parts <<<"$(get_kube_info "${*}")"
 
-        if [[ -n ${parts[0]} ]]; then
+        if [[ -n ${parts[0]:-} ]]; then
           kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o yaml
         fi
         ;;
