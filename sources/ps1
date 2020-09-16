@@ -1,21 +1,11 @@
 #!/usr/bin/env bash
 
-PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
-
 export GIT_PS1_SHOWDIRTYSTATE="true"
 export GIT_PS1_STATESEPARATOR="|"
 export GIT_PS1_SHOWSTASHSTATE="true"
 export GIT_PS1_SHOWUNTRACKEDFILES="true"
 
 export PROMPT_DIRTRIM="3"
-
-if command -v git >/dev/null 2>&1 && [[ "$(type -t __git_ps1)" == "function" ]]; then
-  PS1+="${YELLOW}\$(__git_ps1)${RESET}"
-fi
-
-if command -v kubectl >/dev/null 2>&1 && [[ "$(type -t __kube_ps1)" == "function" ]]; then
-  PS1+="${BLUE}\$(__kube_ps1)${RESET}"
-fi
 
 _previous_status() {
   if [[ ${?} -eq 0 ]]; then
@@ -25,6 +15,16 @@ _previous_status() {
   fi
 }
 
-PS1+=" \$(_previous_status)\n\$(date +'%H:%M')> "
+# Adding time padded to the right, from https://superuser.com/a/1203400
+PS1="\[\e[s\e[${COLUMNS:-$(tput cols)}C\e[5D\A\e[u\]"
 
-export PS1
+PS1+="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
+if command -v git >/dev/null 2>&1 && [[ "$(type -t __git_ps1)" == "function" ]]; then
+  PS1+="${YELLOW}\$(__git_ps1)${RESET}"
+fi
+
+if command -v kubectl >/dev/null 2>&1 && [[ "$(type -t __kube_ps1)" == "function" ]]; then
+  PS1+="${BLUE}\$(__kube_ps1)${RESET}"
+fi
+
+PS1+=" \$(_previous_status)\n> "
