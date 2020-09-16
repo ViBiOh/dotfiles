@@ -15,16 +15,20 @@ _previous_status() {
   fi
 }
 
-# Adding time padded to the right, from https://superuser.com/a/1203400
-PS1="\[\e[s\e[${COLUMNS:-$(tput cols)}C\e[5D\A\e[u\]"
-
-PS1+="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
+PS1_TEMPLATE+="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
 if command -v git >/dev/null 2>&1 && [[ "$(type -t __git_ps1)" == "function" ]]; then
-  PS1+="${YELLOW}\$(__git_ps1)${RESET}"
+  PS1_TEMPLATE+="${YELLOW}\$(__git_ps1)${RESET}"
 fi
 
 if command -v kubectl >/dev/null 2>&1 && [[ "$(type -t __kube_ps1)" == "function" ]]; then
-  PS1+="${BLUE}\$(__kube_ps1)${RESET}"
+  PS1_TEMPLATE+="${BLUE}\$(__kube_ps1)${RESET}"
 fi
 
-PS1+=" \$(_previous_status)\n> "
+PS1_TEMPLATE+=" \$(_previous_status)\n> "
+
+_prompt_command() {
+  # Adding time padded to the right, from https://superuser.com/a/1203400
+  PS1="\[\e[s\e[${COLUMNS:-$(tput cols)}C\e[5D\A\e[u\]${PS1_TEMPLATE}"
+}
+
+export PROMPT_COMMAND='_prompt_command'
