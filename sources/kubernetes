@@ -119,4 +119,12 @@ if command -v kubectl >/dev/null 2>&1; then
     [[ -n ${BASH} ]] && complete -W "restart logs forward watch ns" -o default -o bashdefault kube
   fi
 
+  if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1; then
+    helm_delta() {
+      helm status "${1:-}" -o yaml | sed '1,/^manifest: |$/d' | grep '^  ' | sed 's|^  ||' | grep -v '^$' >"/tmp/${1}_helm.yaml"
+      helm upgrade --debug --dry-run ${*} | sed '1,/^MANIFEST:$/d' | grep -v '^$' >"/tmp/${1}_new.yaml"
+      delta "/tmp/${1}_helm.yaml" "/tmp/${1}_new.yaml"
+      rm "/tmp/${1}_helm.yaml" "/tmp/${1}_new.yaml"
+    }
+  fi
 fi
