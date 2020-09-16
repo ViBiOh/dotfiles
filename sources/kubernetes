@@ -50,6 +50,7 @@ if command -v kubectl >/dev/null 2>&1; then
           <(kubectl get cronjobs --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/cronjob/" + .name') \
           <(kubectl get jobs --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/job/" + .name') \
           <(kubectl get pods --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/pod/" + .name') \
+          <(kubectl get services --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/service/" + .name') \
           <(kubectl get configmaps --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/configmap/" + .name') \
           <(kubectl get secrets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/secret/" + .name') |
           fzf --height 20 --ansi --reverse -1 -q "${1:-}"
