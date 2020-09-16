@@ -12,6 +12,7 @@
 [diff]
 	mnemonicPrefix = true
 	renames = true
+	colorMoved = default
 
 [pull]
 	rebase = merges
@@ -69,3 +70,6 @@
 	cmd = smerge mergetool \"$BASE\" \"$LOCAL\" \"$REMOTE\" -o \"$MERGED\"
 	trustExitCode = true
 	keepBackup = false
+
+[delta]
+	features = side-by-side
