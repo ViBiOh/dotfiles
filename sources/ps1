@@ -7,15 +7,15 @@ export GIT_PS1_STATESEPARATOR="|"
 export GIT_PS1_SHOWSTASHSTATE="true"
 export GIT_PS1_SHOWUNTRACKEDFILES="true"
 
+export PROMPT_DIRTRIM="3"
+
 if command -v git >/dev/null 2>&1 && [[ "$(type -t __git_ps1)" == "function" ]]; then
-  PS1="${PS1}${YELLOW}\$(__git_ps1)${RESET}"
+  PS1+="${YELLOW}\$(__git_ps1)${RESET}"
 fi
 
 if command -v kubectl >/dev/null 2>&1 && [[ "$(type -t __kube_ps1)" == "function" ]]; then
-  PS1="${PS1}${BLUE}\$(__kube_ps1)${RESET}"
+  PS1+="${BLUE}\$(__kube_ps1)${RESET}"
 fi
-
-PROMPT_DIRTRIM="3"
 
 _previous_status() {
   if [[ ${?} -eq 0 ]]; then
@@ -25,4 +25,6 @@ _previous_status() {
   fi
 }
 
-export PS1="${PS1} \$(_previous_status)\n> "
+PS1+=" \$(_previous_status)\n\$(date +'%H:%M')> "
+
+export PS1
