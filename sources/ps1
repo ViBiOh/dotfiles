@@ -4,6 +4,7 @@ export GIT_PS1_SHOWDIRTYSTATE="true"
 export GIT_PS1_STATESEPARATOR="|"
 export GIT_PS1_SHOWSTASHSTATE="true"
 export GIT_PS1_SHOWUNTRACKEDFILES="true"
+export GIT_PS1_COMPRESSSPARSESTATE="true"
 
 export PROMPT_DIRTRIM="3"
 
@@ -15,7 +16,7 @@ _previous_status() {
   fi
 }
 
-PS1_TEMPLATE+="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
+PS1_TEMPLATE="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
 if command -v git >/dev/null 2>&1 && [[ "$(type -t __git_ps1)" == "function" ]]; then
   PS1_TEMPLATE+="${YELLOW}\$(__git_ps1)${RESET}"
 fi
