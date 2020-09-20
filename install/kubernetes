@@ -17,6 +17,10 @@ install() {
     ARCH="arm"
   fi
 
+  if [[ -e "${HOME}/.kube/config" ]]; then
+    chmod 0600 "${HOME}/.kube/config"
+  fi
+
   local KUBERNETES_VERSION
   KUBERNETES_VERSION="$(curl -q -sSL --max-time 30 "https://storage.googleapis.com/kubernetes-release/release/stable.txt")"
   curl -q -sSL --max-time 300 -o "${HOME}/opt/bin/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl"
