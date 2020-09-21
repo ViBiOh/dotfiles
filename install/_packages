@@ -24,7 +24,6 @@ END_OF_BASH_PROFILE
       source "${SCRIPT_DIR}/../sources/_homebrew"
     fi
 
-    brew cask list
     brew update
     brew upgrade
     brew install "${PACKAGES[@]}" fswatch

@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   if command -v brew >/dev/null 2>&1; then
-    brew reinstall sublime-text sublime-merge
+    brew cask install sublime-text sublime-merge
 
     ln -f -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" "${HOME}/opt/bin/subl"
   fi
