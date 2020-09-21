@@ -38,13 +38,13 @@
 [alias]
 	last-tag = ! git describe --tag 2> /dev/null | awk -F "-" '{print $1}'
 	remote-repository = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@.*:(.*).git$ ]] && printf '%s' \"${BASH_REMATCH[1]}\"
-	pr = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@(.*):(.*)$ ]] && open \"https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]%.git}/compare/master...$(git current-branch)?expand=1\"
+	pr = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@(.*):(.*)$ ]] && open \"https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]%.git}/compare/${GIT_DEFAULT_BRANCH:-master}...$(git current-branch)?expand=1\"
 	fco = "! git checkout \"$(git branch -vv --all | fzf --height 20 --ansi -1 --reverse -q \"remotes/${1:-}\" | awk '{print $1}' | sed 's|^remotes/origin/||')\" #"
-	fixup = ! git commit --fixup $(git log-pretty master..$(git current-branch) --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{print $1}')
+	fixup = ! git commit --fixup $(git log-pretty "${GIT_DEFAULT_BRANCH:-master}..$(git current-branch)" --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{print $1}')
 	cc = ! git log --format=format: --name-only | grep -E -v '^$' | sort | uniq -c | sort -rg | head -10
 	copr = !sh -c 'git fetch origin "pull/${1}/head:pr/${1}" && git checkout "pr/${1}"' -
-	rbm = pull --rebase origin master
-	tidy = rebase -i origin/master
+	rbm = pull --rebase origin "${GIT_DEFAULT_BRANCH:-master}"
+	tidy = rebase -i "origin/${GIT_DEFAULT_BRANCH:-master}"
 	commend = commit --amend --no-edit
 	pushu = push -u
 	pushf = push --force-with-lease
@@ -54,6 +54,7 @@
 	s = status -sb
 	unstage = reset HEAD --
 	current-branch = rev-parse --abbrev-ref HEAD
+	default-branch = ! git remote show origin | grep 'HEAD branch:' | awk '{print $3}'
 	log-pretty = log --color --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 	lg = log-pretty --graph
 	changelog = ! git log --no-merges --pretty=format:'%Cred%h%Creset %s' "${2:-HEAD}...${1:-$(git last-tag)}"
