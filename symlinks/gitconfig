@@ -43,8 +43,8 @@
 	fixup = ! git commit --fixup $(git log-pretty "${GIT_DEFAULT_BRANCH:-master}..$(git current-branch)" --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{print $1}')
 	cc = ! git log --format=format: --name-only | grep -E -v '^$' | sort | uniq -c | sort -rg | head -10
 	copr = !sh -c 'git fetch origin "pull/${1}/head:pr/${1}" && git checkout "pr/${1}"' -
-	rbm = pull --rebase origin "${GIT_DEFAULT_BRANCH:-master}"
-	tidy = rebase -i "origin/${GIT_DEFAULT_BRANCH:-master}"
+	rbm = ! git pull --rebase origin "${GIT_DEFAULT_BRANCH:-master}"
+	tidy = ! git rebase -i "origin/${GIT_DEFAULT_BRANCH:-master}"
 	commend = commit --amend --no-edit
 	pushu = push -u
 	pushf = push --force-with-lease
