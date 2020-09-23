@@ -101,6 +101,14 @@ if command -v kubectl >/dev/null 2>&1; then
         fi
         ;;
 
+      "version")
+        IFS='/' read -r -a parts <<<"$(get_kube_restart "${1:-}")"
+
+        if [[ -n ${parts[0]:-} ]]; then
+          kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o json | jq -r '.spec.template.spec.containers[].image'
+        fi
+        ;;
+
       "watch")
         kubectl get pods -A -w
         ;;
