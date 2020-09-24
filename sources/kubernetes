@@ -101,8 +101,8 @@ if command -v kubectl >/dev/null 2>&1; then
         fi
         ;;
 
-      "version")
-        IFS='/' read -r -a parts <<<"$(get_kube_restart "${1:-}")"
+      "image")
+        IFS='/' read -r -a parts <<<"$(get_kube_restart "${*}")"
 
         if [[ -n ${parts[0]:-} ]]; then
           kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o json | jq -r '.spec.template.spec.containers[].image'
@@ -125,7 +125,7 @@ if command -v kubectl >/dev/null 2>&1; then
       esac
     }
 
-    [[ -n ${BASH} ]] && complete -W "restart logs forward watch ns" -o default -o bashdefault kube
+    [[ -n ${BASH} ]] && complete -W "restart logs forward info image watch ns" -o default -o bashdefault kube
   fi
 
   if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1; then
