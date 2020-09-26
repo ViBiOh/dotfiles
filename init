@@ -12,23 +12,24 @@ print_title() {
 }
 
 usage() {
-    printf "Usage of %s\n" "${0}"
-    printf "symlinks\n"
-    printf "\t Create symlink of dotfiles into \${HOME}\n"
-    printf "clean\n"
-    printf "\t Clean installation and temporary files\n"
-    printf "install\n"
-    printf "\t Install required softwares\n"
-    printf "credentials\n"
-    printf "\t Extract credentials into dotfiles in \${HOME}\n"
-    printf "[blank]\n"
-    printf "\t Run all stages\n"
-    printf "help\n"
-    printf "\t Print this help\n"
+  printf "Usage of %s\n" "${0}"
+  printf "symlinks\n"
+  printf "\t Create symlink of dotfiles into \${HOME}\n"
+  printf "clean\n"
+  printf "\t Clean installation and temporary files\n"
+  printf "install\n"
+  printf "\t Install required softwares\n"
+  printf "credentials\n"
+  printf "\t Extract credentials into dotfiles in \${HOME}\n"
+  printf "[blank]\n"
+  printf "\t Run all stages\n"
+  printf "help\n"
+  printf "\t Print this help\n"
 }
 
 create_symlinks() {
   shopt -s nullglob
+
   for file in "${CURRENT_DIR}/symlinks"/*; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
@@ -39,6 +40,7 @@ create_symlinks() {
 
     [[ -r ${file} ]] && [[ -e ${file} ]] && rm -f "${HOME}/.${BASENAME_FILE}" && ln -s "${file}" "${HOME}/.${BASENAME_FILE}"
   done
+
   shopt -u nullglob
 }
 
@@ -47,6 +49,7 @@ browse_install() {
   local LANG="C"
 
   shopt -s nullglob
+
   for file in "${CURRENT_DIR}/install"/*; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file%.*}")"
@@ -78,6 +81,7 @@ browse_install() {
       done
     fi
   done
+
   shopt -u nullglob
 }
 

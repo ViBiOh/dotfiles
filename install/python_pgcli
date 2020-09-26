@@ -28,7 +28,7 @@ install() {
   source "${SCRIPT_DIR}/../sources/_python"
 
   if ! command -v pip >/dev/null 2>&1; then
-    printf "pip is required\n"
+    var_error "pip is required"
     exit
   fi
 
