@@ -26,15 +26,22 @@ source_all() {
   local DOTFILES_PATH
   DOTFILES_PATH="$(dirname "${BASHRC_PATH}")"
 
+  local LC_ALL="C"
+  local LANG="C"
+
   if [[ -e "${DOTFILES_PATH}/../scripts/meta" ]]; then
     source "${DOTFILES_PATH}/../scripts/meta" && meta_init "var" "git" "github" "version" "ssh"
     var_color
     ssh_init
   fi
 
-  while IFS= read -r -d $'\n' file; do
+  shopt -s nullglob
+
+  for file in "${DOTFILES_PATH}/../sources/"*; do
     [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
-  done < <(find "${DOTFILES_PATH}/../sources" -type f ! -name '.*' -print | sort)
+  done
+
+  shopt -u nullglob
 }
 
 set_locale
