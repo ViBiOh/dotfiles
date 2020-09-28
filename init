@@ -52,7 +52,7 @@ browse_install() {
 
   for file in "${CURRENT_DIR}/install"/*; do
     local BASENAME_FILE
-    BASENAME_FILE="$(basename "${file%.*}")"
+    BASENAME_FILE="$(basename "${file}")"
 
     if [[ -n ${FILE_LIMIT} ]] && [[ ${BASENAME_FILE} != "${FILE_LIMIT}" ]]; then
       continue
