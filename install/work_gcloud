@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+clean() {
+  rm -rf "${HOME}/.gsutil"
+  rm -rf "${HOME}/.config/gcloud"
+}
+
+install() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local GCLOUD_VERSION="347.0.0"
+
+  local GCLOUD_ARCHIVE
+  GCLOUD_ARCHIVE="google-cloud-sdk-${GCLOUD_VERSION}-$(normalized_os)-$(normalized_arch).tar.gz"
+
+  curl --disable --silent --show-error --location --max-time 300 -O "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${GCLOUD_ARCHIVE}"
+  rm -rf "${HOME}/opt/google-cloud-sdk"
+  tar -C "${HOME}/opt" -xzf "${GCLOUD_ARCHIVE}"
+  rm -rf "${GCLOUD_ARCHIVE}"
+
+  source "${SCRIPT_DIR}/../sources/gcloud"
+
+  if command -v gcloud >/dev/null 2>&1; then
+    gcloud components update --quiet
+  fi
+}

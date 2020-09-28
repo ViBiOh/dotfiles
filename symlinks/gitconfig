@@ -12,6 +12,9 @@
 [includeIf "gitdir:~/"]
 	path = ~/.gitconfig_secrets
 
+[includeIf "gitdir:~/blablacar/"]
+	path = ~/.gitconfig_work
+
 [core]
 	editor = vi
 	autocrlf = input

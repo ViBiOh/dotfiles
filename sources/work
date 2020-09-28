@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+if ! command -v realpath >/dev/null 2>&1 && command -v python >/dev/null 2>&1; then
+  realpath() {
+    python -c 'import sys; import os.path; print(os.path.realpath(sys.argv[1]))' "${1:-}"
+  }
+fi
+
+export FLUX_FORWARD_NAMESPACE="flux"
+
+bbc_install() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  local BBC_CLI_NAME
+  BBC_CLI_NAME="bbc-$(normalized_os)-$(normalized_arch "amd64" "arm")"
+  local BBC_CLI_ARCHIVE="${BBC_CLI_NAME}.tar.gz"
+
+  (
+    cd "${HOME}/Downloads" || false
+    gsutil cp "gs://bbc.blbl.cr/${BBC_CLI_ARCHIVE}" .
+    tar -xzf "${BBC_CLI_ARCHIVE}"
+    mv "${BBC_CLI_NAME}/bbc" "${HOME}/opt/bin/"
+    rm -rf "${BBC_CLI_NAME}" "${BBC_CLI_ARCHIVE}"
+  )
+
+  if command -v bbc >/dev/null 2>&1; then
+    bbc completion --bash >"${SCRIPT_DIR}/bbc-completion"
+  fi
+}
+
+blabla_credentials() {
+  export GITHUB_TOKEN="${GITHUB_BLABLA_TOKEN}"
+}
+
+op_auth() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  local PASSWORD_DOMAIN
+  PASSWORD_DOMAIN="$(passget bbc/1password domain)"
+
+  local PASSWORD_NAME="${PASSWORD_DOMAIN%.1password.com}"
+
+  op completion bash >"${SCRIPT_DIR}/op-completion"
+  export "OP_SESSION_${PASSWORD_NAME}=$(op signin "${PASSWORD_DOMAIN}" "$(passget bbc/1password login)" "$(passget bbc/1password secret_key)" --raw)"
+}
+
+yc_auth() {
+  yc init --federation-id="${YANDEX_FEDERATION_ID}" --federation-endpoint=console.cloud.yandex.com
+  tsh login --proxy="${TELEPORT_YANDEX_PROXY}"
+}

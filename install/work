@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+clean() {
+  rm -rf "${HOME}/.config/bbc"
+  rm -rf "${HOME}/.config/yandex-cloud"
+}
+
+install() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  local OS
+  OS="$(normalized_os)"
+
+  local ARCH
+  ARCH="$(normalized_arch "amd64" "arm")"
+
+  local FLUX_VERSION="1.21.0"
+  curl_to_binary "https://github.com/fluxcd/flux/releases/download/${FLUX_VERSION}/fluxctl_${OS}_${ARCH}" "fluxctl"
+  fluxctl completion bash >"${SCRIPT_DIR}/../sources/fluxctl-completion"
+
+  local YANDEX_STORAGE_URL="https://storage.yandexcloud.net/yandexcloud-yc"
+  local YANDEX_CLOUD_CLI_VERSION
+  YANDEX_CLOUD_CLI_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "${YANDEX_STORAGE_URL}/release/stable")"
+
+  curl_to_binary "${YANDEX_STORAGE_URL}/release/${YANDEX_CLOUD_CLI_VERSION}/${OS}/${ARCH}/yc" "yc"
+  yc completion bash >"${SCRIPT_DIR}/../sources/yc-completion"
+}

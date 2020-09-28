@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+if [[ -f "${HOME}/opt/google-cloud-sdk/path.bash.inc" ]]; then
+  source "${HOME}/opt/google-cloud-sdk/path.bash.inc"
+fi
+
+if ! command -v gcloud >/dev/null 2>&1; then
+  return
+fi
+
+if [[ -f "${HOME}/opt/google-cloud-sdk/completion.bash.inc" ]]; then
+  source "${HOME}/opt/google-cloud-sdk/completion.bash.inc"
+fi
+
+gcloud_auth() {
+  gcloud auth login --update-adc
+  gcloud config unset compute/region
+  gcloud config set project "$(gcloud projects list | grep 'infra-sandbox' | awk '{print $1}')"
+
+  if command -v docker >/dev/null 2>&1; then
+    gcloud --quiet auth configure-docker "eu.gcr.io"
+  fi
+}
+
+gcloud_import_cluster() {
+  local PROJECT
+  PROJECT="$(gcloud projects list | fzf --height=20 --ansi --reverse -1 --query="${1:-}" | awk '{print $1}')"
+
+  IFS='/' read -r -a CLUSTER <<<"$(gcloud container clusters list --project "${PROJECT}" --format json | jq -r '.[] | .zone + "/" + .name' | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
+
+  var_warning "gcloud container clusters get-credentials --project '${PROJECT}' --zone '${CLUSTER[0]}' '${CLUSTER[1]}'"
+  gcloud container clusters get-credentials --project "${PROJECT}" --zone "${CLUSTER[0]}" "${CLUSTER[1]}"
+}
