@@ -28,9 +28,7 @@ usage() {
 }
 
 create_symlinks() {
-  shopt -s nullglob
-
-  for file in "${CURRENT_DIR}/symlinks"/*; do
+  while IFS= read -r -d '' file; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
 
@@ -39,18 +37,11 @@ create_symlinks() {
     fi
 
     [[ -r ${file} ]] && [[ -e ${file} ]] && rm -f "${HOME}/.${BASENAME_FILE}" && ln -s "${file}" "${HOME}/.${BASENAME_FILE}"
-  done
-
-  shopt -u nullglob
+  done < <(find "${CURRENT_DIR}/symlinks" -type f -print0)
 }
 
 browse_install() {
-  local LC_ALL="C"
-  local LANG="C"
-
-  shopt -s nullglob
-
-  for file in "${CURRENT_DIR}/install"/*; do
+  while IFS= read -r -d $'\n' file; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
 
@@ -80,9 +71,7 @@ browse_install() {
         fi
       done
     fi
-  done
-
-  shopt -u nullglob
+  done < <(find "${CURRENT_DIR}/install" -type f -print | sort)
 }
 
 clean_packages() {
