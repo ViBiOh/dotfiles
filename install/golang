@@ -42,7 +42,7 @@ install() {
   if command -v brew >/dev/null 2>&1; then
     brew install graphviz
   elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install graphviz
+    sudo apt-get install -y -qq --no-install-recommends graphviz
   fi
 
   if command -v go >/dev/null 2>&1; then
