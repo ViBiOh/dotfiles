@@ -1,7 +1,7 @@
 [user]
 	name = Vincent Boutour
 	email = bob@vibioh.fr
-	signingkey = 49265F2EFEC291A90810F6416896D5F3CC06440D
+	signingkey = 6896D5F3CC06440D
 
 [core]
 	editor = vi
