@@ -41,7 +41,12 @@ create_symlinks() {
 }
 
 browse_install() {
-  while IFS= read -r -d $'\n' file; do
+  local LC_ALL="C"
+  local LANG="C"
+
+  shopt -s nullglob
+
+  for file in "${CURRENT_DIR}/install/"*; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
 
@@ -71,7 +76,9 @@ browse_install() {
         fi
       done
     fi
-  done < <(find "${CURRENT_DIR}/install" -type f -print | sort)
+  done
+
+  shopt -u nullglob
 }
 
 clean_packages() {
