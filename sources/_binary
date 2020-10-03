@@ -16,7 +16,7 @@ archive_to_binary() {
     ARCHIVE_FILENAME="${BASH_REMATCH[1]}"
     ARCHIVE_EXTENSION="${BASH_REMATCH[2]}"
   else
-    var_error "download_tar: unable to extract archive filename and extension from ${URL}"
+    var_error "archive_to_binary: unable to extract archive filename and extension from ${URL}"
     return 1
   fi
 
