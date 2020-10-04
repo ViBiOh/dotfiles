@@ -23,8 +23,8 @@ install() {
 
   local KUBERNETES_VERSION
   KUBERNETES_VERSION="$(curl -q -sSL --max-time 30 "https://storage.googleapis.com/kubernetes-release/release/stable.txt")"
-  curl -q -sSL --max-time 300 -o "${HOME}/opt/bin/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl"
-  chmod +x "${HOME}/opt/bin/kubectl"
+
+  curl_to_binary "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl" "kubectl"
   kubectl completion bash >"${SCRIPT_DIR}/../sources/kubectl-completion"
 
   local HELM_VERSION="v3.3.4"

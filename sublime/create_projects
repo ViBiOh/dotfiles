@@ -6,14 +6,14 @@ main() {
   readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   local PROJECT_FOLDER="${SCRIPT_DIR}/projects"
 
-  rm -rf "${PROJECT_FOLDER}"
+  rm -rf "${PROJECT_FOLDER:?}"
   mkdir -p "${PROJECT_FOLDER}"
 
   for project in "${HOME}/code/"*; do
     projectName="$(basename "${project}")"
     fileName="${PROJECT_FOLDER}/${projectName}.sublime-project"
 
-    printf '{\n  "folders": [{\n    "path": "%s"\n  }]\n}\n' "${project}" > "${fileName}"
+    printf '{\n  "folders": [{\n    "path": "%s"\n  }]\n}\n' "${project}" >"${fileName}"
 
     subl --project "${fileName}"
   done

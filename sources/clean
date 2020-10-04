@@ -12,11 +12,11 @@ memory_clean() {
 }
 
 os_clean() {
-  rm -rf "${HOME}/.bash_history"
-  rm -rf "${HOME}/.cache/"
-  rm -rf "${HOME}/.CFUserTextEncoding"
-  rm -rf "${HOME}/.cups/"
-  rm -rf "${HOME}/.local/"
+  rm -rf "${HOME:?}/.bash_history"
+  rm -rf "${HOME:?}/.cache/"
+  rm -rf "${HOME:?}/.CFUserTextEncoding"
+  rm -rf "${HOME:?}/.cups/"
+  rm -rf "${HOME:?}/.local/"
 
   sudo find / \( -name ".DS_Store" -o -name ".localized" \) -exec rm -f {} \; 2>/dev/null
 

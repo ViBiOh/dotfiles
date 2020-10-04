@@ -35,6 +35,20 @@ archive_to_binary() {
     fi
 
     mv "${ARCHIVE_FILENAME}/${BINARY_PATH}" "${BINARY_DESTINATION}"
-    rm -rf "${ARCHIVE_PATH}" "${ARCHIVE_FILENAME}"
+    rm -rf "${ARCHIVE_PATH:?}" "${ARCHIVE_FILENAME:?}"
   )
+}
+
+curl_to_binary() {
+  if [[ ${#} -lt 2 ]]; then
+    var_error "Usage: curl_to_binary [URL] [NAME] [DESTINATION=${HOME}/opt/bin/]"
+    return 1
+  fi
+
+  local BINARY_URL="${1}"
+  local BINARY_NAME="${2}"
+  local BINARY_DESTINATION="${3:-${HOME}/opt/bin/}"
+
+  curl -q -sSL --max-time 300 -o "${BINARY_DESTINATION}/${BINARY_NAME}" "${BINARY_URL}"
+  chmod +x "${BINARY_DESTINATION}/${BINARY_NAME}"
 }
