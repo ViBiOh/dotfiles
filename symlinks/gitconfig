@@ -3,6 +3,9 @@
 	email = bob@vibioh.fr
 	signingkey = 6896D5F3CC06440D
 
+[includeIf "gitdir:~/code/work/"]
+	path = ~/.gitconfig_work
+
 [core]
 	editor = vi
 	autocrlf = input
