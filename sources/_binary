@@ -35,6 +35,7 @@ archive_to_binary() {
     fi
 
     mv "${ARCHIVE_FILENAME}/${BINARY_PATH}" "${BINARY_DESTINATION}"
+    chmod +x "${BINARY_DESTINATION}/$(basename "${BINARY_PATH}")"
     rm -rf "${ARCHIVE_PATH:?}" "${ARCHIVE_FILENAME:?}"
   )
 }
