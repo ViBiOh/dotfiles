@@ -6,17 +6,36 @@ main() {
   readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   local PROJECT_FOLDER="${SCRIPT_DIR}/projects"
 
+  if [[ -e "${SCRIPT_DIR}/../scripts/meta" ]]; then
+    source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var" "git"
+  else
+    printf "scripts' folder not found"
+    return 1
+  fi
+
+  local RELATIVE_DIR="${HOME}/code"
+
   rm -rf "${PROJECT_FOLDER:?}"
   mkdir -p "${PROJECT_FOLDER}"
 
-  for project in "${HOME}/code/"*; do
-    projectName="$(basename "${project}")"
-    fileName="${PROJECT_FOLDER}/${projectName}.sublime-project"
+  while IFS= read -r -d '' dir; do
+    (
+      cd "${dir}" || return
+      if [[ $(git_is_inside) != "true" ]] || [[ $(pwd) != $(git_root) ]]; then
+        return
+      fi
 
-    printf '{\n  "folders": [{\n    "path": "%s"\n  }]\n}\n' "${project}" >"${fileName}"
+      local projectName="${dir##${RELATIVE_DIR}}"
+      projectName="${projectName#/}"
+      projectName="${projectName////_}"
 
-    subl --project "${fileName}"
-  done
+      var_info "Adding ${projectName}"
+
+      fileName="${PROJECT_FOLDER}/${projectName}.sublime-project"
+      jq -c -n --arg path "${dir}" '{folders: [{path: $path}]}' >"${fileName}"
+      subl --project "${fileName}"
+    )
+  done < <(find "${RELATIVE_DIR}" -type d -maxdepth 2 -print0)
 }
 
 main "${@:-}"
