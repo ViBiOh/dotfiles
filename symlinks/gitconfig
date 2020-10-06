@@ -77,3 +77,6 @@
 
 [delta]
 	features = side-by-side
+
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
