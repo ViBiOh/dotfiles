@@ -151,9 +151,9 @@ if command -v kubeseal >/dev/null 2>&1; then
 
     local NAMESPACE=${1}
     shift
-    local VALUE=${1}
-    shift
     local NAME=${1}
+    shift
+    local VALUE=${1}
     shift
 
     printf "%s" "${VALUE}" | kubeseal --raw --from-file=/dev/stdin --namespace "${NAMESPACE}" --name "${NAME}" --scope "namespace-wide" ${*}
