@@ -23,6 +23,7 @@ You can set following environment variables for customizing installation behavio
 #  Server configuration example
 
 export DOTFILES_NO_ALACRITTY="true"
+export DOTFILES_NO_DNSMASQ="true"
 export DOTFILES_NO_FIREFOX="true"
 export DOTFILES_NO_GOLANG="true"
 export DOTFILES_NO_GPG="true"
@@ -37,6 +38,7 @@ export DOTFILES_NO_SIEGE="true"
 export DOTFILES_NO_SUBLIME="true"
 export DOTFILES_NO_SYNCTHING="true"
 export DOTFILES_NO_TERRAFORM="true"
+export DOTFILES_NO_TUNNELBLICK="true"
 ```
 
 ## SSH
