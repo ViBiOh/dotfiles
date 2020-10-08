@@ -1,21 +1,21 @@
 [
-  {
-    "keys": ["super+left"],
-    "command": "jump_back"
-  },
-  {
-    "keys": ["super+right"],
-    "command": "goto_definition"
-  },
-  {
-    "keys": ["super+right"],
-    "command": "lsp_symbol_definition",
-    "context": [
-      {
-        "key": "selector",
-        "operator": "equal",
-        "operand": "(source.go, source.js, source.python)"
-      }
-    ]
-  }
+	{
+		"keys": ["super+left"],
+		"command": "jump_back"
+	},
+	{
+		"keys": ["super+right"],
+		"command": "goto_definition"
+	},
+	{
+		"keys": ["super+right"],
+		"command": "lsp_symbol_definition",
+		"context": [
+			{
+				"key": "selector",
+				"operator": "equal",
+				"operand": "(source.go, source.js, source.python)"
+			}
+		]
+	}
 ]

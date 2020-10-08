@@ -1,13 +1,13 @@
 {
-  "clients": {
-    "gopls": {
-      "enabled": true,
-    },
-    "pyls": {
-      "enabled": true,
-    },
-    "javascript-typescript-langserver": {
-      "enabled": true,
-    },
-  },
+	"clients": {
+		"gopls": {
+			"enabled": true
+		},
+		"pyls": {
+			"enabled": true
+		},
+		"javascript-typescript-langserver": {
+			"enabled": true
+		}
+	}
 }

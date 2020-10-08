@@ -1,7 +1,6 @@
 {
 	"animation_enabled": false,
-	"auto_complete_triggers":
-	[
+	"auto_complete_triggers": [
 		{
 			"characters": "<",
 			"selector": "text.html"
@@ -11,8 +10,7 @@
 			"selector": "source.js,source.jsx,source.go,source.python"
 		}
 	],
-	"binary_file_patterns":
-	[
+	"binary_file_patterns": [
 		"*.jpg",
 		"*.jpeg",
 		"*.png",
@@ -51,10 +49,8 @@
 	"fold_buttons": false,
 	"highlight_line": true,
 	"highlight_modified_tabs": true,
-	"ignored_packages":
-	[
-		"Vintage"
-	],
+	"ignored_packages": ["Vintage"],
+	"index_skip_unknown_extensions": false,
 	"show_encoding": true,
 	"show_full_path": true,
 	"show_line_endings": true,
@@ -62,5 +58,6 @@
 	"theme": "Adaptive.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"tree_animation_enabled": false,
-	"word_wrap": true
+	"word_wrap": true,
+	"color_scheme": "Packages/Color Scheme - Default/Monokai.sublime-color-scheme"
 }

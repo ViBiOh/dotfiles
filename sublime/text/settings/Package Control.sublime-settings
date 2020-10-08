@@ -1,10 +1,8 @@
 {
 	"bootstrapped": true,
-	"in_process_packages":
-	[
+	"in_process_packages": [
 	],
-	"installed_packages":
-	[
+	"installed_packages": [
 		"DocBlockr",
 		"EditorConfig",
 		"LSP",
@@ -16,5 +14,5 @@
 		"SublimeLinter-govet",
 		"SublimeLinter-shellcheck",
 		"Terraform"
-	]
+	],
 }
