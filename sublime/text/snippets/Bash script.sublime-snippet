@@ -1,0 +1,16 @@
+<snippet>
+  <content><![CDATA[
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+main() {
+}
+
+main "${@:-}"
+
+]]></content>
+  <tabTrigger>bms</tabTrigger>
+  <scope>source.shell.bash</scope>
+  <description>Bash Main Script</description>
+</snippet>
