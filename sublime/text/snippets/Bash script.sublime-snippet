@@ -7,7 +7,7 @@ set -o nounset -o pipefail -o errexit
 main() {
 }
 
-main "${@:-}"
+main "\${@:-}"
 
 ]]></content>
   <tabTrigger>bms</tabTrigger>
