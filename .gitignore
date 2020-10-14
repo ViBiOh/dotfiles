@@ -1,1 +1,3 @@
 scripts/
+sources/git-prompt
+sources/*-completion
