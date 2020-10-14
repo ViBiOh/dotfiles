@@ -8,8 +8,14 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[{Makefile,*.go,go.mod,gitconfig*,*.sublime-snippet,sublime/text/settings/*}]
+[{Makefile,*.go,go.mod}]
 indent_style = tab
 
 [*.py]
 indent_size = 4
+
+[{*.sublime-snippet,sublime/text/settings/*}]
+indent_style = tab
+
+[gitconfig*]
+indent_style = tab

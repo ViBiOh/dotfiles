@@ -3,7 +3,7 @@
 	email = bob@vibioh.fr
 	signingkey = 6896D5F3CC06440D
 
-[includeIf "gitdir:~/code/work/"]
+[includeIf "gitdir:~/work/"]
 	path = ~/.gitconfig_work
 
 [core]
