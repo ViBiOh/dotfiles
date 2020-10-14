@@ -32,9 +32,9 @@ source_all() {
     ssh_init
   fi
 
-  while IFS= read -r -d $'\n' file; do
+  for file in "${DOTFILES_PATH}/../sources/"*; do
     [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
-  done < <(find "${DOTFILES_PATH}/../sources" -type f -print | LC_ALL=C sort)
+  done
 }
 
 set_locale
