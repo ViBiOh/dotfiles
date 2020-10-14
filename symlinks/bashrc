@@ -34,7 +34,7 @@ source_all() {
 
   while IFS= read -r -d $'\n' file; do
     [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
-  done < <(LC_ALL=C find "${DOTFILES_PATH}/../sources" -type f -print | sort)
+  done < <(find "${DOTFILES_PATH}/../sources" -type f -print | LC_ALL=C sort)
 }
 
 set_locale

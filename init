@@ -71,7 +71,7 @@ browse_install() {
         fi
       done
     fi
-  done < <(LC_ALL=C find "${CURRENT_DIR}/install" -type f -print | sort)
+  done < <(find "${CURRENT_DIR}/install" -type f -print | LC_ALL=C sort)
 }
 
 clean_packages() {
