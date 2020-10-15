@@ -144,10 +144,10 @@ TODISABLE+=('com.apple.netbiosd'
   'com.apple.screensharing'
   'com.apple.appleseed.fbahelperd'
   'com.apple.apsd'
-  # Needed for .mobileconfig files 'com.apple.ManagedClient.cloudconfigurationd' \
-  # Needed for .mobileconfig files 'com.apple.ManagedClient.enroll' \
-  # Needed for .mobileconfig files 'com.apple.ManagedClient' \
-  # Needed for .mobileconfig files 'com.apple.ManagedClient.startup' \
+  # Needed for .mobileconfig files 'com.apple.ManagedClient.cloudconfigurationd'
+  # Needed for .mobileconfig files 'com.apple.ManagedClient.enroll'
+  # Needed for .mobileconfig files 'com.apple.ManagedClient'
+  # Needed for .mobileconfig files 'com.apple.ManagedClient.startup'
   'com.apple.metadata.mds'
   'com.apple.locate'
   'com.apple.locationd'
@@ -160,4 +160,17 @@ for daemon in "${TODISABLE[@]}"; do
     mv "./System/Library/LaunchDaemons/${daemon}.plist" "./System/Library/LaunchDaemons/${daemon}.plist.bak"
   fi
   printf "[OK] Daemon %s disabled\n" "${daemon}"
+done
+
+# Services to disable
+TODISABLE=()
+
+# AppleSpell
+TODISABLE+=('AppleSpell.service')
+
+for service in "${TODISABLE[@]}"; do
+  if [[ -e "./System/Library/Services/${daemon}/Contents/Resources" ]]; then
+    mv "./System/Library/Services/${daemon}/Contents/Resources" "./System/Library/Services/${daemon}/Contents/Resources.disabled"
+  fi
+  printf "[OK] Service %s disabled\n" "${daemon}"
 done
