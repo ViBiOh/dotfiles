@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-meteo() {
-  curl -q -sSL --max-time 30 -4 "wttr.in/${1:-Paris}?m&format=v2"
-}

@@ -169,8 +169,8 @@ TODISABLE=()
 TODISABLE+=('AppleSpell.service')
 
 for service in "${TODISABLE[@]}"; do
-  if [[ -e "./System/Library/Services/${daemon}/Contents/Resources" ]]; then
-    mv "./System/Library/Services/${daemon}/Contents/Resources" "./System/Library/Services/${daemon}/Contents/Resources.disabled"
+  if [[ -e "./System/Library/Services/${service}/Contents/Resources" ]]; then
+    mv "./System/Library/Services/${service}/Contents/Resources" "./System/Library/Services/${service}/Contents/Resources.disabled"
   fi
-  printf "[OK] Service %s disabled\n" "${daemon}"
+  printf "[OK] Service %s disabled\n" "${service}"
 done

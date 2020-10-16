@@ -3,6 +3,7 @@
 alias dev='cd ${HOME}/code/'
 alias grep='grep --color=auto'
 alias vi='vim'
+alias fuck='sudo $(history -p \!\!)'
 
 export EDITOR='vim'
 export TERM='xterm-256color'
@@ -30,6 +31,10 @@ urlencode() {
 
 random() {
   openssl rand -hex "${1:-30}"
+}
+
+meteo() {
+  curl -q -sSL --max-time 30 -4 "wttr.in/${1:-Paris}?m&format=v2"
 }
 
 if command -v systemctl >/dev/null 2>&1; then
