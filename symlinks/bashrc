@@ -20,19 +20,27 @@ set_locale() {
   return 1
 }
 
-source_all() {
-  local BASHRC_PATH
-  BASHRC_PATH="$(python -c 'import sys; import os.path; print(os.path.realpath(sys.argv[1]))' "${BASH_SOURCE[0]}")"
-  local DOTFILES_PATH
-  DOTFILES_PATH="$(dirname "${BASHRC_PATH}")"
+script_dir() {
+  if [[ -L ${BASH_SOURCE[0]} ]]; then
+    dirname "$(readlink "${BASH_SOURCE[0]}")"
+  else
+    (
+      cd "$(dirname "${BASH_SOURCE[0]}")" && pwd
+    )
+  fi
+}
 
-  if [[ -e "${DOTFILES_PATH}/../scripts/meta" ]]; then
-    source "${DOTFILES_PATH}/../scripts/meta" && meta_init "var" "git" "github" "version" "ssh"
+source_all() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(script_dir)"
+
+  if [[ -e "${SCRIPT_DIR}/../scripts/meta" ]]; then
+    source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var" "git" "github" "version" "ssh"
     var_color
     ssh_init
   fi
 
-  for file in "${DOTFILES_PATH}/../sources/"*; do
+  for file in "${SCRIPT_DIR}/../sources/"*; do
     [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
   done
 }
