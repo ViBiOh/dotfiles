@@ -164,7 +164,7 @@ inoremap <Tab> <C-R>=SuperTab()<CR>
 
 " Using ripgrep for searching
 if executable("rg")
-  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+  set grepprg=rg\ --vimgrep\ --no-heading
   nnoremap <Leader>g :silent lgrep -P<Space>
 endif
 
