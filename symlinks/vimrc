@@ -12,6 +12,9 @@ Plug 'vim-syntastic/syntastic'
 
 call plug#end()
 
+" setting colorscheme to ensure it
+colorscheme default
+
 " Show status line
 set laststatus=2
 
