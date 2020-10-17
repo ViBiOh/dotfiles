@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ -z ${TMUX:-} ]] && [[ -z ${SSH_CLIENT:-} ]]; then
+if [[ $(pgrep -a bash | wc -l) -eq 1 ]]; then
   if [[ $(type -t ssh_agent_stop) == "function" ]]; then
     ssh_agent_stop
   fi
