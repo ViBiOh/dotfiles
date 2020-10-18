@@ -74,6 +74,3 @@
 	cmd = smerge mergetool \"$BASE\" \"$LOCAL\" \"$REMOTE\" -o \"$MERGED\"
 	trustExitCode = true
 	keepBackup = false
-
-[delta]
-	features = side-by-side
