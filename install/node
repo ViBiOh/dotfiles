@@ -7,11 +7,11 @@ clean() {
     npm cache clean --force
   fi
 
-  rm -rf "${HOME:?}/.babel.json"
-  rm -rf "${HOME:?}/.node-gyp"
-  rm -rf "${HOME:?}/.node_repl_history"
-  rm -rf "${HOME:?}/.npm"
-  rm -rf "${HOME:?}/.v8flags."*
+  rm -rf "${HOME}/.babel.json"
+  rm -rf "${HOME}/.node-gyp"
+  rm -rf "${HOME}/.node_repl_history"
+  rm -rf "${HOME}/.npm"
+  rm -rf "${HOME}/.v8flags."*
 }
 
 install() {
@@ -30,10 +30,10 @@ install() {
 
   local NODE_VERSION="latest"
 
-  rm -rf "${HOME:?}/n-install"
+  rm -rf "${HOME}/n-install"
   git clone --depth 1 "https://github.com/tj/n.git" "${HOME}/n-install"
   (cd "${HOME}/n-install" && PREFIX="${HOME}/opt" make install)
-  rm -rf "${HOME:?}/n-install"
+  rm -rf "${HOME}/n-install"
 
   mkdir -p "${HOME}/opt/node"
   source "${SCRIPT_DIR}/../sources/_first"

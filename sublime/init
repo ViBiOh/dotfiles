@@ -6,14 +6,14 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 install_plugin() {
   local PLUGIN_NAME="${1}"
 
-  rm -rf "${TEXT_PKG:?}/${PLUGIN_NAME}"
+  rm -rf "${TEXT_PKG}/${PLUGIN_NAME}"
   ln -s "${SCRIPT_DIR}/plugins/${PLUGIN_NAME}" "${TEXT_PKG}/${PLUGIN_NAME}"
 }
 
 symlink_settings() {
   local USER_SETTINGS="${1}/User"
 
-  rm -rf "${USER_SETTINGS:?}"/*
+  rm -rf "${USER_SETTINGS}"/*
   mkdir -p "${USER_SETTINGS}"
 
   if [[ -d "${SCRIPT_DIR}/${2}/settings/" ]]; then

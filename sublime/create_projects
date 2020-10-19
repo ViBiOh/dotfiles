@@ -15,7 +15,7 @@ main() {
 
   local RELATIVE_DIR="${HOME}/code"
 
-  rm -rf "${PROJECT_FOLDER:?}"
+  rm -rf "${PROJECT_FOLDER}"
   mkdir -p "${PROJECT_FOLDER}"
 
   while IFS= read -r -d '' dir; do

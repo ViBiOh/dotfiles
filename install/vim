@@ -3,8 +3,8 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
-  rm -rf "${HOME:?}/.vim/"
-  rm -rf "${HOME:?}/.viminfo"
+  rm -rf "${HOME}/.vim/"
+  rm -rf "${HOME}/.viminfo"
 }
 
 install() {

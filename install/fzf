@@ -3,8 +3,8 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
-  rm -rf "${HOME:?}/.fzf.bash"
-  rm -rf "${HOME:?}/opt/fzf"
+  rm -rf "${HOME}/.fzf.bash"
+  rm -rf "${HOME}/opt/fzf"
 }
 
 install() {

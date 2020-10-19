@@ -9,8 +9,8 @@ clean() {
     set -e
   fi
 
-  rm -rf "${HOME:?}/.ssh/environment"
-  rm -rf "${HOME:?}/.ssh/known_hosts"
+  rm -rf "${HOME}/.ssh/environment"
+  rm -rf "${HOME}/.ssh/known_hosts"
 }
 
 install() {

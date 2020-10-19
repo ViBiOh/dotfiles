@@ -4,12 +4,12 @@ set -o nounset -o pipefail -o errexit
 
 clean() {
   if [[ -n ${GOPATH:-} ]]; then
-    sudo rm -rf "${GOPATH:?}"
+    sudo rm -rf "${GOPATH}"
     mkdir -p "${GOPATH}"
   fi
 
-  rm -rf "${HOME:?}/opt/go"
-  rm -rf "${HOME:?}/.dlv"
+  rm -rf "${HOME}/opt/go"
+  rm -rf "${HOME}/.dlv"
 }
 
 install() {
@@ -31,7 +31,7 @@ install() {
 
     curl -q -sSL --max-time 300 -O "https://dl.google.com/go/${GO_ARCHIVE}"
     tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
-    rm -rf "${GO_ARCHIVE:?}"
+    rm -rf "${GO_ARCHIVE}"
   fi
 
   local SCRIPT_DIR

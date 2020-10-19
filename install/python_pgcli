@@ -3,8 +3,8 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
-  sudo rm -rf "${HOME:?}/.pgpass"
-  sudo rm -rf "${HOME:?}/.config/pgcli"
+  sudo rm -rf "${HOME}/.pgpass"
+  sudo rm -rf "${HOME}/.config/pgcli"
 }
 
 credentials() {

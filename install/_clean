@@ -3,13 +3,13 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
-  sudo rm -rf "${HOME:?}/.cache"
-  sudo rm -rf "${HOME:?}/.config"
-  sudo rm -rf "${HOME:?}/opt"
+  sudo rm -rf "${HOME}/.cache"
+  sudo rm -rf "${HOME}/.config"
+  sudo rm -rf "${HOME}/opt"
 
   local SCRIPT_DIR
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  rm -rf "${SCRIPT_DIR:?}/../scripts"
+  rm -rf "${SCRIPT_DIR}/../scripts"
 }
 
 install() {

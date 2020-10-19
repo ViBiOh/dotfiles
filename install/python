@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
-  rm -rf "${HOME:?}/.python_history"
+  rm -rf "${HOME}/.python_history"
 }
 
 install() {

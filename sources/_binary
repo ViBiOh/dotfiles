@@ -23,7 +23,7 @@ archive_to_binary() {
   local TEMP_FOLDER="/tmp"
   local ARCHIVE_PATH="${TEMP_FOLDER}/${ARCHIVE_FILENAME}.${ARCHIVE_EXTENSION}"
 
-  curl -q -sSL --max-time 300 -o "${ARCHIVE_PATH}" "${ARCHIVE_URL}"
+  curl -q -sSL --max-time 300 -o "${ARCHIVE_PATH}" -- "${ARCHIVE_URL}"
   (
     cd "${TEMP_FOLDER}" || false
     mkdir -p "${ARCHIVE_FILENAME}"
@@ -50,6 +50,6 @@ curl_to_binary() {
   local BINARY_NAME="${2}"
   local BINARY_DESTINATION="${3:-${HOME}/opt/bin/}"
 
-  curl -q -sSL --max-time 300 -o "${BINARY_DESTINATION}/${BINARY_NAME}" "${BINARY_URL}"
+  curl -q -sSL --max-time 300 -o "${BINARY_DESTINATION}/${BINARY_NAME}" -- "${BINARY_URL}"
   chmod +x "${BINARY_DESTINATION}/${BINARY_NAME}"
 }
