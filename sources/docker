@@ -21,7 +21,7 @@ if command -v docker >/dev/null 2>&1; then
     fi
 
     local AVAILABLE_BEFORE
-    AVAILABLE_BEFORE="$(df -g "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
+    AVAILABLE_BEFORE="$(df -k "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
 
     docker system prune -a --volumes -f
 
@@ -31,9 +31,9 @@ if command -v docker >/dev/null 2>&1; then
     docker volume ls -q | xargs docker volume rm
 
     local AVAILABLE_AFTER
-    AVAILABLE_AFTER="$(df -g "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
+    AVAILABLE_AFTER="$(df -k "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
 
-    local AVAILABLE_RECLAIMED="$((AVAILABLE_AFTER - AVAILABLE_BEFORE))"
+    local AVAILABLE_RECLAIMED="$(((AVAILABLE_AFTER - AVAILABLE_BEFORE) / (1024 ^ 2)))"
     var_info "Total reclaimed space: ${AVAILABLE_RECLAIMED}GB"
   }
 fi
