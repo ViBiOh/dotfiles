@@ -9,11 +9,31 @@ if command -v docker >/dev/null 2>&1; then
   }
 
   docker_clean() {
-    docker system prune -f
+    local DOCKER_ROOT_DIR
+    DOCKER_ROOT_DIR="$(docker info --format '{{ .DockerRootDir }}')"
 
-    docker rmi -f $(docker images -q)
-    docker rmi -f $(docker images --format '{{ .Repository }}:{{ .Tag}}')
-    docker network rm $(docker network ls -q)
-    docker volume rm $(docker volume ls -q)
+    if [[ -z ${DOCKER_ROOT_DIR:-} ]]; then
+      var_warning 'docker seems not available, no `docker info` output'
+    fi
+
+    if [[ ! -d ${DOCKER_ROOT_DIR} ]]; then
+      DOCKER_ROOT_DIR="/"
+    fi
+
+    local AVAILABLE_BEFORE
+    AVAILABLE_BEFORE="$(df -g "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
+
+    docker system prune -a --volumes -f
+
+    docker images -q | xargs docker rmi -f
+    docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi -f
+    docker network ls -q | xargs docker network rm
+    docker volume ls -q | xargs docker volume rm
+
+    local AVAILABLE_AFTER
+    AVAILABLE_AFTER="$(df -g "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
+
+    local AVAILABLE_RECLAIMED="$((AVAILABLE_AFTER - AVAILABLE_BEFORE))"
+    var_info "Total reclaimed space: ${AVAILABLE_RECLAIMED}GB"
   }
 fi
