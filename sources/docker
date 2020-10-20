@@ -23,7 +23,7 @@ if command -v docker >/dev/null 2>&1; then
     local GIGABYTES_BLOCK_SIZE="$((1024 * 1024 * 1024))"
 
     local AVAILABLE_BEFORE
-    AVAILABLE_BEFORE="$(BLOCKSIZE="${GIGABYTES_BLOCK_SIZE}" df "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
+    AVAILABLE_BEFORE="$(sync && BLOCKSIZE="${GIGABYTES_BLOCK_SIZE}" df "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
 
     docker system prune -a --volumes -f
 
@@ -33,7 +33,7 @@ if command -v docker >/dev/null 2>&1; then
     docker volume ls -q | xargs docker volume rm
 
     local AVAILABLE_AFTER
-    AVAILABLE_AFTER="$(BLOCKSIZE="${GIGABYTES_BLOCK_SIZE}" df "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
+    AVAILABLE_AFTER="$(sync && BLOCKSIZE="${GIGABYTES_BLOCK_SIZE}" df "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
 
     local AVAILABLE_RECLAIMED="$((AVAILABLE_AFTER - AVAILABLE_BEFORE))"
     var_info "Total reclaimed space: ${AVAILABLE_RECLAIMED}GB"
