@@ -29,11 +29,18 @@ if command -v pass >/dev/null 2>&1; then
   [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault pass
 
   passfor() {
-    if pass -c "${1}" && [[ "$(pass show "${1}" | grep -c "^otpauth:")" -eq 1 ]]; then
+    if [[ ${#} -ne 1 ]]; then
+      var_error "Usage: passfor PASS_NAME"
+      return 1
+    fi
+
+    local PASS_NAME="${1}"
+
+    if pass -c "${PASS_NAME}" && [[ "$(pass show "${PASS_NAME}" | grep -c "^otpauth:")" -eq 1 ]]; then
       read -s -r -p "  Press enter for otp"
       echo ""
 
-      pass otp -c "${1}"
+      pass otp -c "${PASS_NAME}"
     fi
   }
   [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passfor

@@ -4,24 +4,38 @@ set -o nounset -o pipefail -o errexit
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 install_plugin() {
+  if [[ ${#} -ne 1 ]]; then
+    var_error "Usage: install_plugin PLUGIN_NAME"
+    return 1
+  fi
+
   local PLUGIN_NAME="${1}"
+  shift
 
   rm -rf "${TEXT_PKG}/${PLUGIN_NAME}"
   ln -s "${SCRIPT_DIR}/plugins/${PLUGIN_NAME}" "${TEXT_PKG}/${PLUGIN_NAME}"
 }
 
 symlink_settings() {
-  local USER_SETTINGS="${1}/User"
-
-  rm -rf "${USER_SETTINGS}"/*
-  mkdir -p "${USER_SETTINGS}"
-
-  if [[ -d "${SCRIPT_DIR}/${2}/settings/" ]]; then
-    ln -s "${SCRIPT_DIR}/${2}/settings/"* "${USER_SETTINGS}/"
+  if [[ ${#} -ne 2 ]]; then
+    var_error "Usage: symlink_settings PACKAGE_FOLDER SETTING_TYPE"
+    return 1
   fi
 
-  if [[ -d "${SCRIPT_DIR}/${2}/snippets/" ]]; then
-    ln -s "${SCRIPT_DIR}/${2}/snippets/"* "${USER_SETTINGS}/"
+  local PACKAGE_FOLDER="${1}/User"
+  shift
+  local SETTING_TYPE="${1}"
+  shift
+
+  rm -rf "${PACKAGE_FOLDER}"/*
+  mkdir -p "${PACKAGE_FOLDER}"
+
+  if [[ -d "${SCRIPT_DIR}/${SETTING_TYPE}/settings/" ]]; then
+    ln -s "${SCRIPT_DIR}/${SETTING_TYPE}/settings/"* "${PACKAGE_FOLDER}/"
+  fi
+
+  if [[ -d "${SCRIPT_DIR}/${SETTING_TYPE}/snippets/" ]]; then
+    ln -s "${SCRIPT_DIR}/${SETTING_TYPE}/snippets/"* "${PACKAGE_FOLDER}/"
   fi
 }
 

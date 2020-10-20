@@ -130,13 +130,21 @@ if command -v kubectl >/dev/null 2>&1; then
 
   if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1; then
     helm_delta() {
-      helm status "${1:-}" -o yaml | sed '1,/^manifest: |$/d' | grep '^  ' | sed 's|^  ||' | grep -v '^$' >"/tmp/${1}_helm.yaml"
-      helm upgrade --debug --dry-run ${*} | sed '1,/^MANIFEST:$/d' | grep -v '^$' >"/tmp/${1}_new.yaml"
-      delta "/tmp/${1}_helm.yaml" "/tmp/${1}_new.yaml"
-      rm "/tmp/${1}_helm.yaml" "/tmp/${1}_new.yaml"
+      if [[ ${#} -lt 1 ]]; then
+        var_error "Usage: helm_delta RELEASE_NAME [helm upgrade additionnal args...]"
+        return 1
+      fi
+
+      local RELEASE_NAME="${1}"
+      shift
+
+      helm status "${RELEASE_NAME}" -o yaml | sed '1,/^manifest: |$/d' | grep '^  ' | sed 's|^  ||' | grep -v '^$' >"/tmp/${RELEASE_NAME}_helm.yaml"
+      helm upgrade --debug --dry-run "${RELEASE_NAME}" ${*} | sed '1,/^MANIFEST:$/d' | grep -v '^$' >"/tmp/${RELEASE_NAME}_new.yaml"
+      delta "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
+      rm "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
 
       if [[ $(var_confirm "Perform upgrade") == "true" ]]; then
-        helm upgrade ${*}
+        helm upgrade "${RELEASE_NAME}" ${*}
       fi
     }
   fi
@@ -145,7 +153,7 @@ fi
 if command -v kubeseal >/dev/null 2>&1; then
   kubeseal_raw() {
     if [[ ${#} -lt 3 ]]; then
-      var_error "Usage: kubeseal_raw NAMESPACE NAME VALUE"
+      var_error "Usage: kubeseal_raw NAMESPACE NAME VALUE [kubeseal additionnal args...]"
       return 1
     fi
 

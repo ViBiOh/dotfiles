@@ -2,13 +2,16 @@
 
 archive_to_binary() {
   if [[ ${#} -lt 2 ]]; then
-    var_error "Usage: archive_to_binary [URL] [BINARY_PATH] [BINARY_DESTINATION=${HOME}/opt/bin/]"
+    var_error "Usage: archive_to_binary ARCHIVE_URL BINARY_PATH [BINARY_DESTINATION=${HOME}/opt/bin/]"
     return 1
   fi
 
   local ARCHIVE_URL="${1}"
-  local BINARY_PATH="${2}"
-  local BINARY_DESTINATION="${3:-${HOME}/opt/bin/}"
+  shift
+  local BINARY_PATH="${1}"
+  shift
+  local BINARY_DESTINATION="${1:-${HOME}/opt/bin/}"
+  shift
 
   local ARCHIVE_FILENAME
   local ARCHIVE_EXTENSION
@@ -42,13 +45,16 @@ archive_to_binary() {
 
 curl_to_binary() {
   if [[ ${#} -lt 2 ]]; then
-    var_error "Usage: curl_to_binary [URL] [NAME] [DESTINATION=${HOME}/opt/bin/]"
+    var_error "Usage: curl_to_binary BINARY_URL BINARY_NAME [BINARY_DESTINATION=${HOME}/opt/bin/]"
     return 1
   fi
 
   local BINARY_URL="${1}"
-  local BINARY_NAME="${2}"
-  local BINARY_DESTINATION="${3:-${HOME}/opt/bin/}"
+  shift
+  local BINARY_NAME="${1}"
+  shift
+  local BINARY_DESTINATION="${1:-${HOME}/opt/bin/}"
+  shift
 
   curl -q -sSL --max-time 300 -o "${BINARY_DESTINATION}/${BINARY_NAME}" -- "${BINARY_URL}"
   chmod +x "${BINARY_DESTINATION}/${BINARY_NAME}"
