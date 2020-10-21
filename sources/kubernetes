@@ -56,8 +56,8 @@ if command -v kubectl >/dev/null 2>&1; then
           fzf --height 20 --ansi --reverse -1 -q "${1:-}"
       }
 
-      local ACTION="${1:-}"
-      shift 1
+      local ACTION="${1}"
+      shift
 
       case ${ACTION} in
       "restart")

@@ -11,7 +11,7 @@ archive_to_binary() {
   local BINARY_PATH="${1}"
   shift
   local BINARY_DESTINATION="${1:-${HOME}/opt/bin/}"
-  shift
+  shift || true
 
   local ARCHIVE_FILENAME
   local ARCHIVE_EXTENSION
@@ -54,7 +54,7 @@ curl_to_binary() {
   local BINARY_NAME="${1}"
   shift
   local BINARY_DESTINATION="${1:-${HOME}/opt/bin/}"
-  shift
+  shift || true
 
   curl -q -sSL --max-time 300 -o "${BINARY_DESTINATION}/${BINARY_NAME}" -- "${BINARY_URL}"
   chmod +x "${BINARY_DESTINATION}/${BINARY_NAME}"
