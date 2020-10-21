@@ -23,109 +23,122 @@ if command -v kubectl >/dev/null 2>&1; then
 
       get_kube_restart() {
         cat \
-          <(kubectl get deployments --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
-          <(kubectl get daemonsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
-          <(kubectl get statefulsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/statefulset/" + .name') |
-          fzf --height 20 --ansi --reverse -1 -q "${1:-}"
+          <(kubectl get deployments --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
+          <(kubectl get daemonsets --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
+          <(kubectl get statefulsets --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/statefulset/" + .name') |
+          fzf --height=20 --ansi --reverse -1 --query="${1:-}"
       }
 
       get_kube_log() {
         cat \
-          <(kubectl get deployments --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
-          <(kubectl get daemonsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
-          <(kubectl get statefulsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/statefulset/" + .name') \
-          <(kubectl get jobs --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/job/" + .name') |
-          fzf --height 20 --ansi --reverse -1 -q "${1:-}"
+          <(kubectl get deployments --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
+          <(kubectl get daemonsets --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
+          <(kubectl get statefulsets --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/statefulset/" + .name') \
+          <(kubectl get jobs --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/job/" + .name') |
+          fzf --height=20 --ansi --reverse -1 --query="${1:-}"
       }
 
       get_kube_service() {
-        kubectl get services --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/" + .name' | fzf --height 20 --ansi --reverse -1 -q "${1:-}"
+        kubectl get services --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/" + .name' | fzf --height=20 --ansi --reverse -1 --query="${1:-}"
       }
 
       get_kube_info() {
         cat \
-          <(kubectl get deployments --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
-          <(kubectl get daemonsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
-          <(kubectl get statefulsets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/statefulsets/" + .name') \
-          <(kubectl get cronjobs --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/cronjob/" + .name') \
-          <(kubectl get jobs --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/job/" + .name') \
-          <(kubectl get pods --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/pod/" + .name') \
-          <(kubectl get services --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/service/" + .name') \
-          <(kubectl get configmaps --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/configmap/" + .name') \
-          <(kubectl get secrets --all-namespaces -o=json | jq -r '.items[].metadata | .namespace + "/secret/" + .name') |
-          fzf --height 20 --ansi --reverse -1 -q "${1:-}"
+          <(kubectl get deployments --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
+          <(kubectl get daemonsets --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/daemonset/" + .name') \
+          <(kubectl get statefulsets --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/statefulsets/" + .name') \
+          <(kubectl get cronjobs --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/cronjob/" + .name') \
+          <(kubectl get jobs --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/job/" + .name') \
+          <(kubectl get pods --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/pod/" + .name') \
+          <(kubectl get services --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/service/" + .name') \
+          <(kubectl get configmaps --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/configmap/" + .name') \
+          <(kubectl get secrets --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/secret/" + .name') |
+          fzf --height=20 --ansi --reverse -1 --query="${1:-}"
       }
 
       local ACTION="${1}"
       shift
 
       case ${ACTION} in
-      "restart")
-        IFS='/' read -r -a parts <<<"$(get_kube_restart "${*}")"
-        if [[ -n ${parts[0]:-} ]]; then
-          kubectl -n "${parts[0]}" rollout restart "${parts[1]}" "${parts[2]}"
-        fi
-        ;;
-
-      "log" | "logs")
-        IFS='/' read -r -a parts <<<"$(get_kube_log "${*}")"
-        if [[ -n ${parts[0]:-} ]]; then
-          local PODS_LABELS
-          PODS_LABELS="$(kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o json | jq -r '.spec.selector.matchLabels | to_entries[] | .key + "=" + .value' | paste -sd, -)"
-
-          printf "%bTailing log for %s where labels are %b%s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
-          kubectl -n "${parts[0]}" logs --ignore-errors --prefix --max-log-requests=12 --all-containers=true --selector "${PODS_LABELS}" -f
-        fi
+      "context")
+        kubectl config get-contexts -o name | fzf --height=20 --ansi --reverse -1 --query="${1:-}" | xargs kubectl config use-context
         ;;
 
       "forward")
-        IFS='/' read -r -a parts <<<"$(get_kube_service "${*}")"
+        IFS='/' read -r -a parts <<<"$(get_kube_service "${1:-}")"
 
         if [[ -n ${parts[0]:-} ]]; then
           local KUBE_PORT
-          KUBE_PORT="$(kubectl -n "${parts[0]}" get services "${parts[1]}" -o=json | jq -r '.spec.ports[] | (.port|tostring) + "/" + .protocol' | fzf --height 20 --ansi --reverse -1 -q "${2:-}")"
+          KUBE_PORT="$(kubectl --namespace="${parts[0]}" get services "${parts[1]}" --output=json | jq -r '.spec.ports[] | (.port|tostring) + "/" + .protocol' | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
 
           if [[ -n ${KUBE_PORT:-} ]]; then
             IFS='/' read -r -a ports <<<"${KUBE_PORT}"
             printf "%bForwarding %s from 4000 to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}" "${ports[0]}" "${RESET}"
-            kubectl -n "${parts[0]}" port-forward "services/${parts[1]}" "4000:${ports[0]}"
+            kubectl --namespace="${parts[0]}" port-forward "services/${parts[1]}" "4000:${ports[0]}"
           fi
         fi
         ;;
 
-      "info")
-        IFS='/' read -r -a parts <<<"$(get_kube_info "${*}")"
+      "image")
+        IFS='/' read -r -a parts <<<"$(get_kube_restart "${1:-}")"
 
         if [[ -n ${parts[0]:-} ]]; then
-          kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o yaml
+          kubectl --namespace="${parts[0]}" get "${parts[1]}" "${parts[2]}" --output=json | jq -r '.spec.template.spec.containers[].image'
         fi
         ;;
 
-      "image")
-        IFS='/' read -r -a parts <<<"$(get_kube_restart "${*}")"
+      "info")
+        IFS='/' read -r -a parts <<<"$(get_kube_info "${1:-}")"
 
         if [[ -n ${parts[0]:-} ]]; then
-          kubectl -n "${parts[0]}" get "${parts[1]}" "${parts[2]}" -o json | jq -r '.spec.template.spec.containers[].image'
+          kubectl --namespace="${parts[0]}" get "${parts[1]}" "${parts[2]}" --output=yaml
+        fi
+        ;;
+
+      "log" | "logs")
+        IFS='/' read -r -a parts <<<"$(get_kube_log "${1:-}")"
+        shift || true
+
+        if [[ -n ${parts[0]:-} ]]; then
+          local PODS_LABELS
+          PODS_LABELS="$(kubectl --namespace="${parts[0]}" get "${parts[1]}" "${parts[2]}" --output=json | jq -r '.spec.selector.matchLabels | to_entries[] | .key + "=" + .value' | paste -sd, -)"
+
+          printf "%bTailing log for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${parts[0]}/${parts[1]}/${parts[2]}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
+          kubectl --namespace="${parts[0]}" logs --ignore-errors --prefix --all-containers=true --selector="${PODS_LABELS}" --follow ${@:-}
+        fi
+        ;;
+
+      "ns")
+        kubectl get namespaces --output=json | jq -r '.items[].metadata.name' | fzf --height=20 --ansi --reverse -1 --query="${1:-}" | xargs kubectl config set-context --current --namespace
+        ;;
+
+      "restart")
+        IFS='/' read -r -a parts <<<"$(get_kube_restart "${1:-}")"
+        if [[ -n ${parts[0]:-} ]]; then
+          kubectl --namespace="${parts[0]}" rollout restart "${parts[1]}" "${parts[2]}"
         fi
         ;;
 
       "watch")
-        kubectl get pods -A -w
-        ;;
-
-      "ns")
-        local KUBE_NAMESPACE
-        KUBE_NAMESPACE="$(kubectl get namespaces -o=json | jq -r '.items[].metadata.name' | fzf --height 20 --ansi --reverse -1 -q "${*}")"
-        kubectl config set-context --current --namespace="${KUBE_NAMESPACE}"
+        kubectl get pods --all-namespaces --watch ${@:-}
         ;;
 
       *)
-        kubectl config get-contexts -o name | fzf --height 20 --ansi --reverse -1 -q "${ACTION}" | xargs kubectl config use-context
+        var_error "Usage: kube ACTION"
+        var_info "\nPossibles actions are                         | args\n"
+        var_info " - context     Switch context                 | name query"
+        var_info " - forward     Port-forward to a service      | name query, port number"
+        var_info " - image       Print image name               | name query"
+        var_info " - info        Print yaml output of an object | name query"
+        var_info " - logs        Tail logs                      | name query, additionnals 'kubectl logs' args..."
+        var_info " - ns          Change default namespace       | name query"
+        var_info " - restart     Perform a rollout restart      | name query"
+        var_info " - watch       Watch pods of all namespaces   | additionnals 'kubectl get pods' args..."
         ;;
       esac
     }
 
-    [[ -n ${BASH} ]] && complete -W "restart logs forward info image watch ns" -o default -o bashdefault kube
+    [[ -n ${BASH} ]] && complete -W "restart logs forward info image watch context ns" -o default -o bashdefault kube
   fi
 
   if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1; then
@@ -138,8 +151,8 @@ if command -v kubectl >/dev/null 2>&1; then
       local RELEASE_NAME="${1}"
       shift
 
-      helm status "${RELEASE_NAME}" -o yaml | sed '1,/^manifest: |$/d' | grep '^  ' | sed 's|^  ||' | grep -v '^$' >"/tmp/${RELEASE_NAME}_helm.yaml"
-      helm upgrade --debug --dry-run "${RELEASE_NAME}" ${*} | sed '1,/^MANIFEST:$/d' | grep -v '^$' >"/tmp/${RELEASE_NAME}_new.yaml"
+      helm status "${RELEASE_NAME}" --output=yaml | sed '1,/^manifest: |$/d' | grep '^  ' | sed 's|^  ||' | grep --invert-match '^$' >"/tmp/${RELEASE_NAME}_helm.yaml"
+      helm upgrade --debug --dry-run "${RELEASE_NAME}" ${*} | sed '1,/^MANIFEST:$/d' | grep --invert-match '^$' >"/tmp/${RELEASE_NAME}_new.yaml"
       delta "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
       rm "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
 
@@ -164,6 +177,6 @@ if command -v kubeseal >/dev/null 2>&1; then
     local VALUE=${1}
     shift
 
-    printf "%s" "${VALUE}" | kubeseal --raw --from-file=/dev/stdin --namespace "${NAMESPACE}" --name "${NAME}" --scope "namespace-wide" ${*}
+    printf "%s" "${VALUE}" | kubeseal --raw --from-file=/dev/stdin --namespace="${NAMESPACE}" --name "${NAME}" --scope "namespace-wide" ${*}
   }
 fi

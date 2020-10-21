@@ -3,7 +3,7 @@
 # IMPORTANT: You will need to run this script from Recovery. In fact, macOS Catalina brings read-only filesystem which prevent this script from working from the main OS.
 # from https://gist.github.com/pwnsdx/1217727ca57de2dd2a372afdd7a0fc21
 
-# Get active services: launchctl list | grep -v "\-\t0"
+# Get active services: launchctl list | grep --invert-match "\-\t0"
 # Find a service: grep -lR [service] /System/Library/Launch* /Library/Launch* ~/Library/LaunchAgents
 
 TODISABLE=()

@@ -11,26 +11,25 @@ install() {
     grep -E -v '^\s*#' |
     grep -E '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' |
     tr -s '[:blank:]' ' ' |
-    sort |
-    uniq |
-    grep -v "ɢ" |
-    grep -v "0.0.0.0 www.linkedin.com" |
-    grep -v "0.0.0.0 static.licdn.com" |
-    grep -v "0.0.0.0 media.licdn.com" |
-    grep -v "0.0.0.0 reddit.com" |
-    grep -v "0.0.0.0 www.reddit.com" |
-    grep -v "0.0.0.0 gateway.reddit.com" |
-    grep -v "0.0.0.0 oauth.reddit.com" |
-    grep -v "0.0.0.0 www.redditstatic.com" |
-    grep -v "0.0.0.0 alb.reddit.com" |
-    grep -v "0.0.0.0 redditmedia.com" |
-    grep -v "0.0.0.0 www.redditmedia.com" |
-    grep -v "thumbs.redditmedia.com" |
-    grep -v "0.0.0.0 preview.redd.it" |
-    grep -v "0.0.0.0 external-preview.redd.it" |
-    grep -v "0.0.0.0 v.redd.it" |
-    grep -v "0.0.0.0 styles.redditmedia.com" |
-    grep -v "0.0.0.0 reddit.map.fastly.net" |
+    sort --unique |
+    grep --invert-match "ɢ" |
+    grep --invert-match "0.0.0.0 www.linkedin.com" |
+    grep --invert-match "0.0.0.0 static.licdn.com" |
+    grep --invert-match "0.0.0.0 media.licdn.com" |
+    grep --invert-match "0.0.0.0 reddit.com" |
+    grep --invert-match "0.0.0.0 www.reddit.com" |
+    grep --invert-match "0.0.0.0 gateway.reddit.com" |
+    grep --invert-match "0.0.0.0 oauth.reddit.com" |
+    grep --invert-match "0.0.0.0 www.redditstatic.com" |
+    grep --invert-match "0.0.0.0 alb.reddit.com" |
+    grep --invert-match "0.0.0.0 redditmedia.com" |
+    grep --invert-match "0.0.0.0 www.redditmedia.com" |
+    grep --invert-match "thumbs.redditmedia.com" |
+    grep --invert-match "0.0.0.0 preview.redd.it" |
+    grep --invert-match "0.0.0.0 external-preview.redd.it" |
+    grep --invert-match "0.0.0.0 v.redd.it" |
+    grep --invert-match "0.0.0.0 styles.redditmedia.com" |
+    grep --invert-match "0.0.0.0 reddit.map.fastly.net" |
     sed $'s|0.0.0.0 \(.*\)|0.0.0.0 \\1\\\n0:0:0:0:0:0:0:0 \\1|g' |
     sudo tee /etc/hosts >/dev/null
 
