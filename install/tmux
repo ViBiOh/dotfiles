@@ -6,6 +6,6 @@ install() {
   if command -v brew >/dev/null 2>&1; then
     brew install tmux reattach-to-user-namespace
   elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install -y -qq --no-install-recommends tmux
+    sudo apt-get install --yes -qq --no-install-recommends tmux
   fi
 }

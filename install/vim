@@ -11,9 +11,9 @@ install() {
   if command -v brew >/dev/null 2>&1; then
     brew install vim
   elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install -y -qq --no-install-recommends vim
+    sudo apt-get install --yes -qq --no-install-recommends vim
   fi
 
-  curl -q -sSL --max-time 30 -o "${HOME}/.vim/autoload/plug.vim" --create-dirs "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+  curl --disable --silent --show-error --location --max-time 30 -o "${HOME}/.vim/autoload/plug.vim" --create-dirs "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
   vim -E +PlugInstall +qall
 }

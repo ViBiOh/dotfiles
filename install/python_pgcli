@@ -35,7 +35,7 @@ install() {
   if command -v brew >/dev/null 2>&1; then
     brew install pgcli
   elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install -y -qq --no-install-recommends libpq-dev
+    sudo apt-get install --yes -qq --no-install-recommends libpq-dev
     pip install --user pgcli
   fi
 

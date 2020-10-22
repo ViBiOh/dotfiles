@@ -36,7 +36,7 @@ if command -v pass >/dev/null 2>&1; then
 
     local PASS_NAME="${1}"
 
-    if pass -c "${PASS_NAME}" && [[ "$(pass show "${PASS_NAME}" | grep -c "^otpauth:")" -eq 1 ]]; then
+    if pass -c "${PASS_NAME}" && [[ "$(pass show "${PASS_NAME}" | grep --count "^otpauth:")" -eq 1 ]]; then
       read -s -r -p "  Press enter for otp"
       echo ""
 

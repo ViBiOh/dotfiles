@@ -29,7 +29,7 @@ install() {
   if [[ ! -d "${HOME}/opt/go" ]]; then
     local GO_ARCHIVE="go${GO_VERSION}.${OS}-${ARCH}.tar.gz"
 
-    curl -q -sSL --max-time 300 -O "https://dl.google.com/go/${GO_ARCHIVE}"
+    curl --disable --silent --show-error --location --max-time 300 -O "https://dl.google.com/go/${GO_ARCHIVE}"
     tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
     rm -rf "${GO_ARCHIVE}"
   fi
@@ -42,7 +42,7 @@ install() {
   if command -v brew >/dev/null 2>&1; then
     brew install graphviz
   elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install -y -qq --no-install-recommends graphviz
+    sudo apt-get install --yes -qq --no-install-recommends graphviz
   fi
 
   if command -v go >/dev/null 2>&1; then

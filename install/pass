@@ -6,7 +6,7 @@ install() {
   if command -v brew >/dev/null 2>&1; then
     brew install pass pass-otp
   elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install -y -qq --no-install-recommends pass pass-extension-otp
+    sudo apt-get install --yes -qq --no-install-recommends pass pass-extension-otp
   fi
 
   if ! command -v pass >/dev/null 2>&1; then

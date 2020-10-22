@@ -28,7 +28,7 @@ END_OF_BASH_PROFILE
     brew upgrade
     brew install "${PACKAGES[@]}" fswatch
 
-    if [[ $(grep -c "$(brew --prefix)" "/etc/shells") -eq 0 ]]; then
+    if [[ $(grep --count "$(brew --prefix)" "/etc/shells") -eq 0 ]]; then
       printf "+-------------------------+\n"
       printf "| changing shell for user |\n"
       printf "+-------------------------+\n"
@@ -42,7 +42,7 @@ END_OF_BASH_PROFILE
     sudo apt-get update
     sudo apt-get dist-upgrade -y -qq
     sudo apt-get upgrade -y -qq
-    sudo apt-get install -y -qq --no-install-recommends apt-transport-https
-    sudo apt-get install -y -qq --no-install-recommends "${PACKAGES[@]}" dnsutils
+    sudo apt-get install --yes -qq --no-install-recommends apt-transport-https
+    sudo apt-get install --yes -qq --no-install-recommends "${PACKAGES[@]}" dnsutils
   fi
 }

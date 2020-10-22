@@ -15,7 +15,7 @@ dns_flush_cache() {
     sudo dscacheutil -flushcache
     sudo killall -HUP mDNSResponder
 
-    if [[ $(brew services list | grep -c dnsmasq) -eq 1 ]]; then
+    if [[ $(brew services list | grep --count dnsmasq) -eq 1 ]]; then
       sudo brew services restart dnsmasq
     fi
   else

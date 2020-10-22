@@ -44,5 +44,5 @@ install() {
     return
   fi
 
-  npm install --ignore-scripts -g npm npm-check-updates
+  npm install --ignore-scripts --global npm npm-check-updates
 }

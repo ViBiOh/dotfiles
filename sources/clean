@@ -3,7 +3,7 @@
 memory_clean() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo sync && sudo purge
-  elif [[ $(sudo which sysctl | wc -l) -ne 0 ]] && [[ $(sudo sysctl -a 2>/dev/null | grep -c vm.drop_caches) -ne 0 ]]; then
+  elif [[ $(sudo which sysctl | wc -l) -ne 0 ]] && [[ $(sudo sysctl -a 2>/dev/null | grep --count vm.drop_caches) -ne 0 ]]; then
     sudo sysctl vm.drop_caches=3
   else
     sudo sync

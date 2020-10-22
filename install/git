@@ -6,7 +6,7 @@ install() {
   if command -v brew >/dev/null 2>&1; then
     brew install git
   elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install -y -qq --no-install-recommends git
+    sudo apt-get install --yes -qq --no-install-recommends git
   fi
 
   if ! command -v git >/dev/null 2>&1; then
@@ -15,7 +15,7 @@ install() {
 
   local SCRIPT_DIR
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  curl -q -sSL --max-time 30 -o "${SCRIPT_DIR}/../sources/git-prompt" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{print $3}')/contrib/completion/git-prompt.sh"
+  curl --disable --silent --show-error --location --max-time 30 -o "${SCRIPT_DIR}/../sources/git-prompt" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{print $3}')/contrib/completion/git-prompt.sh"
 
   local DELTA_VERSION="0.4.4"
   local DELTA_OS="-unknown-linux-musl"
