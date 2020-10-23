@@ -44,5 +44,6 @@ install() {
     return
   fi
 
+  mkdir -p "${HOME}/opt/node/lib"
   npm install --ignore-scripts --global npm npm-check-updates
 }
