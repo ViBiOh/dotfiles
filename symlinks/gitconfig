@@ -49,12 +49,12 @@
 	rbm = ! git pull --rebase origin "${GIT_DEFAULT_BRANCH:-master}"
 	tidy = ! git rebase --interactive "origin/${GIT_DEFAULT_BRANCH:-master}"
 	commend = commit --amend --no-edit
-	pushu = push -u
+	pushu = push --set-upstream
 	pushf = push --force-with-lease
 	pur = ! git pushu && git pr
 	co = checkout
-	d = diff -w
-	s = status -sb
+	d = diff --ignore-all-space
+	s = status --short --branch
 	unstage = reset HEAD --
 	current-branch = rev-parse --abbrev-ref HEAD
 	default-branch = ! git remote show origin | grep 'HEAD branch:' | awk '{print $3}'
