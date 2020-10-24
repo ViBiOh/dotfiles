@@ -23,10 +23,10 @@ if command -v docker >/dev/null 2>&1; then
 
     docker system prune -a --volumes -f
 
-    docker images -q | xargs docker rmi -f
-    docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi -f
-    docker network ls -q | xargs docker network rm
-    docker volume ls -q | xargs docker volume rm
+    docker images --quiet | xargs docker rmi --force
+    docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi --force
+    docker network ls --quiet | xargs docker network rm
+    docker volume ls --quiet | xargs docker volume rm
 
     local AVAILABLE_AFTER
     AVAILABLE_AFTER="$(sync && BLOCKSIZE="${GIGABYTES_BLOCK_SIZE}" df -- "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"

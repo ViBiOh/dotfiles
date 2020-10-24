@@ -15,7 +15,7 @@ install() {
 
   local SCRIPT_DIR
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  curl --disable --silent --show-error --location --max-time 30 -o "${SCRIPT_DIR}/../sources/git-prompt" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{print $3}')/contrib/completion/git-prompt.sh"
+  curl --disable --silent --show-error --location --max-time 30 --output "${SCRIPT_DIR}/../sources/git-prompt" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{print $3}')/contrib/completion/git-prompt.sh"
 
   local DELTA_VERSION="0.4.4"
   local DELTA_OS="-unknown-linux-musl"

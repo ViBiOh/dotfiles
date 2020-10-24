@@ -6,12 +6,12 @@ clean() {
   sudo rm -rf "${HOME}/.docker"
 
   if command -v docker >/dev/null 2>&1; then
-    docker system prune -f || true
+    docker system prune -a --volumes -f
 
-    docker rmi -f $(docker images -q) || true
-    docker rmi -f $(docker images --format '{{ .Repository }}:{{ .Tag}}') || true
-    docker network rm $(docker network ls -q) || true
-    docker volume rm $(docker volume ls -q) || true
+    docker images --quiet | xargs docker rmi --force
+    docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi --force
+    docker network ls --quiet | xargs docker network rm
+    docker volume ls --quiet | xargs docker volume rm
   fi
 }
 

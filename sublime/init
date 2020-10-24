@@ -70,7 +70,7 @@ main() {
   fi
 
   if command -v npm >/dev/null 2>&1; then
-    npm install -g prettier eslint javascript-typescript-langserver
+    npm install --global prettier eslint javascript-typescript-langserver
   fi
 
   if command -v pip >/dev/null 2>&1; then
