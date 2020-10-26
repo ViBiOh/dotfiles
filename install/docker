@@ -6,6 +6,10 @@ clean() {
   sudo rm -rf "${HOME}/.docker"
 
   if command -v docker >/dev/null 2>&1; then
+    if ! docker info >/dev/null 2>&1; then
+      return
+    fi
+
     docker system prune -a --volumes -f
 
     docker images --quiet | xargs docker rmi --force
