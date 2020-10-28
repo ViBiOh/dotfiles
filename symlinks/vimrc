@@ -168,7 +168,7 @@ inoremap <Tab> <C-R>=SuperTab()<CR>
 " Using ripgrep for searching
 if executable("rg")
   set grepprg=rg\ --vimgrep\ --no-heading
-  nnoremap <Leader>g :silent lgrep -P<Space>
+  nnoremap <Leader>g :silent lgrep -P --<Space>
 endif
 
 if exists(':autocmd') && exists(':augroup')
