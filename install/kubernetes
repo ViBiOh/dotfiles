@@ -31,6 +31,6 @@ install() {
   archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz" "${OS}-${ARCH}/helm"
   helm completion bash >"${SCRIPT_DIR}/../sources/helm-completion"
 
-  local KUBESEAL_VERSION="v0.12.6"
+  local KUBESEAL_VERSION="v0.13.0"
   curl_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${OS}-${ARCH}" "kubeseal"
 }
