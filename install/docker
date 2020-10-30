@@ -12,10 +12,12 @@ clean() {
 
     docker system prune -a --volumes -f
 
+    set +e
     docker images --quiet | xargs docker rmi --force
     docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi --force
     docker network ls --quiet | xargs docker network rm
     docker volume ls --quiet | xargs docker volume rm
+    set -e
   fi
 }
 
