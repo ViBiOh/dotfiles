@@ -31,6 +31,10 @@ install() {
   archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz" "${OS}-${ARCH}/helm"
   helm completion bash >"${SCRIPT_DIR}/../sources/helm-completion"
 
+  local HELM_VERSION="0.2.1"
+  archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${HELM_VERSION}/flux_${HELM_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
+  flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
+
   local KUBESEAL_VERSION="v0.13.1"
   curl_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${OS}-${ARCH}" "kubeseal"
 }

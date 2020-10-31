@@ -10,7 +10,7 @@ archive_to_binary() {
   shift
   local BINARY_PATH="${1}"
   shift
-  local BINARY_DESTINATION="${1:-${HOME}/opt/bin/}"
+  local BINARY_DESTINATION="${1:-${HOME}/opt/bin}"
   shift || true
 
   local ARCHIVE_FILENAME
