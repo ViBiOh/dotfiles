@@ -12,7 +12,7 @@ install() {
 
   if command -v brew >/dev/null 2>&1; then
     brew install python
-    brew unlink "python@3.8" && brew link "python@3.8"
+    brew unlink "python" && brew link "python"
   elif command -v apt-get >/dev/null 2>&1; then
     sudo apt-get install --yes -qq --no-install-recommends python
   fi
