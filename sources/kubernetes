@@ -156,7 +156,7 @@ if command -v kubectl >/dev/null 2>&1; then
       delta "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
       rm "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
 
-      if [[ $(var_confirm "Perform upgrade") == "true" ]]; then
+      if var_confirm "Perform upgrade"; then
         helm upgrade "${RELEASE_NAME}" ${*}
       fi
     }

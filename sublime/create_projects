@@ -21,7 +21,7 @@ main() {
   while IFS= read -r -d '' dir; do
     (
       cd "${dir}" || return
-      if [[ $(git_is_inside) != "true" ]] || [[ $(pwd) != $(git_root) ]]; then
+      if ! git_is_inside || [[ $(pwd) != $(git_root) ]]; then
         return
       fi
 
