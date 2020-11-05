@@ -6,7 +6,7 @@ if command -v kubectl >/dev/null 2>&1; then
     local exit="${?}"
 
     if [[ -n ${KUBE_PS1:-} ]]; then
-      printf " ☸️ %s" "$(kubectl config current-context)"
+      printf " ☸️ %s" "$(kubectl config view --minify --output=jsonpath --template='{..current-context}/{..namespace}')"
     fi
 
     return "${exit}"
