@@ -125,8 +125,8 @@ TODISABLE+=('com.apple.telephonyutilities.callservicesd'
 for agent in "${TODISABLE[@]}"; do
   if [[ -e "./System/Library/LaunchAgents/${agent}.plist" ]]; then
     mv "./System/Library/LaunchAgents/${agent}.plist" "./System/Library/LaunchAgents/${agent}.plist.bak"
+    printf "[OK] Agent %s disabled\n" "${agent}"
   fi
-  printf "[OK] Agent %s disabled\n" "${agent}"
 done
 
 # Daemons to disable
@@ -158,8 +158,8 @@ TODISABLE+=('com.apple.netbiosd'
 for daemon in "${TODISABLE[@]}"; do
   if [[ -e "./System/Library/LaunchDaemons/${daemon}.plist" ]]; then
     mv "./System/Library/LaunchDaemons/${daemon}.plist" "./System/Library/LaunchDaemons/${daemon}.plist.bak"
+    printf "[OK] Daemon %s disabled\n" "${daemon}"
   fi
-  printf "[OK] Daemon %s disabled\n" "${daemon}"
 done
 
 # Services to disable
@@ -171,6 +171,6 @@ TODISABLE+=('AppleSpell.service')
 for service in "${TODISABLE[@]}"; do
   if [[ -e "./System/Library/Services/${service}/Contents/Resources" ]]; then
     mv "./System/Library/Services/${service}/Contents/Resources" "./System/Library/Services/${service}/Contents/Resources.disabled"
+    printf "[OK] Service %s disabled\n" "${service}"
   fi
-  printf "[OK] Service %s disabled\n" "${service}"
 done
