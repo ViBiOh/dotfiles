@@ -1,19 +1,24 @@
 <snippet>
   <content><![CDATA[
-local ${1}
+local ${1:VarName}
 
-while getopts "${2}:" options; do
-  case "${options}" in
-  ${2})
-    ${1}="${OPTARG}"
+while getopts ":${2:OptName}:" option; do
+  case "\${option}" in
+  ${2:OptName})
+    ${1:VarName}="\${OPTARG}"
+    ;;
+  :)
+    printf "option -%s requires a value\n" "\${OPTARG}" >&2
+    exit 1
     ;;
   \?)
-    printf "unknown option %s\n" "${options}"
+    printf "option -%s is invalid\n" "\${OPTARG}" >&2
+    exit 2
     ;;
   esac
 done
 
-shift $((OPTIND - 1))
+shift \$((OPTIND - 1))
 
 ]]></content>
   <tabTrigger>bgo</tabTrigger>
