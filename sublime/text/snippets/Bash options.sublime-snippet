@@ -1,0 +1,22 @@
+<snippet>
+  <content><![CDATA[
+local ${1}
+
+while getopts "${2}:" options; do
+  case "${options}" in
+  ${2})
+    ${1}="${OPTARG}"
+    ;;
+  \?)
+    printf "unknown option %s\n" "${options}"
+    ;;
+  esac
+done
+
+shift $((OPTIND - 1))
+
+]]></content>
+  <tabTrigger>bgo</tabTrigger>
+  <scope>source.shell.bash</scope>
+  <description>Bash GetOpts</description>
+</snippet>
