@@ -12,19 +12,13 @@ print_title() {
 }
 
 usage() {
-  printf "Usage of %s\n" "${0}"
-  printf "symlinks\n"
-  printf "\t Create symlink of dotfiles into \${HOME}\n"
-  printf "clean\n"
-  printf "\t Clean installation and temporary files\n"
-  printf "install\n"
-  printf "\t Install required softwares\n"
-  printf "credentials\n"
-  printf "\t Extract credentials into dotfiles in \${HOME}\n"
-  printf "[blank]\n"
-  printf "\t Run all stages\n"
-  printf "help\n"
-  printf "\t Print this help\n"
+  printf "Usage: %s [flags]\n" "${0}"
+  printf "  -a\tRun all stages: symlinks, clean, install and passwords\n"
+  printf "  -c\tClean install and temporary files\n"
+  printf "  -i\tInstall and configure softwares\n"
+  printf "  -p\tRetrieve and write credentials\n"
+  printf "  -s\tCreate symlinks into \${HOME}\n"
+  printf "  -h\tPrint this help\n"
 }
 
 create_symlinks() {
@@ -85,44 +79,73 @@ clean_packages() {
 
 main() {
   local FILE_LIMIT=""
-  while getopts "l:" options; do
-    case "${options}" in
+  local RUN_SYMLINKS=0
+  local RUN_CLEAN=0
+  local RUN_INSTALL=0
+  local RUN_PASSWORDS=0
+
+  while getopts ":l:acipsh" option; do
+    case "${option}" in
+    a)
+      RUN_SYMLINKS=1
+      RUN_CLEAN=1
+      RUN_INSTALL=1
+      RUN_PASSWORDS=1
+      ;;
+    c)
+      RUN_CLEAN=1
+      ;;
+    h)
+      usage
+      return 1
+      ;;
+    i)
+      RUN_INSTALL=1
+      ;;
+    p)
+      RUN_PASSWORDS=1
+      ;;
+    s)
+      RUN_SYMLINKS=1
+      ;;
     l)
       FILE_LIMIT="${OPTARG}"
       printf "Limiting to %s\n" "${FILE_LIMIT}"
       ;;
+    :)
+      printf "option -%s requires a value\n" "${OPTARG}" >&2
+      exit 1
+      ;;
     \?)
-      printf "unknown option %s\n" "${options}"
+      printf "option -%s is invalid\n" "${OPTARG}" >&2
+      usage
+      exit 2
       ;;
     esac
   done
 
   shift $((OPTIND - 1))
 
-  local ARGS="${*}"
-  if [[ ${ARGS} =~ help ]]; then
-    usage
-    return 1
-  fi
-
-  if [[ -z ${ARGS} ]] || [[ ${ARGS} =~ symlinks ]]; then
+  if [[ ${RUN_SYMLINKS} -eq 1 ]]; then
     print_title "symlinks"
     create_symlinks
   fi
 
-  set +u
-  set +e
-  PS1="$" source "${HOME}/.bashrc"
-  set -e
-  set -u
+  if [[ -e "${HOME}/.bashrc" ]]; then
+    set +u
+    set +e
+    PS1="$" source "${HOME}/.bashrc"
+    set -e
+    set -u
+  fi
 
   local ACTIONS=()
 
-  if [[ -z ${ARGS} ]] || [[ ${ARGS} =~ clean ]]; then
+  if [[ ${RUN_CLEAN} -eq 1 ]]; then
     ACTIONS+=("clean")
   fi
 
-  if [[ -z ${ARGS} ]] || [[ ${ARGS} =~ install ]]; then
+  if [[ ${RUN_INSTALL} -eq 1 ]]; then
     ACTIONS+=("install")
   fi
 
@@ -131,7 +154,7 @@ main() {
     clean_packages
   fi
 
-  if [[ -z ${ARGS} ]] || [[ ${ARGS} =~ credentials ]]; then
+  if [[ ${RUN_PASSWORDS} -eq 1 ]]; then
     browse_install credentials
   fi
 }
