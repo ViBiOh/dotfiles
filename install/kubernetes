@@ -27,11 +27,11 @@ install() {
   curl_to_binary "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl" "kubectl"
   kubectl completion bash >"${SCRIPT_DIR}/../sources/kubectl-completion"
 
-  local HELM_VERSION="v3.4.0"
+  local HELM_VERSION="v3.4.1"
   archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz" "${OS}-${ARCH}/helm"
   helm completion bash >"${SCRIPT_DIR}/../sources/helm-completion"
 
-  local FLUX_VERSION="0.2.3"
+  local FLUX_VERSION="0.2.4"
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
