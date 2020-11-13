@@ -1,16 +1,10 @@
 " Turnoff vi backward compatibility
 set nocompatible
 
-" vim-plug
-call plug#begin('~/.vim/plugged')
-
-Plug 'junegunn/fzf.vim'
-Plug 'editorconfig/editorconfig-vim'
-Plug 'airblade/vim-gitgutter'
-Plug 'prabirshrestha/vim-lsp'
-Plug 'vim-syntastic/syntastic'
-
-call plug#end()
+" Enable syntax color if exist
+if exists(":syntax")
+  syntax on
+endif
 
 " setting colorscheme to ensure it
 colorscheme default
@@ -120,11 +114,6 @@ set noswapfile
 " Increase update time
 set updatetime=300
 
-" Enable syntax color if exist
-if exists(":syntax")
-  syntax on
-endif
-
 " Change map leader if possible
 if exists(":let")
   let mapleader=","
@@ -217,6 +206,17 @@ endif
 " Search using ctrl-p and fzf
 set rtp+=~/opt/fzf
 noremap <C-p> :FZF<return>
+
+" vim-plug
+call plug#begin('~/.vim/plugged')
+
+Plug 'junegunn/fzf.vim'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'airblade/vim-gitgutter'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'vim-syntastic/syntastic'
+
+call plug#end()
 
 " vim-gutter configuration
 highlight GitGutterAdd    guifg=#009900 ctermfg=2
