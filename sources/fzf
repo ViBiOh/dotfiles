@@ -35,6 +35,7 @@ if command -v pass >/dev/null 2>&1; then
     fi
 
     local PASS_NAME="${1}"
+    shift
 
     if pass -c "${PASS_NAME}" && [[ "$(pass show "${PASS_NAME}" | grep --count "^otpauth:")" -eq 1 ]]; then
       read -s -r -p "  Press enter for otp"
@@ -44,6 +45,22 @@ if command -v pass >/dev/null 2>&1; then
     fi
   }
   [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passfor
+
+  passget() {
+    if [[ ${#} -lt 1 ]]; then
+      var_error "Usage: passget PASS_NAME PASS_FIELD"
+      return 1
+    fi
+
+    local PASS_NAME="${1}"
+    shift
+
+    local PASS_FIELD="${1}"
+    shift
+
+    pass show "${PASS_NAME}" | grep "^${PASS_FIELD}: " | sed 's|^[^ ]*: ||'
+  }
+  [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passget
 fi
 
 if command -v make >/dev/null 2>&1; then
