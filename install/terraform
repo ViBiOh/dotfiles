@@ -24,6 +24,7 @@ credentials \"app.terraform.io\" {
   token = \"${TERRAFORM_TOKEN}\"
 }
 " >>"${HOME}/.terraformrc"
+    chmod 600 "${HOME}/.terraformrc"
   fi
 }
 

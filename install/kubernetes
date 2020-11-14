@@ -31,7 +31,7 @@ install() {
   archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz" "${OS}-${ARCH}/helm"
   helm completion bash >"${SCRIPT_DIR}/../sources/helm-completion"
 
-  local FLUX_VERSION="0.2.4"
+  local FLUX_VERSION="0.2.5"
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 

@@ -17,6 +17,7 @@ credentials() {
 
   if [[ $(echo "${ANSIBLE_PASS}" | wc -l) -eq 1 ]]; then
     pass show "${ANSIBLE_PASS}" >"${HOME}/.ansible-vault-pass"
+    chmod 600 "${HOME}/.ansible-vault-pass"
   fi
 }
 
