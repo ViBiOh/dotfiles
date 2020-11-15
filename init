@@ -16,6 +16,7 @@ usage() {
   printf "  -a\tRun all stages: symlinks, clean, install and passwords\n"
   printf "  -c\tClean install and temporary files\n"
   printf "  -i\tInstall and configure softwares\n"
+  printf "  -l\tLimiting execution to given filename\n"
   printf "  -p\tRetrieve and write credentials\n"
   printf "  -s\tCreate symlinks into \${HOME}\n"
   printf "  -h\tPrint this help\n"
