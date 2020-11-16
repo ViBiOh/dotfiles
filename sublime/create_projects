@@ -2,6 +2,34 @@
 
 set -o nounset -o pipefail -o errexit
 
+browse_folder() {
+  local PROJECTS_DIR=${1}
+  local NAME_PREFIX=${2:-}
+
+  while IFS= read -r -d '' dir; do
+    (
+      cd "${dir}" || return
+      if ! git_is_inside || [[ $(pwd) != $(git_root) ]]; then
+        return
+      fi
+
+      local projectName="${dir##${PROJECTS_DIR}}"
+      projectName="${projectName#/}"
+      projectName="${projectName////_}"
+
+      if [[ -n ${NAME_PREFIX} ]]; then
+        projectName="${NAME_PREFIX}_${projectName}"
+      fi
+
+      var_info "Adding ${projectName}"
+
+      fileName="${PROJECT_FOLDER}/${projectName}.sublime-project"
+      jq -c -n --arg path "${dir}" '{folders: [{path: $path}]}' >"${fileName}"
+      subl --project "${fileName}"
+    )
+  done < <(find "${1}" -type d -maxdepth 1 -print0)
+}
+
 main() {
   readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   local PROJECT_FOLDER="${SCRIPT_DIR}/projects"
@@ -13,29 +41,11 @@ main() {
     return 1
   fi
 
-  local RELATIVE_DIR="${HOME}/code"
-
   rm -rf "${PROJECT_FOLDER}"
   mkdir -p "${PROJECT_FOLDER}"
 
-  while IFS= read -r -d '' dir; do
-    (
-      cd "${dir}" || return
-      if ! git_is_inside || [[ $(pwd) != $(git_root) ]]; then
-        return
-      fi
-
-      local projectName="${dir##${RELATIVE_DIR}}"
-      projectName="${projectName#/}"
-      projectName="${projectName////_}"
-
-      var_info "Adding ${projectName}"
-
-      fileName="${PROJECT_FOLDER}/${projectName}.sublime-project"
-      jq -c -n --arg path "${dir}" '{folders: [{path: $path}]}' >"${fileName}"
-      subl --project "${fileName}"
-    )
-  done < <(find "${RELATIVE_DIR}" -type d -maxdepth 2 -print0)
+  browse_folder "${HOME}/code"
+  browse_folder "${HOME}/work" "work"
 }
 
 main "${@:-}"
