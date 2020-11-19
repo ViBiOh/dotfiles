@@ -7,21 +7,6 @@ clean() {
   sudo rm -rf "${HOME}/.config/pgcli"
 }
 
-credentials() {
-  if ! command -v pass >/dev/null 2>&1; then
-    exit
-  fi
-
-  local PASS_DIR="${PASSWORD_STORE_DIR:-${HOME}/.password-store}"
-  local PG_PASS
-  PG_PASS="$(find "${PASS_DIR}" -name "*pgpass.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|")"
-
-  if [[ $(echo "${PG_PASS}" | wc -l) -eq 1 ]]; then
-    pass show "${PG_PASS}" >"${HOME}/.pgpass"
-    chmod 600 "${HOME}/.pgpass"
-  fi
-}
-
 install() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -49,4 +34,15 @@ install() {
 multi_line = True
 auto_expand = True
 row_limit = 100" >"${HOME}/.config/pgcli/config"
+}
+
+credentials() {
+  if ! command -v pass >/dev/null 2>&1; then
+    exit
+  fi
+
+  if [[ $(pass find pgpass | wc -l) -gt 1 ]]; then
+    pass show "infra/pgpass" >>"${HOME}/.pgpass"
+    chmod 600 "${HOME}/.pgpass"
+  fi
 }

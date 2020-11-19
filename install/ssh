@@ -13,16 +13,6 @@ clean() {
   rm -rf "${HOME}/.ssh/known_hosts"
 }
 
-credentials() {
-  if ! command -v pass >/dev/null 2>&1; then
-    exit
-  fi
-
-  if [[ $(pass find ssh | wc -l) -gt 1 ]]; then
-    pass show "${SSH_CONFIG_SECRET}" >>"${HOME}/.ssh/config"
-  fi
-}
-
 install() {
   local EXTRA_CONFIG=""
 
@@ -43,4 +33,15 @@ install() {
 
   find "${HOME}/.ssh/" -name "config_*" -type f -exec cat {} + >>"${HOME}/.ssh/config"
   find "${HOME}/.ssh/" -name "known_hosts_*" -type f -exec cat {} + >>"${HOME}/.ssh/known_hosts"
+}
+
+credentials() {
+  if ! command -v pass >/dev/null 2>&1; then
+    exit
+  fi
+
+  if [[ $(pass find ssh | wc -l) -gt 1 ]]; then
+    pass show "infra/ssh" >>"${HOME}/.ssh/config"
+    chmod 600 "${HOME}/.ssh/config"
+  fi
 }
