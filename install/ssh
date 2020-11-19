@@ -13,6 +13,16 @@ clean() {
   rm -rf "${HOME}/.ssh/known_hosts"
 }
 
+credentials() {
+  if ! command -v pass >/dev/null 2>&1; then
+    exit
+  fi
+
+  if [[ $(pass find ssh | wc -l) -gt 1 ]]; then
+    pass show "${SSH_CONFIG_SECRET}" >>"${HOME}/.ssh/config"
+  fi
+}
+
 install() {
   local EXTRA_CONFIG=""
 
