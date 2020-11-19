@@ -38,7 +38,6 @@ export DOTFILES_NO_SIEGE="true"
 export DOTFILES_NO_SUBLIME="true"
 export DOTFILES_NO_SYNCTHING="true"
 export DOTFILES_NO_TERRAFORM="true"
-export DOTFILES_NO_TUNNELBLICK="true"
 ```
 
 ## SSH
