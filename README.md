@@ -23,6 +23,7 @@ You can set following environment variables for customizing installation behavio
 #  Server configuration example
 
 export DOTFILES_NO_ALACRITTY="true"
+export DOTFILES_NO_CLEANER="true"
 export DOTFILES_NO_DNSMASQ="true"
 export DOTFILES_NO_FIREFOX="true"
 export DOTFILES_NO_GOLANG="true"
@@ -33,8 +34,8 @@ export DOTFILES_NO_PASS="true"
 export DOTFILES_NO_PYTHON="true"
 export DOTFILES_NO_PYTHON_ANSIBLE="true"
 export DOTFILES_NO_PYTHON_PGCLI="true"
+export DOTFILES_NO_RECTANGLE="true"
 export DOTFILES_NO_SHELLCHECK="true"
-export DOTFILES_NO_SIEGE="true"
 export DOTFILES_NO_SUBLIME="true"
 export DOTFILES_NO_SYNCTHING="true"
 export DOTFILES_NO_TERRAFORM="true"
