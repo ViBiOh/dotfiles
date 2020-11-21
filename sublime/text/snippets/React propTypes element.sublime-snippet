@@ -1,8 +1,0 @@
-<snippet>
-	<content><![CDATA[
-${1}: PropTypes.element${2:.isRequired}$0
-]]></content>
-	<tabTrigger>pte</tabTrigger>
-	<scope>source.js,source.jsx</scope>
-	<description>React: PropTypes.element</description>
-</snippet>
