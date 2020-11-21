@@ -48,4 +48,4 @@ main() {
   browse_folder "${HOME}/work" "work"
 }
 
-main "${@:-}"
+main "${@}"
