@@ -36,7 +36,7 @@ create_symlinks() {
 }
 
 browse_install() {
-  while IFS= read -r -d $'\n' file; do
+  while IFS= read -r -d '' file; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
 
