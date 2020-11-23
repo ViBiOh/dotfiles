@@ -132,7 +132,10 @@ main() {
     create_symlinks
   fi
 
+  mkdir -p "${HOME}/opt/bin"
+
   if [[ -e "${HOME}/.bashrc" ]]; then
+    print_title "Sourcing ~/.bashrc"
     set +u
     set +e
     PS1="$" source "${HOME}/.bashrc"
