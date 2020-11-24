@@ -15,6 +15,6 @@ install() {
 
   (
     cd "${SCRIPT_DIR}/../"
-    curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "var" "git" "git_hooks" "github" "version" "release" "ssh" "docker_registry_cleanup" "release"
+    curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "var" "git" "git_hooks" "github" "version" "release" "ssh" "docker_registry_cleanup" "release" "rotate"
   )
 }
