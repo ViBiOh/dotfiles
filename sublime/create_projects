@@ -45,7 +45,7 @@ main() {
   mkdir -p "${PROJECT_FOLDER}"
 
   browse_folder "${HOME}/code"
-  browse_folder "${HOME}/work" "work"
+  browse_folder "${HOME}/workspace" "work"
 }
 
 main "${@}"
