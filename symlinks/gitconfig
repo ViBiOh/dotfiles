@@ -44,7 +44,8 @@
 	pr = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@(.*):(.*)$ ]] && open \"https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]%.git}/compare/${GIT_DEFAULT_BRANCH:-master}...$(git current-branch)?expand=1\"
 	fco = "! git checkout \"$(git branch -vv --all | fzf --height 20 --ansi -1 --reverse --query=\"remotes/${1:-}\" | awk '{print $1}' | sed 's|^remotes/origin/||')\" #"
 	fixup = ! git commit --fixup $(git log-pretty "${GIT_DEFAULT_BRANCH:-master}..$(git current-branch)" --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{print $1}')
-	cc = ! git log --format=format: --name-only | grep -E -v '^$' | sort | uniq -c | sort -rg | head -10
+	file-stat = ! git log --format=format: --name-only | grep -E -v '^$' | sort | uniq -c | sort -rg | head -10
+	author-stat = ! git log --format=%an | grep -E -v '^$' | sort | uniq -c | sort -rg | head -10
 	copr = !sh -c 'git fetch origin "pull/${1}/head:pr/${1}" && git checkout "pr/${1}"' -
 	rbm = ! git pull --rebase origin "${GIT_DEFAULT_BRANCH:-master}"
 	tidy = ! git rebase --interactive "origin/${GIT_DEFAULT_BRANCH:-master}"
