@@ -23,8 +23,7 @@ install() {
   archive_to_binary "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${OS}_${ARCH}.zip" "terraform"
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
-  echo "plugin_cache_dir = \"${HOME}/.terraform.d/plugin-cache\"
-  " >"${HOME}/.terraformrc"
+  printf "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\n" "${HOME}" >"${HOME}/.terraformrc"
 }
 
 credentials() {
@@ -33,11 +32,7 @@ credentials() {
   fi
 
   if [[ $(pass find terraform | wc -l) -gt 1 ]]; then
-    echo "
-credentials \"app.terraform.io\" {
-  token = \"$(pass show "dev/terraform" | grep "^token: " | sed 's|^[^ ]*: ||')\"
-}
-" >>"${HOME}/.terraformrc"
+    printf "credentials \"app.terraform.io\" {\ntoken = \"%s\"\n}" "$(pass show "dev/terraform" | grep "^token: " | sed 's|^[^ ]*: ||')" >>"${HOME}/.terraformrc"
     chmod 600 "${HOME}/.terraformrc"
   fi
 }
