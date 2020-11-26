@@ -1,20 +1,12 @@
 {
 	"animation_enabled": false,
-	"auto_complete_triggers": [
-		{
-			"characters": "<",
-			"selector": "text.html",
-		},
-		{
-			"characters": ".",
-			"selector": "source.js,source.jsx,source.go,source.python",
-		}
-	],
+	"color_scheme": "Packages/Color Scheme - Default/Monokai.sublime-color-scheme",
 	"default_line_ending": "unix",
 	"drag_text": false,
 	"draw_white_space": "all",
 	"enable_tab_scrolling": false,
 	"fold_buttons": false,
+	"hardware_acceleration": "opengl",
 	"highlight_line": true,
 	"highlight_modified_tabs": true,
 	"ignored_packages": ["Vintage",
@@ -28,5 +20,4 @@
 	"translate_tabs_to_spaces": true,
 	"tree_animation_enabled": false,
 	"word_wrap": true,
-	"color_scheme": "Packages/Color Scheme - Default/Monokai.sublime-color-scheme",
 }
