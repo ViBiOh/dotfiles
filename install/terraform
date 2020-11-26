@@ -35,7 +35,7 @@ credentials() {
   if [[ $(pass find terraform | wc -l) -gt 1 ]]; then
     echo "
 credentials \"app.terraform.io\" {
-  token = \"$(pass show "dev/terraform")\"
+  token = \"$(pass show "dev/terraform" | grep "^token: " | sed 's|^[^ ]*: ||')\"
 }
 " >>"${HOME}/.terraformrc"
     chmod 600 "${HOME}/.terraformrc"
