@@ -53,7 +53,7 @@ if command -v kubectl >/dev/null 2>&1; then
           <(kubectl get services --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/service/" + .name') \
           <(kubectl get configmaps --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/configmap/" + .name') \
           <(kubectl get secrets --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/secret/" + .name') \
-          <(kubectl get ingress --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/ingress/" + .name') |
+          <(kubectl get ingresses.networking.k8s.io --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/ingress.networking.k8s.io/" + .name') |
           fzf --height=20 --ansi --reverse -1 --query="${1:-}"
       }
 
