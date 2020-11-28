@@ -52,7 +52,8 @@ if command -v kubectl >/dev/null 2>&1; then
           <(kubectl get pods --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/pod/" + .name') \
           <(kubectl get services --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/service/" + .name') \
           <(kubectl get configmaps --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/configmap/" + .name') \
-          <(kubectl get secrets --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/secret/" + .name') |
+          <(kubectl get secrets --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/secret/" + .name') \
+          <(kubectl get ingress --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/ingress/" + .name') |
           fzf --height=20 --ansi --reverse -1 --query="${1:-}"
       }
 
