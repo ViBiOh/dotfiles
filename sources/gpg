@@ -3,6 +3,6 @@
 GPG_TTY="$(tty)"
 export GPG_TTY
 
-stop_gpg_agent() {
+gpg_agent_stop() {
   gpgconf --kill gpg-agent
 }

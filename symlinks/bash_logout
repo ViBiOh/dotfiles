@@ -6,8 +6,8 @@ if [[ $(pgrep -a bash | wc -l) -eq 2 ]]; then
     ssh_agent_stop
   fi
 
-  if [[ $(type -t stop_gpg_agent) == "function" ]]; then
-    stop_gpg_agent
+  if [[ $(type -t gpg_agent_stop) == "function" ]]; then
+    gpg_agent_stop
   fi
 fi
 
