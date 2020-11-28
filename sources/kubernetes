@@ -104,7 +104,7 @@ if command -v kubectl >/dev/null 2>&1; then
           PODS_LABELS="$(kubectl --namespace="${parts[0]}" get "${parts[1]}" "${parts[2]}" --output=json | jq -r '.spec.selector.matchLabels | to_entries[] | .key + "=" + .value' | paste -sd, -)"
 
           printf "%bTailing log for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${parts[0]}/${parts[1]}/${parts[2]}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
-          kubectl --namespace="${parts[0]}" logs --ignore-errors --prefix --all-containers=true --selector="${PODS_LABELS}" --follow ${@:-}
+          kubectl --namespace="${parts[0]}" logs --ignore-errors --prefix --all-containers=true --selector="${PODS_LABELS}" --follow "${@}"
         fi
         ;;
 
@@ -120,7 +120,7 @@ if command -v kubectl >/dev/null 2>&1; then
         ;;
 
       "watch")
-        kubectl get pods --all-namespaces --watch ${@:-}
+        kubectl get pods --all-namespaces --watch "${@}"
         ;;
 
       *)
