@@ -19,6 +19,12 @@ if command -v git >/dev/null 2>&1; then
   }
 fi
 
+if command -v jq >/dev/null 2>&1; then
+  fzjq() {
+    printf '' | fzf --query '.' --height 50% --print-query --preview-window up:99% --preview "jq --color-output '{q}' ${1}"
+  }
+fi
+
 if command -v pass >/dev/null 2>&1; then
   _fzf_complete_pass() {
     FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(
