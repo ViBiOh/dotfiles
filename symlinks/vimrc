@@ -211,6 +211,8 @@ noremap <C-p> :FZF<return>
 call plug#begin('~/.vim/plugged')
 
 Plug 'junegunn/fzf.vim'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'prabirshrestha/vim-lsp'
@@ -289,4 +291,12 @@ if exists(":let")
   let g:syntastic_auto_loc_list = 1
   let g:syntastic_check_on_open = 1
   let g:syntastic_check_on_wq = 0
+endif
+
+" nerdTree configuration
+map <C-k> :NERDTreeToggle<CR>
+if exists(':autocmd')
+  autocmd StdinReadPre * let s:std_in=1
+  autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+  autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 endif
