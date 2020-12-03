@@ -40,7 +40,7 @@ symlink_settings() {
 }
 
 install_shfmt() {
-  local SHFMT_VERSION="3.2.0"
+  local SHFMT_VERSION="3.2.1"
   local SHFMT_OS="linux"
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     SHFMT_OS="darwin"
