@@ -1,7 +1,6 @@
 {
 	"bootstrapped": true,
 	"in_process_packages": [
-		"LSP",
 	],
 	"installed_packages": [
 		"DocBlockr",
