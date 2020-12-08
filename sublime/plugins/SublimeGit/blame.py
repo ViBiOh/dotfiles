@@ -92,7 +92,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
                 [
                     "git",
                     "blame",
-                    "-p",
+                    "--porcelain",
                     "-L",
                     "{},{}".format(line_number, line_number),
                     "--",
