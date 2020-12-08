@@ -10,6 +10,7 @@ clean() {
 install() {
   if command -v brew >/dev/null 2>&1; then
     brew install vim
+    brew install --HEAD universal-ctags/universal-ctags/universal-ctags
   elif command -v apt-get >/dev/null 2>&1; then
     sudo apt-get install --yes -qq --no-install-recommends vim
   fi

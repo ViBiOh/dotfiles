@@ -215,6 +215,7 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'vim-syntastic/syntastic'
+Plug 'preservim/tagbar'
 
 call plug#end()
 
@@ -290,3 +291,6 @@ if exists(":let")
   let g:syntastic_check_on_open = 1
   let g:syntastic_check_on_wq = 0
 endif
+
+" tagbar configuration
+nmap <C-t> :TagbarOpenAutoClose<CR>
