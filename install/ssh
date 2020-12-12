@@ -31,8 +31,11 @@ install() {
   ServerAliveCountMax 2
 " >"${HOME}/.ssh/config"
 
+  ssh-keyscan github.com >"${HOME}/.ssh/known_hosts"
+
   find "${HOME}/.ssh/" -name "config_*" -type f -exec cat {} + >>"${HOME}/.ssh/config"
   find "${HOME}/.ssh/" -name "known_hosts_*" -type f -exec cat {} + >>"${HOME}/.ssh/known_hosts"
+
 }
 
 credentials() {
