@@ -35,7 +35,7 @@ install() {
     printf "%bhelm was not found in path. Please run 'helm completion bash >'%s/../sources/helm-completion''%b\n" "${RED}" "${SCRIPT_DIR}" "${RESET}"
   fi
 
-  local FLUX_VERSION="0.5.2"
+  local FLUX_VERSION="0.5.4"
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
