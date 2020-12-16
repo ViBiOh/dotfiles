@@ -6,6 +6,9 @@ if exists(":syntax")
   syntax on
 endif
 
+" Set color width
+set t_Co=256
+
 " setting colorscheme to ensure it
 colorscheme default
 
@@ -113,6 +116,12 @@ set noswapfile
 
 " Increase update time
 set updatetime=300
+
+" Disable arrow keys in normal mode
+nnoremap <left> <nop>
+nnoremap <right> <nop>
+nnoremap <up> <nop>
+nnoremap <down> <nop>
 
 " Change map leader if possible
 if exists(":let")
