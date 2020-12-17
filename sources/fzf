@@ -21,7 +21,7 @@ fi
 
 if command -v jq >/dev/null 2>&1; then
   fzjq() {
-    printf '' | fzf --query '.' --height 50% --print-query --preview-window up:99% --preview "jq --color-output '{q}' ${1}"
+    printf '' | fzf --query '.' --height 50% --print-query --preview-window up:99% --preview "jq --color-output ''{q}'' ${1}"
   }
 fi
 
