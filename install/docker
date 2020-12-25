@@ -23,7 +23,7 @@ clean() {
 
 install() {
   if command -v brew >/dev/null 2>&1; then
-    brew cask install docker
+    brew install --cask docker
   fi
 
   if ! command -v docker >/dev/null 2>&1; then

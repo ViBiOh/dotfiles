@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   if command -v brew >/dev/null 2>&1; then
-    brew cask install sublime-merge
+    brew install --cask sublime-merge
 
     local SUBLIME_TEXT_VERSION
     SUBLIME_TEXT_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/dev_update_check" | jq .latest_version)"
