@@ -10,7 +10,7 @@ packages_update() {
     sudo apt-get dist-upgrade -qq
     sudo apt-get upgrade -qq
   elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman --sync --refresh --upgrade --unneeded --quiet --noconfirm
+    sudo pacman --sync --sysupgrade --refresh --quiet --noconfirm
   fi
 }
 
