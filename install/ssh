@@ -35,7 +35,6 @@ install() {
 
   find "${HOME}/.ssh/" -name "config_*" -type f -exec cat {} + >>"${HOME}/.ssh/config"
   find "${HOME}/.ssh/" -name "known_hosts_*" -type f -exec cat {} + >>"${HOME}/.ssh/known_hosts"
-
 }
 
 credentials() {

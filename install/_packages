@@ -37,5 +37,8 @@ END_OF_BASH_PROFILE
     packages_update
     packages_install "apt-transport-https"
     packages_install "${PACKAGES[@]}" dnsutils
+  else
+    packages_update
+    packages_install "${PACKAGES[@]}"
   fi
 }
