@@ -10,7 +10,7 @@ packages_update() {
     sudo apt-get dist-upgrade -qq
     sudo apt-get upgrade -qq
   elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman -Syuq --noconfirm
+    sudo pacman --sync --refresh --upgrade --unneeded --quiet --noconfirm
   fi
 }
 
@@ -21,7 +21,7 @@ packages_install() {
     export DEBIAN_FRONTEND=noninteractive
     sudo apt-get install -qq --no-install-recommends "${@}"
   elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman -S --noconfirm --needed "${@}"
+    sudo pacman --sync --noconfirm --needed "${@}"
   fi
 }
 
