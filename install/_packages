@@ -37,8 +37,8 @@ END_OF_BASH_PROFILE
     packages_update
     packages_install "apt-transport-https"
     packages_install "${PACKAGES[@]}" dnsutils jdupes
-  else
+  elif command -v pacman >/dev/null 2>&1; then
     packages_update
-    packages_install "${PACKAGES[@]}"
+    packages_install "${PACKAGES[@]}" inetutils
   fi
 }

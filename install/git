@@ -14,12 +14,15 @@ install() {
   curl --disable --silent --show-error --location --max-time 30 --output "${SCRIPT_DIR}/../sources/git-prompt" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{print $3}')/contrib/completion/git-prompt.sh"
 
   local DELTA_VERSION="0.4.5"
-  local DELTA_OS="-unknown-linux-musl"
+
+  local OS="unknown-linux-musl"
+  local ARCH
+  ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    DELTA_OS="-apple-darwin"
+    OS="apple-darwin"
   fi
 
-  local DELTA_RELEASE="delta-${DELTA_VERSION}-x86_64${DELTA_OS}"
+  local DELTA_RELEASE="delta-${DELTA_VERSION}-${ARCH}-${OS}"
   archive_to_binary "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/${DELTA_RELEASE}.tar.gz" "${DELTA_RELEASE}/delta"
 }
