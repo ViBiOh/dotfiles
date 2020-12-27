@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  local PACKAGES=('bash' 'bash-completion' 'htop' 'openssl' 'curl' 'ncdu' 'jq' 'jdupes')
+  local PACKAGES=('bash' 'bash-completion' 'htop' 'openssl' 'curl' 'ncdu' 'jq')
 
   cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
 #!/usr/bin/env bash
@@ -23,7 +23,7 @@ END_OF_BASH_PROFILE
     fi
 
     packages_update
-    packages_install "${PACKAGES[@]}" fswatch
+    packages_install "${PACKAGES[@]}" fswatch jdupes
 
     if [[ $(grep --count "$(brew --prefix)" "/etc/shells") -eq 0 ]]; then
       printf "+-------------------------+\n"
@@ -36,7 +36,7 @@ END_OF_BASH_PROFILE
   elif command -v apt-get >/dev/null 2>&1; then
     packages_update
     packages_install "apt-transport-https"
-    packages_install "${PACKAGES[@]}" dnsutils
+    packages_install "${PACKAGES[@]}" dnsutils jdupes
   else
     packages_update
     packages_install "${PACKAGES[@]}"
