@@ -23,6 +23,10 @@ install() {
     OS="apple-darwin"
   fi
 
+  if [[ ${ARCH} == "aarch64" ]]; then
+    local OS="unknown-linux-gnu"
+  fi
+
   local DELTA_RELEASE="delta-${DELTA_VERSION}-${ARCH}-${OS}"
   archive_to_binary "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/${DELTA_RELEASE}.tar.gz" "${DELTA_RELEASE}/delta"
 }
