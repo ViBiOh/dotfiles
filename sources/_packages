@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+packages_update() {
+  if command -v brew >/dev/null 2>&1; then
+    brew update
+    brew upgrade
+  elif command -v apt-get >/dev/null 2>&1; then
+    export DEBIAN_FRONTEND=noninteractive
+    sudo apt-get update
+    sudo apt-get dist-upgrade -qq
+    sudo apt-get upgrade -qq
+  elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -Syuq --noconfirm
+  fi
+}
+
+packages_install() {
+  if command -v brew >/dev/null 2>&1; then
+    brew install "${@}"
+  elif command -v apt-get >/dev/null 2>&1; then
+    export DEBIAN_FRONTEND=noninteractive
+    sudo apt-get install -qq --no-install-recommends "${@}"
+  elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -S --noconfirm --needed "${@}"
+  fi
+}
+
+packages_clean() {
+  if command -v brew >/dev/null 2>&1; then
+    brew cleanup -s
+  elif command -v apt-get >/dev/null 2>&1; then
+    export DEBIAN_FRONTEND=noninteractive
+    sudo apt-get autoremove --yes
+    sudo apt-get clean all
+  fi
+}

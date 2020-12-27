@@ -2,30 +2,7 @@
 
 set -o nounset -o pipefail -o errexit
 
-clean() {
-  sudo rm -rf "${HOME}/.docker"
-
-  if command -v docker >/dev/null 2>&1; then
-    if ! docker info >/dev/null 2>&1; then
-      return
-    fi
-
-    docker system prune -a --volumes -f
-
-    set +e
-    docker images --quiet | xargs docker rmi --force
-    docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi --force
-    docker network ls --quiet | xargs docker network rm
-    docker volume ls --quiet | xargs docker volume rm
-    set -e
-  fi
-}
-
 install() {
-  if command -v brew >/dev/null 2>&1; then
-    brew install --cask docker
-  fi
-
   if ! command -v docker >/dev/null 2>&1; then
     return
   fi

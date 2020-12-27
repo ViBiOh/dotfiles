@@ -3,9 +3,5 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  if command -v brew >/dev/null 2>&1; then
-    brew install shellcheck
-  elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install --yes -qq --no-install-recommends shellcheck
-  fi
+  packages_install shellcheck
 }

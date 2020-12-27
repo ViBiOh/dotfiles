@@ -10,11 +10,10 @@ install() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+  packages_install python
+
   if command -v brew >/dev/null 2>&1; then
-    brew install python
     brew unlink "python" && brew link "python"
-  elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install --yes -qq --no-install-recommends python
   fi
 
   if ! command -v python >/dev/null 2>&1; then

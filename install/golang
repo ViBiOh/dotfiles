@@ -39,11 +39,7 @@ install() {
   source "${SCRIPT_DIR}/../sources/golang"
   mkdir -p "${GOPATH}"
 
-  if command -v brew >/dev/null 2>&1; then
-    brew install graphviz
-  elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install --yes -qq --no-install-recommends graphviz
-  fi
+  ipackages_install graphviz
 
   if command -v go >/dev/null 2>&1; then
     if [[ ${ARCH} == "amd64" ]]; then

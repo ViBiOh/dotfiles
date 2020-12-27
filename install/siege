@@ -7,11 +7,7 @@ clean() {
 }
 
 install() {
-  if command -v brew >/dev/null 2>&1; then
-    brew install siege
-  elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install --yes -qq --no-install-recommends siege
-  fi
+  packages_install siege
 
   mkdir -p "${HOME}/.siege"
 

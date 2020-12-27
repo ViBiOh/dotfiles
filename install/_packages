@@ -22,9 +22,8 @@ END_OF_BASH_PROFILE
       source "${SCRIPT_DIR}/../sources/_homebrew"
     fi
 
-    brew update
-    brew upgrade
-    brew install "${PACKAGES[@]}" fswatch
+    packages_update
+    packages_install "${PACKAGES[@]}" fswatch
 
     if [[ $(grep --count "$(brew --prefix)" "/etc/shells") -eq 0 ]]; then
       printf "+-------------------------+\n"
@@ -35,12 +34,8 @@ END_OF_BASH_PROFILE
       chsh -s "$(brew --prefix)/bin/bash" -u "$(whoami)"
     fi
   elif command -v apt-get >/dev/null 2>&1; then
-    export DEBIAN_FRONTEND=noninteractive
-
-    sudo apt-get update
-    sudo apt-get dist-upgrade --yes -qq
-    sudo apt-get upgrade --yes -qq
-    sudo apt-get install --yes -qq --no-install-recommends apt-transport-https
-    sudo apt-get install --yes -qq --no-install-recommends "${PACKAGES[@]}" dnsutils
+    packages_update
+    packages_install "apt-transport-https"
+    packages_install "${PACKAGES[@]}" dnsutils
   fi
 }

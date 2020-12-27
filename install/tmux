@@ -3,9 +3,9 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  if command -v brew >/dev/null 2>&1; then
-    brew install tmux reattach-to-user-namespace
-  elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install --yes -qq --no-install-recommends tmux
+  packages_install tmux
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    packages_install reattach-to-user-namespace
   fi
 }

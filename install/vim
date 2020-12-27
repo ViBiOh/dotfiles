@@ -8,11 +8,7 @@ clean() {
 }
 
 install() {
-  if command -v brew >/dev/null 2>&1; then
-    brew install vim
-  elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install --yes -qq --no-install-recommends vim
-  fi
+  packages_install vim
 
   curl --disable --silent --show-error --location --max-time 30 -o "${HOME}/.vim/autoload/plug.vim" --create-dirs "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
   vim +PlugInstall +qall </dev/tty

@@ -3,8 +3,9 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  if command -v brew >/dev/null 2>&1; then
-    brew install --cask alacritty
+  packages_install alacritty
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
     ln -f -s "/Applications/Alacritty.app/Contents/MacOS/alacritty" "${HOME}/opt/bin/alacritty"
   fi
 }

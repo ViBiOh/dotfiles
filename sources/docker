@@ -31,6 +31,8 @@ if command -v docker >/dev/null 2>&1; then
     local AVAILABLE_AFTER
     AVAILABLE_AFTER="$(sync && BLOCKSIZE="${GIGABYTES_BLOCK_SIZE}" df -- "${DOCKER_ROOT_DIR}" | tail -1 | awk '{print $4}')"
 
+    sudo rm -rf "${HOME}/.docker"
+
     local AVAILABLE_RECLAIMED="$((AVAILABLE_AFTER - AVAILABLE_BEFORE))"
     var_info "Total reclaimed space: ${AVAILABLE_RECLAIMED}GB"
   }

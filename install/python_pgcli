@@ -17,10 +17,10 @@ install() {
     exit
   fi
 
-  if command -v brew >/dev/null 2>&1; then
-    brew install pgcli
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    packages_install pgcli
   elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install --yes -qq --no-install-recommends libpq-dev
+    packages_install libpq-dev
     pip install --user pgcli
   fi
 
