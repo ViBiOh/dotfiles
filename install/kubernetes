@@ -42,7 +42,7 @@ install() {
   local KUBESEAL_VERSION="v0.13.1"
   curl_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${OS}-${ARCH}" "kubeseal"
 
-  local LINKERD_VERSION="stable-2.9.0"
+  local LINKERD_VERSION="stable-2.9.1"
   local LINKERD_SUFFIX="${OS}-${ARCH}"
   if [[ ${OS} != "darwin" ]]; then
     LINKERD_SUFFIX="darwin"
