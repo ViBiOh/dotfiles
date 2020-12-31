@@ -22,9 +22,10 @@ install() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     OS="apple-darwin"
   elif [[ ${ARCH} == "aarch64" ]]; then
-    local OS="unknown-linux-gnu"
+    OS="unknown-linux-gnu"
   elif [[ ${ARCH} =~ ^armv ]]; then
-    local OS="unknown-linux-gnueabihf"
+    ARCH="arm"
+    OS="unknown-linux-gnueabihf"
   fi
 
   local DELTA_RELEASE="delta-${DELTA_VERSION}-${ARCH}-${OS}"
