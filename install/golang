@@ -39,7 +39,7 @@ install() {
   source "${SCRIPT_DIR}/../sources/golang"
   mkdir -p "${GOPATH}"
 
-  ipackages_install graphviz
+  packages_install graphviz
 
   if command -v go >/dev/null 2>&1; then
     if [[ ${ARCH} == "amd64" ]]; then
