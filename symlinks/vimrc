@@ -117,12 +117,6 @@ set noswapfile
 " Increase update time
 set updatetime=300
 
-" Disable arrow keys in normal mode
-nnoremap <left> <nop>
-nnoremap <right> <nop>
-nnoremap <up> <nop>
-nnoremap <down> <nop>
-
 " Change map leader if possible
 if exists(":let")
   let mapleader=","
