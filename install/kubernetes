@@ -7,15 +7,9 @@ install() {
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
   local OS
-  OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
+  OS="$(normalized_os)"
   local ARCH
-  ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
-
-  if [[ ${ARCH} == "x86_64" ]]; then
-    ARCH="amd64"
-  elif [[ ${ARCH} =~ ^armv.l$ ]]; then
-    ARCH="arm"
-  fi
+  ARCH="$(normalized_arch "amd64" "arm")"
 
   if [[ -e "${HOME}/.kube/config" ]]; then
     chmod 0600 "${HOME}/.kube/config"

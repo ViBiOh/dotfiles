@@ -15,19 +15,12 @@ clean() {
 install() {
   local GO_VERSION="1.15.6"
 
-  local OS
-  OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
   local ARCH
-  ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
-
-  if [[ ${ARCH} == "x86_64" ]]; then
-    ARCH="amd64"
-  elif [[ ${ARCH} =~ ^armv.l$ ]]; then
-    ARCH="armv6l"
-  fi
+  ARCH="$(normalized_arch "amd64" "armv6l")"
 
   if [[ ! -d "${HOME}/opt/go" ]]; then
-    local GO_ARCHIVE="go${GO_VERSION}.${OS}-${ARCH}.tar.gz"
+    local GO_ARCHIVE
+    GO_ARCHIVE="go${GO_VERSION}.$(normalized_os)-${ARCH}.tar.gz"
 
     curl --disable --silent --show-error --location --max-time 300 --remote-name "https://dl.google.com/go/${GO_ARCHIVE}"
     tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"

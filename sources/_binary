@@ -59,3 +59,26 @@ curl_to_binary() {
   curl --disable --silent --show-error --location --max-time 300 -o "${BINARY_DESTINATION}/${BINARY_NAME}" -- "${BINARY_URL}"
   chmod +x "${BINARY_DESTINATION}/${BINARY_NAME}"
 }
+
+normalized_os() {
+  uname -s | tr "[:upper:]" "[:lower:]"
+}
+
+normalized_arch() {
+  local ARCH
+  ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
+
+  local X86_VALUE="${1:-}"
+  shift || true
+
+  local ARM_VALUE="${1:-}"
+  shift || true
+
+  if [[ ${ARCH} == "x86_64" ]] && [[ -n ${X86_VALUE} ]]; then
+    ARCH="${X86_VALUE}"
+  elif [[ ${ARCH} =~ ^armv ]] && [[ -n ${ARM_VALUE} ]]; then
+    ARCH="${ARM_VALUE}"
+  fi
+
+  printf "%s" "${ARCH}"
+}
