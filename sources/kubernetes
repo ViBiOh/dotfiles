@@ -164,6 +164,7 @@ if command -v kubectl >/dev/null 2>&1; then
       rm "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
 
       if var_confirm "Perform upgrade"; then
+        var_warning "helm upgrade '${RELEASE_NAME}' ${*}"
         helm upgrade "${RELEASE_NAME}" ${*}
       fi
     }
@@ -184,6 +185,7 @@ if command -v kubeseal >/dev/null 2>&1; then
     local VALUE=${1}
     shift
 
+    var_warning "printf '%s' '${VALUE}' | kubeseal --raw --from-file=/dev/stdin --namespace='${NAMESPACE}' --name '${NAME}' --scope 'namespace-wide' ${*}"
     printf "%s" "${VALUE}" | kubeseal --raw --from-file=/dev/stdin --namespace="${NAMESPACE}" --name "${NAME}" --scope "namespace-wide" ${*}
   }
 fi

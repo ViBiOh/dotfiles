@@ -17,14 +17,13 @@ install() {
 
   local OS="unknown-linux-musl"
   local ARCH
-  ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
+  ARCH="$(normalized_arch "" "arm")"
 
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
+  if [[ $(normalized_os) =~ ^darwin ]]; then
     OS="apple-darwin"
   elif [[ ${ARCH} == "aarch64" ]]; then
     OS="unknown-linux-gnu"
-  elif [[ ${ARCH} =~ ^armv ]]; then
-    ARCH="arm"
+  elif [[ ${ARCH} == "arm" ]]; then
     OS="unknown-linux-gnueabihf"
   fi
 

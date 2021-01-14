@@ -9,18 +9,7 @@ clean() {
 install() {
   local TERRAFORM_VERSION="0.14.4"
 
-  local OS
-  OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
-  local ARCH
-  ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
-
-  if [[ ${ARCH} == "x86_64" ]]; then
-    ARCH="amd64"
-  elif [[ ${ARCH} =~ ^armv.l$ ]]; then
-    ARCH="arm"
-  fi
-
-  archive_to_binary "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${OS}_${ARCH}.zip" "terraform"
+  archive_to_binary "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_$(normalized_os)_$(normalized_arch "amd64" "arm").zip" "terraform"
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
   printf "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\n" "${HOME}" >"${HOME}/.terraformrc"

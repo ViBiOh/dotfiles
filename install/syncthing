@@ -6,18 +6,13 @@ install() {
   local SYNCTHING_VERSION="1.12.1"
 
   local OS
-  OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
-  local ARCH
-  ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
+  OS="$(normalized_os)"
 
   if [[ ${OS} == "darwin" ]]; then
     OS="macos"
   fi
 
-  if [[ ${ARCH} == "x86_64" ]]; then
-    ARCH="amd64"
-  fi
-
-  local SYNCTHING_RELEASE="syncthing-${OS}-${ARCH}-v${SYNCTHING_VERSION}"
+  local SYNCTHING_RELEASE
+  SYNCTHING_RELEASE="syncthing-${OS}-$(normalized_arch "amd64" "arm")-v${SYNCTHING_VERSION}"
   archive_to_binary "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/${SYNCTHING_RELEASE}.zip" "${SYNCTHING_RELEASE}/syncthing"
 }

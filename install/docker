@@ -8,14 +8,6 @@ install() {
   fi
 
   local CTOP_VERSION="0.7.4"
-  local OS
-  OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
-  local ARCH
-  ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
-  if [[ ${ARCH} == "x86_64" ]]; then
-    ARCH="amd64"
-  fi
-
-  curl_to_binary "https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-${OS}-${ARCH}" "ctop"
+  curl_to_binary "https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-$(normalized_os)-$(normalized_arch "amd64")" "ctop"
 }
