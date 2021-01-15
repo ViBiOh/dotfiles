@@ -48,13 +48,13 @@ def relative_time(date):
 class SublimeGitBlame(sublime_plugin.EventListener):
     _blame_key = "git_blame"
 
-    _last_filename = ""
-    _last_linenumber = 0
+    _filename = ""
+    _liner_number = 0
 
     def clear_blame(self, view):
         view.erase_status(self._blame_key)
 
-    def print_blame(self, view, selection, value):
+    def print_blame(self, view, value):
         view.set_status(self._blame_key, value)
 
     def on_selection_modified_async(self, view):
@@ -71,27 +71,30 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         if not window:
             return
 
-        current_point = selections[0].begin()
+        selection = selections[0]
+        current_point = selection.begin()
         line_number = view.rowcol(current_point)[0] + 1  # index start at 0
 
-        if file_name == self._last_filename and line_number == self._last_linenumber:
+        if line_number != view.rowcol(selection.end())[0] + 1:
+            self.clear_blame(view)
             return
 
-        self._last_filename = file_name
-        self._last_linenumber = line_number
+        if file_name == self._filename and line_number == self._liner_number:
+            return
+
+        self._filename = file_name
+        self._liner_number = line_number
 
         if current_point == view.size():
             self.clear_blame(view)
             return
-
-        variables = window.extract_variables()
-        working_dir = variables["file_path"]
 
         try:
             git_blame = subprocess.check_output(
                 [
                     "git",
                     "blame",
+                    "-w",
                     "--porcelain",
                     "-L",
                     "{},{}".format(line_number, line_number),
@@ -99,15 +102,15 @@ class SublimeGitBlame(sublime_plugin.EventListener):
                     file_name,
                 ],
                 stderr=subprocess.STDOUT,
-                cwd=working_dir,
+                cwd=window.extract_variables()["file_path"],
             )
         except subprocess.CalledProcessError as e:
             err_content = e.output.decode("utf8")
 
             if new_file_regex.match(err_content):
-                self.print_blame(view, [selections[0]], "New file")
+                self.print_blame(view, "New file")
             elif not_git_regex.match(err_content):
-                self.print_blame(view, [selections[0]], "Not in git")
+                self.print_blame(view, "Not in git")
             else:
                 print(err_content, end="")
 
@@ -119,8 +122,9 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             self.clear_blame(view)
             return
 
-        moment = datetime.fromtimestamp(int(time_regex.findall(blame_content)[0]))
+        time = int(time_regex.findall(blame_content)[0])
+        moment = datetime.fromtimestamp(time)
         description = summary_regex.findall(blame_content)[0]
         blame = "{}|{}: {}".format(author, relative_time(moment), description)
 
-        self.print_blame(view, [selections[0]], blame)
+        self.print_blame(view, blame)

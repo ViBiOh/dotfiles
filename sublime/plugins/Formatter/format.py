@@ -24,12 +24,12 @@ def format(view, region, working_dir, commands):
             cwd=working_dir,
         )
 
-        process_out, process_err = process.communicate(value.encode())
+        process_out, process_err = process.communicate(value.encode("utf8"))
         if process.returncode != 0:
-            print(process_err.decode(), end="")
+            print(process_err.decode("utf8"), end="")
             return value
 
-        value = process_out.decode()
+        value = process_out.decode("utf8")
 
     return value
 
