@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+fix_spotlight() {
+  sudo mdutil -a -d -i off
+  sudo mdutil -X "/"
+  sudo mdutil -X "/System/Volumes/Data"
+}
