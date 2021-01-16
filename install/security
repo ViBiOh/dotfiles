@@ -90,7 +90,6 @@ install() {
     defaults write com.apple.Safari ShowFavoritesBar -bool false
     defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
     defaults write com.apple.Safari ShowSidebarInTopSites -bool false
-    defaults write com.apple.Safari ShowSidebarInTopSites -bool false
     defaults write com.apple.Safari SuppressSearchSuggestions -bool true
     defaults write com.apple.Safari UniversalSearchEnabled -bool false
     defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
@@ -155,9 +154,7 @@ install() {
     sudo pmset -c displaysleep 10
     sudo pmset -c sleep 15
 
-    sudo mdutil -a -d -i off
-    sudo mdutil -X "/"
-    sudo mdutil -X "/System/Volumes/Data"
+    fix_spotlight
 
     sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
     sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
