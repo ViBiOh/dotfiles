@@ -63,7 +63,7 @@ if command -v kubectl >/dev/null 2>&1; then
       case ${ACTION} in
       "context")
         local CONTEXT
-        CONTEXT=$(kubectl config get-contexts -o name | fzf --height=20 --ansi --reverse -1 --query="${1:-}")
+        CONTEXT="$(kubectl config get-contexts -o name | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
 
         if [[ -n ${CONTEXT:-} ]]; then
           KUBECONFIG=$(mktemp -t kubeconfig)
