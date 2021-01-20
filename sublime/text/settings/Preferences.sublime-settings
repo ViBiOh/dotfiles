@@ -6,7 +6,7 @@
   "draw_white_space": "all",
   "enable_tab_scrolling": false,
   "fold_buttons": false,
-  "hardware_acceleration": "none",
+  "hardware_acceleration": "opengl",
   "highlight_line": true,
   "highlight_modified_tabs": true,
   "index_skip_unknown_extensions": false,
