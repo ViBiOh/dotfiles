@@ -39,7 +39,7 @@ archive_to_binary() {
 
     mv "${ARCHIVE_FILENAME}/${BINARY_PATH}" "${BINARY_DESTINATION}"
     chmod +x "${BINARY_DESTINATION}/$(basename "${BINARY_PATH}")"
-    rm -rf "${ARCHIVE_PATH:?}" "${ARCHIVE_FILENAME:?}"
+    rm -rf "${ARCHIVE_PATH}" "${ARCHIVE_FILENAME}"
   )
 }
 
@@ -74,10 +74,15 @@ normalized_arch() {
   local ARM_VALUE="${1:-}"
   shift || true
 
+  local ARM64_VALUE="${1:-}"
+  shift || true
+
   if [[ ${ARCH} == "x86_64" ]] && [[ -n ${X86_VALUE} ]]; then
     ARCH="${X86_VALUE}"
   elif [[ ${ARCH} =~ ^armv ]] && [[ -n ${ARM_VALUE} ]]; then
     ARCH="${ARM_VALUE}"
+  elif [[ ${ARCH} == "aarch64" ]] && [[ -n ${ARM64_VALUE} ]]; then
+    ARCH="${ARM64_VALUE}"
   fi
 
   printf "%s" "${ARCH}"

@@ -5,19 +5,32 @@ set -o nounset -o pipefail -o errexit
 install() {
   packages_install sublime-merge
 
-  if command -v brew >/dev/null 2>&1; then
-    local SUBLIME_TEXT_VERSION
-    SUBLIME_TEXT_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/dev_update_check" | jq .latest_version)"
+  local SUBLIME_TEXT_VERSION
+  SUBLIME_TEXT_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/dev_update_check" | jq .latest_version)"
 
-    local SUBLIME_TEXT_FILENAME="sublime_text_build_${SUBLIME_TEXT_VERSION}_mac.zip"
-    curl --disable --silent --show-error --location --max-time 300 -O "https://download.sublimetext.com/${SUBLIME_TEXT_FILENAME}"
+  local FILENAME_SUFFIX
+  FILENAME_SUFFIX="$(normalized_arch "amd64" "arm" "arm64").tar.gz"
 
-    rm -rf "/Applications/Sublime Text.app"
-    unzip -o "${SUBLIME_TEXT_FILENAME}" -d "/Applications/"
-    rm -rf "${SUBLIME_TEXT_FILENAME}"
+  local OUTPUT_FOLDER="${HOME}/opt/"
 
-    ln -f -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" "${HOME}/opt/bin/subl"
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    OUTPUT_FOLDER="/Applications/"
+    FILENAME_SUFFIX="mac.zip"
+    rm -rf "${OUTPUT_FOLDER}/Sublime Text.app"
   fi
+
+  local SUBLIME_TEXT_FILENAME="sublime_text_build_${SUBLIME_TEXT_VERSION}_${FILENAME_SUFFIX}"
+  curl --disable --silent --show-error --location --max-time 300 -O "https://download.sublimetext.com/${SUBLIME_TEXT_FILENAME}"
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    unzip -d "${OUTPUT_FOLDER}" -o "${SUBLIME_TEXT_FILENAME}"
+    ln -f -s "${OUTPUT_FOLDER}/Sublime Text.app/Contents/SharedSupport/bin/subl" "${HOME}/opt/bin/subl"
+  else
+    tar xzf "${SUBLIME_TEXT_FILENAME}" -C "${OUTPUT_FOLDER}"
+    ln -f -s "${OUTPUT_FOLDER}/sublime_text/sublime_text" "${HOME}/opt/bin/subl"
+  fi
+
+  rm -rf "${SUBLIME_TEXT_FILENAME}"
 
   if command -v subl >/dev/null 2>&1; then
     local SCRIPT_DIR

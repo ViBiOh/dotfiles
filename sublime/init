@@ -4,16 +4,19 @@ set -o nounset -o pipefail -o errexit
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 install_plugin() {
-  if [[ ${#} -ne 1 ]]; then
-    var_error "Usage: install_plugin PLUGIN_NAME"
+  if [[ ${#} -ne 2 ]]; then
+    var_error "Usage: install_plugin PACKAGES_FOLDER PLUGIN_NAME"
     return 1
   fi
+
+  local PACKAGES_FOLDER="${1}"
+  shift
 
   local PLUGIN_NAME="${1}"
   shift
 
-  rm -rf "${TEXT_PKG}/${PLUGIN_NAME}"
-  ln -s "${SCRIPT_DIR}/plugins/${PLUGIN_NAME}" "${TEXT_PKG}/${PLUGIN_NAME}"
+  rm -rf "${PACKAGES_FOLDER:?}/${PLUGIN_NAME}"
+  ln -s "${SCRIPT_DIR}/plugins/${PLUGIN_NAME}" "${PACKAGES_FOLDER}/${PLUGIN_NAME}"
 }
 
 symlink_settings() {
@@ -27,7 +30,7 @@ symlink_settings() {
   local SETTING_TYPE="${1}"
   shift
 
-  rm -rf "${PACKAGE_FOLDER}"/*
+  rm -rf "${PACKAGE_FOLDER:?}"/*
   mkdir -p "${PACKAGE_FOLDER}"
 
   if [[ -d "${SCRIPT_DIR}/${SETTING_TYPE}/settings/" ]]; then
@@ -50,6 +53,9 @@ install_shfmt() {
 }
 
 main() {
+  local TEXT_PKG="${HOME}/.config/sublime-text/Packages"
+  local MERGE_PKG="${HOME}/.config/sublime-merge/Packages"
+
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text/Packages"
     local MERGE_PKG="${HOME}/Library/Application Support/Sublime Merge/Packages"
@@ -60,17 +66,17 @@ main() {
   symlink_settings "${TEXT_PKG}" "text"
   symlink_settings "${MERGE_PKG}" "merge"
 
-  install_plugin SublimeGit
-  install_plugin SublimeGo
-  install_plugin SublimeLayout
-  install_plugin Formatter
+  install_plugin "${TEXT_PKG}" SublimeGit
+  install_plugin "${TEXT_PKG}" SublimeGo
+  install_plugin "${TEXT_PKG}" SublimeLayout
+  install_plugin "${TEXT_PKG}" Formatter
 
   if command -v go >/dev/null 2>&1; then
     GO111MODULE=on go get golang.org/x/tools/gopls@latest
   fi
 
   if command -v npm >/dev/null 2>&1; then
-    npm install --global prettier eslint javascript-typescript-langserver
+    npm install --global prettier eslint
   fi
 
   if command -v pip >/dev/null 2>&1; then
