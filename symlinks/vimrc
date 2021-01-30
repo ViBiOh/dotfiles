@@ -22,7 +22,7 @@ highlight User3 ctermfg=2 ctermbg=235
 highlight clear SignColumn
 
 set statusline=
-set statusline+=%1*\ \%f " Filename
+set statusline+=%1*\ \%f " Filename
 set statusline+=%2*\%m" Modified
 set statusline+=%*\%R " Read-Only indicator
 set statusline+=%=
