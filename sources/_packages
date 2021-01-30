@@ -32,5 +32,7 @@ packages_clean() {
     export DEBIAN_FRONTEND=noninteractive
     sudo apt-get autoremove --yes
     sudo apt-get clean all
+  elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman --sync --clean --quiet --noconfirm
   fi
 }

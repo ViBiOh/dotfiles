@@ -69,6 +69,17 @@ browse_install() {
   done < <(find "${CURRENT_DIR}/install" -type f -print0 | LC_ALL=C sort --zero-terminated)
 }
 
+source_bashrc() {
+  if [[ -e "${HOME}/.bashrc" ]]; then
+    print_title "Sourcing ~/.bashrc"
+    set +u
+    set +e
+    PS1="$" source "${HOME}/.bashrc"
+    set -e
+    set -u
+  fi
+}
+
 main() {
   local FILE_LIMIT=""
   local RUN_SYMLINKS=0
@@ -76,7 +87,7 @@ main() {
   local RUN_INSTALL=0
   local RUN_PASSWORDS=0
 
-  while getopts ":l:acipsh" option; do
+  while getopts ":l:achips" option; do
     case "${option}" in
     a)
       RUN_SYMLINKS=1
@@ -124,15 +135,7 @@ main() {
   fi
 
   mkdir -p "${HOME}/opt/bin"
-
-  if [[ -e "${HOME}/.bashrc" ]]; then
-    print_title "Sourcing ~/.bashrc"
-    set +u
-    set +e
-    PS1="$" source "${HOME}/.bashrc"
-    set -e
-    set -u
-  fi
+  source_bashrc
 
   local ACTIONS=()
 
@@ -148,6 +151,8 @@ main() {
     browse_install "${ACTIONS[@]}"
     packages_clean
   fi
+
+  source_bashrc
 
   if [[ ${RUN_PASSWORDS} -eq 1 ]]; then
     browse_install credentials

@@ -75,3 +75,6 @@
 	cmd = smerge mergetool \"$BASE\" \"$LOCAL\" \"$REMOTE\" -o \"$MERGED\"
 	trustExitCode = true
 	keepBackup = false
+
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
