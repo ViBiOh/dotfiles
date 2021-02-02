@@ -30,6 +30,7 @@ install() {
     grep --invert-match "0.0.0.0 v.redd.it" |
     grep --invert-match "0.0.0.0 styles.redditmedia.com" |
     grep --invert-match "0.0.0.0 reddit.map.fastly.net" |
+    grep --invert-match "0.0.0.0 files.slack.com" |
     sed $'s|0.0.0.0 \(.*\)|0.0.0.0 \\1\\\n0:0:0:0:0:0:0:0 \\1|g' |
     sudo tee /etc/hosts >/dev/null
 
