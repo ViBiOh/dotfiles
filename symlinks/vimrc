@@ -213,12 +213,10 @@ noremap <C-p> :FZF<return>
 " vim-plug
 call plug#begin('~/.vim/plugged')
 
-Plug 'junegunn/fzf.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'vim-syntastic/syntastic'
-Plug 'preservim/tagbar'
 
 call plug#end()
 
@@ -246,14 +244,6 @@ if executable('gopls')
         \ 'name': 'gopls',
         \ 'cmd': {server_info->['gopls']},
         \ 'allowlist': ['go'],
-        \ })
-endif
-
-if executable('javascript-typescript-stdio')
-  au User lsp_setup call lsp#register_server({
-        \ 'name': 'javascript-typescript-stdio',
-        \ 'cmd': {server_info->['javascript-typescript-stdio']},
-        \ 'allowlist': ['javascript', 'javascriptreact'],
         \ })
 endif
 
@@ -294,6 +284,3 @@ if exists(":let")
   let g:syntastic_check_on_open = 1
   let g:syntastic_check_on_wq = 0
 endif
-
-" tagbar configuration
-nmap <C-t> :TagbarOpenAutoClose<CR>
