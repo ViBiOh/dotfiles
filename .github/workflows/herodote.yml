@@ -3,7 +3,7 @@ name: Herodote
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   build:
     name: Feed
@@ -17,7 +17,7 @@ jobs:
 
       - name: Push history
         run: |
-          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/herodote/master/herodote.sh" | bash
+          curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/herodote/main/herodote.sh" | bash
         env:
           HERODOTE_API: https://herodote.vibioh.fr
           HERODOTE_SECRET: ${{ secrets.HERODOTE_SECRET }}
