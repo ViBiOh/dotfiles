@@ -160,7 +160,7 @@ inoremap <Tab> <C-R>=SuperTab()<CR>
 " Using ripgrep for searching
 if executable("rg")
   set grepprg=rg\ --vimgrep\ --no-heading
-  nnoremap <Leader>g :silent lgrep -P --<Space>
+  nnoremap <Leader>* :lgrep -P --<Space>
 endif
 
 if exists(':autocmd') && exists(':augroup')
@@ -213,8 +213,9 @@ noremap <C-p> :FZF<return>
 " vim-plug
 call plug#begin('~/.vim/plugged')
 
-Plug 'editorconfig/editorconfig-vim'
 Plug 'airblade/vim-gitgutter'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'prabirshrestha/vim-lsp'
 Plug 'vim-syntastic/syntastic'
 
@@ -278,9 +279,10 @@ if exists(':autocmd') && exists(':augroup')
 endif
 
 " syntastic configuration
+noremap <C-l> :SyntasticCheck<CR>
 if exists(":let")
   let g:syntastic_always_populate_loc_list = 1
   let g:syntastic_auto_loc_list = 1
-  let g:syntastic_check_on_open = 1
+  let g:syntastic_check_on_open = 0
   let g:syntastic_check_on_wq = 0
 endif
