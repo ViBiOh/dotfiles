@@ -228,8 +228,8 @@ call plug#end()
 highlight GitGutterAdd    guifg=#009900 ctermfg=2
 highlight GitGutterChange guifg=#bbbb00 ctermfg=3
 highlight GitGutterDelete guifg=#ff2222 ctermfg=1
-nmap <Leader>hu <Plug>(GitGutterUndoHunk)
-nmap <Leader>hv <Plug>(GitGutterPreviewHunk)
+nmap <Leader>z <Plug>(GitGutterUndoHunk)
+nmap <Leader>; <Plug>(GitGutterPreviewHunk)
 if exists(':let')
   let g:gitgutter_map_keys = 0
 endif
