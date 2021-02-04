@@ -11,8 +11,3 @@ fi
 ...() {
   cd "$(git_root)" || return 1
 }
-
-git_default_branch() {
-  GIT_DEFAULT_BRANCH="$(git default-branch)"
-  export GIT_DEFAULT_BRANCH
-}
