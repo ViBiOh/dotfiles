@@ -220,6 +220,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'prabirshrestha/vim-lsp'
+Plug 'tpope/vim-surround'
 Plug 'vim-syntastic/syntastic'
 
 call plug#end()
