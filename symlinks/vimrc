@@ -9,8 +9,9 @@ endif
 " Set color width
 set t_Co=256
 
-" setting colorscheme to ensure it
-colorscheme default
+" Setting colorscheme to ensure it
+set background=dark
+colorscheme slate
 
 " Show status line
 set laststatus=2
