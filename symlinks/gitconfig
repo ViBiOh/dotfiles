@@ -57,12 +57,12 @@
 	pushf = push --force-with-lease
 	pur = ! git pushu && git pr
 	co = checkout
-	main = ! git checkout "$(git default-branch)"
 	d = diff --ignore-all-space
 	s = status --short --branch
 	unstage = reset HEAD --
 	current-branch = rev-parse --abbrev-ref HEAD
 	default-branch = ! git remote show origin | grep 'HEAD branch:' | awk '{print $3}'
+	default = ! git checkout "$(git default-branch)"
 	log-pretty = log --color --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 	lg = log-pretty --graph
 	changelog = ! git log --no-merges --pretty=format:'%Cred%h%Creset %s' "${2:-HEAD}...${1:-$(git last-tag)}"
