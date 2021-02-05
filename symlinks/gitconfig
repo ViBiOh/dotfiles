@@ -1,3 +1,6 @@
+[init]
+	defaultBranch = main
+
 [user]
 	name = Vincent Boutour
 	email = bob@vibioh.fr
