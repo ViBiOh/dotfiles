@@ -15,11 +15,11 @@ archive_to_binary() {
 
   local ARCHIVE_FILENAME
   local ARCHIVE_EXTENSION
-  if [[ ${ARCHIVE_URL} =~ .*\/(.*)\.(tar\.gz|zip) ]]; then
+  if [[ ${ARCHIVE_URL} =~ .*\/(.*)\.(tar\.[g|x]z|zip) ]]; then
     ARCHIVE_FILENAME="${BASH_REMATCH[1]}"
     ARCHIVE_EXTENSION="${BASH_REMATCH[2]}"
   else
-    var_error "archive_to_binary: unable to extract archive filename and extension from ${URL}"
+    var_error "archive_to_binary: unable to extract archive filename and extension from ${ARCHIVE_URL}"
     return 1
   fi
 
@@ -31,7 +31,7 @@ archive_to_binary() {
     cd "${TEMP_FOLDER}" || false
     mkdir -p "${ARCHIVE_FILENAME}"
 
-    if [[ ${ARCHIVE_EXTENSION} == "tar.gz" ]]; then
+    if [[ ${ARCHIVE_EXTENSION} == "tar.gz" ]] || [[ ${ARCHIVE_EXTENSION} == "tar.xz" ]]; then
       tar xzf "${ARCHIVE_PATH}" -C "${ARCHIVE_FILENAME}"
     elif [[ ${ARCHIVE_EXTENSION} == "zip" ]]; then
       unzip "${ARCHIVE_PATH}" -d "${ARCHIVE_FILENAME}"
