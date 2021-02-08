@@ -31,8 +31,10 @@ archive_to_binary() {
     cd "${TEMP_FOLDER}" || false
     mkdir -p "${ARCHIVE_FILENAME}"
 
-    if [[ ${ARCHIVE_EXTENSION} == "tar.gz" ]] || [[ ${ARCHIVE_EXTENSION} == "tar.xz" ]]; then
-      tar xzf "${ARCHIVE_PATH}" -C "${ARCHIVE_FILENAME}"
+    if [[ ${ARCHIVE_EXTENSION} == "tar.gz" ]]; then
+      tar -xzf "${ARCHIVE_PATH}" -C "${ARCHIVE_FILENAME}"
+    elif [[ ${ARCHIVE_EXTENSION} == "tar.xz" ]]; then
+      tar -xf "${ARCHIVE_PATH}" -C "${ARCHIVE_FILENAME}"
     elif [[ ${ARCHIVE_EXTENSION} == "zip" ]]; then
       unzip "${ARCHIVE_PATH}" -d "${ARCHIVE_FILENAME}"
     fi

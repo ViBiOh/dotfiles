@@ -11,5 +11,5 @@ install() {
   local OS
   OS="$(normalized_os)"
 
-  archive_to_binary "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.${OS}.${ARCH}.tar.xz" "shellcheck"
+  archive_to_binary "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.${OS}.${ARCH}.tar.xz" "shellcheck-${SHELLCHECK_VERSION}/shellcheck"
 }
