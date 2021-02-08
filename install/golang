@@ -16,7 +16,7 @@ install() {
   local GO_VERSION="1.15.8"
 
   local ARCH
-  ARCH="$(normalized_arch "amd64" "armv6l")"
+  ARCH="$(normalized_arch "amd64" "armv6l" "arm64")"
 
   if [[ ! -d "${HOME}/opt/go" ]]; then
     local GO_ARCHIVE

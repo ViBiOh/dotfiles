@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  local PACKAGES=('bash' 'bash-completion' 'htop' 'openssl' 'curl' 'ncdu' 'jq')
+  local PACKAGES=("bash" "bash-completion" "make" "htop" "openssl" "curl" "ncdu" "jq")
 
   cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
 #!/usr/bin/env bash

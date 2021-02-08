@@ -9,7 +9,7 @@ install() {
   local OS
   OS="$(normalized_os)"
   local ARCH
-  ARCH="$(normalized_arch "amd64" "arm")"
+  ARCH="$(normalized_arch "amd64" "arm" "arm64")"
 
   if [[ -e "${HOME}/.kube/config" ]]; then
     chmod 0600 "${HOME}/.kube/config"

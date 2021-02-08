@@ -3,5 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  packages_install appcleaner
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    packages_install appcleaner
+  fi
 }
