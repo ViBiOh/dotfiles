@@ -20,7 +20,7 @@ install() {
   SUBLIME_TEXT_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/dev_update_check" | jq .latest_version)"
 
   local FILENAME_SUFFIX
-  FILENAME_SUFFIX="$(normalized_arch "amd64" "arm" "arm64").tar.gz"
+  FILENAME_SUFFIX="$(normalized_arch "amd64" "arm" "arm64").tar.xz"
 
   local OUTPUT_FOLDER="${HOME}/opt/"
 
@@ -37,7 +37,7 @@ install() {
     unzip -d "${OUTPUT_FOLDER}" -o "${SUBLIME_TEXT_FILENAME}"
     ln -f -s "${OUTPUT_FOLDER}/Sublime Text.app/Contents/SharedSupport/bin/subl" "${HOME}/opt/bin/subl"
   else
-    tar xzf "${SUBLIME_TEXT_FILENAME}" -C "${OUTPUT_FOLDER}"
+    tar -xf "${SUBLIME_TEXT_FILENAME}" -C "${OUTPUT_FOLDER}"
     ln -f -s "${OUTPUT_FOLDER}/sublime_text/sublime_text" "${HOME}/opt/bin/subl"
   fi
 
