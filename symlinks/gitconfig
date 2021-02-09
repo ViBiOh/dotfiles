@@ -47,8 +47,9 @@
 	pr = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@(.*):(.*)$ ]] && open \"https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]%.git}/compare/$(git default-branch)...$(git current-branch)?expand=1\"
 	fco = "! git switch \"$(git branch -vv --all | fzf --height 20 --ansi -1 --reverse --query=\"remotes/${1:-}\" | awk '{print $1}' | sed 's|^remotes/origin/||')\" #"
 	fixup = ! git commit --fixup $(git log-pretty "$(git default-branch)..$(git current-branch)" --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{print $1}')
-	file-stat = ! git log --format=format: --name-only | grep -E -v '^$' | sort | uniq -c | sort -rg | head -10
-	author-stat = ! git log --format=%an | grep -E -v '^$' | sort | uniq -c | sort -rg | head -10
+	file-stat = ! git log --format=format: --name-only | grep --extended-regexp --invert-match '^$' | sort | uniq -c | sort -rg | head -10
+	line-count = ! git ls-files | grep --invert-match package-lock.json | grep --extended-regexp --invert-match '.jpg$|.jpeg$|.png$|.gif$|.ico$|.lock$|.sum$|.jar$|.bat$|.otf$|.woff$|.svg$|.xml$' | xargs wc -l
+	author-stat = ! git log --format=%an | grep --extended-regexp --invert-match '^$' | sort | uniq -c | sort -rg | head -10
 	copr = !sh -c 'git fetch origin "pull/${1}/head:pr/${1}" && git switch "pr/${1}"' -
 	rbm = ! git pull --rebase origin "$(git default-branch)"
 	tidy = ! git rebase --interactive "origin/$(git default-branch)"
