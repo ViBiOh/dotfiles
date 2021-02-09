@@ -13,6 +13,12 @@ install() {
   fi
 
   local SYNCTHING_RELEASE
-  SYNCTHING_RELEASE="syncthing-${OS}-$(normalized_arch "amd64" "arm")-v${SYNCTHING_VERSION}"
-  archive_to_binary "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/${SYNCTHING_RELEASE}.zip" "${SYNCTHING_RELEASE}/syncthing"
+  SYNCTHING_RELEASE="syncthing-${OS}-$(normalized_arch "amd64" "arm" "arm64")-v${SYNCTHING_VERSION}"
+
+  local SYNCTHIN_ARCHIVE_TYPE="tar.gz"
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    SYNCTHIN_ARCHIVE_TYPE="zip"
+  fi
+
+  archive_to_binary "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/${SYNCTHING_RELEASE}.${SYNCTHIN_ARCHIVE_TYPE}" "${SYNCTHING_RELEASE}/syncthing"
 }
