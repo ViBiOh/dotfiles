@@ -10,7 +10,11 @@ install() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-  packages_install python python-pip
+  packages_install python
+
+  if ! [[ ${OSTYPE} =~ ^darwin ]]; then
+    packages_install python-pip
+  fi
 
   if command -v brew >/dev/null 2>&1; then
     brew unlink "python" && brew link "python"
