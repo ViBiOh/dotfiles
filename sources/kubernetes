@@ -5,22 +5,13 @@ if command -v kubectl >/dev/null 2>&1; then
     # preserve exit status
     local exit="${?}"
 
-    if [[ -n ${KUBE_PS1:-} ]]; then
-      printf " ☸️ %s" "$(kubectl config view --minify --output=jsonpath --template='{..current-context}/{..namespace}')"
-    fi
+    printf " ☸️ %s" "$(kubectl config view --minify --output=jsonpath --template='{..current-context}/{..namespace}')"
 
     return "${exit}"
   }
 
   if command -v fzf >/dev/null 2>&1; then
     kube() {
-      if [[ ${#} -eq 0 ]] && [[ -n ${KUBE_PS1:-} ]]; then
-        unset KUBE_PS1
-        return
-      fi
-
-      export KUBE_PS1="true"
-
       get_kube_restart() {
         cat \
           <(kubectl get deployments --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/deployment/" + .name') \
