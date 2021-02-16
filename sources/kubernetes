@@ -63,7 +63,7 @@ if command -v kubectl >/dev/null 2>&1; then
           var_warning "kubectl config use-context '${CONTEXT}'"
           kubectl config use-context "${CONTEXT}"
 
-          if [[ -z ${TMUX:-} ]]; then
+          if [[ -n ${TMUX:-} ]]; then
             tmux setenv KUBECONFIG "${KUBECONFIG}"
           fi
         fi
