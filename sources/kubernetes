@@ -62,6 +62,10 @@ if command -v kubectl >/dev/null 2>&1; then
           cat "${HOME}/.kube/config" >>"${KUBECONFIG}"
           var_warning "kubectl config use-context '${CONTEXT}'"
           kubectl config use-context "${CONTEXT}"
+
+          if [[ -z ${TMUX:-} ]]; then
+            tmux setenv KUBECONFIG "${KUBECONFIG}"
+          fi
         fi
         ;;
 
