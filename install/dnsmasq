@@ -54,7 +54,7 @@ log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" >/dev/null
 
   if command -v resolvconf >/dev/null 2>&1; then
     if [[ -d /etc/NetworkManager/ ]]; then
-      echo "dns=none" | sudo tee "/etc/NetworkManager/NetworkManager.conf" >/dev/null
+      printf "dns=none\n" | sudo tee "/etc/NetworkManager/NetworkManager.conf" >/dev/null
     fi
 
     echo "resolv_conf=/etc/resolv.conf

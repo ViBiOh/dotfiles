@@ -45,7 +45,7 @@ if command -v pass >/dev/null 2>&1; then
 
     if pass -c "${PASS_NAME}" && [[ "$(pass show "${PASS_NAME}" | grep --count "^otpauth:")" -eq 1 ]]; then
       read -s -r -p "  Press enter for otp"
-      echo ""
+      printf "\n"
 
       pass otp -c "${PASS_NAME}"
     fi
@@ -97,7 +97,7 @@ if command -v pgcli >/dev/null 2>&1; then
 
       while IFS=":" read -r host port db user pass; do
         if [[ ! ${host} =~ ^\s*# ]] && [[ ! ${host} =~ ^\s*$ ]]; then
-          echo -e "host: ${BLUE}${host}${RESET} port: ${YELLOW}${port}${RESET} db: ${RED}${db}${RESET} user: ${GREEN}${user}${RESET} ${BLUE}${comment}${RESET}"
+          printf "host: %b%s%b port: %b%s%b db: %b%s%b user: %b%s%b %b%s%b\n" "${BLUE}" "${host}" "${RESET}" "${YELLOW}" "${port}" "${RESET}" "${RED}" "${db}" "${RESET}" "${GREEN}" "${user}" "${RESET}" "${BLUE}" "${comment}" "${RESET}"
           comment=""
         elif [[ ${host} =~ ^\s*# ]]; then
           comment="${host}"

@@ -30,7 +30,7 @@ END_OF_BASH_PROFILE
       printf "| changing shell for user |\n"
       printf "+-------------------------+\n"
 
-      echo "$(brew --prefix)/bin/bash" | sudo tee -a "/etc/shells" >/dev/null
+      printf "%s/bin/bash\n" "$(brew --prefix)" | sudo tee -a "/etc/shells" >/dev/null
       chsh -s "$(brew --prefix)/bin/bash" -u "$(whoami)"
     fi
   elif command -v apt-get >/dev/null 2>&1; then
