@@ -4,7 +4,7 @@ if ! command -v git >/dev/null 2>&1; then
   return
 fi
 
-if [[ -f "${HOME}/opt/bin/delta" ]]; then
+if command -v delta >/dev/null 2>&1; then
   export GIT_PAGER='delta --dark'
 fi
 
