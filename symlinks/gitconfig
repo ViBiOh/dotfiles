@@ -55,12 +55,12 @@
 	copr = !sh -c 'git fetch origin "pull/${1}/head:pr/${1}" && git switch "pr/${1}"' -
 	up = ! git pull --rebase origin "$(git default-branch)"
 	tidy = ! git rebase --signoff --interactive "origin/$(git default-branch)"
-	commend = c --amend --no-edit
+	commend = ci --amend --no-edit
 	pushu = push --set-upstream
 	pushf = push --force-with-lease
 	pur = ! git pushu && git pr
 	co = checkout
-	c = commit --signoff
+	ci = commit --signoff
 	d = diff --ignore-all-space
 	s = status --short --branch
 	unstage = reset HEAD --
