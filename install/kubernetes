@@ -33,10 +33,6 @@ install() {
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
-  local STERN_VERSION="1.11.0"
-  curl_to_binary "https://github.com/wercker/stern/releases/download/${STERN_VERSION}/stern_${OS}_${ARCH}" "stern"
-  stern --completion bash >"${SCRIPT_DIR}/../sources/stern-completion"
-
   local KUBESEAL_VERSION="v0.13.1"
   curl_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${OS}-${ARCH}" "kubeseal"
 }
