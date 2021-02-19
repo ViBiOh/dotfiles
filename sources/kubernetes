@@ -171,6 +171,44 @@ if command -v kubectl >/dev/null 2>&1; then
   fi
 fi
 
+if command -v yq >/dev/null 2>&1; then
+  get_crds_manifests() {
+    if [[ ${#} -lt 3 ]]; then
+      var_error "Usage: get_crds_manifests CHART_URL CHART_NAME CHART_VERSION"
+      return 1
+    fi
+
+    local CHART_URL=${1}
+    shift
+    local CHART_NAME=${1}
+    shift
+    local CHART_VERSION=${1}
+    shift
+
+    local CURRENT_DIR
+    CURRENT_DIR="$(pwd)"
+
+    local TEMP_FOLDER="/tmp"
+    local ARCHIVE_FILENAME="${CHART_NAME}-${CHART_VERSION}"
+    local ARCHIVE_PATH="${TEMP_FOLDER}/${ARCHIVE_FILENAME}.tar.gz"
+
+    echo "${CHART_URL}/index.yaml"
+
+    local ARCHIVE_URL
+    ARCHIVE_URL="$(curl --disable --silent --show-error --location --max-time 30 -- "${CHART_URL}/index.yaml" | yq eval ".entries.${CHART_NAME}[] | select(.version == \"${CHART_VERSION}\") | .urls[0]" -)"
+
+    curl --disable --silent --show-error --location --max-time 300 -o "${ARCHIVE_PATH}" -- "${ARCHIVE_URL}"
+    (
+      cd "${TEMP_FOLDER}" || false
+      mkdir -p "${ARCHIVE_FILENAME}"
+      tar -xzf "${ARCHIVE_PATH}" -C "${ARCHIVE_FILENAME}"
+
+      cp "${ARCHIVE_FILENAME}/${CHART_NAME}/crds/"* "${CURRENT_DIR}/"
+      rm -rf "${ARCHIVE_PATH}" "${ARCHIVE_FILENAME}"
+    )
+  }
+fi
+
 if command -v kubeseal >/dev/null 2>&1; then
   kubeseal_raw() {
     if [[ ${#} -lt 3 ]]; then
