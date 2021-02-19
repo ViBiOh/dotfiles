@@ -192,8 +192,6 @@ if command -v yq >/dev/null 2>&1; then
     local ARCHIVE_FILENAME="${CHART_NAME}-${CHART_VERSION}"
     local ARCHIVE_PATH="${TEMP_FOLDER}/${ARCHIVE_FILENAME}.tar.gz"
 
-    echo "${CHART_URL}/index.yaml"
-
     local ARCHIVE_URL
     ARCHIVE_URL="$(curl --disable --silent --show-error --location --max-time 30 -- "${CHART_URL}/index.yaml" | yq eval ".entries.${CHART_NAME}[] | select(.version == \"${CHART_VERSION}\") | .urls[0]" -)"
 
