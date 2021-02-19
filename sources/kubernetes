@@ -55,7 +55,7 @@ if command -v kubectl >/dev/null 2>&1; then
         ;;
 
       "forward")
-        IFS='/' read -r -a parts <<<"$(get_kube_resources "services" "${1:-}")"
+        IFS='/' read -r -a parts <<<"$(get_kube_resources "services" "${1:- }")"
 
         if [[ -n ${parts[1]:-} ]]; then
           local KUBE_PORT
@@ -70,7 +70,7 @@ if command -v kubectl >/dev/null 2>&1; then
         ;;
 
       "image")
-        IFS='/' read -r -a parts <<<"$(get_kube_resources "deployments.apps" "${1:-}")"
+        IFS='/' read -r -a parts <<<"$(get_kube_resources "deployments.apps" "${1:- }")"
 
         if [[ -n ${parts[1]:-} ]]; then
           print_and_execute "kubectl get '${parts[0]}' --namespace='${parts[1]}' '${parts[2]}' --output=json | jq -r '.spec.template.spec.containers[].image'"
@@ -86,9 +86,19 @@ if command -v kubectl >/dev/null 2>&1; then
         ;;
 
       "log" | "logs")
-        IFS='/' read -r -a parts <<<"$(get_kube_resources "${@}")"
-        shift || true
-        shift || true
+        local FIRST=""
+        if ! [[ ${1:-} =~ ^- ]]; then
+          FIRST=${1}
+          shift
+        fi
+
+        local SECOND=""
+        if ! [[ ${1:-} =~ ^- ]]; then
+          SECOND=${1}
+          shift
+        fi
+
+        IFS='/' read -r -a parts <<<"$(get_kube_resources "${FIRST}" "${SECOND}")"
 
         if [[ -n ${parts[1]:-} ]]; then
           local PODS_LABELS
