@@ -88,13 +88,13 @@ if command -v kubectl >/dev/null 2>&1; then
       "log" | "logs")
         local FIRST=""
         if ! [[ ${1:-} =~ ^- ]]; then
-          FIRST=${1}
+          FIRST="${1}"
           shift
         fi
 
         local SECOND=""
         if ! [[ ${1:-} =~ ^- ]]; then
-          SECOND=${1}
+          SECOND="${1}"
           shift
         fi
 
@@ -107,9 +107,9 @@ if command -v kubectl >/dev/null 2>&1; then
           printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "$(printf "%s" "${parts[@]}")" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
           if command -v stern >/dev/null 2>&1; then
-            print_and_execute "stern --namespace='${parts[1]}' --selector='${PODS_LABELS}' --since=280h ${@}"
+            print_and_execute "stern --namespace='${parts[1]}' --selector='${PODS_LABELS}' --since=280h ${*}"
           else
-            print_and_execute "kubectl logs --namespace='${parts[1]}' --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow ${@}"
+            print_and_execute "kubectl logs --namespace='${parts[1]}' --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow ${*}"
           fi
         fi
         ;;
@@ -127,7 +127,7 @@ if command -v kubectl >/dev/null 2>&1; then
         ;;
 
       "watch")
-        print_and_execute "kubectl get pods --all-namespaces --watch ${@}"
+        print_and_execute "kubectl get pods --all-namespaces --watch ${*}"
         ;;
 
       *)
