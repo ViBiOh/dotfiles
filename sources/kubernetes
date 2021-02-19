@@ -171,33 +171,65 @@ if command -v kubectl >/dev/null 2>&1; then
   fi
 fi
 
-if command -v yq >/dev/null 2>&1; then
+if command -v yq >/dev/null 2>&1 && command -v helm >/dev/null 2>&1; then
   get_crds_manifests() {
-    if [[ ${#} -lt 3 ]]; then
-      var_error "Usage: get_crds_manifests CHART_URL CHART_NAME CHART_VERSION"
+    local CHART_URL="${1:-$(helm repo list --output yaml | yq eval '.[].url' - | fzf --height=20 --ansi --reverse -1)}"
+    shift || true
+
+    if [[ -z ${CHART_URL} ]]; then
       return 1
     fi
 
-    local CHART_URL=${1}
-    shift
-    local CHART_NAME=${1}
-    shift
-    local CHART_VERSION=${1}
-    shift
+    var_info "Chart URL: ${CHART_URL}"
 
-    local CURRENT_DIR
-    CURRENT_DIR="$(pwd)"
+    local CHART_INDEX_FILENAME
+    CHART_INDEX_FILENAME=$(mktemp -t chartindex)
+    curl --disable --silent --show-error --location --max-time 30 --output "${CHART_INDEX_FILENAME}" -- "${CHART_URL}/index.yaml"
 
-    local TEMP_FOLDER="/tmp"
-    local ARCHIVE_FILENAME="${CHART_NAME}-${CHART_VERSION}"
-    local ARCHIVE_PATH="${TEMP_FOLDER}/${ARCHIVE_FILENAME}.tar.gz"
+    local CHART_NAME
+    CHART_NAME="$(yq eval '.entries | keys' "${CHART_INDEX_FILENAME}" | awk '{print $2}' | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
+
+    if [[ -z ${CHART_NAME} ]]; then
+      rm "${CHART_INDEX_FILENAME}"
+      return 1
+    fi
+
+    var_info "Chart name: ${CHART_NAME}"
+
+    local CHART_VERSION
+    CHART_VERSION="$(yq eval ".entries.${CHART_NAME}[] | .version" "${CHART_INDEX_FILENAME}" | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
+
+    if [[ -z ${CHART_VERSION} ]]; then
+      rm "${CHART_INDEX_FILENAME}"
+      return 1
+    fi
+
+    var_info "Chart version: ${CHART_VERSION}"
 
     local ARCHIVE_URL
     ARCHIVE_URL="$(curl --disable --silent --show-error --location --max-time 30 -- "${CHART_URL}/index.yaml" | yq eval ".entries.${CHART_NAME}[] | select(.version == \"${CHART_VERSION}\") | .urls[0]" -)"
 
+    if [[ -z ${ARCHIVE_URL} ]]; then
+      rm "${CHART_INDEX_FILENAME}"
+      return 1
+    fi
+
+    rm "${CHART_INDEX_FILENAME}"
+
+    local CURRENT_DIR
+    CURRENT_DIR="$(pwd)"
+
+    local TEMP_DIR="/tmp"
+    local ARCHIVE_FILENAME="${CHART_NAME}-${CHART_VERSION}"
+    local ARCHIVE_PATH="${TEMP_DIR}/${ARCHIVE_FILENAME}.tar.gz"
+
+    if ! [[ ${ARCHIVE_URL} =~ ^https?:// ]]; then
+      ARCHIVE_URL="${CHART_URL}/${ARCHIVE_URL}"
+    fi
+
     curl --disable --silent --show-error --location --max-time 300 -o "${ARCHIVE_PATH}" -- "${ARCHIVE_URL}"
     (
-      cd "${TEMP_FOLDER}" || false
+      cd "${TEMP_DIR}" || false
       mkdir -p "${ARCHIVE_FILENAME}"
       tar -xzf "${ARCHIVE_PATH}" -C "${ARCHIVE_FILENAME}"
 
