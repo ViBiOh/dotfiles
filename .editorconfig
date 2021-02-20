@@ -14,7 +14,10 @@ indent_style = tab
 [*.py]
 indent_size = 4
 
-[{*.sublime-snippet,sublime/text/settings/*}]
+[*.sublime-snippet]
+indent_style = tab
+
+[sublime/text/settings/*]
 indent_style = tab
 
 [gitconfig*]
