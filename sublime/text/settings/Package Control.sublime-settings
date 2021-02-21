@@ -12,6 +12,6 @@
 		"SublimeLinter-golint",
 		"SublimeLinter-govet",
 		"SublimeLinter-shellcheck",
-		"Terraform"
+		"Terraform",
 	],
 }
