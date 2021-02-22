@@ -171,8 +171,8 @@ if command -v kubectl >/dev/null 2>&1; then
   fi
 fi
 
-if command -v yq >/dev/null 2>&1 && command -v helm >/dev/null 2>&1; then
-  get_crds_manifests() {
+if command -v yq >/dev/null 2>&1 && command -v helm >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
+  helm_crds_manifests() {
     local CHART_URL="${1:-$(helm repo list --output yaml | yq eval '.[].url' - | fzf --height=20 --ansi --reverse -1)}"
     shift || true
 
@@ -233,7 +233,14 @@ if command -v yq >/dev/null 2>&1 && command -v helm >/dev/null 2>&1; then
       mkdir -p "${ARCHIVE_FILENAME}"
       tar -xzf "${ARCHIVE_PATH}" -C "${ARCHIVE_FILENAME}"
 
-      cp "${ARCHIVE_FILENAME}/${CHART_NAME}/crds/"* "${CURRENT_DIR}/"
+      if [[ -d "${ARCHIVE_FILENAME}/${CHART_NAME}/crds/" ]]; then
+        printf "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(ls -m "${ARCHIVE_FILENAME}/${CHART_NAME}/crds/" | tr -d "\n")" "${BLUE}" "${RESET}" 1>&2
+        cp "${ARCHIVE_FILENAME}/${CHART_NAME}/crds/"* "${CURRENT_DIR}/"
+      else
+        var_warning "no crds/ folder in this chart, searching for definition..."
+        rg -- "^kind: CustomResourceDefinition" "${ARCHIVE_FILENAME}/${CHART_NAME}"
+      fi
+
       rm -rf "${ARCHIVE_PATH}" "${ARCHIVE_FILENAME}"
     )
   }
