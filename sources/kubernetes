@@ -158,7 +158,7 @@ if command -v kubectl >/dev/null 2>&1; then
       local RELEASE_NAME="${1}"
       shift
 
-      helm status "${RELEASE_NAME}" --output=yaml | sed '1,/^manifest: |$/d' | grep '^  ' | sed 's|^  ||' | grep --invert-match '^$' >"/tmp/${RELEASE_NAME}_helm.yaml"
+      printf "%b" "$(helm status "${RELEASE_NAME}" --output=yaml | sed -n 's/^manifest: "//p' | sed 's/"$//')" >"/tmp/${RELEASE_NAME}_helm.yaml"
       helm upgrade --debug --dry-run "${RELEASE_NAME}" ${*} | sed '1,/^MANIFEST:$/d' | grep --invert-match '^$' >"/tmp/${RELEASE_NAME}_new.yaml"
       delta "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
       rm "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
