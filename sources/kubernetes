@@ -173,75 +173,53 @@ fi
 
 if command -v yq >/dev/null 2>&1 && command -v helm >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
   helm_crds_manifests() {
-    local CHART_URL="${1:-$(helm repo list --output yaml | yq eval '.[].url' - | fzf --height=20 --ansi --reverse -1)}"
-    shift || true
+    local CHART_REPO
+    CHART_REPO="$(helm repo list --output yaml | yq eval '.[].name' - | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
 
-    if [[ -z ${CHART_URL} ]]; then
+    if [[ -z ${CHART_REPO} ]]; then
       return 1
     fi
 
-    var_info "Chart URL: ${CHART_URL}"
-
-    local CHART_INDEX_FILENAME
-    CHART_INDEX_FILENAME=$(mktemp -t chartindex)
-    curl --disable --silent --show-error --location --max-time 30 --output "${CHART_INDEX_FILENAME}" -- "${CHART_URL}/index.yaml"
+    var_info "Repository: ${CHART_REPO}"
 
     local CHART_NAME
-    CHART_NAME="$(yq eval '.entries | keys' "${CHART_INDEX_FILENAME}" | awk '{print $2}' | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
+    CHART_NAME="$(helm search repo "${CHART_REPO}" --output yaml | yq eval '.[].name' - | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
 
     if [[ -z ${CHART_NAME} ]]; then
-      rm "${CHART_INDEX_FILENAME}"
       return 1
     fi
 
-    var_info "Chart name: ${CHART_NAME}"
+    var_info "Chart: ${CHART_NAME}"
 
     local CHART_VERSION
-    CHART_VERSION="$(yq eval ".entries.${CHART_NAME}[] | .version" "${CHART_INDEX_FILENAME}" | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
+    CHART_VERSION="$(helm search repo "${CHART_NAME}" --output yaml --devel --versions | yq eval '.[].version' - | fzf --height=20 --ansi --reverse -1 --query="${3:-}")"
 
     if [[ -z ${CHART_VERSION} ]]; then
-      rm "${CHART_INDEX_FILENAME}"
       return 1
     fi
 
-    var_info "Chart version: ${CHART_VERSION}"
-
-    local ARCHIVE_URL
-    ARCHIVE_URL="$(curl --disable --silent --show-error --location --max-time 30 -- "${CHART_URL}/index.yaml" | yq eval ".entries.${CHART_NAME}[] | select(.version == \"${CHART_VERSION}\") | .urls[0]" -)"
-
-    if [[ -z ${ARCHIVE_URL} ]]; then
-      rm "${CHART_INDEX_FILENAME}"
-      return 1
-    fi
-
-    rm "${CHART_INDEX_FILENAME}"
+    var_info "Version: ${CHART_VERSION}"
 
     local CURRENT_DIR
     CURRENT_DIR="$(pwd)"
 
-    local TEMP_DIR="/tmp"
-    local ARCHIVE_FILENAME="${CHART_NAME}-${CHART_VERSION}"
-    local ARCHIVE_PATH="${TEMP_DIR}/${ARCHIVE_FILENAME}.tar.gz"
-
-    if ! [[ ${ARCHIVE_URL} =~ ^https?:// ]]; then
-      ARCHIVE_URL="${CHART_URL}/${ARCHIVE_URL}"
-    fi
-
-    curl --disable --silent --show-error --location --max-time 300 -o "${ARCHIVE_PATH}" -- "${ARCHIVE_URL}"
     (
-      cd "${TEMP_DIR}" || false
-      mkdir -p "${ARCHIVE_FILENAME}"
-      tar -xzf "${ARCHIVE_PATH}" -C "${ARCHIVE_FILENAME}"
+      cd "/tmp" || false
 
-      if [[ -d "${ARCHIVE_FILENAME}/${CHART_NAME}/crds/" ]]; then
-        printf "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(ls -m "${ARCHIVE_FILENAME}/${CHART_NAME}/crds/" | tr -d "\n")" "${BLUE}" "${RESET}" 1>&2
-        cp "${ARCHIVE_FILENAME}/${CHART_NAME}/crds/"* "${CURRENT_DIR}/"
+      local CHART_BASENAME
+      CHART_BASENAME="$(basename "${CHART_NAME}")"
+
+      helm pull "${CHART_NAME}" --version "${CHART_VERSION}" --untar
+
+      if [[ -d "${CHART_BASENAME}/crds/" ]]; then
+        printf "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(ls -m "${CHART_BASENAME}/crds/" | tr -d "\n")" "${BLUE}" "${RESET}" 1>&2
+        cp "${CHART_BASENAME}/crds/"* "${CURRENT_DIR}/"
       else
         var_warning "no crds/ folder in this chart, searching for definition..."
-        rg -- "^kind: CustomResourceDefinition" "${ARCHIVE_FILENAME}/${CHART_NAME}"
+        rg -- "^kind: CustomResourceDefinition" "${CHART_BASENAME}/"
       fi
 
-      rm -rf "${ARCHIVE_PATH}" "${ARCHIVE_FILENAME}"
+      rm -rf "${CHART_BASENAME}"
     )
   }
 fi
