@@ -147,31 +147,31 @@ if command -v kubectl >/dev/null 2>&1; then
 
     [[ -n ${BASH} ]] && complete -W "restart logs forward info image watch context ns" -o default -o bashdefault kube
   fi
-
-  if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1; then
-    helm_delta() {
-      if [[ ${#} -lt 1 ]]; then
-        var_error "Usage: helm_delta RELEASE_NAME [helm upgrade additionnal args...]"
-        return 1
-      fi
-
-      local RELEASE_NAME="${1}"
-      shift
-
-      printf "%b" "$(helm status "${RELEASE_NAME}" --output=yaml | sed -n 's|^manifest: "||p' | sed 's|"$||')" | sed 's|\\\"|"|g' >"/tmp/${RELEASE_NAME}_helm.yaml"
-      helm upgrade --debug --dry-run "${RELEASE_NAME}" ${*} | sed '1,/^MANIFEST:$/d' | grep --invert-match '^$' >"/tmp/${RELEASE_NAME}_new.yaml"
-      delta "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
-      rm "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
-
-      if var_confirm "Perform upgrade"; then
-        var_warning "helm upgrade '${RELEASE_NAME}' ${*}"
-        helm upgrade "${RELEASE_NAME}" ${*}
-      fi
-    }
-  fi
 fi
 
-if command -v yq >/dev/null 2>&1 && command -v helm >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
+if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1; then
+  helm_delta() {
+    if [[ ${#} -lt 1 ]]; then
+      var_error "Usage: helm_delta RELEASE_NAME [helm upgrade additionnal args...]"
+      return 1
+    fi
+
+    local RELEASE_NAME="${1}"
+    shift
+
+    printf "%b" "$(helm status "${RELEASE_NAME}" --output=yaml | sed -n 's|^manifest: "||p' | sed 's|"$||')" | sed 's|\\\"|"|g' >"/tmp/${RELEASE_NAME}_helm.yaml"
+    helm upgrade --debug --dry-run "${RELEASE_NAME}" ${*} | sed '1,/^MANIFEST:$/d' | grep --invert-match '^$' >"/tmp/${RELEASE_NAME}_new.yaml"
+    delta "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
+    rm "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
+
+    if var_confirm "Perform upgrade"; then
+      var_warning "helm upgrade '${RELEASE_NAME}' ${*}"
+      helm upgrade "${RELEASE_NAME}" ${*}
+    fi
+  }
+fi
+
+if command -v helm >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
   helm_crds_manifests() {
     local CHART_REPO
     CHART_REPO="$(helm repo list --output yaml | yq eval '.[].name' - | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
@@ -212,7 +212,7 @@ if command -v yq >/dev/null 2>&1 && command -v helm >/dev/null 2>&1 && command -
       helm pull "${CHART_NAME}" --version "${CHART_VERSION}" --untar
 
       if [[ -d "${CHART_BASENAME}/crds/" ]]; then
-        printf "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(ls -m "${CHART_BASENAME}/crds/" | tr -d "\n")" "${BLUE}" "${RESET}" 1>&2
+        printf "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(find "${CHART_BASENAME}/crds" -print0 | xargs -0 printf "%s, " | sed 's|, $||')" "${BLUE}" "${RESET}" 1>&2
         cp "${CHART_BASENAME}/crds/"* "${CURRENT_DIR}/"
       else
         var_warning "no crds/ folder in this chart, searching for definition..."
