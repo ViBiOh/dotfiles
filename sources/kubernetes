@@ -212,7 +212,7 @@ if command -v helm >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -
       helm pull "${CHART_NAME}" --version "${CHART_VERSION}" --untar
 
       if [[ -d "${CHART_BASENAME}/crds/" ]]; then
-        printf "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(find "${CHART_BASENAME}/crds" -print0 | xargs -0 printf "%s, " | sed 's|, $||')" "${BLUE}" "${RESET}" 1>&2
+        printf "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(find "${CHART_BASENAME}/crds" -type f -print0 | xargs -0 printf "%s, " | sed 's|, $||')" "${BLUE}" "${RESET}" 1>&2
         cp "${CHART_BASENAME}/crds/"* "${CURRENT_DIR}/"
       else
         var_warning "no crds/ folder in this chart, searching for definition..."
