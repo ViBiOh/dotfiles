@@ -5,10 +5,7 @@
 ## Installation
 
 ```bash
-mkdir -p "${HOME}/code/"
-cd "${HOME}/code/"
-git clone https://github.com/ViBiOh/dotfiles.git
-./dotfiles/init -a
+curl "https://raw.githubusercontent.com/ViBiOh/dotfiles/main/bootstrap" | bash
 ```
 
 ### Configuration
