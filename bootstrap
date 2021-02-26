@@ -8,7 +8,7 @@ main() {
 
   mkdir -p "${INSTALL_PATH}"
 
-  curl --disable --silent --show-error --location --max-time 60 --ouput "${ARCHIVE_FILENAME}" "https://github.com/ViBiOh/dotfiles/archive/main.zip"
+  curl --disable --silent --show-error --location --max-time 60 --output "${ARCHIVE_FILENAME}" "https://github.com/ViBiOh/dotfiles/archive/main.zip"
   unzip "${ARCHIVE_FILENAME}" -d "${INSTALL_PATH}/dotfiles"
   rm -f "${ARCHIVE_FILENAME}"
 
