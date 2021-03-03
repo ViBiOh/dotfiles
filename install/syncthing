@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  local SYNCTHING_VERSION="1.13.1"
+  local SYNCTHING_VERSION="1.14.0"
 
   local OS
   OS="$(normalized_os)"
