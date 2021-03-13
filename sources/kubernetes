@@ -186,7 +186,7 @@ fi
 if command -v helm >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
   helm_crds_manifests() {
     local CHART_REPO
-    CHART_REPO="$(helm repo list --output yaml | yq eval '.[].name' - | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
+    CHART_REPO="$(helm repo list --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
 
     if [[ -z ${CHART_REPO} ]]; then
       return 1
@@ -195,7 +195,7 @@ if command -v helm >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -
     var_info "Repository: ${CHART_REPO}"
 
     local CHART_NAME
-    CHART_NAME="$(helm search repo "${CHART_REPO}" --output yaml | yq eval '.[].name' - | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
+    CHART_NAME="$(helm search repo "${CHART_REPO}" --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
 
     if [[ -z ${CHART_NAME} ]]; then
       return 1
@@ -204,7 +204,7 @@ if command -v helm >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -
     var_info "Chart: ${CHART_NAME}"
 
     local CHART_VERSION
-    CHART_VERSION="$(helm search repo "${CHART_NAME}" --output yaml --devel --versions | yq eval '.[].version' - | fzf --height=20 --ansi --reverse -1 --query="${3:-}")"
+    CHART_VERSION="$(helm search repo "${CHART_NAME}" --output json --devel --versions | jq -r '.[].version' | fzf --height=20 --ansi --reverse -1 --query="${3:-}")"
 
     if [[ -z ${CHART_VERSION} ]]; then
       return 1

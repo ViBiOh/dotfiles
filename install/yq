@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-set -o nounset -o pipefail -o errexit
-
-install() {
-  local YQ_VERSION="v4.6.1"
-
-  curl_to_binary "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64")" "yq"
-}
