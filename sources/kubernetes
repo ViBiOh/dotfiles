@@ -195,7 +195,7 @@ if command -v helm >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -
     var_info "Repository: ${CHART_REPO}"
 
     local CHART_NAME
-    CHART_NAME="$(helm search repo "${CHART_REPO}" --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
+    CHART_NAME="$(helm search repo "${CHART_REPO}/" --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
 
     if [[ -z ${CHART_NAME} ]]; then
       return 1
