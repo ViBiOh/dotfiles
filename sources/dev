@@ -37,6 +37,20 @@ rainbow() {
   }'
 }
 
+loadtest() {
+  if [[ ${#} -lt 1 ]]; then
+    var_error "Usage: loadtest URL RATE_PER_SECOND"
+    return 1
+  fi
+
+  local URL=${1}
+  shift
+  local RATE=${1}
+  shift || true
+
+  printf "GET %s" "${URL}" | vegeta attack -rate="${RATE:-50}" -duration=30s | vegeta plot >vegeta.html && open vegeta.html
+}
+
 if command -v systemctl >/dev/null 2>&1; then
   status() {
     sudo systemctl status "${@}"
