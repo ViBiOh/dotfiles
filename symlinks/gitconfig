@@ -79,7 +79,9 @@
 [merge]
 	tool = smerge
 
+[mergetool]
+	keepBackup = false
+
 [mergetool "smerge"]
 	cmd = smerge mergetool \"$BASE\" \"$LOCAL\" \"$REMOTE\" -o \"$MERGED\"
 	trustExitCode = true
-	keepBackup = false
