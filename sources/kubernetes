@@ -181,7 +181,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1; then
 
     if var_confirm "Perform upgrade"; then
       var_warning "helm upgrade '${RELEASE_NAME}' ${*}"
-      helm upgrade "${RELEASE_NAME}" ${*}
+      helm upgrade --namespace "${NAMESPACE}" "${RELEASE_NAME}" ${*}
     fi
   }
 fi
