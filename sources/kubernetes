@@ -186,7 +186,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1; then
   }
 fi
 
-if command -v helm >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
+if command -v helm >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
   helm_crds_manifests() {
     local CHART_REPO
     CHART_REPO="$(helm repo list --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
