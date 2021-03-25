@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+terraform_install() {
+  local TERRAFORM_VERSION=${1}
+  shift
+
+  local TERRAFORM_PATH="${HOME}/opt/bin/terraform"
+  local TERRAFORM_VERSION_PATH="${HOME}/opt/bin/terraform_${TERRAFORM_VERSION}"
+
+  if ! [[ -e "${HOME}/opt/bin/terraform_${TERRAFORM_VERSION}" ]]; then
+    archive_to_binary "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").zip" "terraform" "${TERRAFORM_VERSION_PATH}"
+  fi
+
+  rm -f "${TERRAFORM_PATH}"
+  ln -s "${TERRAFORM_VERSION_PATH}" "${TERRAFORM_PATH}"
+}

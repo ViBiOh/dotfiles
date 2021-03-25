@@ -7,9 +7,7 @@ clean() {
 }
 
 install() {
-  local TERRAFORM_VERSION="0.14.9"
-
-  archive_to_binary "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").zip" "terraform"
+  terraform_install "0.14.9"
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
   printf "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\n" "${HOME}" >"${HOME}/.terraformrc"
