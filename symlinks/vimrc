@@ -140,7 +140,7 @@ set list
 set listchars=tab:>.,trail:.,extends:#,nbsp:.
 
 " Share clipboard with system
-set clipboard=unnamed
+" set clipboard=unnamed
 
 " Autoformat code with ctrl+f
 noremap <C-f> gg=G<return>
