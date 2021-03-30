@@ -20,6 +20,12 @@ meteo() {
   curl --disable --silent --show-error --location --max-time 30 -4 "wttr.in/${1:-Paris}?m&format=v2"
 }
 
+if [[ ${OSTYPE} =~ ^darwin ]]; then
+  temperature() {
+    sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep "temperature"
+  }
+fi
+
 rainbow() {
   awk '
   BEGIN{
@@ -49,7 +55,9 @@ if command -v vegeta >/dev/null 2>&1; then
     local RATE=${1}
     shift || true
 
+    var_info "Attacking '${URL}' at ${RATE} request(s) per second during 30 seconds..."
     printf "GET %s" "${URL}" | vegeta attack -rate="${RATE:-50}" -duration=30s | vegeta plot >vegeta.html && open vegeta.html
+    var_warning 'Don''t forget to delete `rm vegeta.html`'
   }
 fi
 
