@@ -5,19 +5,16 @@
 ## Installation
 
 ```bash
-mkdir -p "${HOME}/code"
-cd "${HOME}/code"
-git clone https://github.com/ViBiOh/dotfiles.git
-./dotfiles/init -a
-```
-
-or
-
-```bash
 curl "https://raw.githubusercontent.com/ViBiOh/dotfiles/main/bootstrap" | bash
 ```
 
-### Configuration
+## Update
+
+```bash
+"${HOME}/code/dotfiles/init" -a
+```
+
+## Configuration
 
 You can set following environment variables for customizing installation behavior:
 
