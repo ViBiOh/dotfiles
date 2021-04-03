@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+main() {
+  local INSTALL_PATH="${HOME}/code"
+  local DOTFILES_NAME="dotfiles"
+  local ARCHIVE_FILENAME="${INSTALL_PATH}/dotfiles.zip"
+
+  mkdir -p "${INSTALL_PATH}"
+
+  curl --disable --silent --show-error --location --max-time 60 --output "${ARCHIVE_FILENAME}" "https://github.com/ViBiOh/${DOTFILES_NAME}/archive/main.zip"
+  unzip "${ARCHIVE_FILENAME}" -d "${INSTALL_PATH}"
+  rm -f "${ARCHIVE_FILENAME}"
+
+  rm -rf "${INSTALL_PATH:?}/${DOTFILES_NAME}"
+  mv "${INSTALL_PATH}/${DOTFILES_NAME}-main" "${INSTALL_PATH}/${DOTFILES_NAME}"
+
+  (
+    cd "${INSTALL_PATH}/${DOTFILES_NAME}"
+    "/init" -a
+
+    git init
+    git remote add origin "http://github.com/ViBiOh/dotfiles.git"
+    git checkout "main" --force
+  )
+}
+
+main "${@}"
