@@ -18,7 +18,7 @@ main() {
 
   (
     cd "${INSTALL_PATH}/${DOTFILES_NAME}"
-    "/init" -a
+    "./init" -a
 
     git init
     git remote add origin "http://github.com/ViBiOh/dotfiles.git"
