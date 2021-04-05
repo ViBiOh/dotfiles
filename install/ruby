@@ -3,6 +3,6 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
-  sudo rm -rf "${HOME}/.bundle"
-  sudo rm -rf "${HOME}/.gem"
+  rm -rf "${HOME}/.bundle"
+  rm -rf "${HOME}/.gem"
 }

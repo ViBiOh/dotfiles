@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 clean() {
   if [[ -n ${GOPATH:-} ]]; then
-    sudo rm -rf "${GOPATH}"
+    rm -rf "${GOPATH}"
     mkdir -p "${GOPATH}"
   fi
 
