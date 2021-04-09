@@ -5,7 +5,7 @@ set -o nounset -o pipefail -o errexit
 clean() {
   rm -rf "${HOME}/.cache"
   rm -rf "${HOME}/.config/htop"
-  rm -rf "${HOME}/opt"
+  sudo rm -rf "${HOME}/opt"
 
   local SCRIPT_DIR
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
