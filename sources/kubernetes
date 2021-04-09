@@ -161,7 +161,7 @@ if command -v kubectl >/dev/null 2>&1; then
   fi
 fi
 
-if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1; then
+if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
   helm_delta() {
     if [[ ${#} -lt 2 ]]; then
       var_error "Usage: helm_delta NAMESPACE RELEASE_NAME [helm upgrade additionnal args...]"
