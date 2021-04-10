@@ -63,8 +63,8 @@ if command -v kubectl >/dev/null 2>&1; then
 
           if [[ -n ${KUBE_PORT:-} ]]; then
             IFS='/' read -r -a ports <<<"${KUBE_PORT}"
-            printf "%bForwarding %s from 4000 to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}" "${ports[0]}" "${RESET}"
-            print_and_execute "kubectl port-forward --namespace='${parts[1]}' '${parts[0]}/${parts[2]}' '4000:${ports[0]}'"
+            printf "%bForwarding %s from ${3:-4000} to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}" "${ports[0]}" "${RESET}"
+            print_and_execute "kubectl port-forward --namespace='${parts[1]}' '${parts[0]}/${parts[2]}' '${3:-4000}:${ports[0]}'"
           fi
         fi
         ;;
