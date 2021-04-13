@@ -12,9 +12,20 @@
 		"command": "lsp_symbol_definition",
 		"context": [
 			{
-				"key": "selector",
+				"key": "lsp.session_with_capability",
 				"operator": "equal",
-				"operand": "(source.go, source.js, source.python)"
+				"operand": "definitionProvider"
+			}
+		]
+	},
+	{
+		"keys": ["super+control+right"],
+		"command": "lsp_symbol_implementation",
+		"context": [
+			{
+				"key": "lsp.session_with_capability",
+				"operator": "equal",
+				"operand": "implementationProvider"
 			}
 		]
 	}
