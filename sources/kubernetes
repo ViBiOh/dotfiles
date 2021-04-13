@@ -146,7 +146,7 @@ if command -v kubectl >/dev/null 2>&1; then
         var_error "Usage: kube ACTION"
         var_info "\nPossibles actions are                       | args\n"
         var_info " - context | Switch context                 | name query"
-        var_info " - forward | Port-forward to a service      | name query, port number"
+        var_info " - forward | Port-forward to a service      | name query, service port number, exposed port number (default 4000)"
         var_info " - image   | Print image name               | name query"
         var_info " - info    | Print yaml output of an object | name query"
         var_info " - logs    | Tail logs                      | name query, additionnals 'kubectl logs' args..."
