@@ -10,7 +10,7 @@ if command -v kubectl >/dev/null 2>&1; then
     return "${exit}"
   }
 
-  if command -v fzf >/dev/null 2>&1; then
+  if command -v fzf >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
     kube() {
       get_kube_resources() {
         local RESOURCE="${1:-}"
@@ -26,6 +26,10 @@ if command -v kubectl >/dev/null 2>&1; then
         fi
 
         printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/" + .name' | fzf --height=20 --ansi --reverse -1 --query="${QUERY}")"
+      }
+
+      json_to_yaml() {
+        python -c 'import sys, yaml, json; print(yaml.dump(json.loads(sys.stdin.read())))'
       }
 
       print_and_execute() {
@@ -51,6 +55,14 @@ if command -v kubectl >/dev/null 2>&1; then
           if [[ -n ${TMUX:-} ]]; then
             tmux setenv KUBECONFIG "${KUBECONFIG}"
           fi
+        fi
+        ;;
+
+      "desc")
+        IFS='/' read -r -a parts <<<"$(get_kube_resources "${@}")"
+
+        if [[ -n ${parts[1]:-} ]]; then
+          print_and_execute "kubectl describe '${parts[0]}' --namespace='${parts[1]}' '${parts[2]}'"
         fi
         ;;
 
@@ -81,7 +93,12 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(get_kube_resources "${@}")"
 
         if [[ -n ${parts[1]:-} ]]; then
-          print_and_execute "kubectl get '${parts[0]}' --namespace='${parts[1]}' '${parts[2]}' --output=yaml"
+          local OUTPUT="--output=yaml"
+          if [[ ${parts[0]} =~ secrets? ]]; then
+            OUTPUT="--output=json | jq '.data[] |= @base64d' | json_to_yaml"
+          fi
+
+          print_and_execute "kubectl get '${parts[0]}' --namespace='${parts[1]}' '${parts[2]}' ${OUTPUT}"
         fi
         ;;
 
@@ -146,18 +163,19 @@ if command -v kubectl >/dev/null 2>&1; then
         var_error "Usage: kube ACTION"
         var_info "\nPossibles actions are                       | args\n"
         var_info " - context | Switch context                 | name query"
+        var_info " - desc    | Describe an object             | type/name name?"
         var_info " - forward | Port-forward to a service      | name query, service port number, exposed port number (default 4000)"
         var_info " - image   | Print image name               | name query"
-        var_info " - info    | Print yaml output of an object | name query"
+        var_info " - info    | Print yaml output of an object | type/name name?"
         var_info " - logs    | Tail logs                      | name query, additionnals 'kubectl logs' args..."
         var_info " - ns      | Change default namespace       | name query"
-        var_info " - restart | Perform a rollout restart      | name query"
+        var_info " - restart | Perform a rollout restart      | type/name name?"
         var_info " - watch   | Watch pods of all namespaces   | additionnals 'kubectl get pods' args..."
         ;;
       esac
     }
 
-    [[ -n ${BASH} ]] && complete -W "restart logs forward info image watch context ns" -o default -o bashdefault kube
+    [[ -n ${BASH} ]] && complete -W "restart logs context desc forward image info logs ns restart watch" -o default -o bashdefault kube
   fi
 fi
 
