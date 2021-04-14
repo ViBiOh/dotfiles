@@ -47,7 +47,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
         if [[ -n ${CONTEXT:-} ]]; then
           KUBECONFIG=$(mktemp -t kubeconfig)
-          export KUBECONFIG=${KUBECONFIG}
+          export KUBECONFIG="${KUBECONFIG}"
           cat "${HOME}/.kube/config" >>"${KUBECONFIG}"
           var_warning "kubectl config use-context '${CONTEXT}'"
           kubectl config use-context "${CONTEXT}"
