@@ -10,6 +10,7 @@ clean() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   rm -rf "${SCRIPT_DIR}/../scripts"
+  rm -rf "${SCRIPT_DIR}/../sources/"*-completion
 }
 
 install() {

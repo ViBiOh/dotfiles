@@ -33,10 +33,11 @@ install() {
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
-  local STERN_VERSION="1.15.0"
-  archive_to_binary "https://github.com/stern/stern/releases/download/v${STERN_VERSION}/stern_${STERN_VERSION}_${OS}_${ARCH}.tar.gz" "stern_${STERN_VERSION}_${OS}_${ARCH}/stern"
-  stern --completion bash >"${SCRIPT_DIR}/../sources/stern-completion"
-
   local KUBESEAL_VERSION="v0.13.1"
   curl_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${OS}-${ARCH}" "kubeseal"
+
+  if [[ ${ARCH} == "amd64" ]]; then
+    local KAIL_VERSION="0.15.0"
+    archive_to_binary "https://github.com/boz/kail/releases/download/v${KAIL_VERSION}/kail_${KAIL_VERSION}_${OS}_${ARCH}.tar.gz" "kail"
+  fi
 }

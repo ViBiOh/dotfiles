@@ -119,14 +119,11 @@ if command -v kubectl >/dev/null 2>&1; then
 
         if [[ -n ${parts[1]:-} ]]; then
           local PODS_LABELS
-          local FORCE_KUBECTL=0
 
           if [[ ${parts[0]} =~ ^cronjobs? ]]; then
             PODS_LABELS="job-name in ($(kubectl get jobs --namespace="${parts[1]}" --output json | jq --arg name "${parts[2]}" -r '.items[] | select(.metadata.ownerReferences[].name == $name) | .metadata.name' | paste -sd, -))"
-            FORCE_KUBECTL=1
           elif [[ ${parts[0]} =~ ^jobs? ]]; then
             PODS_LABELS="job-name=${parts[2]}"
-            FORCE_KUBECTL=1
           elif [[ ${parts[0]} =~ ^deployments? ]]; then
             PODS_LABELS="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=json | jq -r '.spec.selector.matchLabels | to_entries[] | .key + "=" + .value' | paste -sd, -)"
           else
@@ -135,8 +132,8 @@ if command -v kubectl >/dev/null 2>&1; then
 
           printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${parts[0]}/${parts[1]}/${parts[2]}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
-          if command -v stern >/dev/null 2>&1 && [[ ${FORCE_KUBECTL} -ne 1 ]]; then
-            print_and_execute "stern --namespace='${parts[1]}' --selector='${PODS_LABELS}' ${*}"
+          if command -v kail >/dev/null 2>&1; then
+            print_and_execute "kail --ns='${parts[1]}' --label='${PODS_LABELS}' --since=48h ${*}"
           else
             print_and_execute "kubectl logs --namespace='${parts[1]}' --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow ${*}"
           fi
