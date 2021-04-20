@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  local SHELLCHECK_VERSION="v0.7.1"
+  local SHELLCHECK_VERSION="v0.7.2"
 
   local ARCH
   ARCH="$(normalized_arch "" "armv6hf")"
