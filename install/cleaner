@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-set -o nounset -o pipefail -o errexit
-
-install() {
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    packages_install appcleaner
-  fi
-}
