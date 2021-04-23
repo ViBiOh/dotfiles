@@ -154,7 +154,9 @@ install() {
     sudo pmset -c displaysleep 10
     sudo pmset -c sleep 15
 
-    fix_spotlight
+    if command -v fix_spotlight >/dev/null 2>&1; then
+      fix_spotlight || true
+    fi
 
     sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
     sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
