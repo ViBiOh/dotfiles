@@ -5,7 +5,8 @@ set -o nounset -o pipefail -o errexit
 install() {
   local PACKAGES=("bash" "bash-completion" "make" "htop" "openssl" "curl" "ncdu" "jq")
 
-  cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
 #!/usr/bin/env bash
 
 if [[ -f "${HOME}/.bashrc" ]]; then
@@ -13,7 +14,6 @@ if [[ -f "${HOME}/.bashrc" ]]; then
 fi
 END_OF_BASH_PROFILE
 
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
