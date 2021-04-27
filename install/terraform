@@ -7,7 +7,7 @@ clean() {
 }
 
 install() {
-  terraform_install "0.15.0"
+  terraform_install "0.15.1"
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
   printf "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\n" "${HOME}" >"${HOME}/.terraformrc"
