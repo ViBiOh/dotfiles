@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 clean() {
   rm -rf "${HOME}/.cache"
-  rm -rf "${HOME}/.config/htop"
+  sudo rm -rf "${HOME}/.config/htop"
   sudo rm -rf "${HOME}/opt"
 
   local SCRIPT_DIR
