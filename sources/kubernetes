@@ -10,8 +10,6 @@ if command -v kubectl >/dev/null 2>&1; then
     return "${exit}"
   }
 
-  alias k="kubectl"
-
   if command -v fzf >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
     kube() {
       get_kube_resources() {
