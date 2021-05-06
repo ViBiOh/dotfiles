@@ -33,7 +33,7 @@ if command -v kubectl >/dev/null 2>&1; then
       }
 
       print_and_execute() {
-        printf "%b%b%b\n" "${YELLOW}" "${@}" "${RESET}" 2>&1
+        printf "%b%b%b\n" "${YELLOW}" "${@}" "${RESET}" 1>&2
         eval "${@}"
       }
 
