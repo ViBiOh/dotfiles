@@ -8,7 +8,7 @@ class AsyncTask:
     killed = False
     proc = None
 
-    def __init__(self, command=["printf", "Hello World"], cwd=None, output=print):
+    def __init__(self, command=["printf", "Hello"], cwd=None, output=print):
         self.output = output
 
         if self.proc is not None:
