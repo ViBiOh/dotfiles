@@ -18,9 +18,12 @@ install() {
   local ARCH
   ARCH="$(normalized_arch "amd64" "armv6l" "arm64")"
 
+  local OS
+  OS="$(normalized_os)"
+
   if [[ ! -d "${HOME}/opt/go" ]]; then
     local GO_ARCHIVE
-    GO_ARCHIVE="go${GO_VERSION}.$(normalized_os)-${ARCH}.tar.gz"
+    GO_ARCHIVE="go${GO_VERSION}.${OS}-${ARCH}.tar.gz"
 
     curl --disable --silent --show-error --location --max-time 300 --remote-name "https://dl.google.com/go/${GO_ARCHIVE}"
     tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
@@ -45,4 +48,7 @@ install() {
     go get -u golang.org/x/tools/cmd/goimports
     go get -u golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment
   fi
+
+  local GOLANGCI_LINT_VERSION="1.39.0"
+  archive_to_binary "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/golangci-lint-${GOLANGCI_LINT_VERSION}-${OS}-${ARCH}.tar.gz" "golangci-lint-${GOLANGCI_LINT_VERSION}-${OS}-${ARCH}/golangci-lint"
 }
