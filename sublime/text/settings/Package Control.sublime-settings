@@ -8,6 +8,7 @@
 		"Package Control",
 		"SublimeLinter",
 		"SublimeLinter-eslint",
+		"SublimeLinter-golangcilint",
 		"SublimeLinter-golint",
 		"SublimeLinter-govet",
 		"SublimeLinter-shellcheck",
