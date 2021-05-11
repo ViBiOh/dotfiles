@@ -5,11 +5,13 @@
 set -o nounset -o pipefail -o errexit
 
 script_dir() {
-  if [[ -L \${BASH_SOURCE[0]} ]]; then
-    dirname "\$(readlink "\${BASH_SOURCE[0]}")"
+  local FILE_SOURCE="\${BASH_SOURCE[0]}"
+
+  if [[ -L \${FILE_SOURCE} ]]; then
+    dirname "\$(readlink "\${FILE_SOURCE}")"
   else
     (
-      cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd
+      cd "\$(dirname "\${FILE_SOURCE}")" && pwd
     )
   fi
 }

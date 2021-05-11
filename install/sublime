@@ -2,6 +2,18 @@
 
 set -o nounset -o pipefail -o errexit
 
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
 install() {
   local ARCH
   ARCH="$(normalized_arch)"
@@ -44,9 +56,6 @@ install() {
   rm -rf "${SUBLIME_TEXT_FILENAME}"
 
   if command -v subl >/dev/null 2>&1; then
-    local SCRIPT_DIR
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-    "${SCRIPT_DIR}/../sublime/init"
+    "$(script_dir)/../sublime/init"
   fi
 }
