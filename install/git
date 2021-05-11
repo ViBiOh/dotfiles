@@ -2,6 +2,18 @@
 
 set -o nounset -o pipefail -o errexit
 
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
 install() {
   packages_install git
 
@@ -9,9 +21,7 @@ install() {
     return
   fi
 
-  local SCRIPT_DIR
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  curl --disable --silent --show-error --location --max-time 30 --output "${SCRIPT_DIR}/../sources/git-prompt" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{print $3}')/contrib/completion/git-prompt.sh"
+  curl --disable --silent --show-error --location --max-time 30 --output "$(script_dir)/../sources/git-prompt" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{print $3}')/contrib/completion/git-prompt.sh"
 
   local DELTA_VERSION="0.7.1"
 

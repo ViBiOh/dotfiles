@@ -2,6 +2,18 @@
 
 set -o nounset -o pipefail -o errexit
 
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
 install() {
   local PACKAGES=("bash" "bash-completion" "make" "htop" "openssl" "curl" "ncdu" "jq")
 
@@ -14,12 +26,9 @@ if [[ -f "${HOME}/.bashrc" ]]; then
 fi
 END_OF_BASH_PROFILE
 
-    local SCRIPT_DIR
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
     if ! command -v brew >/dev/null 2>&1; then
-      /bin/bash -c "$(curl --disable --silent --show-error --location https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-      source "${SCRIPT_DIR}/../sources/_homebrew"
+      /bin/bash -c "$(curl --disable --silent --show-error --location "https://raw.githubusercontent.com/Homebrew/install/master/install.sh")"
+      source "$(script_dir)/../sources/_homebrew"
     fi
 
     packages_update

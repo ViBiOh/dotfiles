@@ -21,11 +21,13 @@ set_locale() {
 }
 
 script_dir() {
-  if [[ -L ${BASH_SOURCE[0]} ]]; then
-    dirname "$(readlink "${BASH_SOURCE[0]}")"
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
   else
     (
-      cd "$(dirname "${BASH_SOURCE[0]}")" && pwd
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
     )
   fi
 }
@@ -53,4 +55,5 @@ if [[ -e "${HOME}/.localrc" ]]; then
 fi
 
 unset -f set_locale
+unset -f script_dir
 unset -f source_all

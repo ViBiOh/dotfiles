@@ -2,6 +2,18 @@
 
 set -o nounset -o pipefail -o errexit
 
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
 clean() {
   if command -v npm >/dev/null 2>&1; then
     npm cache clean --force
@@ -26,7 +38,7 @@ install() {
   fi
 
   local SCRIPT_DIR
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  SCRIPT_DIR="$(script_dir)"
 
   local NODE_VERSION="latest"
 

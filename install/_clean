@@ -2,13 +2,25 @@
 
 set -o nounset -o pipefail -o errexit
 
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
 clean() {
   rm -rf "${HOME}/.cache"
   sudo rm -rf "${HOME}/.config/htop"
   sudo rm -rf "${HOME}/opt"
 
   local SCRIPT_DIR
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  SCRIPT_DIR="$(script_dir)"
   rm -rf "${SCRIPT_DIR}/../scripts"
   rm -rf "${SCRIPT_DIR}/../sources/"*-completion
 }
