@@ -14,9 +14,6 @@ script_dir() {
   fi
 }
 
-readonly SCRIPT_DIR
-SCRIPT_DIR="$(script_dir)"
-
 install_plugin() {
   if [[ ${#} -ne 2 ]]; then
     var_error "Usage: install_plugin PACKAGES_FOLDER PLUGIN_NAME"
@@ -67,6 +64,9 @@ install_shfmt() {
 }
 
 main() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(script_dir)"
+
   local TEXT_PKG="${HOME}/.config/sublime-text/Packages"
   local MERGE_PKG="${HOME}/.config/sublime-merge/Packages"
 
