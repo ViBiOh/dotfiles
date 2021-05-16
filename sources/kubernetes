@@ -128,9 +128,9 @@ if command -v kubectl >/dev/null 2>&1; then
           printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${parts[0]}/${parts[1]}/${parts[2]}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
           if command -v kail >/dev/null 2>&1; then
-            var_print_and_run "kail --ns='${parts[1]}' --label='${PODS_LABELS}' --since=48h ${*}"
+            var_print_and_run "kail --ns='${parts[1]}' --label='${PODS_LABELS}' --since=24h ${*}"
           else
-            var_print_and_run "kubectl logs --namespace='${parts[1]}' --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow ${*}"
+            var_print_and_run "kubectl logs --namespace='${parts[1]}' --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
           fi
         fi
         ;;
