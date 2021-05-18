@@ -3,6 +3,8 @@ colors:
   primary:
     background: "#000000"
 
+background_opacity: 0.999
+
 window:
   startup_mode: Maximized
 
