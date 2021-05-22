@@ -56,8 +56,13 @@ if command -v kubectl >/dev/null 2>&1; then
       "desc")
         IFS='/' read -r -a parts <<<"$(get_kube_resources "${@}")"
 
-        if [[ -n ${parts[1]:-} ]]; then
-          var_print_and_run "kubectl describe '${parts[0]}' --namespace='${parts[1]}' '${parts[2]}'"
+        if [[ -n ${parts[2]:-} ]]; then
+          local EXTRA_ARGS=""
+          if [[ -n ${parts[1]:-} ]]; then
+            local EXTRA_ARGS+=" --namespace=${parts[1]}"
+          fi
+
+          var_print_and_run "kubectl describe ${parts[0]}${EXTRA_ARGS} ${parts[2]}"
         fi
         ;;
 
@@ -71,7 +76,7 @@ if command -v kubectl >/dev/null 2>&1; then
           if [[ -n ${KUBE_PORT:-} ]]; then
             IFS='/' read -r -a ports <<<"${KUBE_PORT}"
             printf "%bForwarding %s from ${3:-4000} to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}" "${ports[0]}" "${RESET}"
-            var_print_and_run "kubectl port-forward --namespace='${parts[1]}' '${parts[0]}/${parts[2]}' '${3:-4000}:${ports[0]}'"
+            var_print_and_run "kubectl port-forward --namespace=${parts[1]} ${parts[0]}/${parts[2]} ${3:-4000}:${ports[0]}"
           fi
         fi
         ;;
@@ -80,20 +85,25 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(get_kube_resources "deployments.apps" "${1:- }")"
 
         if [[ -n ${parts[1]:-} ]]; then
-          var_print_and_run "kubectl get '${parts[0]}' --namespace='${parts[1]}' '${parts[2]}' --output=json | jq -r '.spec.template.spec.containers[].image'"
+          var_print_and_run "kubectl get ${parts[0]} --namespace=${parts[1]} ${parts[2]} --output=json | jq -r '.spec.template.spec.containers[].image'"
         fi
         ;;
 
       "info")
         IFS='/' read -r -a parts <<<"$(get_kube_resources "${@}")"
 
-        if [[ -n ${parts[1]:-} ]]; then
+        if [[ -n ${parts[2]:-} ]]; then
+          local EXTRA_ARGS=""
+          if [[ -n ${parts[1]:-} ]]; then
+            local EXTRA_ARGS+=" --namespace=${parts[1]}"
+          fi
+
           local OUTPUT="--output=yaml"
           if [[ ${parts[0]} =~ secrets? ]]; then
             OUTPUT="--output=json | jq '.data[] |= @base64d' | json_to_yaml"
           fi
 
-          var_print_and_run "kubectl get '${parts[0]}' --namespace='${parts[1]}' '${parts[2]}' ${OUTPUT}"
+          var_print_and_run "kubectl get ${parts[0]}${EXTRA_ARGS} ${parts[2]} ${OUTPUT}"
         fi
         ;;
 
@@ -130,7 +140,7 @@ if command -v kubectl >/dev/null 2>&1; then
           if command -v kail >/dev/null 2>&1; then
             var_print_and_run "kail --ns='${parts[1]}' --label='${PODS_LABELS}' --since=24h ${*}"
           else
-            var_print_and_run "kubectl logs --namespace='${parts[1]}' --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
+            var_print_and_run "kubectl logs --namespace=${parts[1]} --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
           fi
         fi
         ;;
@@ -143,7 +153,7 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(get_kube_resources "${@}")"
 
         if [[ -n ${parts[1]:-} ]]; then
-          var_print_and_run "kubectl rollout restart --namespace='${parts[1]}' '${parts[0]}' '${parts[2]}'"
+          var_print_and_run "kubectl rollout restart --namespace=${parts[1]} ${parts[0]} ${parts[2]}"
         fi
         ;;
 
