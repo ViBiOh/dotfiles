@@ -162,7 +162,7 @@ if command -v kubectl >/dev/null 2>&1; then
         ;;
 
       *)
-        var_error "Usage: kube ACTION"
+        var_red "Usage: kube ACTION"
         var_info "\nPossibles actions are                       | args\n"
         var_info " - context | Switch context                 | name query"
         var_info " - desc    | Describe an object             | type/name name?"
@@ -184,7 +184,7 @@ fi
 if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
   helm_delta() {
     if [[ ${#} -lt 2 ]]; then
-      var_error "Usage: helm_delta NAMESPACE RELEASE_NAME [helm upgrade additionnal args...]"
+      var_red "Usage: helm_delta NAMESPACE RELEASE_NAME [helm upgrade additionnal args...]"
       return 1
     fi
 
@@ -262,7 +262,7 @@ fi
 if command -v kubeseal >/dev/null 2>&1; then
   kubeseal_raw() {
     if [[ ${#} -lt 3 ]]; then
-      var_error "Usage: kubeseal_raw NAMESPACE NAME VALUE [kubeseal additionnal args...]"
+      var_red "Usage: kubeseal_raw NAMESPACE NAME VALUE [kubeseal additionnal args...]"
       return 1
     fi
 

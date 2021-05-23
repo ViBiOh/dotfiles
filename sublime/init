@@ -16,7 +16,7 @@ script_dir() {
 
 install_plugin() {
   if [[ ${#} -ne 2 ]]; then
-    var_error "Usage: install_plugin PACKAGES_FOLDER PLUGIN_NAME"
+    var_red "Usage: install_plugin PACKAGES_FOLDER PLUGIN_NAME"
     return 1
   fi
 
@@ -32,7 +32,7 @@ install_plugin() {
 
 symlink_settings() {
   if [[ ${#} -ne 2 ]]; then
-    var_error "Usage: symlink_settings PACKAGE_FOLDER SETTING_TYPE"
+    var_red "Usage: symlink_settings PACKAGE_FOLDER SETTING_TYPE"
     return 1
   fi
 

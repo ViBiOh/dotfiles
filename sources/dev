@@ -47,7 +47,7 @@ rainbow() {
 if command -v vegeta >/dev/null 2>&1; then
   loadtest() {
     if [[ ${#} -lt 1 ]]; then
-      var_error "Usage: loadtest URL RATE_PER_SECOND"
+      var_red "Usage: loadtest URL RATE_PER_SECOND"
       return 1
     fi
 

@@ -36,7 +36,7 @@ if command -v pass >/dev/null 2>&1; then
 
   passfor() {
     if [[ ${#} -ne 1 ]]; then
-      var_error "Usage: passfor PASS_NAME"
+      var_red "Usage: passfor PASS_NAME"
       return 1
     fi
 
@@ -54,7 +54,7 @@ if command -v pass >/dev/null 2>&1; then
 
   passget() {
     if [[ ${#} -lt 1 ]]; then
-      var_error "Usage: passget PASS_NAME PASS_FIELD"
+      var_red "Usage: passget PASS_NAME PASS_FIELD"
       return 1
     fi
 

@@ -2,7 +2,7 @@
 
 archive_to_binary() {
   if [[ ${#} -lt 2 ]]; then
-    var_error "Usage: archive_to_binary ARCHIVE_URL BINARY_PATH [BINARY_DESTINATION=${HOME}/opt/bin/]"
+    var_red "Usage: archive_to_binary ARCHIVE_URL BINARY_PATH [BINARY_DESTINATION=${HOME}/opt/bin/]"
     return 1
   fi
 
@@ -53,7 +53,7 @@ archive_to_binary() {
 
 curl_to_binary() {
   if [[ ${#} -lt 2 ]]; then
-    var_error "Usage: curl_to_binary BINARY_URL BINARY_NAME [BINARY_DESTINATION=${HOME}/opt/bin/]"
+    var_red "Usage: curl_to_binary BINARY_URL BINARY_NAME [BINARY_DESTINATION=${HOME}/opt/bin/]"
     return 1
   fi
 
