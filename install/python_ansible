@@ -26,7 +26,7 @@ install() {
     exit
   fi
 
-  pip install --user ansible ansible-lint jmespath yamllint
+  pip install --user ansible==3.4.0 ansible-lint jmespath yamllint
 }
 
 credentials() {
