@@ -33,7 +33,7 @@ install() {
   curl_to_binary "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl" "kubectl"
   kubectl completion bash >"${SCRIPT_DIR}/../sources/kubectl-completion"
 
-  local HELM_VERSION="v3.5.4"
+  local HELM_VERSION="v3.6.0"
   archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz" "${OS}-${ARCH}/helm"
   if command -v helm >/dev/null 2>&1; then
     helm completion bash >"${SCRIPT_DIR}/../sources/helm-completion"
@@ -41,7 +41,7 @@ install() {
     printf "%bhelm was not found in path. Please run 'helm completion bash >'%s/../sources/helm-completion''%b\n" "${RED}" "${SCRIPT_DIR}" "${RESET}"
   fi
 
-  local FLUX_VERSION="0.13.4"
+  local FLUX_VERSION="0.14.0"
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
