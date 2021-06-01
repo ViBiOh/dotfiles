@@ -197,7 +197,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     local CHART="${1}"
     shift
 
-    helm status --namespace "${NAMESPACE}" "${NAME}" "${CHART}" --output=json | jq -r '.manifest' | yq eval 'sortKeys(..)' - >"/tmp/${NAME}_helm.yaml"
+    helm status --namespace "${NAMESPACE}" "${NAME}" --output=json | jq -r '.manifest' | yq eval 'sortKeys(..)' - >"/tmp/${NAME}_helm.yaml"
     helm upgrade --namespace "${NAMESPACE}" --debug --dry-run "${NAME}" "${CHART}" ${*} | sed '1,/^MANIFEST:$/d' | grep --invert-match '^$' | yq eval 'sortKeys(..)' - >"/tmp/${NAME}_new.yaml"
     delta "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
     rm "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
