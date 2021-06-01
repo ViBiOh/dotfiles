@@ -183,25 +183,27 @@ fi
 
 if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v yq >/dev/null 2>&1; then
   helm_delta() {
-    if [[ ${#} -lt 2 ]]; then
-      var_red "Usage: helm_delta NAMESPACE RELEASE_NAME [helm upgrade additionnal args...]"
+    if [[ ${#} -lt 3 ]]; then
+      var_red "Usage: helm_delta NAMESPACE NAME CHART [helm upgrade additionnal args...]"
       return 1
     fi
 
     local NAMESPACE="${1}"
     shift
 
-    local RELEASE_NAME="${1}"
+    local NAME="${1}"
     shift
 
-    helm status --namespace "${NAMESPACE}" "${RELEASE_NAME}" --output=json | jq -r '.manifest' | yq eval 'sortKeys(..)' - >"/tmp/${RELEASE_NAME}_helm.yaml"
-    helm upgrade --namespace "${NAMESPACE}" --debug --dry-run "${RELEASE_NAME}" ${*} | sed '1,/^MANIFEST:$/d' | grep --invert-match '^$' | yq eval 'sortKeys(..)' - >"/tmp/${RELEASE_NAME}_new.yaml"
-    delta "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
-    rm "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
+    local CHART="${1}"
+    shift
+
+    helm status --namespace "${NAMESPACE}" "${NAME}" "${CHART}" --output=json | jq -r '.manifest' | yq eval 'sortKeys(..)' - >"/tmp/${NAME}_helm.yaml"
+    helm upgrade --namespace "${NAMESPACE}" --debug --dry-run "${NAME}" "${CHART}" ${*} | sed '1,/^MANIFEST:$/d' | grep --invert-match '^$' | yq eval 'sortKeys(..)' - >"/tmp/${NAME}_new.yaml"
+    delta "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
+    rm "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
 
     if var_confirm "Perform upgrade"; then
-      var_warning "helm upgrade '${RELEASE_NAME}' ${*}"
-      helm upgrade --namespace "${NAMESPACE}" "${RELEASE_NAME}" ${*}
+      var_print_and_run "helm upgrade --namespace=${NAMESPACE} ${NAME} ${CHART} ${*}"
     fi
   }
 fi
