@@ -181,7 +181,7 @@ if command -v kubectl >/dev/null 2>&1; then
   fi
 fi
 
-if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v yq >/dev/null 2>&1; then
   helm_delta() {
     if [[ ${#} -lt 2 ]]; then
       var_red "Usage: helm_delta NAMESPACE RELEASE_NAME [helm upgrade additionnal args...]"
@@ -194,8 +194,8 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     local RELEASE_NAME="${1}"
     shift
 
-    helm status --namespace "${NAMESPACE}" "${RELEASE_NAME}" --output=json | jq -r '.manifest' >"/tmp/${RELEASE_NAME}_helm.yaml"
-    helm upgrade --namespace "${NAMESPACE}" --debug --dry-run "${RELEASE_NAME}" ${*} | sed '1,/^MANIFEST:$/d' | grep --invert-match '^$' >"/tmp/${RELEASE_NAME}_new.yaml"
+    helm status --namespace "${NAMESPACE}" "${RELEASE_NAME}" --output=json | jq -r '.manifest' | yq eval 'sortKeys(..)' - >"/tmp/${RELEASE_NAME}_helm.yaml"
+    helm upgrade --namespace "${NAMESPACE}" --debug --dry-run "${RELEASE_NAME}" ${*} | sed '1,/^MANIFEST:$/d' | grep --invert-match '^$' | yq eval 'sortKeys(..)' - >"/tmp/${RELEASE_NAME}_new.yaml"
     delta "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
     rm "/tmp/${RELEASE_NAME}_helm.yaml" "/tmp/${RELEASE_NAME}_new.yaml"
 
