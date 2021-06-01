@@ -181,7 +181,7 @@ if command -v kubectl >/dev/null 2>&1; then
   fi
 fi
 
-if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v yq >/dev/null 2>&1; then
+if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v yq >/dev/null 2>&1; then
   helm_delta() {
     if [[ ${#} -lt 3 ]]; then
       var_red "Usage: helm_delta NAMESPACE NAME CHART [helm upgrade additionnal args...]"
@@ -197,8 +197,12 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     local CHART="${1}"
     shift
 
-    helm status --namespace "${NAMESPACE}" "${NAME}" --output=json | jq -r '.manifest' | yq eval 'sortKeys(..)' - >"/tmp/${NAME}_helm.yaml"
-    helm upgrade --namespace "${NAMESPACE}" --debug --dry-run "${NAME}" "${CHART}" ${*} | sed '1,/^MANIFEST:$/d' | grep --invert-match '^$' | yq eval 'sortKeys(..)' - >"/tmp/${NAME}_new.yaml"
+    extract_manifest() {
+      yq eval '.manifest' - | yq eval --prettyPrint 'sortKeys(..)' -
+    }
+
+    helm status --output=yaml --namespace "${NAMESPACE}" "${NAME}" | extract_manifest >"/tmp/${NAME}_helm.yaml"
+    helm upgrade --output=yaml --namespace "${NAMESPACE}" "${NAME}" "${CHART}" --debug --dry-run ${*} | extract_manifest >"/tmp/${NAME}_new.yaml"
     delta "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
     rm "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
 
