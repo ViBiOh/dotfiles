@@ -44,8 +44,7 @@ if command -v kubectl >/dev/null 2>&1; then
           KUBECONFIG=$(mktemp -t kubeconfig)
           export KUBECONFIG="${KUBECONFIG}"
           cat "${HOME}/.kube/config" >>"${KUBECONFIG}"
-          var_warning "kubectl config use-context '${CONTEXT}'"
-          kubectl config use-context "${CONTEXT}"
+          var_print_and_run "kubectl config use-context ${CONTEXT}"
 
           if [[ -n ${TMUX:-} ]]; then
             tmux setenv KUBECONFIG "${KUBECONFIG}"
