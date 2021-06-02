@@ -182,26 +182,22 @@ fi
 
 if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v yq >/dev/null 2>&1; then
   helm_delta() {
-    if [[ ${#} -lt 3 ]]; then
-      var_red "Usage: helm_delta NAMESPACE NAME CHART [helm upgrade additionnal args...]"
+    IFS='/' read -r -a parts <<<"$(helm list --all-namespaces --output yaml | yq eval '.[] | .namespace + "/" + .name' - | fzf --height=20 --ansi --reverse)"
+    if [[ -z ${parts[0]:-} ]] || [[ -z ${parts[1]:-} ]]; then
       return 1
     fi
 
-    local NAMESPACE="${1}"
-    shift
-
-    local NAME="${1}"
-    shift
-
-    local CHART="${1}"
-    shift
+    var_read CHART
 
     extract_manifest() {
       yq eval '.manifest' - | yq eval --prettyPrint 'sortKeys(..)' -
     }
 
-    helm status --output=yaml --namespace "${NAMESPACE}" "${NAME}" | extract_manifest >"/tmp/${NAME}_helm.yaml"
-    helm upgrade --output=yaml --namespace "${NAMESPACE}" "${NAME}" "${CHART}" --debug --dry-run ${*} | extract_manifest >"/tmp/${NAME}_new.yaml"
+    local NAMESPACE="${parts[0]}"
+    local NAME="${parts[1]}"
+
+    helm status --output=yaml --namespace="${NAMESPACE}" "${NAME}" | extract_manifest >"/tmp/${NAME}_helm.yaml"
+    helm upgrade --output=yaml --namespace="${NAMESPACE}" "${NAME}" "${CHART}" --debug --dry-run ${*} | extract_manifest >"/tmp/${NAME}_new.yaml"
     delta "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
     rm "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
 
@@ -266,24 +262,13 @@ fi
 
 if command -v kubeseal >/dev/null 2>&1; then
   kubeseal_raw() {
-    if [[ ${#} -lt 3 ]]; then
-      var_red "Usage: kubeseal_raw NAMESPACE NAME VALUE [kubeseal additionnal args...]"
-      return 1
-    fi
-
-    local NAMESPACE=${1}
-    shift
-    local NAME=${1}
-    shift
-    local VALUE=${1}
-    shift
+    var_read NAMESPACE
+    var_read NAME
+    var_read VALUE
 
     local SCOPE=""
+    SCOPE="$(printf "strict\nnamespace-wide\ncluster-wide" | fzf --ansi --reverse)"
 
-    if var_confirm "namespace-wide"; then
-      SCOPE=" --scope=namespace-wide"
-    fi
-
-    var_print_and_run "printf '%s' '${VALUE}' | kubeseal --raw --from-file=/dev/stdin --namespace=${NAMESPACE} --name=${NAME}${SCOPE} ${*}"
+    var_print_and_run "printf '%s' '${VALUE}' | kubeseal --raw --from-file=/dev/stdin --namespace=${NAMESPACE} --name=${NAME} --scope=${SCOPE} ${*}"
   }
 fi
