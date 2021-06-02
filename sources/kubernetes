@@ -10,7 +10,7 @@ if command -v kubectl >/dev/null 2>&1; then
     return "${exit}"
   }
 
-  if command -v fzf >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+  if command -v fzf >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v yq >/dev/null 2>&1; then
     kube() {
       get_kube_resources() {
         local RESOURCE="${1:-}"
@@ -26,10 +26,6 @@ if command -v kubectl >/dev/null 2>&1; then
         fi
 
         printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/" + .name' | fzf --height=20 --ansi --reverse -1 --query="${QUERY}")"
-      }
-
-      json_to_yaml() {
-        python -c 'import sys, yaml, json; print(yaml.dump(json.loads(sys.stdin.read())))'
       }
 
       local ACTION="${1}"
@@ -99,7 +95,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
           local OUTPUT="--output=yaml"
           if [[ ${parts[0]} =~ secrets? ]]; then
-            OUTPUT="--output=json | jq '.data[] |= @base64d' | json_to_yaml"
+            OUTPUT="--output=json | jq '.data[] |= @base64d' | yq eval --prettyPrint '.' -"
           fi
 
           var_print_and_run "kubectl get ${parts[0]}${EXTRA_ARGS} ${parts[2]} ${OUTPUT}"
