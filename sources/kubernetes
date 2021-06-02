@@ -278,7 +278,12 @@ if command -v kubeseal >/dev/null 2>&1; then
     local VALUE=${1}
     shift
 
-    var_warning "printf '%s' '${VALUE}' | kubeseal --raw --from-file=/dev/stdin --namespace='${NAMESPACE}' --name '${NAME}' --scope 'namespace-wide' ${*}"
-    printf "%s" "${VALUE}" | kubeseal --raw --from-file=/dev/stdin --namespace="${NAMESPACE}" --name "${NAME}" --scope "namespace-wide" ${*}
+    local SCOPE=""
+
+    if var_confirm "namespace-wide"; then
+      SCOPE=" --scope=namespace-wide"
+    fi
+
+    var_print_and_run "printf '%s' '${VALUE}' | kubeseal --raw --from-file=/dev/stdin --namespace=${NAMESPACE} --name=${NAME}${SCOPE} ${*}"
   }
 fi
