@@ -258,8 +258,11 @@ fi
 
 if command -v kubeseal >/dev/null 2>&1; then
   kubeseal_raw() {
+    local NAMESPACE
     var_read NAMESPACE
+    local NAME
     var_read NAME
+    local VALUE
     var_read VALUE
 
     local SCOPE=""
