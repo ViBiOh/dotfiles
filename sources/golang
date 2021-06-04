@@ -11,6 +11,5 @@ fi
 export GOPATH="${HOME}/opt/gopath"
 export PATH="${GOPATH}/bin:${PATH}"
 
-alias pprof_cpu='go tool pprof -http localhost:8080 http://localhost:9999/debug/pprof/profile'
 alias pprof_memory='go tool pprof -http localhost:8080 http://localhost:9999/debug/pprof/heap'
 alias pprof_goroutine='go tool pprof -http localhost:8080 http://localhost:9999/debug/pprof/goroutine'
