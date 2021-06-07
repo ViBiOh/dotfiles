@@ -20,8 +20,9 @@ clean() {
     mkdir -p "${GOPATH}"
   fi
 
-  rm -rf "${HOME}/opt/go"
   rm -rf "${HOME}/.dlv"
+  rm -rf "${HOME}/opt/go"
+  rm -rf "${HOME}/pprof"
 }
 
 install() {
