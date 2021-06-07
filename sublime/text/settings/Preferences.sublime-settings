@@ -1,6 +1,5 @@
 {
 	"animation_enabled": false,
-	"color_scheme": "Packages/Color Scheme - Default/Monokai.sublime-color-scheme",
 	"default_line_ending": "unix",
 	"drag_text": false,
 	"draw_white_space": "all",
