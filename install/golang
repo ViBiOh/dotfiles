@@ -45,7 +45,7 @@ install() {
 
   local SCRIPT_DIR
   SCRIPT_DIR="$(script_dir)"
-  source "${SCRIPT_DIR}/../sources/golang"
+  source "${SCRIPT_DIR}/../sources/_golang"
   mkdir -p "${GOPATH}"
 
   packages_install graphviz
@@ -53,7 +53,7 @@ install() {
   if command -v go >/dev/null 2>&1; then
     if [[ ${ARCH} == "amd64" ]]; then
       go get -u github.com/go-delve/delve/cmd/dlv
-      go get -u github.com/aarzilli/gdlv
+      go install github.com/aarzilli/gdlv@latest
     fi
 
     go get -u github.com/kisielk/errcheck

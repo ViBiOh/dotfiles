@@ -15,6 +15,7 @@ script_dir() {
 }
 
 clean() {
+  rm -rf "${HOME}/.ansible/"
   rm -rf "${HOME}/.ansible"*[^.cfg]
 }
 
