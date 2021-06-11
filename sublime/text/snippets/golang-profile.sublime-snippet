@@ -1,9 +1,9 @@
 <snippet>
 	<content><![CDATA[
-if strings.HasPrefix(r.URL.Path, "/debug/pprof") {
-	pprof.Index(w, r)
-	return
-}
+import _ "net/http/pprof"
+go func() {
+	fmt.Println(http.ListenAndServe("localhost:9999", http.DefaultServeMux))
+}()
 
 ]]></content>
 	<tabTrigger>gph</tabTrigger>
