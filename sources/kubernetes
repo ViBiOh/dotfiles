@@ -176,47 +176,18 @@ if command -v kubectl >/dev/null 2>&1; then
   fi
 fi
 
-if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v yq >/dev/null 2>&1; then
-  helm_delta() {
-    IFS='/' read -r -a parts <<<"$(helm list --all-namespaces --output yaml | yq eval '.[] | .namespace + "/" + .name' - | fzf --height=20 --ansi --reverse)"
-    if [[ -z ${parts[0]:-} ]] || [[ -z ${parts[1]:-} ]]; then
+if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
+  helm_select_chart() {
+    local CHART_REPOSITORY
+    CHART_REPOSITORY="$(helm repo list --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
+    if [[ -z ${CHART_REPOSITORY} ]]; then
       return 1
     fi
 
-    var_read CHART
-
-    extract_manifest() {
-      yq eval '.manifest' - | yq eval --prettyPrint 'sortKeys(..)' -
-    }
-
-    local NAMESPACE="${parts[0]}"
-    local NAME="${parts[1]}"
-
-    helm status --output=yaml --namespace="${NAMESPACE}" "${NAME}" | extract_manifest >"/tmp/${NAME}_helm.yaml"
-    helm upgrade --output=yaml --namespace="${NAMESPACE}" "${NAME}" "${CHART}" --debug --dry-run ${*} | extract_manifest >"/tmp/${NAME}_new.yaml"
-    delta "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
-    rm "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
-
-    if var_confirm "Perform upgrade"; then
-      var_print_and_run "helm upgrade --namespace=${NAMESPACE} ${NAME} ${CHART} ${*}"
-    fi
-  }
-fi
-
-if command -v helm >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
-  helm_crds_manifests() {
-    local CHART_REPO
-    CHART_REPO="$(helm repo list --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
-
-    if [[ -z ${CHART_REPO} ]]; then
-      return 1
-    fi
-
-    var_info "Repository: ${CHART_REPO}"
+    var_info "Repository: ${CHART_REPOSITORY}"
 
     local CHART_NAME
-    CHART_NAME="$(helm search repo "${CHART_REPO}/" --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
-
+    CHART_NAME="$(helm search repo "${CHART_REPOSITORY}/" --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
     if [[ -z ${CHART_NAME} ]]; then
       return 1
     fi
@@ -232,6 +203,50 @@ if command -v helm >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -
 
     var_info "Version: ${CHART_VERSION}"
 
+    printf "%s@%s" "${CHART_NAME}" "${CHART_VERSION}"
+  }
+
+  helm_delta() {
+    IFS='/' read -r -a release <<<"$(helm list --all-namespaces --output yaml | yq eval '.[] | .namespace + "/" + .name' - | fzf --height=20 --ansi --reverse)"
+    if [[ -z ${release[0]:-} ]] || [[ -z ${release[1]:-} ]]; then
+      return 1
+    fi
+
+    local NAMESPACE="${release[0]}"
+    local NAME="${release[1]}"
+    var_info "Release: ${NAMESPACE}/${NAME}"
+
+    IFS='@' read -r -a chart <<<"$(helm_select_chart)"
+    if [[ -z ${chart[0]:-} ]] || [[ -z ${chart[1]:-} ]]; then
+      return 1
+    fi
+
+    local CHART="${chart[0]}"
+    local VERSION="${chart[1]}"
+
+    extract_manifest() {
+      yq eval '.manifest' - | yq eval --prettyPrint 'sortKeys(..)' -
+    }
+
+    helm status --output=yaml --namespace="${NAMESPACE}" "${NAME}" | extract_manifest >"/tmp/${NAME}_helm.yaml"
+    helm upgrade --output=yaml --namespace="${NAMESPACE}" "${NAME}" "${CHART}" --version "${VERSION}" --debug --dry-run ${*} | extract_manifest >"/tmp/${NAME}_new.yaml"
+    delta "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
+    rm "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
+
+    if var_confirm "Perform upgrade"; then
+      var_print_and_run "helm upgrade --namespace=${NAMESPACE} ${NAME} ${CHART} --version ${VERSION} ${*}"
+    fi
+  }
+
+  helm_crds_manifests() {
+    IFS='@' read -r -a chart <<<"$(helm_select_chart)"
+    if [[ -z ${chart[0]:-} ]] || [[ -z ${chart[1]:-} ]]; then
+      return 1
+    fi
+
+    local CHART="${chart[0]}"
+    local VERSION="${chart[1]}"
+
     local CURRENT_DIR
     CURRENT_DIR="$(pwd)"
 
@@ -239,9 +254,9 @@ if command -v helm >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -
       cd "/tmp" || false
 
       local CHART_BASENAME
-      CHART_BASENAME="$(basename "${CHART_NAME}")"
+      CHART_BASENAME="$(basename "${CHART}")"
 
-      helm pull "${CHART_NAME}" --version "${CHART_VERSION}" --untar
+      helm pull "${CHART}" --version "${VERSION}" --untar
 
       if [[ -d "${CHART_BASENAME}/crds/" ]]; then
         printf "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(find "${CHART_BASENAME}/crds" -type f -print0 | xargs -0 printf "%s, " | sed 's|, $||')" "${BLUE}" "${RESET}" 1>&2
