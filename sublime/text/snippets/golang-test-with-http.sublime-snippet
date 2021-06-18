@@ -23,7 +23,7 @@ func Test${1:FuncName}(t *testing.T) {
 			${1:FuncName}(writer, tc.request)
 
 			if got := writer.Code; got != tc.wantStatus {
-				t.Errorf("${1:FuncName} = %d, want %d", got, tc.wantStatus)
+				t.Errorf("${1:FuncName} = HTTP/%d, want HTTP/%d", got, tc.wantStatus)
 			}
 
 			if got, _ := request.ReadBodyResponse(writer.Result()); string(got) != tc.want {
