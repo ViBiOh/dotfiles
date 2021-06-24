@@ -95,8 +95,9 @@ if command -v kubectl >/dev/null 2>&1; then
 
           local OUTPUT="--output=yaml"
           if [[ ${parts[0]} =~ secrets? ]]; then
-            OUTPUT="--output=json | jq '.data[] |= @base64d' | yq eval --prettyPrint '.' -"
+            OUTPUT="--output=json | jq '.data[] |= @base64d'"
           fi
+          OUTPUT="${OUTPUT} | yq eval --prettyPrint '.' -"
 
           var_print_and_run "kubectl get ${parts[0]}${EXTRA_ARGS} ${parts[2]} ${OUTPUT}"
         fi
