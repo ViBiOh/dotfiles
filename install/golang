@@ -52,15 +52,15 @@ install() {
 
   if command -v go >/dev/null 2>&1; then
     if [[ ${ARCH} == "amd64" ]]; then
-      go get -u github.com/go-delve/delve/cmd/dlv
+      go install github.com/go-delve/delve/cmd/dlv@latest
       go install github.com/aarzilli/gdlv@latest
     fi
 
-    go get -u github.com/kisielk/errcheck
-    go get -u github.com/tsenart/vegeta
-    go get -u golang.org/x/lint/golint
-    go get -u golang.org/x/tools/cmd/goimports
-    go get -u golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment
+    go install github.com/kisielk/errcheck@latest
+    go install github.com/tsenart/vegeta@latest
+    go install golang.org/x/lint/golint@latest
+    go install golang.org/x/tools/cmd/goimports@latest
+    go install golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@latest
   fi
 
   local GOLANGCI_LINT_VERSION="1.41.1"
