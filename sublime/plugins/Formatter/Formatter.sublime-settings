@@ -8,7 +8,7 @@
     "source.json": [
       ["prettier", "--no-color", "--stdin-filepath", "file.json"]
     ],
-    "source.yaml": [["prettier", "--no-color", "--stdin-filepath", "file.yml"]],
+    "source.yaml": [["prettier", "--no-color", "--stdin-filepath", "file.yaml"]],
     "source.shell.bash": [["shfmt", "-s", "-"]],
     "text.html.markdown": [
       ["prettier", "--no-color", "--stdin-filepath", "file.md"]
