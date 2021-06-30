@@ -14,6 +14,10 @@ script_dir() {
   fi
 }
 
+clean() {
+  rm -f "${HOME}/.gitconfig_secrets"
+}
+
 install() {
   packages_install git
 
@@ -39,8 +43,4 @@ install() {
 
   local DELTA_RELEASE="delta-${DELTA_VERSION}-${ARCH}-${OS}"
   archive_to_binary "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/${DELTA_RELEASE}.tar.gz" "${DELTA_RELEASE}/delta"
-}
-
-credentials() {
-  git config --global url."https://ViBiOh:${GITHUB_TOKEN}@github.com".insteadOf "https://github.com"
 }
