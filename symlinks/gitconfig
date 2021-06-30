@@ -9,6 +9,9 @@
 [includeIf "gitdir:~/workspace/"]
 	path = ~/.gitconfig_work
 
+[includeIf "gitdir:~/"]
+	path = ~/.gitconfig_secrets
+
 [core]
 	editor = vi
 	autocrlf = input

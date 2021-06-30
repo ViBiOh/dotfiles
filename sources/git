@@ -11,3 +11,8 @@ fi
 ...() {
   cd "$(git_root)" || return 1
 }
+
+git_secrets() {
+  printf '[url "https://ViBiOh:%s@github.com"]\n  insteadOf = https://github.com' "${GITHUB_TOKEN}" >"${HOME}/.gitconfig_secrets"
+  chmod 600 "${HOME}/.gitconfig_secrets"
+}
