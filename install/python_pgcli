@@ -52,7 +52,7 @@ credentials() {
   fi
 
   if [[ $(pass find pgpass | wc -l) -gt 1 ]]; then
-    pass show "infra/pgpass" >>"${HOME}/.pgpass"
+    pass show "infra/pgpass" >"${HOME}/.pgpass"
     chmod 600 "${HOME}/.pgpass"
   fi
 }
