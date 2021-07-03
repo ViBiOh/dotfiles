@@ -272,18 +272,26 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
   }
 fi
 
-if command -v kubeseal >/dev/null 2>&1; then
+if command -v kubeseal >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
   kubeseal_raw() {
     local NAMESPACE
-    var_read NAMESPACE
+    var_shift_or_read NAMESPACE "${1:-}"
+    shift || true
+
     local NAME
-    var_read NAME
-    local VALUE
-    var_read VALUE
+    var_shift_or_read NAME "${1:-}"
+    shift || true
+
+    local CONTENT
+    var_shift_or_read CONTENT "${1:-}"
+    shift || true
+
+    local CERT=""
+    CERT="$(rg --files --glob '*.{pem,crt}' | fzf --ansi --reverse)"
 
     local SCOPE=""
     SCOPE="$(printf "strict\nnamespace-wide\ncluster-wide" | fzf --ansi --reverse)"
 
-    var_print_and_run "printf '%s' '${VALUE}' | kubeseal --raw --from-file=/dev/stdin --namespace=${NAMESPACE} --name=${NAME} --scope=${SCOPE} ${*}"
+    var_print_and_run "printf '%s' '${CONTENT}' | kubeseal --raw --from-file=/dev/stdin --namespace='${NAMESPACE}' --name='${NAME}' --scope='${SCOPE}' --cert='${CERT}' | pbcopy"
   }
 fi
