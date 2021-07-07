@@ -1,0 +1,16 @@
+<snippet>
+	<content><![CDATA[
+// ${1:SortName} sort ${2:Struct} by ${3:Comment}
+type ${1:SortName} []${2:Struct}
+
+func (a ${1:SortName}) Len() int      { return len(a) }
+func (a ${1:SortName}) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a ${1:SortName}) Less(i, j int) bool {
+	return a[i].${4:Property} < a[j].${4:Property}
+}
+
+]]></content>
+	<tabTrigger>gss</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang Sort Struct</description>
+</snippet>
