@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-export HISTCONTROL=ignoreboth:erasedups
-export LESSHISTFILE=/dev/null
-
-# When the shell exits, append to the history file instead of overwriting it
-shopt -s histappend

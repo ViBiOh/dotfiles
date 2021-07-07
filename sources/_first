@@ -3,12 +3,3 @@
 if [[ -d "${HOME}/opt/bin" ]]; then
   export PATH="${HOME}/opt/bin:${PATH}"
 fi
-
-# Enter a folder name to `cd` to it
-shopt -s autocd
-
-# Fix minor spelling issues with `cd`
-shopt -s cdspell
-
-# Fix minor spelling issues for commands
-shopt -s dirspell
