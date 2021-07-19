@@ -1,6 +1,2 @@
-[user]
-	email = vincent.boutour@blablacar.com
-	signingkey = D2FE511E9AAC2DA0
-
 [url "ssh://git@github.com/"]
 	insteadOf = https://github.com/
