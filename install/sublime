@@ -25,7 +25,7 @@ install() {
       printf "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/stable/%s" "${ARCH}" | sudo tee -a "/etc/pacman.conf"
     fi
 
-    packages_install sublime-merge
+    packages_install --cask sublime-merge
   fi
 
   local SUBLIME_TEXT_VERSION
