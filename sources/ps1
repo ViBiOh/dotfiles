@@ -17,11 +17,11 @@ _previous_status() {
 }
 
 PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
-if command -v git >/dev/null 2>&1 && [[ "$(type -t __git_ps1)" == "function" ]]; then
+if [[ "$(type -t __git_ps1)" == "function" ]]; then
   PS1+="${YELLOW}\$(__git_ps1)${RESET}"
 fi
 
-if command -v kubectl >/dev/null 2>&1 && [[ "$(type -t __kube_ps1)" == "function" ]]; then
+if [[ "$(type -t __kube_ps1)" == "function" ]]; then
   PS1+="${BLUE}\$(__kube_ps1)${RESET}"
 fi
 

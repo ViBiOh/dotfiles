@@ -5,7 +5,12 @@ if command -v kubectl >/dev/null 2>&1; then
     # preserve exit status
     local exit="${?}"
 
-    printf " ☸️ %s" "$(kubectl config view --minify --output=jsonpath --template='{..current-context}/{..namespace}' 2>/dev/null)"
+    local K8S_CONTEXT
+    K8S_CONTEXT="$(kubectl config view --minify --output=jsonpath --template='{..current-context}/{..namespace}' 2>/dev/null)"
+
+    if [[ -n ${K8S_CONTEXT} ]]; then
+      printf " ☸️ %s" "${K8S_CONTEXT}"
+    fi
 
     return "${exit}"
   }
