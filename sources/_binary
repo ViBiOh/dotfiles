@@ -69,7 +69,17 @@ curl_to_binary() {
 }
 
 normalized_os() {
-  uname -s | tr "[:upper:]" "[:lower:]"
+  local OS_NAME
+  OS_NAME="$(uname -s | tr "[:upper:]" "[:lower:]")"
+
+  local MACOS_VALUE="${1:-}"
+  shift || true
+
+  if [[ ${OS_NAME} == "darwin" ]] && [[ -n ${MACOS_VALUE} ]]; then
+    OS_NAME="${MACOS_VALUE}"
+  fi
+
+  printf "%s" "${OS_NAME}"
 }
 
 normalized_arch() {
