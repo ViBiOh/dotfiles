@@ -29,7 +29,14 @@ install() {
   fi
 
   local SUBLIME_TEXT_VERSION
-  SUBLIME_TEXT_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/dev_update_check" | jq .latest_version)"
+  SUBLIME_TEXT_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/dev_update_check" | jq ".latest_version")"
+
+  local SUBLIME_TEXT_STABLE_VERSION
+  SUBLIME_TEXT_STABLE_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/stable_update_check" | jq ".latest_version")"
+
+  if [[ ${SUBLIME_TEXT_VERSION} < ${SUBLIME_TEXT_STABLE_VERSION} ]]; then
+    SUBLIME_TEXT_VERSION="${SUBLIME_TEXT_STABLE_VERSION}"
+  fi
 
   local FILENAME_SUFFIX
   FILENAME_SUFFIX="$(normalized_arch "amd64" "arm" "arm64").tar.xz"
