@@ -26,7 +26,7 @@ clean() {
 }
 
 install() {
-  local GO_VERSION="1.16.6"
+  local GO_VERSION="1.16.7"
 
   local ARCH
   ARCH="$(normalized_arch "amd64" "armv6l" "arm64")"
