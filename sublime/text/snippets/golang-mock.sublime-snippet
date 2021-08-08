@@ -1,0 +1,19 @@
+<snippet>
+	<content><![CDATA[
+ctrl := gomock.NewController(t)
+defer ctrl.Finish()
+
+mock${1} := mocks.New${1}(ctrl)
+
+tc.instance.${1} = mock${1}
+
+switch tc.intention {
+case "":
+	mock${1}.EXPECT().
+}
+
+]]></content>
+	<tabTrigger>gmo</tabTrigger>
+	<scope>source.go</scope>
+	<description>Gomock</description>
+</snippet>
