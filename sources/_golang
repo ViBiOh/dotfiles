@@ -14,3 +14,14 @@ export PATH="${GOPATH}/bin:${PATH}"
 alias pprof_cpu='go tool pprof -http localhost:8080 http://localhost:9999/debug/pprof/profile'
 alias pprof_memory='go tool pprof -http localhost:8080 http://localhost:9999/debug/pprof/heap'
 alias pprof_goroutine='go tool pprof -http localhost:8080 http://localhost:9999/debug/pprof/goroutine'
+
+if command -v fzf >/dev/null 2>&1; then
+  go_bump() {
+    local MODULE_TO_BUMP
+    MODULE_TO_BUMP="$(go list -m -json all | jq -r 'select(.Indirect != true) | .Path' | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
+
+    if [[ -n ${MODULE_TO_BUMP} ]]; then
+      var_print_and_run "go get '${MODULE_TO_BUMP}'"
+    fi
+  }
+fi
