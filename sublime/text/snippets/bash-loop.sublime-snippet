@@ -1,11 +1,11 @@
 <snippet>
-  <content><![CDATA[
+	<content><![CDATA[
 while IFS= read -r -d '' file; do
   printf "%s" "\${file}"
 done < <(find . -type f -name '*' -print0)
 
 ]]></content>
-  <tabTrigger>bl</tabTrigger>
-  <scope>source.shell.bash</scope>
-  <description>Bash File Loop</description>
+	<tabTrigger>bl</tabTrigger>
+	<scope>source.shell.bash</scope>
+	<description>Bash File Loop</description>
 </snippet>

@@ -1,5 +1,5 @@
 <snippet>
-  <content><![CDATA[
+	<content><![CDATA[
 local ${1:VarName}
 
 while getopts ":${2:OptName}:" option; do
@@ -21,7 +21,7 @@ done
 shift \$((OPTIND - 1))
 
 ]]></content>
-  <tabTrigger>bgo</tabTrigger>
-  <scope>source.shell.bash</scope>
-  <description>Bash GetOpts</description>
+	<tabTrigger>bgo</tabTrigger>
+	<scope>source.shell.bash</scope>
+	<description>Bash GetOpts</description>
 </snippet>
