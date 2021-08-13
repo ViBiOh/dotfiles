@@ -1,0 +1,13 @@
+<snippet>
+	<content><![CDATA[
+func Benchmark${2:FuncName}(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		${2:FuncName}()
+	}
+}
+
+]]></content>
+	<tabTrigger>gb</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang Benchmark</description>
+</snippet>
