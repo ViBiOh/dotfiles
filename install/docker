@@ -9,5 +9,5 @@ install() {
 
   local CTOP_VERSION="0.7.6"
 
-  curl_to_binary "https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64")" "ctop"
+  curl_to_binary "https://github.com/bcicen/ctop/releases/download/${CTOP_VERSION}/ctop-${CTOP_VERSION}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64")" "ctop"
 }
