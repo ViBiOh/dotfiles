@@ -34,7 +34,6 @@ install() {
     sudo tee /etc/hosts >/dev/null
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
     defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
     defaults write NSGlobalDomain AppleFontSmoothing -int 1
     defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
@@ -44,8 +43,15 @@ install() {
     defaults write NSGlobalDomain AppleMetricUnits -bool true
     defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+    defaults write NSGlobalDomain com.apple.keyboard.fnState -int 1
+    defaults write NSGlobalDomain com.apple.mouse.scaling -int 5
     defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+    defaults write NSGlobalDomain com.apple.sound.beep.flash -int 0
+    defaults write NSGlobalDomain com.apple.springing.delay -int 5
+    defaults write NSGlobalDomain com.apple.springing.enabled -int 1
     defaults write NSGlobalDomain com.apple.swipescrolldirection -bool true
+    defaults write NSGlobalDomain com.apple.trackpad.forceClick -int 1
+    defaults write NSGlobalDomain com.apple.trackpad.scaling -int 1
     defaults write NSGlobalDomain InitialKeyRepeat -int 15
     defaults write NSGlobalDomain KeyRepeat -int 2
     defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
@@ -60,6 +66,8 @@ install() {
     defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
 
     defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
+    defaults write com.apple.systempreferences DisableAutoLoginButtonIsHidden -bool true
+    defaults write com.apple.systempreferences ShowAllMode -bool true
 
     defaults write com.apple.finder AppleShowAllFiles -bool true
     defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
@@ -109,15 +117,17 @@ install() {
 
     defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
 
-    defaults write com.apple.dock tilesize -int 36
     defaults write com.apple.dock autohide -bool true
     defaults write com.apple.dock autohide-delay -float 0
     defaults write com.apple.dock autohide-time-modifier -float 0
-    defaults write com.apple.dock showhidden -bool true
     defaults write com.apple.dock hide-mirror -bool true
+    defaults write com.apple.dock largesize -int 128
+    defaults write com.apple.dock launchanim -bool false
     defaults write com.apple.dock mineffect -string "scale"
     defaults write com.apple.dock minimize-to-application -bool true
-    defaults write com.apple.dock launchanim -bool false
+    defaults write com.apple.dock orientation -string "left"
+    defaults write com.apple.dock showhidden -bool true
+    defaults write com.apple.dock tilesize -int 36
 
     defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
