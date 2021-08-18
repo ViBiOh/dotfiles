@@ -10,7 +10,7 @@ install() {
   terraform_install "1.0.4"
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
-  printf "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\n" "${HOME}" >"${HOME}/.terraformrc"
+  printf "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\ndisable_checkpoint = true\n" "${HOME}" >"${HOME}/.terraformrc"
 }
 
 credentials() {
