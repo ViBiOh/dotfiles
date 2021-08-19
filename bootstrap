@@ -7,7 +7,7 @@ main() {
   local GITHUB_USER="ViBiOh"
   local REPOSITORY_NAME="dotfiles"
   local DOTFILES_BRANCH="main"
-  local ARCHIVE_FILENAME="${INSTALL_PATH}/dotfiles.zip"
+  local ARCHIVE_FILENAME="${INSTALL_PATH}/${REPOSITORY_NAME}.zip"
 
   mkdir -p "${INSTALL_PATH}"
 
