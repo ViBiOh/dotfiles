@@ -5,11 +5,5 @@ set -o nounset -o pipefail -o errexit
 install() {
   local SHELLCHECK_VERSION="v0.7.2"
 
-  local ARCH
-  ARCH="$(normalized_arch "" "armv6hf")"
-
-  local OS
-  OS="$(normalized_os)"
-
-  archive_to_binary "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.${OS}.${ARCH}.tar.xz" "shellcheck-${SHELLCHECK_VERSION}/shellcheck"
+  archive_to_binary "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.$(normalized_os).$(normalized_arch "" "armv6hf").tar.xz" "shellcheck-${SHELLCHECK_VERSION}/shellcheck"
 }

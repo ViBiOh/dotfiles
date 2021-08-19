@@ -5,15 +5,8 @@ set -o nounset -o pipefail -o errexit
 install() {
   local SYNCTHING_VERSION="1.18.1"
 
-  local OS
-  OS="$(normalized_os)"
-
-  if [[ ${OS} == "darwin" ]]; then
-    OS="macos"
-  fi
-
   local SYNCTHING_RELEASE
-  SYNCTHING_RELEASE="syncthing-${OS}-$(normalized_arch "amd64" "arm" "arm64")-v${SYNCTHING_VERSION}"
+  SYNCTHING_RELEASE="syncthing-$(normalized_os "macos")-$(normalized_arch "amd64" "arm" "arm64")-v${SYNCTHING_VERSION}"
 
   local SYNCTHIN_ARCHIVE_TYPE="tar.gz"
   if [[ ${OSTYPE} =~ ^darwin ]]; then
