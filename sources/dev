@@ -58,7 +58,8 @@ if command -v vegeta >/dev/null 2>&1; then
 
     var_info "Attacking '${URL}' at ${RATE} request(s) per second during 30 seconds..."
     printf "GET %s" "${URL}" | vegeta attack -rate="${RATE}" -duration=30s | vegeta plot >vegeta.html && open vegeta.html
-    var_warning "Don't forget to delete \`rm vegeta.html\`"
+    sleep 5
+    rm vegeta.html
   }
 fi
 
