@@ -43,7 +43,9 @@ install() {
   echo "[main]
 multi_line = True
 auto_expand = True
-row_limit = 100" >"${HOME}/.config/pgcli/config"
+row_limit = 100
+log_level = ERROR
+" >"${HOME}/.config/pgcli/config"
 }
 
 credentials() {
