@@ -22,7 +22,7 @@ if command -v fzf >/dev/null 2>&1; then
 
     if [[ -n ${MODULE_TO_BUMP} ]]; then
       var_read MODULE_VERSION "latest"
-      if [[ ${MODULE_VERSION} != "latest" ]] && [[ -n ${MODULE_VERSION} ]]; then
+      if [[ -n ${MODULE_VERSION} ]]; then
         MODULE_VERSION="@${MODULE_VERSION}"
       fi
 
