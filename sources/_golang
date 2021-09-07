@@ -21,6 +21,8 @@ if command -v fzf >/dev/null 2>&1; then
     MODULE_TO_BUMP="$(go list -m -json all | jq -r 'select(.Indirect != true) | .Path' | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
 
     if [[ -n ${MODULE_TO_BUMP} ]]; then
+      local MODULE_VERSION=""
+
       var_read MODULE_VERSION "latest"
       if [[ -n ${MODULE_VERSION} ]]; then
         MODULE_VERSION="@${MODULE_VERSION}"
