@@ -33,6 +33,11 @@ if command -v kubectl >/dev/null 2>&1; then
         printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/" + .name' | fzf --height=20 --ansi --reverse -1 --query="${QUERY}")"
       }
 
+      print_and_run() {
+        printf "%b%b%b\n" "${YELLOW}" "${@}" "${RESET}" 1>&2
+        eval "${@}"
+      }
+
       local ACTION="${1}"
       shift
 
@@ -45,7 +50,7 @@ if command -v kubectl >/dev/null 2>&1; then
           KUBECONFIG=$(mktemp -t kubeconfig)
           export KUBECONFIG="${KUBECONFIG}"
           cat "${HOME}/.kube/config" >>"${KUBECONFIG}"
-          var_print_and_run "kubectl config use-context ${CONTEXT}"
+          print_and_run "kubectl config use-context ${CONTEXT}"
 
           if [[ -n ${TMUX:-} ]]; then
             tmux setenv KUBECONFIG "${KUBECONFIG}"
@@ -62,7 +67,7 @@ if command -v kubectl >/dev/null 2>&1; then
             local EXTRA_ARGS+=" --namespace=${parts[1]}"
           fi
 
-          var_print_and_run "kubectl describe ${parts[0]}${EXTRA_ARGS} ${parts[2]}"
+          print_and_run "kubectl describe ${parts[0]}${EXTRA_ARGS} ${parts[2]}"
         fi
         ;;
 
@@ -76,7 +81,7 @@ if command -v kubectl >/dev/null 2>&1; then
           if [[ -n ${KUBE_PORT:-} ]]; then
             IFS='/' read -r -a ports <<<"${KUBE_PORT}"
             printf "%bForwarding %s from ${3:-4000} to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}" "${ports[0]}" "${RESET}"
-            var_print_and_run "kubectl port-forward --namespace=${parts[1]} ${parts[0]}/${parts[2]} ${3:-4000}:${ports[0]}"
+            print_and_run "kubectl port-forward --namespace=${parts[1]} ${parts[0]}/${parts[2]} ${3:-4000}:${ports[0]}"
           fi
         fi
         ;;
@@ -85,7 +90,7 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(get_kube_resources "deployments.apps" "${1:- }")"
 
         if [[ -n ${parts[1]:-} ]]; then
-          var_print_and_run "kubectl get ${parts[0]} --namespace=${parts[1]} ${parts[2]} --output=json | jq -r '.spec.template.spec.containers[].image'"
+          print_and_run "kubectl get ${parts[0]} --namespace=${parts[1]} ${parts[2]} --output=json | jq -r '.spec.template.spec.containers[].image'"
         fi
         ;;
 
@@ -104,7 +109,7 @@ if command -v kubectl >/dev/null 2>&1; then
           fi
           OUTPUT="${OUTPUT} | yq eval --prettyPrint '.' -"
 
-          var_print_and_run "kubectl get ${parts[0]}${EXTRA_ARGS} ${parts[2]} ${OUTPUT}"
+          print_and_run "kubectl get ${parts[0]}${EXTRA_ARGS} ${parts[2]} ${OUTPUT}"
         fi
         ;;
 
@@ -139,9 +144,9 @@ if command -v kubectl >/dev/null 2>&1; then
           printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${parts[0]}/${parts[1]}/${parts[2]}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
           if command -v kail >/dev/null 2>&1; then
-            var_print_and_run "kail --ns='${parts[1]}' --label='${PODS_LABELS}' --since=24h ${*}"
+            print_and_run "kail --ns='${parts[1]}' --label='${PODS_LABELS}' --since=24h ${*}"
           else
-            var_print_and_run "kubectl logs --namespace=${parts[1]} --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
+            print_and_run "kubectl logs --namespace=${parts[1]} --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
           fi
         fi
         ;;
@@ -154,12 +159,12 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(get_kube_resources "${@}")"
 
         if [[ -n ${parts[1]:-} ]]; then
-          var_print_and_run "kubectl rollout restart --namespace=${parts[1]} ${parts[0]} ${parts[2]}"
+          print_and_run "kubectl rollout restart --namespace=${parts[1]} ${parts[0]} ${parts[2]}"
         fi
         ;;
 
       "watch")
-        var_print_and_run "kubectl get pods --all-namespaces --watch ${*}"
+        print_and_run "kubectl get pods --all-namespaces --watch ${*}"
         ;;
 
       *)
