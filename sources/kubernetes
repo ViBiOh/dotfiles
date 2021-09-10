@@ -168,17 +168,17 @@ if command -v kubectl >/dev/null 2>&1; then
         ;;
 
       *)
-        var_red "Usage: kube ACTION"
-        var_info "\nPossibles actions are                       | args\n"
-        var_info " - context | Switch context                 | name query"
-        var_info " - desc    | Describe an object             | type/name name?"
-        var_info " - forward | Port-forward to a service      | name query, service port number, exposed port number (default 4000)"
-        var_info " - image   | Print image name               | name query"
-        var_info " - info    | Print yaml output of an object | type/name name?"
-        var_info " - logs    | Tail logs                      | name query, additionnals 'kubectl logs' args..."
-        var_info " - ns      | Change default namespace       | name query"
-        var_info " - restart | Perform a rollout restart      | type/name name?"
-        var_info " - watch   | Watch pods of all namespaces   | additionnals 'kubectl get pods' args..."
+        printf "%bUsage: kube ACTION%b\n" "${RED}" "${RESET}" 1>&2
+        printf "%b\nPossibles actions are                       | args\n%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - context | Switch context                 | name query%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - desc    | Describe an object             | type/name name?%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - forward | Port-forward to a service      | name query, service port number, exposed port number (default 4000)%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - image   | Print image name               | name query%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - info    | Print yaml output of an object | type/name name?%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - logs    | Tail logs                      | name query, additionnals 'kubectl logs' args...%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - ns      | Change default namespace       | name query%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - restart | Perform a rollout restart      | type/name name?%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - watch   | Watch pods of all namespaces   | additionnals 'kubectl get pods' args...%b\n" "${BLUE}" "${RESET}" 1>&2
         ;;
       esac
     }
