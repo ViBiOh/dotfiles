@@ -23,7 +23,7 @@ if command -v fzf >/dev/null 2>&1; then
     if [[ -n ${MODULE_TO_BUMP} ]]; then
       local MODULE_VERSION=""
 
-      var_read MODULE_VERSION "latest"
+      var_read MODULE_VERSION "${2:-latest}"
       if [[ -n ${MODULE_VERSION} ]]; then
         MODULE_VERSION="@${MODULE_VERSION}"
       fi
