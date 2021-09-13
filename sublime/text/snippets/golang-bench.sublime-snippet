@@ -1,8 +1,8 @@
 <snippet>
 	<content><![CDATA[
-func Benchmark${2:FuncName}(b *testing.B) {
+func Benchmark${1:FuncName}(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		${2:FuncName}()
+		${1:FuncName}()
 	}
 }
 
