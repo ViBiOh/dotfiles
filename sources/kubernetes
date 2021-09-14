@@ -170,15 +170,15 @@ if command -v kubectl >/dev/null 2>&1; then
       *)
         printf "%bUsage: kube ACTION%b\n" "${RED}" "${RESET}" 1>&2
         printf "%b\nPossibles actions are                       | args\n%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - context | Switch context                 | name query%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - desc    | Describe an object             | type/name name?%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - forward | Port-forward to a service      | name query, service port number, exposed port number (default 4000)%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - image   | Print image name               | name query%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - info    | Print yaml output of an object | type/name name?%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - logs    | Tail logs                      | name query, additionnals 'kubectl logs' args...%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - ns      | Change default namespace       | name query%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - restart | Perform a rollout restart      | type/name name?%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - watch   | Watch pods of all namespaces   | additionnals 'kubectl get pods' args...%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - context | Switch context                 | <context name>%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - desc    | Describe an object             | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - forward | Port-forward to a service      | <service name> <service port number>? <exposed port number>? (default 4000)%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - image   | Print image name               | <deployment name>%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - info    | Print yaml output of an object | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - logs    | Tail logs                      | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - ns      | Change default namespace       | <namespace name>%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - restart | Perform a rollout restart      | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - watch   | Watch pods of all namespaces   | <any additionnals 'kubectl get pods' args...>%b\n" "${BLUE}" "${RESET}" 1>&2
         ;;
       esac
     }
