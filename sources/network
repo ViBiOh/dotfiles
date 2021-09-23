@@ -11,6 +11,10 @@ open_ports() {
 }
 
 dns_flush_cache() {
+  if command -v dnscrypt-proxy >/dev/null 2>&1; then
+    sudo dnscrypt-proxy -service restart
+  fi
+
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo dscacheutil -flushcache
     sudo killall -HUP mDNSResponder

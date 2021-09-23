@@ -6,7 +6,10 @@ install() {
   local DNSMASQ_CONF="/etc/dnsmasq.conf"
   local LISTEN_ADDRESS="127.0.0.1"
 
+  local DNSCRYPT_PROXY_VERSION="2.1.0"
+
   packages_install dnsmasq
+  archive_to_binary "https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/${DNSCRYPT_PROXY_VERSION}/dnscrypt-proxy-$(normalized_os "macos")_$(normalized_arch "" "arm" "arm64")-${DNSCRYPT_PROXY_VERSION}.zip" "dnscrypt-proxy"
 
   if command -v brew >/dev/null 2>&1; then
     DNSMASQ_CONF="$(brew --prefix)/etc/dnsmasq.conf"
@@ -15,8 +18,7 @@ install() {
   echo "listen-address=${LISTEN_ADDRESS}
 bind-interfaces
 
-server=1.1.1.1
-server=1.0.0.1
+server=127.0.0.1#40
 
 # Never forward plain (local) names
 domain-needed
@@ -30,6 +32,7 @@ rebind-localhost-ok
 
 # Query servers in order
 no-resolv
+no-hosts
 strict-order
 
 # Set the size of the cache
@@ -40,6 +43,13 @@ cache-size=8192
 log-async
 log-dhcp
 log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" >/dev/null
+
+  echo "" | sudo tee "${DNSMASQ_CONF}" >/dev/null
+
+  if command -v dnscrypt-proxy >/dev/null 2>&1; then
+    sudo dnscrypt-proxy -config "${HOME}/.dnscrypt-proxy.toml" -service install
+    sudo dnscrypt-proxy -config "${HOME}/.dnscrypt-proxy.toml" -service start
+  fi
 
   if command -v brew >/dev/null 2>&1; then
     sudo brew services start dnsmasq
