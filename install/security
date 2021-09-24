@@ -32,7 +32,6 @@ install() {
     grep --invert-match "0.0.0.0 www.redditmedia.com" |
     grep --invert-match "0.0.0.0 www.redditstatic.com" |
     grep --invert-match "thumbs.redditmedia.com" |
-    grep --extended-regexp '^0.0.0.0 ' |
     sed $'s|0.0.0.0 \(.*\)|0.0.0.0 \\1\\\n0:0:0:0:0:0:0:0 \\1|g' |
     sudo tee /etc/hosts >/dev/null
 
