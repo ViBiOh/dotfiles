@@ -47,8 +47,12 @@ log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" >/dev/null
   echo "" | sudo tee "${DNSMASQ_CONF}" >/dev/null
 
   if command -v dnscrypt-proxy >/dev/null 2>&1; then
-    sudo dnscrypt-proxy -config "${HOME}/.dnscrypt-proxy.toml" -service install
-    sudo dnscrypt-proxy -config "${HOME}/.dnscrypt-proxy.toml" -service start
+    if [[ -e "/Library/LaunchDaemons/dnscrypt-proxy.plist" ]]; then
+      sudo dnscrypt-proxy -config "${HOME}/.dnscrypt-proxy.toml" -service restart
+    else
+      sudo dnscrypt-proxy -config "${HOME}/.dnscrypt-proxy.toml" -service install
+      sudo dnscrypt-proxy -config "${HOME}/.dnscrypt-proxy.toml" -service start
+    fi
   fi
 
   if command -v brew >/dev/null 2>&1; then
