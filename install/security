@@ -18,6 +18,7 @@ install() {
     grep --invert-match "0.0.0.0 external-preview.redd.it" |
     grep --invert-match "0.0.0.0 gateway.reddit.com" |
     grep --invert-match "0.0.0.0 gql.reddit.com" |
+    grep --invert-match "0.0.0.0 linkedin.com" |
     grep --invert-match "0.0.0.0 media.licdn.com" |
     grep --invert-match "0.0.0.0 oauth.reddit.com" |
     grep --invert-match "0.0.0.0 preview.redd.it" |
