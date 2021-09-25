@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+redis() {
+  npx redis-commander --redis-host "localhost" --redis-port 4000 --redis-password "$(pass "infra/redis" | head -1)"
+}
