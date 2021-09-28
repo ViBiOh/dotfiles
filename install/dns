@@ -6,7 +6,7 @@ install() {
   local DNSMASQ_CONF="/etc/dnsmasq.conf"
   local LISTEN_ADDRESS="127.0.0.1"
 
-  local DNSCRYPT_PROXY_VERSION="2.1.0"
+  local DNSCRYPT_PROXY_VERSION="2.1.1"
 
   packages_install dnsmasq
   archive_to_binary "https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/${DNSCRYPT_PROXY_VERSION}/dnscrypt-proxy-$(normalized_os "macos")_$(normalized_arch "" "arm" "arm64")-${DNSCRYPT_PROXY_VERSION}.zip" "dnscrypt-proxy"
