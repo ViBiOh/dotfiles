@@ -5,7 +5,7 @@ set -o nounset -o pipefail -o errexit
 install() {
   cat \
     <(curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
-    <(curl --disable --silent --show-error --location --max-time 30 "https://someonewhocares.org/hosts/zero/hosts") |
+    <(curl --disable --silent --show-error --location --max-time 30 "https://someonewhocares.org/hosts/zero/hosts") \
     <(printf "127.0.0.1 %s\n::1 %s\n" "$(hostname)" "$(hostname)") |
     grep --extended-regexp --invert-match '^$' |
     grep --extended-regexp --invert-match '^\s*#' |
