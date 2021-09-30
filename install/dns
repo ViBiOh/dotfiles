@@ -4,7 +4,6 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   local DNSMASQ_CONF="/etc/dnsmasq.conf"
-  local LISTEN_ADDRESS="127.0.0.1"
 
   local DNSCRYPT_PROXY_VERSION="2.1.1"
 
@@ -32,7 +31,7 @@ install() {
     DNSMASQ_CONF="$(brew --prefix)/etc/dnsmasq.conf"
   fi
 
-  echo "listen-address=${LISTEN_ADDRESS}
+  echo "listen-address=127.0.0.1
 bind-interfaces
 
 server=127.0.0.1#40
