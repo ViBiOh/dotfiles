@@ -60,6 +60,8 @@ log-async
 log-dhcp
 log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" >/dev/null
 
+  echo "nameserver 127.0.0.1" | sudo tee "/etc/resolv.conf" >/dev/null
+
   if command -v dnscrypt-proxy >/dev/null 2>&1; then
     if [[ -e ${DNSCRYPT_SERVICE_FILE} ]]; then
       sudo "${HOME}/opt/bin/dnscrypt-proxy" -config "${HOME}/.dnscrypt-proxy.toml" -service restart
