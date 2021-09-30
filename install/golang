@@ -23,6 +23,7 @@ clean() {
   rm -rf "${HOME}/.dlv"
   rm -rf "${HOME}/opt/go"
   rm -rf "${HOME}/pprof"
+  rm -rf "${HOME}/.mc"
 }
 
 install() {
@@ -70,4 +71,16 @@ install() {
   archive_to_binary "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/golangci-lint-${GOLANGCI_LINT_VERSION}-${OS}-${ARCH}.tar.gz" "golangci-lint-${GOLANGCI_LINT_VERSION}-${OS}-${ARCH}/golangci-lint"
 
   golangci-lint completion bash >"${SCRIPT_DIR}/../sources/golangci-lint-completion"
+}
+
+credentials() {
+  if ! command -v pass >/dev/null 2>&1; then
+    exit
+  fi
+
+  if [[ $(pass find "mc" | wc -l) -gt 1 ]]; then
+    mkdir -p "${HOME}/.mc"
+    pass show "infra/mc" >"${HOME}/.mc/config.json"
+    chmod 600 "${HOME}/.mc/config.json"
+  fi
 }
