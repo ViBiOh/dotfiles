@@ -12,7 +12,7 @@ install() {
   OS="$(normalized_os "macos")"
 
   local EXTENSION="tar.gz"
-  if [[ ${0S} == "macos" ]]; then
+  if [[ ${OS} == "macos" ]]; then
     EXTENSION="zip"
   fi
 
