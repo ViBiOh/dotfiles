@@ -6,7 +6,7 @@ install() {
   cat \
     <(curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts") \
     <(curl --disable --silent --show-error --location --max-time 30 "https://someonewhocares.org/hosts/zero/hosts") |
-    <(printf "127.0.0.1 %s\n127.0.0.1 localhost\n::1 %s\n::1 localhost\n" "$(hostname)" "$(hostname)") |
+    <(printf "127.0.0.1 %s\n::1 %s\n" "$(hostname)" "$(hostname)") |
     grep --extended-regexp --invert-match '^$' |
     grep --extended-regexp --invert-match '^\s*#' |
     grep --extended-regexp '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' |
@@ -35,7 +35,7 @@ install() {
     sed $'s|0.0.0.0 \(.*\)|0.0.0.0 \\1\\\n0:0:0:0:0:0:0:0 \\1|g' |
     sudo tee /etc/hosts >/dev/null
 
-  grep --extended-regexp '^0.0.0.0 ' /etc/hosts | sed 's|^0.0.0.0 ||' >"${HOME}/.dns-blocklist"
+  grep --extended-regexp '^0.0.0.0 ' "/etc/hosts" | sed 's|^0.0.0.0 ||' >"${HOME}/.dns-blocklist"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
