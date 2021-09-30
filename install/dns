@@ -8,8 +8,16 @@ install() {
 
   local DNSCRYPT_PROXY_VERSION="2.1.1"
 
+  local OS
+  OS="$(normalized_os "macos")"
+
+  local EXTENSION="tar.gz"
+  if [[ ${0S} == "macos" ]]; then
+    EXTENSION="zip"
+  fi
+
   packages_install dnsmasq
-  archive_to_binary "https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/${DNSCRYPT_PROXY_VERSION}/dnscrypt-proxy-$(normalized_os "macos")_$(normalized_arch "" "arm" "arm64")-${DNSCRYPT_PROXY_VERSION}.zip" "dnscrypt-proxy"
+  archive_to_binary "https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/${DNSCRYPT_PROXY_VERSION}/dnscrypt-proxy-${OS}_$(normalized_arch "" "arm" "arm64")-${DNSCRYPT_PROXY_VERSION}.${EXTENSION}" "dnscrypt-proxy"
 
   if command -v brew >/dev/null 2>&1; then
     DNSMASQ_CONF="$(brew --prefix)/etc/dnsmasq.conf"
