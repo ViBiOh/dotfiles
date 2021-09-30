@@ -16,14 +16,17 @@ install() {
 
   local EXTENSION="tar.gz"
   local BINARY_PATH_PREFIX=""
+  local BINARY_DESTINATION
+
   if [[ ${OS} == "macos" ]]; then
     EXTENSION="zip"
   else
     BINARY_PATH_PREFIX="${OS}-${ARCH}/"
+    BINARY_DESTINATION="/usr/local/bin/"
   fi
 
   packages_install dnsmasq
-  archive_to_binary "https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/${DNSCRYPT_PROXY_VERSION}/dnscrypt-proxy-${OS}_${ARCH}-${DNSCRYPT_PROXY_VERSION}.${EXTENSION}" "${BINARY_PATH_PREFIX}dnscrypt-proxy"
+  archive_to_binary "https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/${DNSCRYPT_PROXY_VERSION}/dnscrypt-proxy-${OS}_${ARCH}-${DNSCRYPT_PROXY_VERSION}.${EXTENSION}" "${BINARY_PATH_PREFIX}dnscrypt-proxy" "${BINARY_DESTINATION}"
 
   if command -v brew >/dev/null 2>&1; then
     DNSMASQ_CONF="$(brew --prefix)/etc/dnsmasq.conf"
