@@ -14,16 +14,19 @@ install() {
   local ARCH
   ARCH="$(normalized_arch "" "arm" "arm64")"
 
-  local EXTENSION="tar.gz"
-  local BINARY_PATH_PREFIX=""
+  local DNSCRYPT_ARCHIVE_EXTENSION="tar.gz"
+  local DNSCRYPT_ARCHIVE_FOLDER=""
+  local DNSCRYPT_SERVICE_FILE=""
   if [[ ${OS} == "macos" ]]; then
-    EXTENSION="zip"
+    DNSCRYPT_SERVICE_FILE="/Library/LaunchDaemons/dnscrypt-proxy.plist"
+    DNSCRYPT_ARCHIVE_EXTENSION="zip"
   else
-    BINARY_PATH_PREFIX="${OS}-${ARCH}/"
+    DNSCRYPT_SERVICE_FILE="/etc/systemd/system/dnscrypt-proxy.service"
+    DNSCRYPT_ARCHIVE_FOLDER="${OS}-${ARCH}/"
   fi
 
   packages_install dnsmasq
-  archive_to_binary "https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/${DNSCRYPT_PROXY_VERSION}/dnscrypt-proxy-${OS}_${ARCH}-${DNSCRYPT_PROXY_VERSION}.${EXTENSION}" "${BINARY_PATH_PREFIX}dnscrypt-proxy"
+  archive_to_binary "https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/${DNSCRYPT_PROXY_VERSION}/dnscrypt-proxy-${OS}_${ARCH}-${DNSCRYPT_PROXY_VERSION}.${DNSCRYPT_ARCHIVE_EXTENSION}" "${DNSCRYPT_ARCHIVE_FOLDER}dnscrypt-proxy"
 
   if command -v brew >/dev/null 2>&1; then
     DNSMASQ_CONF="$(brew --prefix)/etc/dnsmasq.conf"
@@ -61,7 +64,7 @@ log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" >/dev/null
   echo "" | sudo tee "${DNSMASQ_CONF}" >/dev/null
 
   if command -v dnscrypt-proxy >/dev/null 2>&1; then
-    if [[ -e "/Library/LaunchDaemons/dnscrypt-proxy.plist" ]]; then
+    if [[ -e ${DNSCRYPT_SERVICE_FILE} ]]; then
       sudo "${HOME}/opt/bin/dnscrypt-proxy" -config "${HOME}/.dnscrypt-proxy.toml" -service restart
     else
       sudo "${HOME}/opt/bin/dnscrypt-proxy" -config "${HOME}/.dnscrypt-proxy.toml" -service install
