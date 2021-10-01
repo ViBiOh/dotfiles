@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 
 backup() {
-  tar -czf - . | gpg --symmetric --cipher-algo AES256 >"backup.tar.gz.gpg"
+  tar -czf - . | pv | gpg --symmetric --cipher-algo AES256 --batch --passphrase "${1:-$(passget "infra/backup" aes)}" >"$(basename "$(pwd)").tar.gz.gpg"
+}
+
+upload() {
+  mc mv "${1:-$(basename "$(pwd)")}.tar.gz.gpg" "scw/fibr/"
 }
 
 restore() {
-  mkdir backup
-  gpg --decrypt "backup.tar.gz.gpg" | tar -xz -C backup -
+  local BASE_FILENAME="${1:-backup}"
+
+  mkdir "${BASE_FILENAME}"
+  gpg --decrypt --batch --passphrase "${2:-$(passget "infra/backup" aes)}" "${BASE_FILENAME}.tar.gz.gpg" | pv | tar -xz -C "${BASE_FILENAME}" -
 }
