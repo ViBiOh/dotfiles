@@ -34,8 +34,8 @@ install() {
   echo "listen-address=127.0.0.1
 bind-interfaces
 
-server=${OFFICE_DOMAINS:-}${PRIMARY_OFFICE_DNS:-}
-server=${OFFICE_DOMAINS:-}${SECONDARY_OFFICE_DNS:-}
+${PRIMARY_OFFICE_DNS:+server=${OFFICE_DOMAINS:-}${PRIMARY_OFFICE_DNS}}
+${SECONDARY_OFFICE_DNS:+server=${OFFICE_DOMAINS:-}${SECONDARY_OFFICE_DNS}}
 server=127.0.0.1#40
 
 # Never forward plain (local) names
@@ -47,7 +47,7 @@ bogus-priv
 # Reject private addresses from upstream nameservers
 stop-dns-rebind
 rebind-localhost-ok
-rebind-domain-ok=${OFFICE_DOMAINS:-}
+${OFFICE_DOMAINS:+rebind-domain-ok=${OFFICE_DOMAINS}}
 
 # Query servers in order
 no-resolv
