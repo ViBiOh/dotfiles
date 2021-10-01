@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 
 backup() {
-  tar -czf - ./* >"backup.tar.gz"
-  gpg --output "backup.gpg.tar.gz" --symmetric --cipher-algo AES256 "backup.tar.gz"
-  rm "backup.tar.gz"
+  tar -czf - . | gpg --symmetric --cipher-algo AES256 >"backup.tar.gz.gpg"
 }
 
 restore() {
-  gpg --output "backup.tar.gz" --decrypt "backup.gpg.tar.gz"
-  mkdir -p backup
-  tar -xz -C backup -f "backup.tar.gz"
-  rm "backup.tar.gz"
+  mkdir backup
+  gpg --decrypt "backup.tar.gz.gpg" | tar -xz -C backup -
 }
