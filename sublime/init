@@ -54,13 +54,9 @@ symlink_settings() {
 }
 
 install_shfmt() {
-  local SHFMT_VERSION="3.3.1"
-  local SHFMT_OS="linux"
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    SHFMT_OS="darwin"
-  fi
+  local SHFMT_VERSION="3.4.0"
 
-  curl_to_binary "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_${SHFMT_OS}_amd64" "shfmt"
+  curl_to_binary "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_$(normalized_os)_$(normalized_arch "amd64")" "shfmt"
 }
 
 main() {
@@ -86,7 +82,7 @@ main() {
   install_plugin "${TEXT_PKG}" Formatter
 
   if command -v go >/dev/null 2>&1; then
-    GO111MODULE=on go install golang.org/x/tools/gopls@latest
+    GO111MODULE=on go install "golang.org/x/tools/gopls@latest"
   fi
 
   if command -v npm >/dev/null 2>&1; then
