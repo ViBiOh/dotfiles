@@ -183,6 +183,7 @@ install() {
     sudo scutil --set ComputerName macbook
     sudo scutil --set HostName macbook
     sudo scutil --set LocalHostName macbook
+    sudo networksetup -setcomputername macbook
 
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
