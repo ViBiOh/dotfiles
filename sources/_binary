@@ -53,7 +53,7 @@ archive_to_binary() {
 
 curl_to_binary() {
   if [[ ${#} -lt 2 ]]; then
-    var_red "Usage: curl_to_binary BINARY_URL BINARY_NAME [BINARY_DESTINATION=${HOME}/opt/bin/]"
+    var_red "Usage: curl_to_binary BINARY_URL BINARY_NAME [BINARY_DESTINATION=${HOME}/opt/bin]"
     return 1
   fi
 
@@ -61,7 +61,7 @@ curl_to_binary() {
   shift
   local BINARY_NAME="${1}"
   shift
-  local BINARY_DESTINATION="${1:-${HOME}/opt/bin/}"
+  local BINARY_DESTINATION="${1:-${HOME}/opt/bin}"
   shift || true
 
   curl --disable --silent --show-error --location --max-time 300 -o "${BINARY_DESTINATION}/${BINARY_NAME}" -- "${BINARY_URL}"

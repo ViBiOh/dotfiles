@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+clean() {
+  rm -rf "${HOME}/.mc"
+}
+
+install() {
+  curl_to_binary "https://dl.min.io/client/mc/release/$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64")/mc" "mc"
+}
+
+credentials() {
+  if ! command -v pass >/dev/null 2>&1; then
+    exit
+  fi
+
+  if [[ $(pass find "mc" | wc -l) -gt 1 ]]; then
+    mkdir -p "${HOME}/.mc"
+    pass show "infra/mc" >"${HOME}/.mc/config.json"
+    chmod 600 "${HOME}/.mc/config.json"
+  fi
+}
