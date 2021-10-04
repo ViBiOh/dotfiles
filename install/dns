@@ -55,21 +55,7 @@ remote-control:
   control-key-file: \"${UNBOUND_CONTROL_FOLDER}/unbound_control.key\"
   control-cert-file: \"${UNBOUND_CONTROL_FOLDER}/unbound_control.pem\"
 
-${UNBOUND_OFFICE_DNS_FORWARD:-}
-forward-zone:
-  name: \".\"
-
-  # Quad9
-  forward-addr: 9.9.9.9@853
-  forward-addr: 2620:fe::fe
-  forward-addr: 149.112.112.112@853
-  forward-addr: 2620:fe::9
-
-  # Cloudflare
-  forward-addr: 1.1.1.1@853
-  forward-addr: 1.0.0.1@853
-
-  forward-ssl-upstream: yes" | sudo tee "${UNBOUND_CONF}" >/dev/null
+${UNBOUND_EXTRA_DNS_CONF:-}" | sudo tee "${UNBOUND_CONF}" >/dev/null
 
   sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
   if ! [[ -e "${UNBOUND_DNSSEC_CERT}/unbound_server.key" ]]; then
