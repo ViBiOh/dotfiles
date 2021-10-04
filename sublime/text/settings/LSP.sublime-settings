@@ -1,10 +1,15 @@
 {
-	"clients": {
-		"gopls": {
-			"enabled": true
-		},
-		"pyls": {
-			"enabled": true
-		}
-	}
+  "clients": {
+    "gopls": {
+      "enabled": true,
+      "command": ["gopls"],
+      "selector": "source.go",
+      "initializationOptions": {
+        "experimentalWorkspaceModule": false
+      }
+    },
+    "pyls": {
+      "enabled": true
+    }
+  }
 }
