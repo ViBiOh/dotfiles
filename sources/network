@@ -11,24 +11,16 @@ open_ports() {
 }
 
 dns_flush_cache() {
-  if command -v dnscrypt-proxy >/dev/null 2>&1; then
-    sudo dnscrypt-proxy -service restart
+  if command -v unbound-control >/dev/null 2>&1; then
+    sudo unbound-control -q reload
   fi
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo dscacheutil -flushcache
     sudo killall -HUP mDNSResponder
-
-    if [[ $(brew services list | grep --count dnsmasq) -eq 1 ]]; then
-      sudo brew services restart dnsmasq
-    fi
   else
     if [[ $(systemctl list-units systemd-resolve* | wc -l) -gt 2 ]]; then
       sudo systemd-resolve --flush-caches
-    fi
-
-    if [[ $(systemctl list-units dnsmasq* | wc -l) -gt 2 ]]; then
-      sudo systemctl restart dnsmasq
     fi
   fi
 }
