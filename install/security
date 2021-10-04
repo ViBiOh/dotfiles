@@ -33,9 +33,9 @@ install() {
     grep --invert-match "0.0.0.0 www.redditstatic.com" |
     grep --invert-match "thumbs.redditmedia.com" |
     sed $'s|0.0.0.0 \(.*\)|0.0.0.0 \\1\\\n0:0:0:0:0:0:0:0 \\1|g' |
-    sudo tee /etc/hosts >/dev/null
+    sudo tee "/etc/hosts" >/dev/null
 
-  grep --extended-regexp '^0.0.0.0 ' "/etc/hosts" | sed 's|^0.0.0.0 ||' >"${HOME}/.dns-blocklist"
+  grep --extended-regexp '^0.0.0.0 ' "/etc/hosts" | awk '{print "local-zone: \""$2"\" refuse"}' >"${HOME}/.unbound-blocklist"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false

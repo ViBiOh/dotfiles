@@ -3,84 +3,72 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  local DNSMASQ_CONF="/etc/dnsmasq.conf"
+  local UNBOUND_CONF="/etc/unbound/unbound.conf"
+  local UNBOUND_DNSSEC_CERT="/usr/local/etc/unbound/root.key"
+  local UNBOUND_CONTROL_FOLDER="/usr/local/etc/unbound"
 
-  local DNSCRYPT_PROXY_VERSION="2.1.1"
-
-  local OS
-  OS="$(normalized_os "macos")"
-
-  local ARCH
-  ARCH="$(normalized_arch "" "arm" "arm64")"
-
-  local DNSCRYPT_ARCHIVE_EXTENSION="tar.gz"
-  local DNSCRYPT_ARCHIVE_FOLDER=""
-  local DNSCRYPT_SERVICE_FILE=""
-  if [[ ${OS} == "macos" ]]; then
-    DNSCRYPT_SERVICE_FILE="/Library/LaunchDaemons/dnscrypt-proxy.plist"
-    DNSCRYPT_ARCHIVE_EXTENSION="zip"
-  else
-    DNSCRYPT_SERVICE_FILE="/etc/systemd/system/dnscrypt-proxy.service"
-    DNSCRYPT_ARCHIVE_FOLDER="${OS}-${ARCH}/"
-  fi
-
-  packages_install dnsmasq
-  archive_to_binary "https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/${DNSCRYPT_PROXY_VERSION}/dnscrypt-proxy-${OS}_${ARCH}-${DNSCRYPT_PROXY_VERSION}.${DNSCRYPT_ARCHIVE_EXTENSION}" "${DNSCRYPT_ARCHIVE_FOLDER}dnscrypt-proxy"
-
+  packages_install unbound
   if command -v brew >/dev/null 2>&1; then
-    DNSMASQ_CONF="$(brew --prefix)/etc/dnsmasq.conf"
+    UNBOUND_CONF="$(brew --prefix)${UNBOUND_CONF}"
   fi
 
-  echo "listen-address=127.0.0.1
-bind-interfaces
+  echo "server:
+  verbosity: 1
+  username: root
+  chroot: ''
 
-server=127.0.0.1#40
+  interface: 127.0.0.1
+  port: 53
 
-# Never forward plain (local) names
-domain-needed
+  access-control: 0.0.0.0/0 refuse
+  access-control: 127.0.0.0/8 allow
 
-# Never forward addresses in the non-routed address spaces
-bogus-priv
+  do-ip4: yes
+  do-ip6: no
+  do-udp: yes
+  do-tcp: yes
 
-# Reject private addresses from upstream nameservers
-stop-dns-rebind
-rebind-localhost-ok
+  hide-identity: yes
+  hide-version: yes
+  harden-glue: yes
+  harden-dnssec-stripped: yes
+  use-caps-for-id: yes
 
-# Query servers in order
-no-resolv
-no-hosts
-strict-order
+  cache-min-ttl: 3600
+  cache-max-ttl: 86400
 
-# Set the size of the cache
-# The default is to keep 150 hostnames
-cache-size=8192
+  auto-trust-anchor-file: \"${UNBOUND_DNSSEC_CERT}\"
 
-# Optional logging directives
-log-async
-log-dhcp
-log-facility=/var/log/dnsmasq.log" | sudo tee "${DNSMASQ_CONF}" >/dev/null
+  use-syslog: no
+  logfile: /var/log/unbound.log
+
+  include: \"${HOME}/.unbound-blocklist\"
+
+remote-control:
+  control-enable: yes
+  control-interface: 127.0.0.1
+  server-key-file: \"${UNBOUND_CONTROL_FOLDER}/unbound_server.key\"
+  server-cert-file: \"${UNBOUND_CONTROL_FOLDER}/unbound_server.pem\"
+  control-key-file: \"${UNBOUND_CONTROL_FOLDER}/unbound_control.key\"
+  control-cert-file: \"${UNBOUND_CONTROL_FOLDER}/unbound_control.pem\"
+
+${UNBOUND_OFFICE_DNS_FORWARD:-}
+forward-zone:
+  name: \".\"
+  forward-addr: 1.1.1.1@853
+  forward-addr: 1.0.0.1@853
+  forward-ssl-upstream: yes" | sudo tee "${UNBOUND_CONF}" >/dev/null
+
+  sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
+  if ! [[ -e "${UNBOUND_DNSSEC_CERT}/unbound_server.key" ]]; then
+    sudo unbound-control-setup -d "${UNBOUND_CONTROL_FOLDER}"
+  fi
 
   echo "nameserver 127.0.0.1" | sudo tee "/etc/resolv.conf" >/dev/null
 
-  if command -v dnscrypt-proxy >/dev/null 2>&1; then
-    if [[ -e ${DNSCRYPT_SERVICE_FILE} ]]; then
-      sudo "${HOME}/opt/bin/dnscrypt-proxy" -config "${HOME}/.dnscrypt-proxy.toml" -service restart
-    else
-      sudo "${HOME}/opt/bin/dnscrypt-proxy" -config "${HOME}/.dnscrypt-proxy.toml" -service install
-      sudo "${HOME}/opt/bin/dnscrypt-proxy" -config "${HOME}/.dnscrypt-proxy.toml" -service start
-    fi
-  fi
-
   if command -v brew >/dev/null 2>&1; then
-    sudo brew services start dnsmasq
     sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
     sudo networksetup -setsearchdomains "Wi-Fi" local
-
-    scutil --dns
-    networksetup -getdnsservers "Wi-Fi"
-  elif command -v systemctl >/dev/null 2>&1; then
-    sudo systemctl enable dnsmasq
-    sudo systemctl restart dnsmasq
   fi
 
   if command -v resolvconf >/dev/null 2>&1; then
