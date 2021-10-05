@@ -21,7 +21,7 @@ if command -v fzf >/dev/null 2>&1; then
     MODULE_TO_BUMP="$(go list -m -json all | jq -r 'select(.Indirect != true) | .Path' | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
 
     if [[ -n ${MODULE_TO_BUMP} ]]; then
-      printf "MODULE=%s" "${MODULE_TO_BUMP}"
+      printf "MODULE=%s\n" "${MODULE_TO_BUMP}"
       local MODULE_VERSION=""
 
       if [[ -z ${2:-} ]] && [[ ${MODULE_TO_BUMP} =~ ^github.com\/([^\/]+)\/([^\/]+)(\/.+)?$ ]] && [[ -n ${GITHUB_TOKEN} ]]; then
@@ -39,7 +39,7 @@ if command -v fzf >/dev/null 2>&1; then
       fi
 
       if [[ -n ${MODULE_VERSION} ]]; then
-        printf "MODULE_VERSION=%s" "${MODULE_VERSION}"
+        printf "MODULE_VERSION=%s\n" "${MODULE_VERSION}"
         MODULE_VERSION="@${MODULE_VERSION}"
       fi
 
