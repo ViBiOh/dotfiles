@@ -160,6 +160,9 @@ install() {
 
     sudo systemsetup -setrestartfreeze on
     sudo systemsetup -setwakeonnetworkaccess off
+    sudo systemsetup -setremoteappleevents off
+    sudo systemsetup -f -setremotelogin off
+    sudo systemsetup -setcomputername macbook
 
     sudo pmset -a hibernatemode 0
     sudo pmset -a lidwake 1
