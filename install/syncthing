@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  local SYNCTHING_VERSION="1.18.2"
+  local SYNCTHING_VERSION="1.18.3"
 
   local SYNCTHING_RELEASE
   SYNCTHING_RELEASE="syncthing-$(normalized_os "macos")-$(normalized_arch "amd64" "arm" "arm64")-v${SYNCTHING_VERSION}"
