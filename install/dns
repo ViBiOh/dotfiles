@@ -55,6 +55,12 @@ remote-control:
   control-key-file: \"${UNBOUND_CONTROL_FOLDER}/unbound_control.key\"
   control-cert-file: \"${UNBOUND_CONTROL_FOLDER}/unbound_control.pem\"
 
+forward-zone:
+  name: .
+  forward-addr: 1.1.1.1@853
+  forward-addr: 1.0.0.1@853
+  forward-ssl-upstream: yes
+
 ${UNBOUND_EXTRA_DNS_CONF:-}" | sudo tee "${UNBOUND_CONF}" >/dev/null
 
   sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
