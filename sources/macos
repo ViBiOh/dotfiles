@@ -5,3 +5,11 @@ fix_spotlight() {
   sudo mdutil -X "/"
   sudo mdutil -X "/System/Volumes/Data"
 }
+
+macos_start() {
+  if command -v unbound-control >/dev/null 2>&1; then
+    sudo unbound-control -q start
+  fi
+
+  fix_spotlight
+}
