@@ -18,9 +18,10 @@ dns_flush_cache() {
     fi
 
     local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
+    local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
 
     sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
-    sudo unbound-control -q reload
+    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload
   fi
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then

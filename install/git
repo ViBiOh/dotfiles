@@ -14,10 +14,6 @@ script_dir() {
   fi
 }
 
-clean() {
-  rm -f "${HOME}/.gitconfig_secrets"
-}
-
 install() {
   packages_install git
 
