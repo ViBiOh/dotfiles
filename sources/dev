@@ -21,6 +21,18 @@ random() {
   openssl rand -hex "${1:-30}"
 }
 
+loop() {
+  if [[ ${#} -lt 1 ]]; then
+    var_red "Usage: loop command interval?(default 60s)"
+    return 1
+  fi
+
+  while true; do
+    ${1}
+    sleep "${2:-60}"
+  done
+}
+
 meteo() {
   curl --disable --silent --show-error --location --max-time 30 -4 "wttr.in/${1:-Paris}?m&format=v2"
 }
