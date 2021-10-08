@@ -14,7 +14,7 @@ install() {
   local UNBOUND_CA_CERT="${UNBOUND_CONF_FOLDER}/ca-certificates.pem"
   local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
 
-  curl --disable --silent --show-error --location --max-time 30 "https://curl.se/ca/cacert.pem" --output "${UNBOUND_CA_CERT}"
+  sudo curl --disable --silent --show-error --location --max-time 30 "https://curl.se/ca/cacert.pem" --output "${UNBOUND_CA_CERT}"
   chmod 600 "${UNBOUND_CA_CERT}"
   sudo chown "root" "${UNBOUND_CA_CERT}"
 
