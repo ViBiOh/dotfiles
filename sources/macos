@@ -11,5 +11,7 @@ macos_start() {
     sudo unbound-control -q start
   fi
 
+  dns_flush_cache
+
   fix_spotlight
 }
