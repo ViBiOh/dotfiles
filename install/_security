@@ -190,10 +190,10 @@ install() {
 
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsigned off
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsignedapp off
-    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall on
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall on
     sudo pkill -HUP socketfilterfw
 
     chflags nohidden "${HOME}/Library"
