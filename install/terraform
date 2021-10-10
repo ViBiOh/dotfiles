@@ -19,7 +19,7 @@ credentials() {
   fi
 
   if [[ $(pass find terraform | wc -l) -gt 1 ]]; then
-    printf "credentials \"app.terraform.io\" {\ntoken = \"%s\"\n}" "$(passget "dev/terraform" "token")" >>"${HOME}/.terraformrc"
+    printf "credentials \"app.terraform.io\" {\n  token = \"%s\"\n}" "$(passget "dev/terraform" "token")" >>"${HOME}/.terraformrc"
     chmod 600 "${HOME}/.terraformrc"
   fi
 }
