@@ -7,11 +7,6 @@ fix_spotlight() {
 }
 
 macos_start() {
-  if command -v unbound-control >/dev/null 2>&1; then
-    sudo unbound-control -q start
-  fi
-
-  dns_flush_cache
-
   fix_spotlight
+  dns_flush_cache
 }
