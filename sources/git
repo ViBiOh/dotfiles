@@ -12,7 +12,7 @@ fi
   cd "$(git_root)" || return 1
 }
 
-jira_branch() {
+jira() {
   if [[ -z ${JIRA_URL:-} ]]; then
     return
   fi
@@ -30,7 +30,20 @@ jira_branch() {
     fzf --height=20 --ansi --reverse --query="${1:-}" |
     awk '{print $1}')"
 
-  if [[ -n ${JIRA_TICKET:-} ]]; then
-    git checkout -b "feat-${JIRA_TICKET}"
+  if [[ -z ${JIRA_TICKET:-} ]]; then
+    return
   fi
+
+  if git rev-parse --is-inside-work-tree != "true" 2>&1; then
+    printf "%s" "${JIRA_TICKET}"
+  fi
+
+  local JIRA_BRANCH_NAME=""feat-${JIRA_TICKET}""
+
+  local CHECKOUT_OPTION=""
+  if git rev-parse --quiet --verify "${JIRA_BRANCH_NAME}" >/dev/null 2>&1; then
+    CHECKOUT_OPTION+=" -b"
+  fi
+
+  git checkout "${CHECKOUT_OPTION}" "${JIRA_BRANCH_NAME}"
 }
