@@ -11,3 +11,26 @@ fi
 ...() {
   cd "$(git_root)" || return 1
 }
+
+jira_branch() {
+  if [[ -z ${JIRA_URL:-} ]]; then
+    return
+  fi
+
+  local JIRA_TICKET
+  JIRA_TICKET="$(curl \
+    --disable \
+    --silent \
+    --show-error \
+    --location \
+    --max-time 30 \
+    --user "$(passget "${JIRA_CREDENTIALS}" "login"):$(pass "${JIRA_CREDENTIALS}" | head -1)" \
+    "${JIRA_URL}/rest/api/2/search?jql=status%20NOT%20IN%20%28Done%2C%20Resolved%29%20AND%20assignee%20%3D%20currentUser%28%29" |
+    jq -r '.issues[] | .key + " " + .fields.summary' |
+    fzf --height=20 --ansi --reverse --query="${1:-}" |
+    awk '{print $1}')"
+
+  if [[ -n ${JIRA_TICKET:-} ]]; then
+    git checkout -b "feat-${JIRA_TICKET}"
+  fi
+}
