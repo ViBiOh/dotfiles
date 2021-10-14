@@ -64,7 +64,7 @@ jira_branch() {
   local JIRA_BRANCH_NAME=""feat-${JIRA_TICKET}""
 
   local CHECKOUT_OPTION=""
-  if git rev-parse --quiet --verify "${JIRA_BRANCH_NAME}" >/dev/null 2>&1; then
+  if ! git rev-parse --quiet --verify "${JIRA_BRANCH_NAME}" >/dev/null 2>&1; then
     CHECKOUT_OPTION+=" -b"
   fi
 
