@@ -17,26 +17,49 @@ jira() {
     return
   fi
 
-  local JIRA_TICKET
-  JIRA_TICKET="$(curl \
+  local JIRA_USER
+  JIRA_USER="$(passget "${JIRA_CREDENTIALS}" "login")"
+
+  local JIRA_PASS
+  JIRA_PASS="$(pass "${JIRA_CREDENTIALS}" | head -1)"
+
+  curl \
     --disable \
     --silent \
     --show-error \
     --location \
     --max-time 30 \
-    --user "$(passget "${JIRA_CREDENTIALS}" "login"):$(pass "${JIRA_CREDENTIALS}" | head -1)" \
+    --user "${JIRA_USER}:${JIRA_PASS}" \
     "${JIRA_URL}/rest/api/2/search?jql=status%20NOT%20IN%20%28Done%2C%20Resolved%29%20AND%20assignee%20%3D%20currentUser%28%29" |
     jq -r '.issues[] | .key + " " + .fields.summary' |
     fzf --height=20 --ansi --reverse --query="${1:-}" |
-    awk '{print $1}')"
+    awk '{print $1}'
+}
 
-  if [[ -z ${JIRA_TICKET:-} ]]; then
+jira_open() {
+  if [[ -z ${JIRA_URL:-} ]]; then
     return
   fi
 
-  if git rev-parse --is-inside-work-tree != "true" 2>&1; then
-    printf "%s" "${JIRA_TICKET}"
+  local JIRA_TICKET
+  JIRA_TICKET="$(jira "${1:-}")"
+
+  if [[ -n ${JIRA_TICKET:-} ]]; then
+    open "${JIRA_URL}/browse/${JIRA_TICKET}"
   fi
+}
+
+jira_branch() {
+  if [[ -z ${JIRA_URL:-} ]]; then
+    return
+  fi
+
+  if ! git_is_inside; then
+    return
+  fi
+
+  local JIRA_TICKET
+  JIRA_TICKET="$(jira "${1:-}")"
 
   local JIRA_BRANCH_NAME=""feat-${JIRA_TICKET}""
 

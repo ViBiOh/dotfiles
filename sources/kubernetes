@@ -227,7 +227,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     local NAME="${release[1]}"
     var_info "Release: ${NAMESPACE}/${NAME}"
 
-    IFS='@' read -r -a chart <<<"$(helm_select_chart)"
+    IFS='@' read -r -a chart <<<"$(helm_select_chart "" "" "")"
     if [[ -z ${chart[0]:-} ]] || [[ -z ${chart[1]:-} ]]; then
       return 1
     fi
@@ -250,7 +250,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
   }
 
   helm_crds_manifests() {
-    IFS='@' read -r -a chart <<<"$(helm_select_chart)"
+    IFS='@' read -r -a chart <<<"$(helm_select_chart "" "" "")"
     if [[ -z ${chart[0]:-} ]] || [[ -z ${chart[1]:-} ]]; then
       return 1
     fi
