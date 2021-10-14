@@ -92,3 +92,73 @@ if command -v systemctl >/dev/null 2>&1; then
     sudo journalctl -u "${@}"
   }
 fi
+
+if [[ -n ${JIRA_URL:-} ]]; then
+  jira() {
+    local open
+    local branch
+
+    while getopts ":ob" option; do
+      case "${option}" in
+      o)
+        open="true"
+        ;;
+      b)
+        branch="true"
+        ;;
+      :)
+        printf "option -%s requires a value\n" "${OPTARG}" >&2
+        return 1
+        ;;
+      \?)
+        printf "option -%s is invalid\n" "${OPTARG}" >&2
+        return 2
+        ;;
+      esac
+    done
+
+    shift $((OPTIND - 1))
+
+    local JIRA_TICKET
+    JIRA_TICKET="$(jira_ticket "${1:-}")"
+
+    if [[ -z ${JIRA_TICKET:-} ]]; then
+      return
+    fi
+
+    if [[ ${open} == "true" ]]; then
+      open "${JIRA_URL}/browse/${JIRA_TICKET}"
+    fi
+
+    if [[ ${branch} == "true" ]] && git_is_inside; then
+      local JIRA_BRANCH_NAME=""feat-${JIRA_TICKET}""
+
+      local CHECKOUT_OPTION=""
+      if ! git rev-parse --quiet --verify "${JIRA_BRANCH_NAME}" >/dev/null 2>&1; then
+        CHECKOUT_OPTION+=" -b"
+      fi
+
+      git checkout ${CHECKOUT_OPTION} "${JIRA_BRANCH_NAME}"
+    fi
+  }
+
+  jira_ticket() {
+    local JIRA_USER
+    JIRA_USER="$(passget "${JIRA_CREDENTIALS}" "login")"
+
+    local JIRA_PASS
+    JIRA_PASS="$(pass "${JIRA_CREDENTIALS}" | head -1)"
+
+    curl \
+      --disable \
+      --silent \
+      --show-error \
+      --location \
+      --max-time 30 \
+      --user "${JIRA_USER}:${JIRA_PASS}" \
+      "${JIRA_URL}/rest/api/2/search?jql=status%20NOT%20IN%20%28Done%2C%20Resolved%29%20AND%20assignee%20%3D%20currentUser%28%29" |
+      jq -r '.issues[] | .key + " " + .fields.summary' |
+      fzf --height=20 --ansi --reverse --query="${1:-}" |
+      awk '{print $1}'
+  }
+fi
