@@ -147,7 +147,7 @@ if [[ -n ${JIRA_URL:-} ]]; then
     JIRA_USER="$(passget "${JIRA_CREDENTIALS}" "login")"
 
     local JIRA_PASS
-    JIRA_PASS="$(pass "${JIRA_CREDENTIALS}" | head -1)"
+    JIRA_PASS="$(pass show "${JIRA_CREDENTIALS}" | head -1)"
 
     curl \
       --disable \
