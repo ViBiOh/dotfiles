@@ -64,9 +64,8 @@ if command -v pass >/dev/null 2>&1; then
     local PASS_FIELD="${1}"
     shift
 
-    pass show "${PASS_NAME}" | grep "^${PASS_FIELD}: " | sed 's|^[^ ]*: ||'
+    pass show "${PASS_NAME}" | grep "^${PASS_FIELD}: " | sed "s|^${PASS_FIELD}: ||"
   }
-  [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passget
 fi
 
 if command -v make >/dev/null 2>&1; then

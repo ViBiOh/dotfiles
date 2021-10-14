@@ -130,7 +130,7 @@ if [[ -n ${JIRA_URL:-} ]]; then
       open "${JIRA_URL}/browse/${JIRA_TICKET}"
     fi
 
-    if [[ ${branch} == "true" ]] && git_is_inside; then
+    if [[ ${branch} == "true" ]] && [[ $(git rev-parse --is-inside-work-tree 2>&1) == "true" ]]; then
       local JIRA_BRANCH_NAME=""feat-${JIRA_TICKET}""
 
       local CHECKOUT_OPTION=""
