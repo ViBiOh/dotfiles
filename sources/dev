@@ -95,16 +95,12 @@ fi
 
 if [[ -n ${JIRA_URL:-} ]]; then
   jira() {
-    local open
-    local branch
+    local currentUser="true"
 
-    while getopts ":ob" option; do
+    while getopts ":a" option; do
       case "${option}" in
-      o)
-        open="true"
-        ;;
-      b)
-        branch="true"
+      a)
+        currentUser="false"
         ;;
       :)
         printf "option -%s requires a value\n" "${OPTARG}" >&2
@@ -117,20 +113,66 @@ if [[ -n ${JIRA_URL:-} ]]; then
       esac
     done
 
+    jira_help() {
+      printf "%bUsage: jira ACTION%b\n" "${RED}" "${RESET}" 1>&2
+      printf "%b\nPossibles actions are                               | args\n%b\n" "${BLUE}" "${RESET}" 1>&2
+      printf "%b - browse   Open browser for ticket                 | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+      printf "%b - branch   Switch git repository branch to ticket  | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+      printf "%b - print    Print ticket ID                         | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+
+      printf "%b\nPossibles options are\n%b\n" "${BLUE}" "${RESET}" 1>&2
+      printf "%b - -a List tickets for all users (not just current)%b\n" "${BLUE}" "${RESET}" 1>&2
+      return 1
+    }
+
     shift $((OPTIND - 1))
 
+    local ACTION="${1:-}"
+    shift
+
+    if [[ -z ${ACTION} ]]; then
+      jira_help
+      return
+    fi
+
+    local JIRA_USER
+    JIRA_USER="$(passget "${JIRA_CREDENTIALS}" "login")"
+
+    local JIRA_PASS
+    JIRA_PASS="$(pass show "${JIRA_CREDENTIALS}" | head -1)"
+
+    local JIRA_JQL="status%20NOT%20IN%20%28Done%2C%20Resolved%29"
+    if [[ ${currentUser} == "true" ]]; then
+      JIRA_JQL+="%20AND%20assignee%20%3D%20currentUser%28%29"
+    fi
+
     local JIRA_TICKET
-    JIRA_TICKET="$(jira_ticket "${1:-}")"
+    JIRA_TICKET="$(curl \
+      --disable \
+      --silent \
+      --show-error \
+      --location \
+      --max-time 10 \
+      --user "${JIRA_USER}:${JIRA_PASS}" \
+      "${JIRA_URL}/rest/api/2/search?jql=${JIRA_JQL}" |
+      jq -r '.issues[] | .key + " " + .fields.summary' |
+      fzf --height=20 --ansi --reverse --query="${1:-}" |
+      awk '{print $1}')"
 
     if [[ -z ${JIRA_TICKET:-} ]]; then
       return
     fi
 
-    if [[ ${open} == "true" ]]; then
+    case ${ACTION} in
+    "browse")
       open "${JIRA_URL}/browse/${JIRA_TICKET}"
-    fi
+      ;;
 
-    if [[ ${branch} == "true" ]] && [[ $(git rev-parse --is-inside-work-tree 2>&1) == "true" ]]; then
+    "branch")
+      if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
+        printf "%bnot in a git directory%b\n" "${RED}" "${RESET}" 1>&2
+      fi
+
       local JIRA_BRANCH_NAME=""feat-${JIRA_TICKET}""
 
       local CHECKOUT_OPTION=""
@@ -139,26 +181,15 @@ if [[ -n ${JIRA_URL:-} ]]; then
       fi
 
       git checkout ${CHECKOUT_OPTION} "${JIRA_BRANCH_NAME}"
-    fi
-  }
+      ;;
 
-  jira_ticket() {
-    local JIRA_USER
-    JIRA_USER="$(passget "${JIRA_CREDENTIALS}" "login")"
+    "print")
+      printf "%s" "${JIRA_TICKET}"
+      ;;
 
-    local JIRA_PASS
-    JIRA_PASS="$(pass show "${JIRA_CREDENTIALS}" | head -1)"
-
-    curl \
-      --disable \
-      --silent \
-      --show-error \
-      --location \
-      --max-time 30 \
-      --user "${JIRA_USER}:${JIRA_PASS}" \
-      "${JIRA_URL}/rest/api/2/search?jql=status%20NOT%20IN%20%28Done%2C%20Resolved%29%20AND%20assignee%20%3D%20currentUser%28%29" |
-      jq -r '.issues[] | .key + " " + .fields.summary' |
-      fzf --height=20 --ansi --reverse --query="${1:-}" |
-      awk '{print $1}'
+    *)
+      jira_help
+      ;;
+    esac
   }
 fi
