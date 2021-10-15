@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+
+if [[ -z ${JIRA_URL:-} ]]; then
+  return
+fi
+
+jira() {
+  local scope="self"
+
+  while getopts ":a" option; do
+    case "${option}" in
+    a)
+      scope="all"
+      ;;
+    :)
+      printf "option -%s requires a value\n" "${OPTARG}" >&2
+      return 1
+      ;;
+    \?)
+      printf "option -%s is invalid\n" "${OPTARG}" >&2
+      return 2
+      ;;
+    esac
+  done
+
+  shift $((OPTIND - 1))
+
+  local ACTION="${1:-}"
+  shift
+
+  if [[ -z ${ACTION} ]]; then
+    _jira_help
+    return
+  fi
+
+  local JIRA_TICKET
+  JIRA_TICKET="$(
+    _jira_ticket "${scope}" |
+      fzf --height=20 --ansi --reverse -1 --query="${1:-}" |
+      awk '{print $1}'
+  )"
+
+  if [[ -z ${JIRA_TICKET:-} ]]; then
+    return
+  fi
+
+  case ${ACTION} in
+  "browse")
+    open "${JIRA_URL}/browse/${JIRA_TICKET}"
+    ;;
+
+  "branch")
+    if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
+      printf "%bnot in a git directory%b\n" "${RED}" "${RESET}" 1>&2
+    fi
+
+    local JIRA_BRANCH_NAME=""feat-${JIRA_TICKET}""
+
+    local CHECKOUT_OPTION=""
+    if ! git rev-parse --quiet --verify "${JIRA_BRANCH_NAME}" >/dev/null 2>&1; then
+      CHECKOUT_OPTION+=" -b"
+    fi
+
+    git checkout ${CHECKOUT_OPTION} "${JIRA_BRANCH_NAME}"
+    ;;
+
+  "print")
+    printf "%s" "${JIRA_TICKET}"
+    ;;
+
+  *)
+    _jira_help
+    ;;
+  esac
+}
+
+_jira_help() {
+  printf "%bUsage: jira ACTION%b\n" "${RED}" "${RESET}" 1>&2
+  printf "%b\nPossibles actions are                               | args\n%b\n" "${BLUE}" "${RESET}" 1>&2
+  printf "%b - browse   Open browser for ticket                 | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+  printf "%b - branch   Switch git repository branch to ticket  | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+  printf "%b - print    Print ticket ID                         | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+
+  printf "%b\nPossibles options are\n%b\n" "${BLUE}" "${RESET}" 1>&2
+  printf "%b - -a List tickets for all users (not just current)%b\n" "${BLUE}" "${RESET}" 1>&2
+  return 1
+}
+
+_jira_auth() {
+  printf "Basic %s" "$(pass show "${JIRA_CREDENTIALS}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { print a["user"] ":" a["pass"]}' | base64)"
+}
+
+_jira_ticket() {
+  local JIRA_JQL="status NOT IN (Done, Closed, Resolved)"
+  if [[ ${1:-} == "self" ]]; then
+    JIRA_JQL+=" AND assignee = currentUser()"
+  fi
+  JIRA_JQL+=" ORDER BY updated DESC"
+
+  curl \
+    --disable \
+    --silent \
+    --show-error \
+    --location \
+    --max-time 10 \
+    --fail-with-body \
+    --header "Content-Type: application/json" \
+    --header "Authorization: $(_jira_auth)" \
+    --get \
+    --data-urlencode "jql=${JIRA_JQL} " \
+    "${JIRA_URL}/rest/api/2/search" |
+    jq -r '.issues[] | .key + " " + .fields.summary'
+}
+
+_fzf_complete_jira() {
+  if [[ ${COMP_CWORD} -eq 1 ]]; then
+    mapfile -t COMPREPLY < <(compgen -W "browse branch print" -- "${COMP_WORDS[COMP_CWORD]}")
+    return
+  fi
+
+  FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(
+    _jira_ticket "self"
+  )
+}
+
+_fzf_complete_jira_post() {
+  awk '{print $1}'
+}
+
+[[ -n ${BASH} ]] && complete -F _fzf_complete_jira -o default -o bashdefault jira
