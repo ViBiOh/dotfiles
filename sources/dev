@@ -126,7 +126,7 @@ if [[ -n ${JIRA_URL:-} ]]; then
     local JIRA_TICKET
     JIRA_TICKET="$(
       _jira_ticket "${scope}" |
-        fzf --height=20 --ansi --reverse --query="${1:-}" |
+        fzf --height=20 --ansi --reverse -1 --query="${1:-}" |
         awk '{print $1}'
     )"
 
