@@ -177,9 +177,9 @@ if [[ -n ${JIRA_URL:-} ]]; then
   }
 
   _jira_ticket() {
-    local JIRA_JQL="status%20NOT%20IN%20%28Done%2C%20Resolved%29"
+    local JIRA_JQL="status NOT IN (Done, Resolved)"
     if [[ ${1:-} == "self" ]]; then
-      JIRA_JQL+="%20AND%20assignee%20%3D%20currentUser%28%29"
+      JIRA_JQL+=" AND assignee = currentUser()"
     fi
 
     local JIRA_USER
@@ -195,7 +195,9 @@ if [[ -n ${JIRA_URL:-} ]]; then
       --location \
       --max-time 10 \
       --user "${JIRA_USER}:${JIRA_PASS}" \
-      "${JIRA_URL}/rest/api/2/search?jql=${JIRA_JQL}" |
+      --get \
+      --data-urlencode "jql=${JIRA_JQL} " \
+      "${JIRA_URL}/rest/api/2/search" |
       jq -r '.issues[] | .key + " " + .fields.summary'
   }
 
