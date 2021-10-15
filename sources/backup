@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 backup() {
-  tar -czf - . | pv | gpg --symmetric --cipher-algo AES256 --batch --passphrase "${1:-$(passget "infra/backup" aes)}" >"$(basename "$(pwd)").tar.gz.gpg"
+  tar -czf - . | pv | gpg --symmetric --cipher-algo AES256 --batch --passphrase "${1:-$("$(pass show "infra/backup" | awk -F': ' '$1 == "aes" {print $2}')")}" >"$(basename "$(pwd)").tar.gz.gpg"
 }
 
 upload() {
@@ -12,5 +12,5 @@ restore() {
   local BASE_FILENAME="${1:-backup}"
 
   mkdir "${BASE_FILENAME}"
-  gpg --decrypt --batch --passphrase "${2:-$(passget "infra/backup" aes)}" "${BASE_FILENAME}.tar.gz.gpg" | pv | tar -xz -C "${BASE_FILENAME}" -
+  gpg --decrypt --batch --passphrase "${2:-$("$(pass show "infra/backup" | awk -F': ' '$1 == "aes" {print $2}')")}" "${BASE_FILENAME}.tar.gz.gpg" | pv | tar -xz -C "${BASE_FILENAME}" -
 }

@@ -32,6 +32,7 @@ if command -v pass >/dev/null 2>&1; then
       find "${PASS_DIR}" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"
     )
   }
+
   [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault pass
 
   passfor() {
@@ -50,22 +51,8 @@ if command -v pass >/dev/null 2>&1; then
       pass otp -c "${PASS_NAME}"
     fi
   }
+
   [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passfor
-
-  passget() {
-    if [[ ${#} -lt 1 ]]; then
-      var_red "Usage: passget PASS_NAME PASS_FIELD"
-      return 1
-    fi
-
-    local PASS_NAME="${1}"
-    shift
-
-    local PASS_FIELD="${1}"
-    shift
-
-    pass show "${PASS_NAME}" | grep "^${PASS_FIELD}: " | sed "s|^${PASS_FIELD}: ||"
-  }
 fi
 
 if command -v make >/dev/null 2>&1; then
@@ -80,6 +67,7 @@ if command -v ssh >/dev/null 2>&1; then
   _fzf_complete_ssh_notrigger() {
     FZF_COMPLETION_TRIGGER="" _fzf_host_completion
   }
+
   [[ -n ${BASH} ]] && complete -F _fzf_complete_ssh_notrigger -o default -o bashdefault ssh
 fi
 
