@@ -21,8 +21,8 @@ dns_flush_cache() {
     local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
 
     sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
-    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload
-    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop || true
+    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload 2>/dev/null || true
+    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop 2>/dev/null || true
     sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
   fi
 
