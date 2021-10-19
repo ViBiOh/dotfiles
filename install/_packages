@@ -32,7 +32,7 @@ END_OF_BASH_PROFILE
     fi
 
     packages_update
-    packages_install "${PACKAGES[@]}" fswatch jdupes
+    packages_install "${PACKAGES[@]}"
 
     if [[ $(grep --count "$(brew --prefix)" "/etc/shells") -eq 0 ]]; then
       printf "+-------------------------+\n"
