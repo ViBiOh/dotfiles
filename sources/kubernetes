@@ -30,7 +30,7 @@ if command -v kubectl >/dev/null 2>&1; then
           RESOURCE="deployments.apps"
         fi
 
-        printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/" + .name' | fzf --height=20 --ansi --reverse -1 --query="${QUERY}")"
+        printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/" + .name' | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
       }
 
       _kube_print_and_run() {
@@ -44,7 +44,7 @@ if command -v kubectl >/dev/null 2>&1; then
       case ${ACTION} in
       "context")
         local CONTEXT
-        CONTEXT="$(kubectl config get-contexts -o name | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
+        CONTEXT="$(kubectl config get-contexts -o name | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
 
         if [[ -n ${CONTEXT:-} ]]; then
           KUBECONFIG=$(mktemp -t kubeconfig)
@@ -76,7 +76,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
         if [[ -n ${parts[1]:-} ]]; then
           local KUBE_PORT
-          KUBE_PORT="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=json | jq -r '.spec.ports[] | (.port|tostring) + "/" + .protocol' | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
+          KUBE_PORT="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=json | jq -r '.spec.ports[] | (.port|tostring) + "/" + .protocol' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}")"
 
           if [[ -n ${KUBE_PORT:-} ]]; then
             IFS='/' read -r -a ports <<<"${KUBE_PORT}"
@@ -152,7 +152,7 @@ if command -v kubectl >/dev/null 2>&1; then
         ;;
 
       "ns")
-        kubectl get namespaces --output=json | jq -r '.items[].metadata.name' | fzf --height=20 --ansi --reverse -1 --query="${1:-}" | xargs kubectl config set-context --current --namespace
+        kubectl get namespaces --output=json | jq -r '.items[].metadata.name' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}" | xargs kubectl config set-context --current --namespace
         ;;
 
       "restart")
@@ -191,25 +191,25 @@ if command -v kubectl >/dev/null 2>&1; then
 
       case ${COMP_WORDS[COMP_CWORD - 1]} in
       "context")
-        FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(
+        FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
           kubectl config get-contexts -o name
         )
         ;;
 
       "forward")
-        FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(
+        FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
           kubectl get services --all-namespaces --output=json | jq -r '.items[].metadata.name'
         )
         ;;
 
       "image")
-        FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(
+        FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
           kubectl get deployments.apps --all-namespaces --output=json | jq -r '.items[].metadata.name'
         )
         ;;
 
       "ns")
-        FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(
+        FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
           kubectl get namespaces --output=json | jq -r '.items[].metadata.name'
         )
         ;;
@@ -223,7 +223,7 @@ fi
 if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
   helm_select_chart() {
     local CHART_REPOSITORY
-    CHART_REPOSITORY="$(helm repo list --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${1:-}")"
+    CHART_REPOSITORY="$(helm repo list --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
     if [[ -z ${CHART_REPOSITORY} ]]; then
       return 1
     fi
@@ -231,7 +231,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     var_info "Repository: ${CHART_REPOSITORY}"
 
     local CHART_NAME
-    CHART_NAME="$(helm search repo "${CHART_REPOSITORY}/" --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse -1 --query="${2:-}")"
+    CHART_NAME="$(helm search repo "${CHART_REPOSITORY}/" --output json | jq -r '.[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}")"
     if [[ -z ${CHART_NAME} ]]; then
       return 1
     fi
@@ -239,7 +239,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     var_info "Chart: ${CHART_NAME}"
 
     local CHART_VERSION
-    CHART_VERSION="$(helm search repo "${CHART_NAME}" --output json --devel --versions | jq -r '.[].version' | fzf --height=20 --ansi --reverse -1 --query="${3:-}")"
+    CHART_VERSION="$(helm search repo "${CHART_NAME}" --output json --devel --versions | jq -r '.[].version' | fzf --height=20 --ansi --reverse --select-1 --query="${3:-}")"
 
     if [[ -z ${CHART_VERSION} ]]; then
       return 1

@@ -27,7 +27,7 @@ fi
 
 if command -v pass >/dev/null 2>&1; then
   _fzf_complete_pass() {
-    FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(
+    FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
       local PASS_DIR=${PASSWORD_STORE_DIR:-${HOME}/.password-store}
       find "${PASS_DIR}" -name "*.gpg" -print | sed -e "s|${PASS_DIR}/\(.*\)\.gpg$|\1|"
     )
@@ -58,7 +58,7 @@ fi
 if command -v make >/dev/null 2>&1; then
   _fzf_complete_make() {
     # From https://unix.stackexchange.com/a/230050
-    FZF_COMPLETION_TRIGGER="" _fzf_complete "-1" "${@}" < <(make -pqr 2>/dev/null | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | grep --invert-match Makefile | sort --unique)
+    FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(make -pqr 2>/dev/null | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | grep --invert-match Makefile | sort --unique)
   }
   [[ -n ${BASH} ]] && complete -F _fzf_complete_make -o default -o bashdefault make
 fi
@@ -77,7 +77,7 @@ if command -v pgcli >/dev/null 2>&1; then
       return
     fi
 
-    FZF_COMPLETION_TRIGGER="" _fzf_complete "--ansi" "-1" "${@}" < <(
+    FZF_COMPLETION_TRIGGER="" _fzf_complete --ansi --select-1 "${@}" < <(
       var_color
 
       local comment=""
