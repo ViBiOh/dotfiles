@@ -87,7 +87,7 @@ _jira_help() {
 }
 
 _jira_auth() {
-  printf "Basic %s" "$(pass show "${JIRA_CREDENTIALS}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { print a["user"] ":" a["pass"]}' | base64)"
+  printf "Basic %s" "$(pass show "${JIRA_CREDENTIALS}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)"
 }
 
 _jira_ticket() {
