@@ -110,6 +110,7 @@ _jira_ticket() {
     --dump-header "${HEADER_OUPUT}" \
     --fail-with-body \
     --header "Content-Type: application/json" \
+    --header "Authorization: $(_jira_auth)" \
     --get \
     --data-urlencode "jql=${JIRA_JQL} " \
     "${JIRA_URL}/rest/api/2/search")"
