@@ -42,11 +42,11 @@
 	ui = true
 
 [alias]
-	last-tag = ! git describe --tag 2> /dev/null | awk -F "-" '{printf("%s", $1)}'
+	last-tag = ! git describe --tag 2> /dev/null | awk -F "-" '{printf(\"%s\", $1)}'
 	remote-repository = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@.*:(.*).git$ ]] && printf '%s' \"${BASH_REMATCH[1]}\"
 	pr = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@(.*):(.*)$ ]] && open \"https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]%.git}/compare/$(git default-branch)...$(git current-branch)?expand=1\"
-	fco = "! git switch \"$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query=\"remotes/${1:-}\" | awk '{printf("%s", $1)}' | sed 's|^remotes/origin/||')\" #"
-	fixup = ! git ci --fixup $(git log-pretty "$(git default-branch).." --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{printf("%s", $1)}')
+	fco = "! git switch \"$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query=\"remotes/${1:-}\" | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||')\" #"
+	fixup = ! git ci --fixup "$(git log-pretty "$(git default-branch).." --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{printf(\"%s\", $1)}')"
 	file-list = ! git ls-files | grep --invert-match package-lock.json | grep --extended-regexp --invert-match '.jpg$|.jpeg$|.png$|.gif$|.ico$|.lock$|.sum$|.jar$|.bat$|.otf$|.woff$|.svg$|.xml$'
 	files-commits = ! git log --format=format: --name-only | grep --extended-regexp --invert-match '^$' | sort | uniq -c | sort -rg | head -10
 	lines-count = ! git file-list | xargs wc -l 2>/dev/null | tail -1
@@ -68,7 +68,7 @@
 	unstage = reset HEAD --
 	current-branch = rev-parse --abbrev-ref HEAD
 	default-branch = config branch.default
-	set-default-branch = ! git config branch.default "$(git remote show origin | grep 'HEAD branch:' | awk '{printf("%s", $3)}')"
+	set-default-branch = ! git config branch.default "$(git remote show origin | grep 'HEAD branch:' | awk '{printf(\"%s\", $3)}')"
 	default = ! git switch "$(git default-branch)"
 	log-pretty = log --color --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 	lg = log-pretty --graph
