@@ -12,11 +12,7 @@ open_ports() {
 
 dns_flush_cache() {
   if command -v unbound-control >/dev/null 2>&1; then
-    local UNBOUND_CONF_FOLDER="/etc/unbound"
-    if command -v brew >/dev/null 2>&1; then
-      UNBOUND_CONF_FOLDER="$(brew --prefix)${UNBOUND_CONF_FOLDER}"
-    fi
-
+    local UNBOUND_CONF_FOLDER="${BREW_PREFIX:-}/etc/unbound"
     local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
     local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
 
