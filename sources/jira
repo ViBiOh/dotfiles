@@ -37,7 +37,7 @@ jira() {
   JIRA_TICKET="$(
     _jira_ticket "${scope}" |
       fzf --height=20 --ansi --reverse --select-1 --query="${1:-}" --exit-0 |
-      awk '{print $1}'
+      awk '{printf("%s", $1)}'
   )"
 
   if [[ -z ${JIRA_TICKET:-} ]]; then
@@ -138,7 +138,7 @@ _fzf_complete_jira() {
 }
 
 _fzf_complete_jira_post() {
-  awk '{print $1}'
+  awk '{printf("%s", $1)}'
 }
 
 [[ -n ${BASH} ]] && complete -F _fzf_complete_jira -o default -o bashdefault jira
