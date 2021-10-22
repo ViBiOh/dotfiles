@@ -8,5 +8,5 @@ if command -v brew >/dev/null 2>&1; then
   BREW_PREFIX="$(brew --prefix)"
   export BREW_PREFIX
 
-  export PATH="${BREW_PREFIX}/opt/ruby/bin:${BREW_PREFIX}/opt/openssl/bin:${BREW_PREFIX}/opt/make/libexec/gnubin:${BREW_PREFIX}/opt/curl/bin:${BREW_PREFIX}/sbin:${PATH}"
+  export PATH="${BREW_PREFIX}/opt/ruby/bin:${BREW_PREFIX}/opt/openssl/bin:${BREW_PREFIX}/opt/grep/libexec/gnubin:${BREW_PREFIX}/opt/make/libexec/gnubin:${BREW_PREFIX}/opt/curl/bin:${BREW_PREFIX}/sbin:${PATH}"
 fi
