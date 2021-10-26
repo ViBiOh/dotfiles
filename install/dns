@@ -73,6 +73,10 @@ forward-zone:
 
   sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload || true
   sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop || true
+
+  printf "Waiting 1 second before starting again..."
+  sleep 1
+
   sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
 
   echo "nameserver 127.0.0.1" | sudo tee "/etc/resolv.conf" >/dev/null
