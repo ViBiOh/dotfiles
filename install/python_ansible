@@ -31,12 +31,5 @@ install() {
 }
 
 credentials() {
-  if ! command -v pass >/dev/null 2>&1; then
-    exit
-  fi
-
-  if [[ $(pass find ansible | wc -l) -gt 1 ]]; then
-    pass show "dev/ansible" >"${HOME}/.ansible-vault-pass"
-    chmod 600 "${HOME}/.ansible-vault-pass"
-  fi
+  extract_secret "dev/ansible" ".ansible-vault-pass"
 }

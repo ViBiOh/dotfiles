@@ -14,6 +14,10 @@ script_dir() {
   fi
 }
 
+clean() {
+  rm -rf "${HOME}/.kube"
+}
+
 install() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(script_dir)"
@@ -52,4 +56,8 @@ install() {
     local KAIL_VERSION="0.15.0"
     archive_to_binary "https://github.com/boz/kail/releases/download/v${KAIL_VERSION}/kail_${KAIL_VERSION}_${OS}_${ARCH}.tar.gz" "kail"
   fi
+}
+
+credentials() {
+  extract_secret "infra/kube" ".kube/config"
 }

@@ -49,12 +49,5 @@ log_level = ERROR
 }
 
 credentials() {
-  if ! command -v pass >/dev/null 2>&1; then
-    exit
-  fi
-
-  if [[ $(pass find pgpass | wc -l) -gt 1 ]]; then
-    pass show "infra/pgpass" >"${HOME}/.pgpass"
-    chmod 600 "${HOME}/.pgpass"
-  fi
+  extract_secret "infra/ssh" ".pgpass"
 }

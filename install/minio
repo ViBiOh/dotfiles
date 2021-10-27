@@ -11,13 +11,5 @@ install() {
 }
 
 credentials() {
-  if ! command -v pass >/dev/null 2>&1; then
-    exit
-  fi
-
-  if [[ $(pass find "mc" | wc -l) -gt 1 ]]; then
-    mkdir -p "${HOME}/.mc"
-    pass show "infra/mc" >"${HOME}/.mc/config.json"
-    chmod 600 "${HOME}/.mc/config.json"
-  fi
+  extract_secret "infra/mc" ".mc/config.json"
 }

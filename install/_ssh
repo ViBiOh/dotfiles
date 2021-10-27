@@ -9,6 +9,7 @@ clean() {
     set -e
   fi
 
+  rm -rf "${HOME}/.ssh/config"
   rm -rf "${HOME}/.ssh/environment"
   rm -rf "${HOME}/.ssh/known_hosts"
 }
@@ -39,12 +40,5 @@ install() {
 }
 
 credentials() {
-  if ! command -v pass >/dev/null 2>&1; then
-    exit
-  fi
-
-  if [[ $(pass find ssh | wc -l) -gt 1 ]]; then
-    pass show "infra/ssh" >>"${HOME}/.ssh/config"
-    chmod 600 "${HOME}/.ssh/config"
-  fi
+  extract_secret "infra/ssh" ".ssh/config"
 }
