@@ -24,7 +24,7 @@ install() {
 
   (
     cd "${SCRIPT_DIR}/../"
-    curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "var" "git" "git_coco" "github" "version" "ssh" "kube_pg_restore" "rotate" "http"
+    curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "var" "git" "git_coco" "github" "version" "ssh" "kube_pg_restore" "rotate" "http" "tmux"
 
     source "${SCRIPT_DIR}/../scripts/git"
     ln -s -f "${SCRIPT_DIR}/../scripts/git_coco" "${HOME}/opt/bin/git-coco"

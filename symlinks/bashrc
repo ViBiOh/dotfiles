@@ -37,7 +37,7 @@ source_all() {
   SCRIPT_DIR="$(script_dir)"
 
   if [[ -e "${SCRIPT_DIR}/../scripts/meta" ]]; then
-    source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var" "git" "github" "version" "ssh"
+    source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var" "git" "github" "version" "ssh" "tmux"
     var_color
     ssh_init
   fi
