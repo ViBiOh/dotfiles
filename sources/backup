@@ -16,15 +16,12 @@ restore() {
 }
 
 backup_all() {
-  local SCRIPT_DIR
-  SCRIPT_DIR="$(pwd)"
-
   local MAX_PARALLEL=4
   local QUIET="false"
   local ITEMS=()
 
-  while getopts 'i:n:qh' opt; do
-    case "${opt}" in
+  while getopts ":i:n:q" option; do
+    case "${option}" in
     i)
       IFS=',' read -r -a ITEMS <<<"${OPTARG}"
       ;;
@@ -34,13 +31,13 @@ backup_all() {
     q)
       QUIET="true"
       ;;
-    h)
-      display_usage
-      return
+    :)
+      printf "option -%s requires a value\n" "${OPTARG}" >&2
+      return 1
       ;;
-
     \?)
-      printf "%bunknown option%b\n" "${RED}" "${RESET}"
+      printf "option -%s is invalid\n" "${OPTARG}" >&2
+      return 2
       ;;
     esac
   done
