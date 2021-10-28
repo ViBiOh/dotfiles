@@ -15,7 +15,7 @@ script_dir() {
 }
 
 install() {
-  local PACKAGES=("bash" "bash-completion" "make" "awk" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv")
+  local PACKAGES=("bash" "bash-completion" "make" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv")
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
@@ -32,7 +32,7 @@ END_OF_BASH_PROFILE
     fi
 
     packages_update
-    packages_install "${PACKAGES[@]}"
+    packages_install "${PACKAGES[@]}" "awk"
 
     if [[ $(grep --count "${BREW_PREFIX}" "/etc/shells") -eq 0 ]]; then
       printf "+-------------------------+\n"
