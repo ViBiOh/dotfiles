@@ -8,79 +8,19 @@ upload() {
   mc mv "${1:-$(basename "$(pwd)")}.tar.gz.gpg" "scw/fibr/"
 }
 
+backup_dir() {
+  cd "${1:-}" || return
+  backup ""
+  upload ""
+}
+
+backup_all() {
+  tmux_batch -a backup_dir 'find . -mindepth 1 -maxdepth 1 -type d -not -path "./.*" -print0'
+}
+
 restore() {
   local BASE_FILENAME="${1:-backup}"
 
   mkdir "${BASE_FILENAME}"
   gpg --decrypt --batch --passphrase "${2:-$(pass show "infra/backup" | awk -F': ' '$1 == "aes" {printf("%s", $2)}')}" "${BASE_FILENAME}.tar.gz.gpg" | pv | tar -xz -C "${BASE_FILENAME}" -
-}
-
-backup_all() {
-  local MAX_PARALLEL=4
-  local QUIET="false"
-  local ITEMS=()
-
-  while getopts ":i:n:q" option; do
-    case "${option}" in
-    i)
-      IFS=',' read -r -a ITEMS <<<"${OPTARG}"
-      ;;
-    n)
-      MAX_PARALLEL="${OPTARG}"
-      ;;
-    q)
-      QUIET="true"
-      ;;
-    :)
-      printf "option -%s requires a value\n" "${OPTARG}" >&2
-      return 1
-      ;;
-    \?)
-      printf "option -%s is invalid\n" "${OPTARG}" >&2
-      return 2
-      ;;
-    esac
-  done
-
-  shift $((OPTIND - 1))
-
-  if [[ ${#ITEMS[@]} -ne 0 ]]; then
-    ITEMS_LIST="$(printf "\t- %s\n" "${ITEMS[@]}")"
-    printf "%bDoing %bbackup%b for items\n%b%s%b\n" "${BLUE}" "${YELLOW}" "${BLUE}" "${YELLOW}" "${ITEMS_LIST}" "${RESET}"
-
-    for project in "${ITEMS[@]}"; do
-      (
-        cd "${project}" || return
-
-        backup ""
-        upload ""
-      )
-    done
-
-    if [[ ${QUIET} == "true" ]]; then
-      tmux kill-pane -t "${TMUX_PANE}"
-    fi
-
-    return
-  fi
-
-  local index=0
-  declare -A spread
-
-  while IFS= read -r -d '' folder; do
-    spread["$((index % MAX_PARALLEL))"]+="${folder},"
-    index="$((index + 1))"
-  done < <(find . -mindepth 1 -maxdepth 1 -type d -not -path "./.*" -print0)
-
-  (
-    index=0
-    for items in "${spread[@]}"; do
-      local ARGS=("backup_all" "-i" "${items[*]%,}")
-      if [[ ${QUIET} == "true" ]]; then
-        ARGS+=("-q")
-      fi
-
-      tmux_split_cmd "${ARGS[@]}"
-    done
-  )
 }
