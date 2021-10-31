@@ -49,5 +49,5 @@ log_level = ERROR
 }
 
 credentials() {
-  extract_secret "infra/ssh" ".pgpass"
+  extract_secret "infra/pgpass" ".pgpass"
 }
