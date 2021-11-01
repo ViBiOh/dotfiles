@@ -4,7 +4,7 @@ if [[ -z ${JIRA_URL:-} ]]; then
   return
 fi
 
-jira() (
+jira() {
   local scope="self"
 
   while getopts ":a" option; do
@@ -72,9 +72,9 @@ jira() (
     _jira_help
     ;;
   esac
-)
+}
 
-_jira_help() (
+_jira_help() {
   printf "%bUsage: jira ACTION%b\n" "${RED}" "${RESET}" 1>&2
   printf "%b\nPossibles actions are                               | args\n%b\n" "${BLUE}" "${RESET}" 1>&2
   printf "%b - browse   Open browser for ticket                 | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
@@ -84,13 +84,13 @@ _jira_help() (
   printf "%b\nPossibles options are\n%b\n" "${BLUE}" "${RESET}" 1>&2
   printf "%b - -a List tickets for all users (not just current)%b\n" "${BLUE}" "${RESET}" 1>&2
   return 1
-)
+}
 
-_jira_auth() (
+_jira_auth() {
   printf "Basic %s" "$(pass show "${JIRA_CREDENTIALS}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)"
-)
+}
 
-_jira_ticket() (
+_jira_ticket() {
   local JIRA_JQL="status NOT IN (Done, Closed, Resolved)"
   if [[ ${1:-} == "self" ]]; then
     JIRA_JQL+=" AND assignee = currentUser()"
@@ -124,9 +124,9 @@ _jira_ticket() (
   rm -f "${HEADER_OUPUT}"
 
   printf "%s" "${JIRA_OUTPUT}" | jq -r '.issues[] | .key + " " + .fields.summary'
-)
+}
 
-_fzf_complete_jira() (
+_fzf_complete_jira() {
   if [[ ${COMP_CWORD} -eq 1 ]]; then
     mapfile -t COMPREPLY < <(compgen -W "browse branch print" -- "${COMP_WORDS[COMP_CWORD]}")
     return
@@ -135,10 +135,10 @@ _fzf_complete_jira() (
   FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
     _jira_ticket "self"
   )
-)
+}
 
-_fzf_complete_jira_post() (
+_fzf_complete_jira_post() {
   awk '{printf("%s", $1)}'
-)
+}
 
 [[ -n ${BASH} ]] && complete -F _fzf_complete_jira -o default -o bashdefault jira

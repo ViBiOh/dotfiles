@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-terraform_install() (
+terraform_install() {
   local TERRAFORM_VERSION=${1}
   shift
 
@@ -13,4 +13,4 @@ terraform_install() (
 
   rm -f "${TERRAFORM_PATH}"
   ln -s "${TERRAFORM_VERSION_PATH}" "${TERRAFORM_PATH}"
-)
+}

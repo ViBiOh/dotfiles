@@ -17,11 +17,11 @@ if command -v mc >/dev/null 2>&1; then
   complete -C mc mc
 fi
 
-random() (
+random() {
   openssl rand -hex "${1:-30}"
-)
+}
 
-loop() (
+loop() {
   if [[ ${#} -lt 1 ]]; then
     var_red "Usage: loop command interval?(default 60s)"
     return 1
@@ -31,19 +31,19 @@ loop() (
     ${1}
     sleep "${2:-60}"
   done
-)
+}
 
-meteo() (
+meteo() {
   curl --disable --silent --show-error --location --max-time 30 -4 "wttr.in/${1:-Paris}?m&format=v2"
-)
+}
 
 if [[ ${OSTYPE} =~ ^darwin ]]; then
-  temperature() (
+  temperature() {
     sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep "temperature"
-  )
+  }
 fi
 
-rainbow() (
+rainbow() {
   awk '
   BEGIN{
     s="          "; s=s s s s s s s s;
@@ -58,10 +58,10 @@ rainbow() (
     }
     printf "\n";
   }'
-)
+}
 
 if command -v vegeta >/dev/null 2>&1; then
-  loadtest() (
+  loadtest() {
     if [[ ${#} -lt 1 ]]; then
       var_red "Usage: loadtest URL RATE_PER_SECOND"
       return 1
@@ -76,19 +76,19 @@ if command -v vegeta >/dev/null 2>&1; then
     printf "GET %s" "${URL}" | vegeta attack -rate="${RATE}" -duration=30s | vegeta plot >vegeta.html && open vegeta.html
     sleep 5
     rm vegeta.html
-  )
+  }
 fi
 
 if command -v systemctl >/dev/null 2>&1; then
-  status() (
+  status() {
     sudo systemctl status "${@}"
-  )
+  }
 
-  restart() (
+  restart() {
     sudo systemctl restart "${@}"
-  )
+  }
 
-  logs() (
+  logs() {
     sudo journalctl -u "${@}"
-  )
+  }
 fi

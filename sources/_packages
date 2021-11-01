@@ -14,13 +14,13 @@ packages_update() {
   fi
 }
 
-packages_install_desktop() (
+packages_install_desktop() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install --cask "${@}"
   else
     packages_install "${@}"
   fi
-)
+}
 
 packages_install() {
   if command -v brew >/dev/null 2>&1; then

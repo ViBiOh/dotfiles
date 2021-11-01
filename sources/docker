@@ -4,7 +4,7 @@ if command -v docker >/dev/null 2>&1; then
   export DOCKER_CONTENT_TRUST="1"
   export DOCKER_CLI_EXPERIMENTAL="enabled"
 
-  docker_clean() (
+  docker_clean() {
     local DOCKER_ROOT_DIR
     DOCKER_ROOT_DIR="$(docker info --format '{{ .DockerRootDir }}')"
 
@@ -35,5 +35,5 @@ if command -v docker >/dev/null 2>&1; then
 
     local AVAILABLE_RECLAIMED="$((AVAILABLE_AFTER - AVAILABLE_BEFORE))"
     var_info "Total reclaimed space: ${AVAILABLE_RECLAIMED}GB"
-  )
+  }
 fi
