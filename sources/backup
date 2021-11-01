@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
 
-backup() {
+backup() (
   tar -czf - . | pv | gpg --symmetric --cipher-algo AES256 --batch --passphrase "${1:-$(pass show "infra/backup" | awk -F': ' '$1 == "aes" {printf("%s", $2)}')}" >"$(basename "$(pwd)").tar.gz.gpg"
-}
+)
 
-upload() {
+upload() (
   mc mv "${1:-$(basename "$(pwd)")}.tar.gz.gpg" "scw/fibr/"
-}
+)
 
-backup_dir() {
+backup_dir() (
   cd "${1:-}" || return
   backup ""
   upload ""
-}
+)
 
-backup_all() {
+backup_all() (
   tmux_batch -a backup_dir 'find . -mindepth 1 -maxdepth 1 -type d -not -path "./.*" -print0'
-}
+)
 
-restore() {
+restore() (
   local BASE_FILENAME="${1:-backup}"
 
   mkdir "${BASE_FILENAME}"
   gpg --decrypt --batch --passphrase "${2:-$(pass show "infra/backup" | awk -F': ' '$1 == "aes" {printf("%s", $2)}')}" "${BASE_FILENAME}.tar.gz.gpg" | pv | tar -xz -C "${BASE_FILENAME}" -
-}
+)

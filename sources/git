@@ -8,6 +8,6 @@ if command -v delta >/dev/null 2>&1; then
   export GIT_PAGER='delta --dark'
 fi
 
-...() {
+...() (
   cd "$(git_root)" || return 1
-}
+)

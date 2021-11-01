@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-archive_to_binary() {
+archive_to_binary() (
   if [[ ${#} -lt 2 ]]; then
     var_red "Usage: archive_to_binary ARCHIVE_URL BINARY_PATH [BINARY_DESTINATION=${HOME}/opt/bin/]"
     return 1
@@ -49,9 +49,9 @@ archive_to_binary() {
 
     rm -rf "${ARCHIVE_PATH}" "${ARCHIVE_FILENAME}"
   )
-}
+)
 
-curl_to_binary() {
+curl_to_binary() (
   if [[ ${#} -lt 2 ]]; then
     var_red "Usage: curl_to_binary BINARY_URL BINARY_NAME [BINARY_DESTINATION=${HOME}/opt/bin]"
     return 1
@@ -66,9 +66,9 @@ curl_to_binary() {
 
   curl --disable --silent --show-error --location --max-time 300 -o "${BINARY_DESTINATION}/${BINARY_NAME}" -- "${BINARY_URL}"
   chmod +x "${BINARY_DESTINATION}/${BINARY_NAME}"
-}
+)
 
-normalized_os() {
+normalized_os() (
   local OS_NAME
   OS_NAME="$(uname -s | tr "[:upper:]" "[:lower:]")"
 
@@ -80,9 +80,9 @@ normalized_os() {
   fi
 
   printf "%s" "${OS_NAME}"
-}
+)
 
-normalized_arch() {
+normalized_arch() (
   local ARCH
   ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
@@ -104,4 +104,4 @@ normalized_arch() {
   fi
 
   printf "%s" "${ARCH}"
-}
+)

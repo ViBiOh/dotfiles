@@ -8,13 +8,13 @@ export GIT_PS1_COMPRESSSPARSESTATE="true"
 
 export PROMPT_DIRTRIM="3"
 
-_previous_status() {
+_previous_status() (
   if [[ ${?} -eq 0 ]]; then
     printf -- "%b✔%b" "${GREEN}" "${RESET}"
   else
     printf -- "%bx%b" "${RED}" "${RESET}"
   fi
-}
+)
 
 PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
 if [[ "$(type -t __git_ps1)" == "function" ]]; then

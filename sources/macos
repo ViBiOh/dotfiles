@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-fix_spotlight() {
+fix_spotlight() (
   sudo mdutil -a -d -i off
   sudo mdutil -X "/"
   sudo mdutil -X "/System/Volumes/Data"
-}
+)
 
-macos_start() {
+macos_start() (
   fix_spotlight
   dns_flush_cache
-}
+)

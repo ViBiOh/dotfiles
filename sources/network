@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-open_ports() {
+open_ports() (
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo lsof -PniTCP -sTCP:LISTEN
   elif command -v ss >/dev/null 2>&1; then
@@ -8,9 +8,9 @@ open_ports() {
   elif command -v netstat >/dev/null 2>&1; then
     sudo netstat -pluton
   fi
-}
+)
 
-dns_flush_cache() {
+dns_flush_cache() (
   if command -v unbound-control >/dev/null 2>&1; then
     local UNBOUND_CONF_FOLDER="${BREW_PREFIX:-}/etc/unbound"
     local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
@@ -34,4 +34,4 @@ dns_flush_cache() {
       sudo systemd-resolve --flush-caches
     fi
   fi
-}
+)

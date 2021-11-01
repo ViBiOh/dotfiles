@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-memory_clean() {
+memory_clean() (
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo sync && sudo purge
   elif [[ $(sudo which sysctl | wc -l) -ne 0 ]] && [[ $(sudo sysctl -a 2>/dev/null | grep --count vm.drop_caches) -ne 0 ]]; then
@@ -9,9 +9,9 @@ memory_clean() {
     sudo sync
     printf "3\n" >"/proc/sys/vm/drop_caches"
   fi
-}
+)
 
-os_clean() {
+os_clean() (
   rm -rf "${HOME}/.bash_history"
   rm -rf "${HOME}/.cache/"
   rm -rf "${HOME}/.CFUserTextEncoding"
@@ -21,9 +21,9 @@ os_clean() {
   sudo find / \( -name ".DS_Store" -or -name ".localized" \) -exec rm -f {} \; 2>/dev/null
 
   memory_clean
-}
+)
 
-brew_clean_all() {
+brew_clean_all() (
   brew remove --force "$(brew list)" --ignore-dependencies
   brew cleanup
-}
+)
