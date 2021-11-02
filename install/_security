@@ -133,6 +133,15 @@ install() {
     defaults write com.apple.dock orientation -string "left"
     defaults write com.apple.dock showhidden -bool true
     defaults write com.apple.dock tilesize -int 36
+    defaults write com.apple.dock wvous-tl-modifier -int 1048576
+    defaults write com.apple.dock wvous-tr-modifier -int 1048576
+    defaults write com.apple.dock wvous-bl-modifier -int 1048576
+    defaults write com.apple.dock wvous-br-modifier -int 1048576
+    defaults write com.apple.dock wvous-tl-corner -int 1
+    defaults write com.apple.dock wvous-tr-corner -int 1
+    defaults write com.apple.dock wvous-bl-corner -int 1
+    defaults write com.apple.dock wvous-br-corner -int 1
+    killall Dock
 
     defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
