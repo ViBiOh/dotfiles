@@ -67,7 +67,7 @@ forward-zone:
 " | sudo tee "${UNBOUND_CONF_FILE}" >/dev/null
 
   sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
-  if ! [[ -e "${UNBOUND_DNSSEC_CERT}/unbound_server.key" ]]; then
+  if ! [[ -e "${UNBOUND_CONF_FOLDER}/unbound_server.key" ]]; then
     sudo unbound-control-setup -d "${UNBOUND_CONF_FOLDER}"
   fi
 
