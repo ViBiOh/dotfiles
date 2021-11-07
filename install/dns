@@ -44,6 +44,7 @@ install() {
 
   use-syslog: no
   logfile: /var/log/unbound.log
+  log-queries: no
 
   include: \"${HOME}/.unbound-blocklist\"
 
