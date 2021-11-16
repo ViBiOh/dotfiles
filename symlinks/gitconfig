@@ -67,6 +67,7 @@
 	d = diff --ignore-all-space
 	s = status --short --branch
 	unstage = reset HEAD --
+	fresh-clean = ! git reset HEAD -- . && git checkout -- . && git clean -ffxd
 	current-branch = rev-parse --abbrev-ref HEAD
 	default-branch = config branch.default
 	set-default-branch = ! git config branch.default "$(git get-default-branch)"
