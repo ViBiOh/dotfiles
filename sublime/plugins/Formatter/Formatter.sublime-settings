@@ -1,6 +1,6 @@
 {
   "selectors": {
-    "source.go": [["goimports"], ["gofumpt", "-s"]],
+    "source.go": [["goimports"], ["gofumpt"]],
     "source.js": [["prettier", "--no-color", "--stdin-filepath", "file.js"]],
     "source.json": [
       ["prettier", "--no-color", "--stdin-filepath", "file.json"]
