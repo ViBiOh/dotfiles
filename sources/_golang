@@ -47,3 +47,23 @@ if command -v fzf >/dev/null 2>&1; then
     fi
   }
 fi
+
+go_mod_loop() {
+  declare -A MODULES
+
+  for module in $(go mod graph | grep -i " $(go list -m)@"); do
+    if [[ ${module} =~ (.*)@.* ]]; then
+      if [[ -z ${MODULES[${BASH_REMATCH[1]}]} ]]; then
+        local NEED_MODULE="${BASH_REMATCH[1]}"
+        MODULES[${NEED_MODULE}]="true"
+
+        local MOD_WHY
+        MOD_WHY="$(go mod why -m "${NEED_MODULE}")"
+
+        if ! [[ ${MOD_WHY} =~ \(main\ module\ does\ not\ need\ module ]]; then
+          printf '%b%s creates an import loop%b\n%s\n' "${BLUE}" "${NEED_MODULE}" "${RESET}" "${MOD_WHY}"
+        fi
+      fi
+    fi
+  done
+}
