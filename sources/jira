@@ -56,6 +56,12 @@ jira() {
 
     local JIRA_BRANCH_NAME=""feat-${JIRA_TICKET}""
 
+    local BRANCH_SUFFIX
+    read -r -p "BRANCH_SUFFIX=" BRANCH_SUFFIX
+    if [[ -n ${BRANCH_SUFFIX} ]]; then
+      JIRA_BRANCH_NAME="${JIRA_BRANCH_NAME}${BRANCH_SUFFIX}"
+    fi
+
     local CHECKOUT_OPTION=""
     if ! git rev-parse --quiet --verify "${JIRA_BRANCH_NAME}" >/dev/null 2>&1; then
       CHECKOUT_OPTION+=" -b"
