@@ -25,8 +25,11 @@ You can set following environment variables for customizing installation behavio
 
 # Server configuration example
 
+export DOTFILES_NO__HOSTS="true"
+export DOTFILES_NO__MACOS="true"
 export DOTFILES_NO_ALACRITTY="true"
 export DOTFILES_NO_APPLE="true"
+export DOTFILES_NO_DNS="true"
 export DOTFILES_NO_FIREFOX="true"
 export DOTFILES_NO_GOLANG="true"
 export DOTFILES_NO_GPG="true"

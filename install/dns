@@ -67,6 +67,8 @@ forward-zone:
   forward-ssl-upstream: yes
 " | sudo tee "${UNBOUND_CONF_FILE}" >/dev/null
 
+  grep --extended-regexp '^0.0.0.0 ' "/etc/hosts" | awk '{print "local-zone: \""$2"\" refuse"}' | sort --unique >"${HOME}/.unbound-blocklist"
+
   sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
   if ! [[ -e "${UNBOUND_CONF_FOLDER}/unbound_server.key" ]]; then
     sudo unbound-control-setup -d "${UNBOUND_CONF_FOLDER}"
