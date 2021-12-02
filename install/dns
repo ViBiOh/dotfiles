@@ -2,6 +2,40 @@
 
 set -o nounset -o pipefail -o errexit
 
+generate_dns_blocklist() {
+  cat \
+    <(curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/${BLOCKED_HOSTS:-fakenews-gambling-porn-social}/hosts") \
+    <(curl --disable --silent --show-error --location --max-time 30 "https://someonewhocares.org/hosts/zero/hosts") \
+    grep --extended-regexp --invert-match '^$' |
+    grep --extended-regexp --invert-match '^\s*#' |
+    grep --extended-regexp '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' |
+    tr -s '[:blank:]' ' ' |
+    tr '[:upper:]' '[:lower:]' |
+    sort --unique |
+    grep --invert-match "0.0.0.0 alb.reddit.com" |
+    grep --invert-match "0.0.0.0 external-preview.redd.it" |
+    grep --invert-match "0.0.0.0 gateway.reddit.com" |
+    grep --invert-match "0.0.0.0 gql.reddit.com" |
+    grep --invert-match "0.0.0.0 linkedin.com" |
+    grep --invert-match "0.0.0.0 media.licdn.com" |
+    grep --invert-match "0.0.0.0 oauth.reddit.com" |
+    grep --invert-match "0.0.0.0 preview.redd.it" |
+    grep --invert-match "0.0.0.0 reddit.com" |
+    grep --invert-match "0.0.0.0 reddit.map.fastly.net" |
+    grep --invert-match "0.0.0.0 redditmedia.com" |
+    grep --invert-match "0.0.0.0 static.licdn.com" |
+    grep --invert-match "0.0.0.0 styles.redditmedia.com" |
+    grep --invert-match "0.0.0.0 v.redd.it" |
+    grep --invert-match "0.0.0.0 www.linkedin.com" |
+    grep --invert-match "0.0.0.0 www.reddit.com" |
+    grep --invert-match "0.0.0.0 www.redditmedia.com" |
+    grep --invert-match "0.0.0.0 www.redditstatic.com" |
+    grep --invert-match "thumbs.redditmedia.com" |
+    grep --extended-regexp '^0.0.0.0 ' |
+    awk '{print "local-zone: \""$2"\" refuse"}' |
+    sort --unique >"${HOME}/.unbound-blocklist"
+}
+
 install() {
   packages_install unbound
 
@@ -67,7 +101,7 @@ forward-zone:
   forward-ssl-upstream: yes
 " | sudo tee "${UNBOUND_CONF_FILE}" >/dev/null
 
-  grep --extended-regexp '^0.0.0.0 ' "/etc/hosts" | awk '{print "local-zone: \""$2"\" refuse"}' | sort --unique >"${HOME}/.unbound-blocklist"
+  generate_blocklist
 
   sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
   if ! [[ -e "${UNBOUND_CONF_FOLDER}/unbound_server.key" ]]; then
