@@ -5,7 +5,7 @@ set -o nounset -o pipefail -o errexit
 generate_dns_blocklist() {
   cat \
     <(curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/${BLOCKED_HOSTS:-fakenews-gambling-porn-social}/hosts") \
-    <(curl --disable --silent --show-error --location --max-time 30 "https://someonewhocares.org/hosts/zero/hosts") \
+    <(curl --disable --silent --show-error --location --max-time 30 "https://someonewhocares.org/hosts/zero/hosts") |
     grep --extended-regexp --invert-match '^$' |
     grep --extended-regexp --invert-match '^\s*#' |
     grep --extended-regexp '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' |
@@ -101,7 +101,7 @@ forward-zone:
   forward-ssl-upstream: yes
 " | sudo tee "${UNBOUND_CONF_FILE}" >/dev/null
 
-  generate_blocklist
+  generate_dns_blocklist
 
   sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
   if ! [[ -e "${UNBOUND_CONF_FOLDER}/unbound_server.key" ]]; then

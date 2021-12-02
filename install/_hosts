@@ -6,7 +6,7 @@ install() {
   local DOTFILES_HOSTNAME
   DOTFILES_HOSTNAME="$(hostname)"
 
-  print '127.0.0.1 local
+  printf '127.0.0.1 local
 127.0.0.1 localhost
 127.0.0.1 localhost.localdomain
 127.0.0.1 %s
