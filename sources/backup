@@ -9,9 +9,11 @@ upload() {
 }
 
 backup_dir() {
-  cd "${1:-}" || return
-  backup ""
-  upload ""
+  (
+    cd "${1:-}" || return
+    backup ""
+    upload ""
+  )
 }
 
 backup_all() {
