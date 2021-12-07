@@ -70,6 +70,30 @@ jira() {
     git checkout ${CHECKOUT_OPTION} "${JIRA_BRANCH_NAME}"
     ;;
 
+  "transition")
+    local JIRA_TRANSITIONS
+    JIRA_TRANSITIONS="$(_jira_request --get "${JIRA_URL}/rest/api/2/issue/${JIRA_TICKET}/transitions")"
+
+    if [[ -z ${JIRA_TRANSITIONS} ]]; then
+      return
+    fi
+
+    local JIRA_TRANSITION
+    JIRA_TRANSITION="$(
+      printf "%s" "${JIRA_TRANSITIONS}" | jq -r '.transitions[] | .id + " - " + .name' |
+        fzf --height=20 --ansi --reverse --exit-0 |
+        awk '{printf("%s", $1)}'
+    )"
+
+    if [[ -z ${JIRA_TRANSITION} ]]; then
+      return
+    fi
+
+    _jira_request --request "POST" "${JIRA_URL}/rest/api/2/issue/${JIRA_TICKET}/transitions" --header "Content-Type: application/json" --data "$(jq -n -c --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
+    printf "%s transitionned to status %s\n" "${JIRA_TICKET}" "${JIRA_TRANSITION}"
+
+    ;;
+
   "print")
     printf "%s" "${JIRA_TICKET}"
     ;;
@@ -83,9 +107,10 @@ jira() {
 _jira_help() {
   printf "%bUsage: jira ACTION%b\n" "${RED}" "${RESET}" 1>&2
   printf "%b\nPossibles actions are                               | args\n%b\n" "${BLUE}" "${RESET}" 1>&2
-  printf "%b - browse   Open browser for ticket                 | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-  printf "%b - branch   Switch git repository branch to ticket  | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-  printf "%b - print    Print ticket ID                         | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+  printf "%b - browse      Open browser for ticket                 | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+  printf "%b - branch      Switch git repository branch to ticket  | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+  printf "%b - print       Print ticket ID                         | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+  printf "%b - transition  Transition ticket to another state      | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
 
   printf "%b\nPossibles options are\n%b\n" "${BLUE}" "${RESET}" 1>&2
   printf "%b - -a List tickets for all users (not just current)%b\n" "${BLUE}" "${RESET}" 1>&2
@@ -96,30 +121,24 @@ _jira_auth() {
   printf "Basic %s" "$(pass show "${JIRA_CREDENTIALS}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)"
 }
 
-_jira_ticket() {
-  local JIRA_JQL="status NOT IN (Done, Closed, Resolved)"
-  if [[ ${1:-} == "self" ]]; then
-    JIRA_JQL+=" AND assignee = currentUser()"
-  fi
-  JIRA_JQL+=" ORDER BY updated DESC"
-
+_jira_request() {
   local HEADER_OUPUT
   HEADER_OUPUT=$(mktemp -t jira_ticket)
 
   local JIRA_OUTPUT
-  JIRA_OUTPUT="$(curl \
-    --disable \
-    --silent \
-    --show-error \
-    --location \
-    --max-time 10 \
-    --dump-header "${HEADER_OUPUT}" \
-    --fail-with-body \
-    --header "Content-Type: application/json" \
-    --header "Authorization: $(_jira_auth)" \
-    --get \
-    --data-urlencode "jql=${JIRA_JQL} " \
-    "${JIRA_URL}/rest/api/2/search")"
+  JIRA_OUTPUT="$(
+    curl \
+      --disable \
+      --silent \
+      --show-error \
+      --location \
+      --max-time 10 \
+      --dump-header "${HEADER_OUPUT}" \
+      --fail-with-body \
+      --header "Content-Type: application/json" \
+      --header "Authorization: $(_jira_auth)" \
+      "${@}"
+  )"
 
   if [[ ${?} -ne 0 ]]; then
     cat "${HEADER_OUPUT}" >/dev/stderr
@@ -128,13 +147,27 @@ _jira_ticket() {
   fi
 
   rm -f "${HEADER_OUPUT}"
+  printf "%s" "${JIRA_OUTPUT}"
+}
 
-  printf "%s" "${JIRA_OUTPUT}" | jq -r '.issues[] | .key + " " + .fields.summary'
+_jira_ticket() {
+  local JIRA_JQL="status NOT IN (Done, Closed, Resolved)"
+  if [[ ${1:-} == "self" ]]; then
+    JIRA_JQL+=" AND assignee = currentUser()"
+  fi
+  JIRA_JQL+=" ORDER BY updated DESC"
+
+  local JIRA_OUTPUT
+  JIRA_OUTPUT="$(_jira_request --get --data-urlencode "jql=${JIRA_JQL}" "${JIRA_URL}/rest/api/2/search")"
+
+  if [[ -n ${JIRA_OUTPUT} ]]; then
+    printf "%s" "${JIRA_OUTPUT}" | jq -r '.issues[] | .key + " " + .fields.summary'
+  fi
 }
 
 _fzf_complete_jira() {
   if [[ ${COMP_CWORD} -eq 1 ]]; then
-    mapfile -t COMPREPLY < <(compgen -W "browse branch print" -- "${COMP_WORDS[COMP_CWORD]}")
+    mapfile -t COMPREPLY < <(compgen -W "browse branch print transition" -- "${COMP_WORDS[COMP_CWORD]}")
     return
   fi
 
