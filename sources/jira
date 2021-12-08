@@ -135,7 +135,7 @@ _jira_request() {
       --max-time 10 \
       --dump-header "${HEADER_OUPUT}" \
       --fail-with-body \
-      --header "Content-Type: application/json" \
+      --header "Accept: application/json" \
       --header "Authorization: $(_jira_auth)" \
       "${@}"
   )"
