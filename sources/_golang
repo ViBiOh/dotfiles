@@ -30,8 +30,8 @@ if command -v fzf >/dev/null 2>&1; then
         MODULE_VERSION="$(
           cat \
             <(printf "latest\n") \
-            <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/branches" | jq -r '.[].name') \
-            <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/tags" | jq -r '.[].name') |
+            <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/branches?per_page=100" | jq -r '.[].name') \
+            <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/tags?per_page=100" | jq -r '.[].name') |
             fzf --height=20 --ansi --reverse
         )"
       else
@@ -41,9 +41,9 @@ if command -v fzf >/dev/null 2>&1; then
       if [[ -n ${MODULE_VERSION} ]]; then
         printf "MODULE_VERSION=%s\n" "${MODULE_VERSION}"
         MODULE_VERSION="@${MODULE_VERSION}"
-      fi
 
-      var_print_and_run "go get -d '${MODULE_TO_BUMP}${MODULE_VERSION}'"
+        var_print_and_run "go get -d '${MODULE_TO_BUMP}${MODULE_VERSION}'"
+      fi
     fi
   }
 fi
