@@ -67,7 +67,7 @@ forward-zone:
   forward-ssl-upstream: yes
 " | sudo tee "${UNBOUND_CONF_FILE}" >/dev/null
 
-  generate_dns_blocklist
+  dns_block
 
   sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
   if ! [[ -e "${UNBOUND_CONF_FOLDER}/unbound_server.key" ]]; then
