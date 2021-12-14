@@ -55,28 +55,29 @@ dns_allow() {
   declare -A websites
 
   websites["reddit"]="
+      preview.redd.it
+      v.redd.it
+      redd.it
       alb.reddit.com
       external-preview.redd.it
       gateway.reddit.com
       gql.reddit.com
       oauth.reddit.com
-      preview.redd.it
+      www.reddit.com
       reddit.com
-      reddit.map.fastly.net
-      redditmedia.com
       styles.redditmedia.com
       thumbs.redditmedia.com
-      v.redd.it
-      www.reddit.com
       www.redditmedia.com
+      redditmedia.com
       www.redditstatic.com
+      reddit.map.fastly.net
   "
 
   websites["linkedin"]="
+    www.linkedin.com
     linkedin.com
     media.licdn.com
     static.licdn.com
-    www.linkedin.com
   "
 
   websites["aws"]="analytics.console.aws.a2z.com"
