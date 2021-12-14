@@ -76,6 +76,7 @@ dns_allow() {
     linkedin.com
     media.licdn.com
     static.licdn.com
+    www.linkedin.com
   "
 
   websites["aws"]="analytics.console.aws.a2z.com"
@@ -95,7 +96,7 @@ dns_allow() {
   local GREP_PIPELINE=()
 
   for entry in ${websites[${WEBSITE}]}; do
-    GREP_PIPELINE+=("-e" "'\"${entry}\"'")
+    GREP_PIPELINE+=("-e" "\"${entry}\"")
   done
 
   local UNBOUND_BLOCKLIST
