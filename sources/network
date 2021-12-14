@@ -35,3 +35,14 @@ dns_flush_cache() {
     fi
   fi
 }
+
+dns_ads_pass() {
+  UNBOUND_BLOCKLIST=$(mktemp -t unbound)
+
+  # In-browser mtv
+  grep -v '"pagead2.googlesyndication.com"' "${HOME}/.unbound-blocklist" |
+    grep -v '"googlesyndication.com"' >"${UNBOUND_BLOCKLIST}"
+
+  mv "${UNBOUND_BLOCKLIST}" "${HOME}/.unbound-blocklist"
+  dns_flush_cache
+}
