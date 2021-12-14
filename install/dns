@@ -2,21 +2,6 @@
 
 set -o nounset -o pipefail -o errexit
 
-generate_dns_blocklist() {
-  cat \
-    <(curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/${BLOCKED_HOSTS:-fakenews-gambling-porn-social}/hosts") \
-    <(curl --disable --silent --show-error --location --max-time 30 "https://someonewhocares.org/hosts/zero/hosts") |
-    grep --extended-regexp --invert-match '^$' |
-    grep --extended-regexp --invert-match '^\s*#' |
-    grep --extended-regexp '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' |
-    tr -s '[:blank:]' ' ' |
-    tr '[:upper:]' '[:lower:]' |
-    sort --unique |
-    grep --extended-regexp '^0.0.0.0 ' |
-    awk '{print "local-zone: \""$2"\" refuse"}' |
-    sort --unique >"${HOME}/.unbound-blocklist"
-}
-
 install() {
   packages_install unbound
 

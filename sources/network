@@ -36,7 +36,22 @@ dns_flush_cache() {
   fi
 }
 
-dns_allow_website() {
+dns_block() {
+  cat \
+    <(curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/${BLOCKED_HOSTS:-fakenews-gambling-porn-social}/hosts") \
+    <(curl --disable --silent --show-error --location --max-time 30 "https://someonewhocares.org/hosts/zero/hosts") |
+    grep --extended-regexp --invert-match '^$' |
+    grep --extended-regexp --invert-match '^\s*#' |
+    grep --extended-regexp '^(0.0.0.0|127.0.0.1|255.255.255.255|::1|fe00::|ff02::)' |
+    tr -s '[:blank:]' ' ' |
+    tr '[:upper:]' '[:lower:]' |
+    sort --unique |
+    grep --extended-regexp '^0.0.0.0 ' |
+    awk '{print "local-zone: \""$2"\" refuse"}' |
+    sort --unique >"${HOME}/.unbound-blocklist"
+}
+
+dns_allow() {
   declare -A websites
 
   websites["reddit"]="
@@ -50,11 +65,11 @@ dns_allow_website() {
       reddit.map.fastly.net
       redditmedia.com
       styles.redditmedia.com
+      thumbs.redditmedia.com
       v.redd.it
       www.reddit.com
       www.redditmedia.com
       www.redditstatic.com
-      thumbs.redditmedia.com
   "
 
   websites["linkedin"]="
@@ -66,8 +81,8 @@ dns_allow_website() {
   websites["aws"]="analytics.console.aws.a2z.com"
 
   websites["mtv"]="
-    pagead2.googlesyndication.com
     googlesyndication.com
+    pagead2.googlesyndication.com
   "
 
   local WEBSITE
