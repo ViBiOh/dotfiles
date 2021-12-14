@@ -12,25 +12,6 @@ generate_dns_blocklist() {
     tr -s '[:blank:]' ' ' |
     tr '[:upper:]' '[:lower:]' |
     sort --unique |
-    grep --invert-match "0.0.0.0 alb.reddit.com" |
-    grep --invert-match "0.0.0.0 external-preview.redd.it" |
-    grep --invert-match "0.0.0.0 gateway.reddit.com" |
-    grep --invert-match "0.0.0.0 gql.reddit.com" |
-    grep --invert-match "0.0.0.0 linkedin.com" |
-    grep --invert-match "0.0.0.0 media.licdn.com" |
-    grep --invert-match "0.0.0.0 oauth.reddit.com" |
-    grep --invert-match "0.0.0.0 preview.redd.it" |
-    grep --invert-match "0.0.0.0 reddit.com" |
-    grep --invert-match "0.0.0.0 reddit.map.fastly.net" |
-    grep --invert-match "0.0.0.0 redditmedia.com" |
-    grep --invert-match "0.0.0.0 static.licdn.com" |
-    grep --invert-match "0.0.0.0 styles.redditmedia.com" |
-    grep --invert-match "0.0.0.0 v.redd.it" |
-    grep --invert-match "0.0.0.0 www.linkedin.com" |
-    grep --invert-match "0.0.0.0 www.reddit.com" |
-    grep --invert-match "0.0.0.0 www.redditmedia.com" |
-    grep --invert-match "0.0.0.0 www.redditstatic.com" |
-    grep --invert-match "thumbs.redditmedia.com" |
     grep --extended-regexp '^0.0.0.0 ' |
     awk '{print "local-zone: \""$2"\" refuse"}' |
     sort --unique >"${HOME}/.unbound-blocklist"
