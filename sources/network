@@ -10,7 +10,7 @@ open_ports() {
   fi
 }
 
-dns_flush_cache() {
+dns_flush() {
   if command -v unbound-control >/dev/null 2>&1; then
     local UNBOUND_CONF_FOLDER="${BREW_PREFIX:-}/etc/unbound"
     local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
@@ -97,7 +97,7 @@ dns_allow() {
   local GREP_PIPELINE=()
 
   for entry in ${websites[${WEBSITE}]}; do
-    GREP_PIPELINE+=("-e" "\"${entry}\"")
+    GREP_PIPELINE+=("--regexp" "\"${entry}\"")
   done
 
   local UNBOUND_BLOCKLIST
@@ -107,5 +107,5 @@ dns_allow() {
 
   mv "${UNBOUND_BLOCKLIST}" "${HOME}/.unbound-blocklist"
 
-  dns_flush_cache
+  dns_flush
 }

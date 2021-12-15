@@ -8,5 +8,5 @@ fix_spotlight() {
 
 macos_start() {
   fix_spotlight
-  dns_flush_cache
+  dns_flush
 }
