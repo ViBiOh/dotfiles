@@ -3,3 +3,7 @@
 redis() {
   npx redis-commander --redis-host "${1:-localhost}" --redis-port "${2:-6379}" --redis-password "${3:-$(pass show "infra/redis" | head -1)}" --noload --nosave --open
 }
+
+redis-cli() {
+  nc -v "${1:-localhost}" "${2:-6379}"
+}
