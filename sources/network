@@ -85,6 +85,9 @@ dns_allow() {
   websites["mtv"]="
     googlesyndication.com
     pagead2.googlesyndication.com
+    securepubads.g.doubleclick.net
+    g.doubleclick.net
+    doubleclick.net
   "
 
   local WEBSITE
