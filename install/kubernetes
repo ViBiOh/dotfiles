@@ -49,8 +49,8 @@ install() {
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
-  local KUBESEAL_VERSION="v0.17.1"
-  curl_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${OS}-${ARCH}" "kubeseal"
+  local KUBESEAL_VERSION="0.17.1"
+  archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-${OS}-${ARCH}.tar.gz" "kubeseal"
 
   if [[ ${ARCH} == "amd64" ]]; then
     local KAIL_VERSION="0.15.0"
