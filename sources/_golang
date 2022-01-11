@@ -20,30 +20,32 @@ if command -v fzf >/dev/null 2>&1; then
     local MODULE_TO_BUMP
     MODULE_TO_BUMP="$(go list -m -json all | jq -r 'select(.Indirect != true) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
 
-    if [[ -n ${MODULE_TO_BUMP} ]]; then
-      printf "MODULE=%s\n" "${MODULE_TO_BUMP}"
-      local MODULE_VERSION=""
+    if [[ -z ${MODULE_TO_BUMP} ]]; then
+      return
+    fi
 
-      if [[ -z ${2:-} ]] && [[ ${MODULE_TO_BUMP} =~ ^github.com\/([^\/]+)\/([^\/]+)(\/.+)?$ ]] && [[ -n ${GITHUB_TOKEN} ]]; then
-        local REPOSITORY_NAME="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+    printf "MODULE=%s\n" "${MODULE_TO_BUMP}"
+    local MODULE_VERSION=""
 
-        MODULE_VERSION="$(
-          cat \
-            <(printf "latest\n") \
-            <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/branches?per_page=100" | jq -r '.[].name') \
-            <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/tags?per_page=100" | jq -r '.[].name') |
-            fzf --height=20 --ansi --reverse
-        )"
-      else
-        var_read MODULE_VERSION "${2:-latest}"
-      fi
+    if [[ -z ${2:-} ]] && [[ ${MODULE_TO_BUMP} =~ ^github.com\/([^\/]+)\/([^\/]+)(\/.+)?$ ]] && [[ -n ${GITHUB_TOKEN} ]]; then
+      local REPOSITORY_NAME="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
 
-      if [[ -n ${MODULE_VERSION} ]]; then
-        printf "MODULE_VERSION=%s\n" "${MODULE_VERSION}"
-        MODULE_VERSION="@${MODULE_VERSION}"
+      MODULE_VERSION="$(
+        cat \
+          <(printf "latest\n") \
+          <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/branches?per_page=100" | jq -r '.[].name') \
+          <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/tags?per_page=100" | jq -r '.[].name') |
+          fzf --height=20 --ansi --reverse
+      )"
+    else
+      var_read MODULE_VERSION "${2:-latest}"
+    fi
 
-        var_print_and_run "go get -d '${MODULE_TO_BUMP}${MODULE_VERSION}'"
-      fi
+    if [[ -n ${MODULE_VERSION} ]]; then
+      printf "MODULE_VERSION=%s\n" "${MODULE_VERSION}"
+      MODULE_VERSION="@${MODULE_VERSION}"
+
+      var_print_and_run "go get -d '${MODULE_TO_BUMP}${MODULE_VERSION}'"
     fi
   }
 fi
@@ -66,4 +68,21 @@ go_mod_loop() {
       fi
     fi
   done
+}
+
+go_mod_local() {
+  local MODULE_TO_LOCAL
+  MODULE_TO_LOCAL="$(go list -m -json all | jq -r 'select(.Indirect != true) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
+
+  if [[ -z ${MODULE_TO_LOCAL} ]]; then
+    return
+  fi
+
+  if [[ $(go list -m -json "${MODULE_TO_LOCAL}" | jq -r 'select(.Replace != null) | .Path' | wc -l) -gt 0 ]]; then
+    printf "Module %s was already replaced, removing it..." "${MODULE_TO_LOCAL}"
+    go mod edit -dropreplace="${MODULE_TO_LOCAL}"
+    return
+  fi
+
+  go mod edit -replace="${MODULE_TO_LOCAL}=../$(basename "${MODULE_TO_LOCAL}")"
 }
