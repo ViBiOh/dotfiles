@@ -20,7 +20,7 @@ install() {
   chroot: ''
 
   interface: 127.0.0.1
-  port: 53
+  port: ${UNBOUND_PORT:-53}
 
   access-control: 0.0.0.0/0 refuse
   access-control: 127.0.0.0/8 allow
@@ -77,7 +77,7 @@ forward-zone:
   sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload || true
   sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop || true
 
-  printf "Waiting 1 second before starting again...\n"
+  printf "Waiting 1 second before starting unbound...\n"
   sleep 1
 
   sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
