@@ -90,22 +90,6 @@ forward-zone:
   fi
 
   if command -v systemctl >/dev/null 2>&1; then
-    echo "[Unit]
-Description=unbound
-After=network-online.target
-
-[Service]
-User=root
-
-Type=simple
-Restart=always
-RestartSec=60s
-
-ExecStart=unbound-control -c '${UNBOUND_CONF_FILE}' -q start
-
-[Install]
-WantedBy=multi-user.target" >"/etc/systemd/system/unbound.service"
-    sudo systemctl daemon-reload
     sudo systemctl enable "unbound.service"
     sudo systemctl restart "unbound.service"
   fi
