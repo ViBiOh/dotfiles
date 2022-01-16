@@ -36,6 +36,8 @@ install() {
   harden-dnssec-stripped: yes
   use-caps-for-id: yes
 
+  edns-buffer-size: 1232
+
   cache-min-ttl: 3600
   cache-max-ttl: 86400
 
