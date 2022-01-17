@@ -53,8 +53,13 @@ fi
 go_mod_loop() {
   declare -A MODULES
 
-  for module in $(go mod graph | grep -i " $(go list -m)@"); do
-    if [[ ${module} =~ (.*)@.* ]]; then
+  local CURRENT_MODULE
+  CURRENT_MODULE="$(go list -m)"
+
+  MODULES[${CURRENT_MODULE}]="true"
+
+  for module in $(go mod graph | grep -i " ${CURRENT_MODULE}@"); do
+    if [[ ${module} =~ ^(.*)@.* ]]; then
       if [[ -z ${MODULES[${BASH_REMATCH[1]}]} ]]; then
         local NEED_MODULE="${BASH_REMATCH[1]}"
         MODULES[${NEED_MODULE}]="true"
