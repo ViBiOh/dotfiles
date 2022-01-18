@@ -54,7 +54,6 @@ install() {
   if command -v go >/dev/null 2>&1; then
     if [[ ${ARCH} == "amd64" ]]; then
       go install "github.com/go-delve/delve/cmd/dlv@latest"
-      go install "github.com/aarzilli/gdlv@latest"
     fi
 
     go install "github.com/golang/mock/mockgen@latest"
