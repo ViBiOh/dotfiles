@@ -4,11 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   local DOTFILES_HOSTNAME
-  if command -v hostname >/dev/null 2>&1; then
-    DOTFILES_HOSTNAME="$(hostname)"
-  else
-    DOTFILES_HOSTNAME="$(cat "/etc/hostname")"
-  fi
+  DOTFILES_HOSTNAME="$(hostname)"
 
   printf '127.0.0.1 local
 127.0.0.1 localhost
