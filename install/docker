@@ -3,11 +3,12 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  if ! command -v docker >/dev/null 2>&1; then
-    return
+  packages_install "docker"
+  if command -v brew >/dev/null 2>&1; then
+    brew unlink "docker" && brew link "docker"
   fi
 
-  local CTOP_VERSION="0.7.6"
-
-  curl_to_binary "https://github.com/bcicen/ctop/releases/download/${CTOP_VERSION}/ctop-${CTOP_VERSION}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64")" "ctop"
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    packages_install_desktop "colima"
+  fi
 }
