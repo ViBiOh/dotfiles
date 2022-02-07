@@ -3,12 +3,8 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  packages_install "docker"
-  if command -v brew >/dev/null 2>&1; then
-    brew unlink "docker" && brew link "docker"
-  fi
-
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    packages_install_desktop "colima"
+    packages_install "docker" "colima"
+    brew unlink "docker" && brew link "docker"
   fi
 }
