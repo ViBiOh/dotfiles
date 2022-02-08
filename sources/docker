@@ -1,26 +1,15 @@
 #!/usr/bin/env bash
 
+if command -v colima >/dev/null 2>&1; then
+  docker_start() {
+    colima start --runtime containerd
+  }
+fi
+
 if command -v docker >/dev/null 2>&1; then
   export DOCKER_CONTENT_TRUST="1"
-  export DOCKER_CLI_EXPERIMENTAL="enabled"
 
   docker_clean() {
-    local DOCKER_ROOT_DIR
-    DOCKER_ROOT_DIR="$(docker info --format '{{ .DockerRootDir }}')"
-
-    if [[ -z ${DOCKER_ROOT_DIR:-} ]]; then
-      var_warning 'docker seems not available, no `docker info` output'
-    fi
-
-    if [[ ! -d ${DOCKER_ROOT_DIR} ]]; then
-      DOCKER_ROOT_DIR="/"
-    fi
-
-    local GIGABYTES_BLOCK_SIZE="$((1024 * 1024 * 1024))"
-
-    local AVAILABLE_BEFORE
-    AVAILABLE_BEFORE="$(sync && BLOCKSIZE="${GIGABYTES_BLOCK_SIZE}" df -- "${DOCKER_ROOT_DIR}" | tail -1 | awk '{printf("%s", $4)}')"
-
     docker system prune -a --volumes -f
 
     docker images --quiet | xargs docker rmi --force
@@ -33,11 +22,5 @@ if command -v docker >/dev/null 2>&1; then
     if command -v colima >/dev/null 2>&1; then
       colima delete --force
     fi
-
-    local AVAILABLE_AFTER
-    AVAILABLE_AFTER="$(sync && BLOCKSIZE="${GIGABYTES_BLOCK_SIZE}" df -- "${DOCKER_ROOT_DIR}" | tail -1 | awk '{printf("%s", $4)}')"
-
-    local AVAILABLE_RECLAIMED="$((AVAILABLE_AFTER - AVAILABLE_BEFORE))"
-    var_info "Total reclaimed space: ${AVAILABLE_RECLAIMED}GB"
   }
 fi
