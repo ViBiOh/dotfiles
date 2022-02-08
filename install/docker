@@ -6,5 +6,8 @@ install() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install "docker" "colima"
     brew unlink "docker" && brew link "docker"
+
+    local DOCKER_COMPOSE_VERSION="2.2.3"
+    curl_to_binary "https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-$(normalized_os)-$(normalized_arch)" "docker-compose"
   fi
 }
