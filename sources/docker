@@ -1,26 +1,13 @@
 #!/usr/bin/env bash
 
-if command -v colima >/dev/null 2>&1; then
-  docker_start() {
-    colima start --runtime containerd
-  }
-fi
-
 if command -v docker >/dev/null 2>&1; then
   export DOCKER_CONTENT_TRUST="1"
 
   docker_clean() {
     docker system prune -a --volumes -f
-
     docker images --quiet | xargs docker rmi --force
     docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi --force
     docker network ls --quiet | xargs docker network rm
     docker volume ls --quiet | xargs docker volume rm
-
-    sudo rm -rf "${HOME}/.docker"
-
-    if command -v colima >/dev/null 2>&1; then
-      colima delete --force
-    fi
   }
 fi
