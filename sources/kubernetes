@@ -71,6 +71,22 @@ if command -v kubectl >/dev/null 2>&1; then
         fi
         ;;
 
+      "env")
+        IFS='/' read -r -a parts <<<"$(_kube_resources "deployments.apps" "${1:- }")"
+
+        if [[ -n ${parts[1]:-} ]]; then
+          local KUBE_CONTAINER
+          KUBE_CONTAINER="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=json | jq -r '.spec.template.spec.containers[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}")"
+
+          local ENV_FROMS
+          ENV_FROMS="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=json | jq -r '.spec.template.spec.containers[] | select(.name == '\""${KUBE_CONTAINER}"\"') | if has("envFrom") then (.envFrom[] | to_entries | .[] | (.key | rtrimstr("Ref")) + "/" + .value.name) else "" end')"
+          for envFrom in ${ENV_FROMS}; do
+            IFS='/' read -r -a envConfig <<<"$(printf "%s" "${envFrom}")"
+            kubectl get "${envConfig[0]}" --namespace="${parts[1]}" "${envConfig[1]}" --output=json | jq -r '.data | to_entries | .[] | .key + "=\"" + (.value | gsub("[\\n]"; "\\n")) + "\""'
+          done
+        fi
+        ;;
+
       "forward")
         IFS='/' read -r -a parts <<<"$(_kube_resources "services" "${1:- }")"
 
@@ -169,23 +185,24 @@ if command -v kubectl >/dev/null 2>&1; then
 
       *)
         printf "%bUsage: kube ACTION%b\n" "${RED}" "${RESET}" 1>&2
-        printf "%b\nPossibles actions are                       | args\n%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - context | Switch context                 | <context name>%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - desc    | Describe an object             | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - forward | Port-forward to a service      | <service name> <service port number>? <exposed port number>? (default 4000)%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - image   | Print image name               | <deployment name>%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - info    | Print yaml output of an object | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - logs    | Tail logs                      | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - ns      | Change default namespace       | <namespace name>%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - restart | Perform a rollout restart      | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - watch   | Watch pods of all namespaces   | <any additionnals 'kubectl get pods' args...>%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b\nPossibles actions are                            | args\n%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - context | Switch context                      | <context name>%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - desc    | Describe an object                  | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - env     | Generate .env file from deployments | <deployment name> <container name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - forward | Port-forward to a service           | <service name> <service port number>? <exposed port number>? (default 4000)%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - image   | Print image name                    | <deployment name>%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - info    | Print yaml output of an object      | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - logs    | Tail logs                           | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - ns      | Change default namespace            | <namespace name>%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - restart | Perform a rollout restart           | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+        printf "%b - watch   | Watch pods of all namespaces        | <any additionnals 'kubectl get pods' args...>%b\n" "${BLUE}" "${RESET}" 1>&2
         ;;
       esac
     }
 
     _fzf_complete_kube() {
       if [[ ${COMP_CWORD} -eq 1 ]]; then
-        mapfile -t COMPREPLY < <(compgen -W "context desc forward image info logs ns restart watch" -- "${COMP_WORDS[COMP_CWORD]}")
+        mapfile -t COMPREPLY < <(compgen -W "context desc env forward image info logs ns restart watch" -- "${COMP_WORDS[COMP_CWORD]}")
         return
       fi
 
@@ -199,6 +216,12 @@ if command -v kubectl >/dev/null 2>&1; then
       "forward")
         FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
           kubectl get services --all-namespaces --output=json | jq -r '.items[].metadata.name'
+        )
+        ;;
+
+      "env")
+        FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
+          kubectl get deployments.apps --all-namespaces --output=json | jq -r '.items[].metadata.name'
         )
         ;;
 
