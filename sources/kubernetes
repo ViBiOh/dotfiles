@@ -82,8 +82,19 @@ if command -v kubectl >/dev/null 2>&1; then
           ENV_FROMS="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=json | jq -r '.spec.template.spec.containers[] | select(.name == '\""${KUBE_CONTAINER}"\"') | if has("envFrom") then (.envFrom[] | to_entries | .[] | (.key | rtrimstr("Ref")) + "/" + .value.name) else "" end')"
           for envFrom in ${ENV_FROMS}; do
             IFS='/' read -r -a envConfig <<<"$(printf "%s" "${envFrom}")"
-            kubectl get "${envConfig[0]}" --namespace="${parts[1]}" "${envConfig[1]}" --output=json | jq -r '.data | to_entries | .[] | .key + "=\"" + (.value | gsub("[\\n]"; "\\n")) + "\""'
+            local JQ_QUERY='.data | to_entries | .[] | .key + "=\"" + (.value | gsub("[\\n]"; "\\n")) + "\""'
+            if [[ ${envConfig[0]} == "secret" ]]; then
+              local JQ_QUERY='.data | to_entries | .[] | .key + "=\"" + (.value | @base64d | gsub("[\\n]"; "\\n")) + "\""'
+            fi
+
+            kubectl get "${envConfig[0]}" --namespace="${parts[1]}" "${envConfig[1]}" --output=json | jq -r "${JQ_QUERY}"
           done
+
+          local ENV_VAR
+          ENV_VAR="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=json | jq -r '.spec.template.spec.containers[] | select(.name == '\""${KUBE_CONTAINER}"\"') | if has("env") then (.env[] | if (.value | type == "string") then (.name + "=\"" + (.value | gsub("[\\n]"; "\\n")) + "\"") else "" end) else "" end')"
+          if [[ -n ${ENV_VAR} ]]; then
+            printf "%s" "${ENV_VAR}"
+          fi
         fi
         ;;
 
