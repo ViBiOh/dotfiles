@@ -34,10 +34,11 @@ install() {
   hide-version: yes
   harden-glue: yes
   harden-dnssec-stripped: yes
-  use-caps-for-id: yes
+  use-caps-for-id: no
 
   edns-buffer-size: 1232
 
+  prefetch: yes
   cache-min-ttl: 3600
   cache-max-ttl: 86400
 
@@ -61,7 +62,7 @@ remote-control:
 ${UNBOUND_EXTRA_DNS_CONF:-}
 
 forward-zone:
-  name: .
+  name: \".\"
   forward-addr: 2606:4700:4700::1111@853#cloudflare-dns.com
   forward-addr: 1.1.1.1@853#cloudflare-dns.com
   forward-addr: 2606:4700:4700::1001@853#cloudflare-dns.com
