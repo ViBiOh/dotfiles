@@ -17,7 +17,7 @@ install() {
   echo "server:
   verbosity: 1
   username: root
-  chroot: ''
+  chroot: \"\"
 
   interface: 127.0.0.1
   port: ${UNBOUND_PORT:-53}
