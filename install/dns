@@ -58,9 +58,7 @@ remote-control:
   server-cert-file: \"${UNBOUND_CONF_FOLDER}/unbound_server.pem\"
   control-key-file: \"${UNBOUND_CONF_FOLDER}/unbound_control.key\"
   control-cert-file: \"${UNBOUND_CONF_FOLDER}/unbound_control.pem\"
-
 ${UNBOUND_EXTRA_DNS_CONF:-}
-
 forward-zone:
   name: \".\"
   forward-addr: 2606:4700:4700::1111@853#cloudflare-dns.com
