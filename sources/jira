@@ -4,6 +4,11 @@ if [[ -z ${JIRA_URL:-} ]]; then
   return
 fi
 
+# Declare configuration in the form of an associative array
+#
+# declare -g -A JIRAS_URL
+# JIRAS_URL["https://my.atlassian.net"]="my/jira"
+
 jira() {
   local scope="self"
 
