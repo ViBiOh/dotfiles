@@ -72,7 +72,7 @@ jira() {
 
   "transition")
     local JIRA_TRANSITIONS
-    JIRA_TRANSITIONS="$(_jira_request --get "${JIRA_URL}/rest/api/2/issue/${JIRA_TICKET}/transitions")"
+    JIRA_TRANSITIONS="$(_jira_request "/rest/api/2/issue/${JIRA_TICKET}/transitions" --get)"
 
     if [[ -z ${JIRA_TRANSITIONS} ]]; then
       return
@@ -89,7 +89,7 @@ jira() {
       return
     fi
 
-    _jira_request --request "POST" "${JIRA_URL}/rest/api/2/issue/${JIRA_TICKET}/transitions" --header "Content-Type: application/json" --data "$(jq -n -c --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
+    _jira_request "/rest/api/2/issue/${JIRA_TICKET}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq -n -c --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
     printf "%s transitionned to status %s\n" "${JIRA_TICKET}" "${JIRA_TRANSITION}"
 
     ;;
@@ -118,12 +118,26 @@ _jira_help() {
 }
 
 _jira_auth() {
-  printf "Basic %s" "$(pass show "${JIRA_CREDENTIALS}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)"
+  printf "Basic %s" "$(pass show "${1:-}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)"
 }
 
 _jira_request() {
+  if [[ ${#} -lt 1 ]]; then
+    var_red "Usage: _jira_request PATH [EXTRA_CURL_ARGS]"
+    return 1
+  fi
+
   local HEADER_OUPUT
   HEADER_OUPUT=$(mktemp -t jira_ticket)
+
+  JIRA_DOMAIN="$(printf "%s\n" "${!JIRAS_URL[@]}" | fzf --height=20 --ansi --reverse --select-1)"
+
+  local JIRA_CREDENTIALS
+  JIRA_CREDENTIALS="${JIRAS_URL["${JIRA_DOMAIN}"]}"
+
+  local URL
+  URL="${JIRA_DOMAIN}${1:-}"
+  shift 1
 
   local JIRA_OUTPUT
   JIRA_OUTPUT="$(
@@ -136,7 +150,8 @@ _jira_request() {
       --dump-header "${HEADER_OUPUT}" \
       --fail-with-body \
       --header "Accept: application/json" \
-      --header "Authorization: $(_jira_auth)" \
+      --header "Authorization: $(_jira_auth "${JIRA_CREDENTIALS}")" \
+      "${URL}" \
       "${@}"
   )"
 
@@ -158,7 +173,7 @@ _jira_ticket() {
   JIRA_JQL+=" ORDER BY updated DESC"
 
   local JIRA_OUTPUT
-  JIRA_OUTPUT="$(_jira_request --get --data-urlencode "jql=${JIRA_JQL}" "${JIRA_URL}/rest/api/2/search")"
+  JIRA_OUTPUT="$(_jira_request "/rest/api/2/search" --get --data-urlencode "jql=${JIRA_JQL}")"
 
   if [[ -n ${JIRA_OUTPUT} ]]; then
     printf "%s" "${JIRA_OUTPUT}" | jq -r '.issues[] | .key + " " + .fields.summary'
