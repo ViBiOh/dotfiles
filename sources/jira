@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 
-if [[ ${#JIRAS_URL[@]} -eq 0 ]]; then
-  return
-fi
-
 # Declare configuration in the form of an associative array
 #
 # declare -g -A JIRAS_URL
 # JIRAS_URL["https://my.atlassian.net"]="my/jira"
 
 jira() {
+  if [[ ${#JIRAS_URL[@]} -eq 0 ]]; then
+    printf "%bNo JIRA configuration defined%b\n" "${YELLOW}" "${RESET}"
+    return
+  fi
+
   local scope="self"
 
   while getopts ":a" option; do
@@ -128,7 +129,7 @@ _jira_auth() {
 
 _jira_request() {
   if [[ ${#} -lt 1 ]]; then
-    var_red "Usage: _jira_request PATH [EXTRA_CURL_ARGS]"
+    printf "%bUsage: _jira_request PATH [EXTRA_CURL_ARGS]%b\n" "${RED}" "${RESET}"
     return 1
   fi
 
