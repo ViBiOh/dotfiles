@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ -z ${JIRA_URL:-} ]]; then
+if [[ -z ${JIRAS_URL:-} ]]; then
   return
 fi
 
