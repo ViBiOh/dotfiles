@@ -39,6 +39,9 @@ jira() {
     return
   fi
 
+  local JIRA_DOMAIN
+  JIRA_DOMAIN="$(printf "%s\n" "${!JIRAS_URL[@]}" | fzf --height=20 --ansi --reverse --select-1)"
+
   local JIRA_TICKET
   JIRA_TICKET="$(
     _jira_ticket "${scope}" |
@@ -52,7 +55,7 @@ jira() {
 
   case ${ACTION} in
   "browse")
-    open "${JIRA_URL}/browse/${JIRA_TICKET}"
+    open "${JIRA_DOMAIN}/browse/${JIRA_TICKET}"
     ;;
 
   "branch")
@@ -135,8 +138,6 @@ _jira_request() {
 
   local HEADER_OUPUT
   HEADER_OUPUT=$(mktemp -t jira_ticket)
-
-  JIRA_DOMAIN="$(printf "%s\n" "${!JIRAS_URL[@]}" | fzf --height=20 --ansi --reverse --select-1)"
 
   local JIRA_CREDENTIALS
   JIRA_CREDENTIALS="${JIRAS_URL["${JIRA_DOMAIN}"]}"
