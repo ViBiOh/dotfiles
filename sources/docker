@@ -10,7 +10,7 @@ if command -v docker >/dev/null 2>&1; then
   export DOCKER_CONTENT_TRUST="1"
 
   docker_clean() {
-    docker system prune -a --volumes -f
+    docker ps --all --quiet | xargs docker rm --force --volumes
     docker images --quiet | xargs docker rmi --force
     docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi --force
     docker network ls --quiet | xargs docker network rm
