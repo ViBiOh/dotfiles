@@ -54,7 +54,7 @@ symlink_settings() {
 }
 
 install_shfmt() {
-  local SHFMT_VERSION="3.4.2"
+  local SHFMT_VERSION="3.4.3"
 
   curl_to_binary "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_$(normalized_os)_$(normalized_arch "amd64")" "shfmt"
 }
