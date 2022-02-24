@@ -23,7 +23,7 @@ random() {
 
 loop() {
   if [[ ${#} -lt 1 ]]; then
-    var_red "Usage: loop command interval?(default 60s)"
+    var_red "Usage: 'loop command' [interval?(default 60s)]"
     return 1
   fi
 
@@ -62,6 +62,35 @@ rainbow() {
 
 aziz() {
   curl --disable --silent --show-error --location --max-time 30 --request POST "http://${HUE_API}/api/groups/1" --data state=on --data method=PATCH >/dev/null
+}
+
+emergency() {
+  var_confirm "Erase all data"
+
+  stop_ssh_agent
+  gpg_agent_stop
+
+  sudo --reset-timestamp networksetup -setdnsservers "Wi-Fi" Empty
+  sudo networksetup -setsearchdomains "Wi-Fi" Empty
+  sudo networksetup -setdnsservers "USB 10/100/1000 LAN" Empty
+  sudo networksetup -setsearchdomains "USB 10/100/1000 LAN" Empty
+
+  sudo rm -rf \
+    "${HOME}/.ssh" \
+    "${HOME}/.gnupg" \
+    "${HOME}/.kube" \
+    "${HOME}/.mc" \
+    "${HOME}/.localrc" \
+    "${HOME}/.pgpass" \
+    "${HOME}/.ansible-vault-pass" \
+    "${HOME}/.terraformrc" \
+    "${HOME}/.bash_history" \
+    "${HOME}/.bash_profile" \
+    "${PASSWORD_STORE_DIR:-${HOME}/.password-store}" \
+    "${HOME}/code" \
+    "${HOME}/opt" \
+    "${HOME}/workspace" \
+    "${HOME}/Documents"
 }
 
 if command -v vegeta >/dev/null 2>&1; then
