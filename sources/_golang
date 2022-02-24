@@ -89,5 +89,7 @@ go_mod_local() {
     return
   fi
 
-  go mod edit -replace="${MODULE_TO_LOCAL}=../$(basename "${MODULE_TO_LOCAL}")"
+  if [[ ${MODULE_TO_LOCAL} =~ (.*)(/v[0-9]+)? ]]; then
+    go mod edit -replace="${MODULE_TO_LOCAL}=../$(basename "${BASH_REMATCH[1]}")"
+  fi
 }
