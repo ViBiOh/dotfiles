@@ -47,9 +47,9 @@ if command -v kubectl >/dev/null 2>&1; then
         CONTEXT="$(kubectl config get-contexts -o name | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
 
         if [[ -n ${CONTEXT:-} ]]; then
-          KUBECONFIG=$(mktemp -t kubeconfig)
-          export KUBECONFIG="${KUBECONFIG}"
+          KUBECONFIG=$(mktemp)
           cat "${HOME}/.kube/config" >>"${KUBECONFIG}"
+          export KUBECONFIG="${KUBECONFIG}"
           _kube_print_and_run "kubectl config use-context ${CONTEXT}"
 
           if [[ -n ${TMUX:-} ]]; then
