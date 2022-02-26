@@ -5,7 +5,7 @@ backup() {
 }
 
 upload() {
-  mc mv "${1:-$(basename "$(pwd)")}.tar.gz.gpg" "scw/fibr/"
+  MC_UPLOAD_MULTIPART_SIZE=104857600 mc mv "${1:-$(basename "$(pwd)")}.tar.gz.gpg" "scw/fibr/"
 }
 
 backup_dir() {
