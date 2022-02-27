@@ -130,13 +130,12 @@ if command -v kubectl >/dev/null 2>&1; then
             local EXTRA_ARGS+=" --namespace=${parts[1]}"
           fi
 
-          local OUTPUT="--output=yaml"
+          local QUERY="."
           if [[ ${parts[0]} =~ secrets? ]]; then
-            OUTPUT="--output=json | jq '.data[] |= @base64d'"
+            QUERY=".data[] |= @base64d"
           fi
-          OUTPUT="${OUTPUT} | yq eval --prettyPrint '.' -"
 
-          _kube_print_and_run "kubectl get ${parts[0]}${EXTRA_ARGS} ${parts[2]} ${OUTPUT}"
+          _kube_print_and_run "kubectl get ${parts[0]}${EXTRA_ARGS} ${parts[2]} --output=yaml | yq eval --prettyPrint '${QUERY}'"
         fi
         ;;
 
