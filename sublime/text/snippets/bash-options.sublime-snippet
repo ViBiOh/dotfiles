@@ -2,6 +2,7 @@
 	<content><![CDATA[
 local ${1:VarName}
 
+OPTIND=0
 while getopts ":${2:OptName}:" option; do
   case "\${option}" in
   ${2:OptName})

@@ -95,6 +95,7 @@ main() {
   local RUN_INSTALL=0
   local RUN_PASSWORDS=0
 
+  OPTIND=0
   while getopts ":l:achips" option; do
     case "${option}" in
     a)
