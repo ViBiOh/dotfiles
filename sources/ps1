@@ -25,29 +25,7 @@ if [[ "$(type -t __kube_ps1)" == "function" ]]; then
   PS1+="${BLUE}\$(__kube_ps1)${RESET}"
 fi
 
-PS1+=' $(_previous_status)'
+PS1+=" \$(printf '⏰ %(%H:%M:%S)T')"
+PS1+=" \$(_previous_status)\n> "
 
-ps1_start_date() {
-  export PS1_START_SECOND
-  PS1_START_SECOND="$(printf '%(%s)T')"
-}
-
-ps1_duration() {
-  local PS1_END_SECOND
-  PS1_END_SECOND="$(printf '%(%s)T')"
-
-  local PS1_DURATION_SECOND
-  PS1_DURATION_SECOND="$((PS1_END_SECOND - PS1_START_SECOND))"
-
-  if [[ ${PS1_DURATION_SECOND} -eq 0 ]]; then
-    return
-  fi
-
-  printf " ⏳%ds" "${PS1_DURATION_SECOND}"
-}
-
-trap "ps1_start_date" DEBUG
-PS1+='$(ps1_duration)'
-
-PS1+="\n> "
 export PS1
