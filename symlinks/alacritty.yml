@@ -5,6 +5,7 @@ colors:
 
 window:
   startup_mode: Maximized
+  decorations: none
 
 font:
   size: 12.0
