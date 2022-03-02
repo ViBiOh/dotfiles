@@ -37,6 +37,13 @@ meteo() {
   curl --disable --silent --show-error --location --max-time 30 -4 "wttr.in/${1:-Paris}?m&format=v2"
 }
 
+date_in() {
+  local TZ
+  TZ="$(rg --files /usr/share/zoneinfo/ | sed 's|/usr/share/zoneinfo/||' | fzf --height=20 --ansi --reverse --select-1 --query="${*:-New_York}")"
+
+  printf "%b%s%b %b%s%b\n" "${BLUE}" "${TZ}" "${RESET}" "${YELLOW}" "$(TZ=${TZ} date '+%Y-%m-%d %H:%M:%S')" "${RESET}"
+}
+
 if [[ ${OSTYPE} =~ ^darwin ]]; then
   temperature() {
     sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep "temperature"
