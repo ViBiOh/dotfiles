@@ -74,23 +74,32 @@ aziz() {
 emergency() {
   var_confirm "Erase all data"
 
-  stop_ssh_agent
-  gpg_agent_stop
-
   sudo --reset-timestamp networksetup -setdnsservers "Wi-Fi" Empty
   sudo networksetup -setsearchdomains "Wi-Fi" Empty
   sudo networksetup -setdnsservers "USB 10/100/1000 LAN" Empty
   sudo networksetup -setsearchdomains "USB 10/100/1000 LAN" Empty
 
+  _emergency_script_dir() {
+    local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+    if [[ -L ${FILE_SOURCE} ]]; then
+      dirname "$(readlink "${FILE_SOURCE}")"
+    else
+      (
+        cd "$(dirname "${FILE_SOURCE}")" && pwd
+      )
+    fi
+  }
+
+  "$(_emergency_script_dir)/../init" -c
+
+  stop_ssh_agent
+  gpg_agent_stop
+
   sudo rm -rf \
     "${HOME}/.ssh" \
     "${HOME}/.gnupg" \
-    "${HOME}/.kube" \
-    "${HOME}/.mc" \
     "${HOME}/.localrc" \
-    "${HOME}/.pgpass" \
-    "${HOME}/.ansible-vault-pass" \
-    "${HOME}/.terraformrc" \
     "${HOME}/.bash_history" \
     "${HOME}/.bash_profile" \
     "${PASSWORD_STORE_DIR:-${HOME}/.password-store}" \
