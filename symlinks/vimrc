@@ -76,10 +76,6 @@ if has(':signcolumn')
   set signcolumn=number
 endif
 
-" Clear highlight when pressing escape
-nnoremap <esc> :nohlsearch<return><esc>
-nnoremap <esc>^[ <esc>^[
-
 " Keep search matches in the middle of the window.
 nnoremap n nzzzv
 nnoremap N Nzzzv
