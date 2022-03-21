@@ -44,6 +44,14 @@ date_in() {
   printf "%b%s%b %b%s%b\n" "${BLUE}" "${TZ}" "${RESET}" "${YELLOW}" "$(TZ=${TZ} date '+%Y-%m-%d %H:%M:%S')" "${RESET}"
 }
 
+_fzf_complete_date_in() {
+  FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
+    rg --files /usr/share/zoneinfo/ | sed 's|/usr/share/zoneinfo/||'
+  )
+}
+
+[[ -n ${BASH} ]] && complete -F _fzf_complete_date_in -o default -o bashdefault date_in
+
 if [[ ${OSTYPE} =~ ^darwin ]]; then
   temperature() {
     sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep "temperature"
