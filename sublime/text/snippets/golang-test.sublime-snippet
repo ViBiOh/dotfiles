@@ -5,13 +5,11 @@ func Test${2:FuncName}(t *testing.T) {
 		content string
 	}
 
-	cases := []struct {
-		intention string
+	cases := map[string]struct {
 		args      args
 		want      bool
 	}{
-		{
-			"simple",
+		"simple": {
 			args{
 				content: "test",
 			},
@@ -19,8 +17,8 @@ func Test${2:FuncName}(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			if got := ${2:FuncName}(tc.args.content); got != tc.want {
 				t.Errorf("${2:FuncName}() = %t, want %t", got, tc.want)
 			}

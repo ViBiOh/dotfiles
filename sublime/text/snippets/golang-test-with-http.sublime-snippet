@@ -1,15 +1,13 @@
 <snippet>
 	<content><![CDATA[
 func Test${1:FuncName}(t *testing.T) {
-	cases := []struct {
-		intention string
+	cases := map[string]struct {
 		request    *http.Request
 		want       string
 		wantStatus int
 		wantHeader http.Header
 	}{
-		{
-			"simple",
+		"simple": {
 			httptest.NewRequest(http.MethodGet, "/", nil),
 			"",
 			http.StatusOK,
@@ -17,8 +15,8 @@ func Test${1:FuncName}(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			writer := httptest.NewRecorder()
 			${1:FuncName}(writer, tc.request)
 

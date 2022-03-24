@@ -5,14 +5,12 @@ func Test${1:FuncName}(t *testing.T) {
 		content string
 	}
 
-	cases := []struct {
-		intention string
+	cases := map[string]struct {
 		args      args
 		want      bool
 		wantErr   error
 	}{
-		{
-			"simple",
+		"simple": {
 			args{
 				content: "test",
 			},
@@ -21,8 +19,8 @@ func Test${1:FuncName}(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.intention, func(t *testing.T) {
+	for intention, tc := range cases {
+		t.Run(intention, func(t *testing.T) {
 			got, gotErr := ${1:FuncName}(tc.args.content)
 
 			failed := false
