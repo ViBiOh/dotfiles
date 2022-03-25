@@ -88,8 +88,11 @@ forward-zone:
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
     sudo networksetup -setsearchdomains "Wi-Fi" local
-    sudo networksetup -setdnsservers "USB 10/100/1000 LAN" 127.0.0.1
-    sudo networksetup -setsearchdomains "USB 10/100/1000 LAN" local
+
+    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i 'USB 10/100/1000 LAN') -gt 0 ]]; then
+      sudo networksetup -setdnsservers "USB 10/100/1000 LAN" 127.0.0.1
+      sudo networksetup -setsearchdomains "USB 10/100/1000 LAN" local
+    fi
   fi
 
   if command -v systemctl >/dev/null 2>&1; then
