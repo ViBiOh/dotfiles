@@ -132,6 +132,10 @@ install() {
     defaults write com.apple.screencapture location -string "${HOME}/Downloads"
     defaults write com.apple.screencapture type -string "png"
 
+    defaults write com.apple.touchbar.agent PresentationModeGlobal "functionKeys"
+    defaults write "Apple Global Domain" AppleInterfaceStyle "Dark"
+    defaults write com.apple.menuextra.clock IsAnalo -int 1
+
     sudo systemsetup -setrestartfreeze on
     sudo systemsetup -setwakeonnetworkaccess off
     sudo systemsetup -f -setremotelogin off
