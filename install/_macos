@@ -106,6 +106,7 @@ install() {
     defaults write com.apple.dock wvous-tr-corner -int 1
     defaults write com.apple.dock wvous-bl-corner -int 1
     defaults write com.apple.dock wvous-br-corner -int 1
+    defaults write com.apple.dock "show-recents" -int 0
     killall Dock
 
     defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
