@@ -17,6 +17,14 @@ if command -v mc >/dev/null 2>&1; then
   complete -C mc mc
 fi
 
+cipher() {
+  gpg --symmetric --cipher-algo AES256 "${@}" | base64
+}
+
+decipher() {
+  base64 -D | gpg --decrypt "${@}"
+}
+
 random() {
   openssl rand -hex "${1:-30}"
 }
