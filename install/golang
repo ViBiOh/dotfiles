@@ -64,6 +64,7 @@ install() {
     go install "golang.org/x/tools/cmd/goimports@latest"
     go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@latest"
     go install "mvdan.cc/gofumpt@latest"
+    go install "github.com/ViBiOh/registry-cleaner@latest"
   fi
 
   local GOLANGCI_LINT_VERSION="1.45.2"
