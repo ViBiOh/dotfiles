@@ -16,4 +16,15 @@ if command -v docker >/dev/null 2>&1; then
     docker network ls --quiet | xargs docker network rm
     docker volume ls --quiet | xargs docker volume rm
   }
+
+  sidecars() {
+    docker rm --force --volumes "rabbit"
+    docker run --detach --name "rabbit" --publish "127.0.0.1:5672:5672" --publish "127.0.0.1:15672:15672" "rabbitmq:management"
+
+    docker rm --force --volumes "redis"
+    docker run --detach --name "redis" --publish "127.0.0.1:6379:6379" "redis"
+
+    docker rm --force --volumes "postgres"
+    docker run --detach --name "postgres" --publish "127.0.0.1:5432:5432" --env "POSTGRES_PASSWORD=postgres" "postgres"
+  }
 fi
