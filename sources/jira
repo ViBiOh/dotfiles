@@ -64,7 +64,13 @@ jira() {
       printf "%bnot in a git directory%b\n" "${RED}" "${RESET}" 1>&2
     fi
 
-    local JIRA_BRANCH_NAME=""feat-${JIRA_TICKET}""
+    local JIRA_BRANCH_NAME="${JIRA_TICKET}"
+
+    local BRANCH_PREFIX
+    read -r -p "BRANCH_PREFIX=" BRANCH_PREFIX
+    if [[ -n ${BRANCH_SUFFIX} ]]; then
+      JIRA_BRANCH_NAME="${BRANCH_PREFIX}${JIRA_BRANCH_NAME}"
+    fi
 
     local BRANCH_SUFFIX
     read -r -p "BRANCH_SUFFIX=" BRANCH_SUFFIX
