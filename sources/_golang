@@ -54,7 +54,7 @@ go_mod_loop() {
   declare -A MODULES
 
   local CURRENT_MODULE
-  CURRENT_MODULE="$(go list -m)"
+  CURRENT_MODULE="$(go mod edit -json | jq -r '.Module.Path')"
 
   MODULES[${CURRENT_MODULE}]="true"
 
@@ -77,7 +77,7 @@ go_mod_loop() {
 
 go_mod_local() {
   local MODULE_TO_LOCAL
-  MODULE_TO_LOCAL="$(go list -m -json all | jq -r 'select(.Indirect != true) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
+  MODULE_TO_LOCAL="$(go list -m -json all | jq --arg currentModule "$(go mod edit -json | jq -r '.Module.Path')" -r 'select(.Indirect != true and $currentModule != .Path) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
 
   if [[ -z ${MODULE_TO_LOCAL} ]]; then
     return
