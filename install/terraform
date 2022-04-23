@@ -7,7 +7,7 @@ clean() {
 }
 
 install() {
-  terraform_install "1.1.8"
+  terraform_install "1.1.9"
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
   printf "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\ndisable_checkpoint = true\n" "${HOME}" >"${HOME}/.terraformrc"

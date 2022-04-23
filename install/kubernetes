@@ -45,11 +45,11 @@ install() {
     printf "%bhelm was not found in path. Please run 'helm completion bash >'%s/../sources/helm-completion''%b\n" "${RED}" "${SCRIPT_DIR}" "${RESET}"
   fi
 
-  local FLUX_VERSION="0.29.2"
+  local FLUX_VERSION="0.29.3"
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
-  local KUBESEAL_VERSION="0.17.3"
+  local KUBESEAL_VERSION="0.17.5"
   archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-${OS}-${ARCH}.tar.gz" "kubeseal"
 
   if [[ ${ARCH} == "amd64" ]]; then
