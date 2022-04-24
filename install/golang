@@ -62,7 +62,7 @@ install() {
     go install "github.com/tsenart/vegeta@latest"
     go install "golang.org/x/lint/golint@latest"
     go install "golang.org/x/tools/cmd/goimports@latest"
-    go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@latest"
+    go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
     go install "mvdan.cc/gofumpt@latest"
     go install "github.com/ViBiOh/registry-cleaner@latest"
   fi

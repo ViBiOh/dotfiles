@@ -82,7 +82,7 @@ main() {
   install_plugin "${TEXT_PKG}" Formatter
 
   if command -v go >/dev/null 2>&1; then
-    GO111MODULE=on go install "golang.org/x/tools/gopls@latest"
+    go install "golang.org/x/tools/gopls@latest"
   fi
 
   if command -v npm >/dev/null 2>&1; then
