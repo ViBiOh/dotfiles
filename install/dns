@@ -50,7 +50,7 @@ install() {
   log-queries: no
 
   include: \"${HOME}/.unbound-blocklist\"
-
+${UNBOUND_EXTRA_SERVER_CONF:-}
 remote-control:
   control-enable: yes
   control-interface: 127.0.0.1
