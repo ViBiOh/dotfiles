@@ -122,7 +122,9 @@ emergency() {
     "${HOME}/code" \
     "${HOME}/opt" \
     "${HOME}/workspace" \
-    "${HOME}/Documents"
+    "${HOME}/Documents" \
+    "${HOME}/Library/Application Support/Sublime Text/Local/*" \
+    "${HOME}/Library/Application Support/Sublime Merge/Local/*"
 }
 
 if command -v vegeta >/dev/null 2>&1; then
