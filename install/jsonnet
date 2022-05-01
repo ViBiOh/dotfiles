@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+install() {
+  local JSONNET_VERSION="0.18.0"
+
+  archive_to_binary "https://github.com/google/go-jsonnet/releases/download/v${JSONNET_VERSION}/go-jsonnet_${JSONNET_VERSION}_$(normalized_os "Darwin")_$(normalized_arch).tar.gz" "jsonnet"
+}
