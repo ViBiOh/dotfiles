@@ -13,9 +13,6 @@
     "source.yaml": [
       ["prettier", "--no-color", "--stdin-filepath", "file.yaml"]
     ],
-    "source.toml": [
-      ["prettier", "--no-color", "--stdin-filepath", "file.toml"]
-    ],
     "text.html.markdown": [
       ["prettier", "--no-color", "--stdin-filepath", "file.md"]
     ]
