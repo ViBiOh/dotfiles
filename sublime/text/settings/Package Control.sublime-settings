@@ -14,5 +14,6 @@
 		"SublimeLinter-govet",
 		"SublimeLinter-shellcheck",
 		"Terraform",
+		"TOML",
 	],
 }
