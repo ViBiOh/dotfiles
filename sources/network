@@ -109,7 +109,7 @@ dns_allow() {
   done
 
   local UNBOUND_BLOCKLIST
-  UNBOUND_BLOCKLIST=$(mktemp -t unbound)
+  UNBOUND_BLOCKLIST=$(mktemp)
 
   grep --invert-match "${GREP_PIPELINE[@]}" "${HOME}/.unbound-blocklist" >"${UNBOUND_BLOCKLIST}"
 

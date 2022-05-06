@@ -6,6 +6,11 @@
 # JIRAS_URL["https://my.atlassian.net"]="my/jira"
 
 jira() {
+  local RED='\033[0;31m'
+  local BLUE='\033[0;34m'
+  local YELLOW='\033[33m'
+  local RESET='\033[0m'
+
   if [[ ${#JIRAS_URL[@]} -eq 0 ]]; then
     printf "%bNo JIRA configuration defined%b\n" "${YELLOW}" "${RESET}"
     return
@@ -144,7 +149,7 @@ _jira_request() {
   fi
 
   local HEADER_OUPUT
-  HEADER_OUPUT=$(mktemp -t jira_ticket)
+  HEADER_OUPUT=$(mktemp)
 
   local JIRA_CREDENTIALS
   JIRA_CREDENTIALS="${JIRAS_URL["${JIRA_DOMAIN}"]}"
