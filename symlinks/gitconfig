@@ -21,6 +21,9 @@
 	renames = true
 	colorMoved = default
 
+[interactive]
+	diffFilter = delta --color-only
+
 [pull]
 	rebase = merges
 
