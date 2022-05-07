@@ -86,7 +86,7 @@ main() {
   fi
 
   if command -v npm >/dev/null 2>&1; then
-    npm install --global prettier eslint
+    npm install --ignore-scripts --global prettier eslint
   fi
 
   if command -v pip >/dev/null 2>&1; then
