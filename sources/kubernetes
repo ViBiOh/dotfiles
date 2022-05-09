@@ -44,7 +44,7 @@ if command -v kubectl >/dev/null 2>&1; then
       case ${ACTION} in
       "context")
         local CONTEXT
-        CONTEXT="$(kubectl config get-contexts -o name | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
+        CONTEXT="$(kubectl config get-contexts --output name | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
 
         if [[ -n ${CONTEXT:-} ]]; then
           KUBECONFIG_TMP=$(mktemp)
@@ -219,7 +219,7 @@ if command -v kubectl >/dev/null 2>&1; then
       case ${COMP_WORDS[COMP_CWORD - 1]} in
       "context")
         FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-          kubectl config get-contexts -o name
+          kubectl config get-contexts --output name
         )
         ;;
 

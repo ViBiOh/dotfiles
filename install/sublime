@@ -50,7 +50,7 @@ install() {
   fi
 
   local SUBLIME_TEXT_FILENAME="sublime_text_build_${SUBLIME_TEXT_VERSION}_${FILENAME_SUFFIX}"
-  curl --disable --silent --show-error --location --max-time 300 -O "https://download.sublimetext.com/${SUBLIME_TEXT_FILENAME}"
+  curl --disable --silent --show-error --location --max-time 300 --remote-name "https://download.sublimetext.com/${SUBLIME_TEXT_FILENAME}"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     unzip -d "${OUTPUT_FOLDER}" -o "${SUBLIME_TEXT_FILENAME}"
