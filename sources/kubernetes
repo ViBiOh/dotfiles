@@ -33,11 +33,6 @@ if command -v kubectl >/dev/null 2>&1; then
         printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=json | jq -r '.items[].metadata | .namespace + "/" + .name' | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
       }
 
-      _kube_print_and_run() {
-        printf "%b%b%b\n" "${YELLOW}" "${@}" "${RESET}" 1>&2
-        eval "${@}"
-      }
-
       local ACTION="${1}"
       shift
 
@@ -50,7 +45,7 @@ if command -v kubectl >/dev/null 2>&1; then
           KUBECONFIG_TMP=$(mktemp)
           cp "${KUBECONFIG:-${HOME}/.kube/config}" "${KUBECONFIG_TMP}"
           export KUBECONFIG="${KUBECONFIG_TMP}"
-          _kube_print_and_run "kubectl config use-context ${CONTEXT}"
+          var_print_and_run "kubectl config use-context ${CONTEXT}"
 
           if [[ -n ${TMUX:-} ]]; then
             tmux setenv KUBECONFIG "${KUBECONFIG}"
@@ -67,7 +62,7 @@ if command -v kubectl >/dev/null 2>&1; then
             local EXTRA_ARGS+=" --namespace=${parts[1]}"
           fi
 
-          _kube_print_and_run "kubectl describe ${parts[0]}${EXTRA_ARGS} ${parts[2]}"
+          var_print_and_run "kubectl describe ${parts[0]}${EXTRA_ARGS} ${parts[2]}"
         fi
         ;;
 
@@ -108,7 +103,7 @@ if command -v kubectl >/dev/null 2>&1; then
           if [[ -n ${KUBE_PORT:-} ]]; then
             IFS='/' read -r -a ports <<<"${KUBE_PORT}"
             printf "%bForwarding %s from ${3:-4000} to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}" "${ports[0]}" "${RESET}"
-            _kube_print_and_run "kubectl port-forward --namespace=${parts[1]} ${parts[0]}/${parts[2]} ${3:-4000}:${ports[0]}"
+            var_print_and_run "kubectl port-forward --namespace=${parts[1]} ${parts[0]}/${parts[2]} ${3:-4000}:${ports[0]}"
           fi
         fi
         ;;
@@ -117,7 +112,7 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(_kube_resources "deployments.apps" "${1:- }")"
 
         if [[ -n ${parts[1]:-} ]]; then
-          _kube_print_and_run "kubectl get ${parts[0]} --namespace=${parts[1]} ${parts[2]} --output=json | jq -r '.spec.template.spec.containers[].image'"
+          var_print_and_run "kubectl get ${parts[0]} --namespace=${parts[1]} ${parts[2]} --output=json | jq -r '.spec.template.spec.containers[].image'"
         fi
         ;;
 
@@ -135,7 +130,7 @@ if command -v kubectl >/dev/null 2>&1; then
             QUERY=".data[] |= @base64d"
           fi
 
-          _kube_print_and_run "kubectl get ${parts[0]}${EXTRA_ARGS} ${parts[2]} --output=yaml | yq eval --prettyPrint '${QUERY}'"
+          var_print_and_run "kubectl get ${parts[0]}${EXTRA_ARGS} ${parts[2]} --output=yaml | yq eval --prettyPrint '${QUERY}'"
         fi
         ;;
 
@@ -170,9 +165,9 @@ if command -v kubectl >/dev/null 2>&1; then
           printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${parts[0]}/${parts[1]}/${parts[2]}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
           if command -v kail >/dev/null 2>&1; then
-            _kube_print_and_run "kail --ns='${parts[1]}' --label='${PODS_LABELS}' --since=24h ${*}"
+            var_print_and_run "kail --ns='${parts[1]}' --label='${PODS_LABELS}' --since=24h ${*}"
           else
-            _kube_print_and_run "kubectl logs --namespace=${parts[1]} --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
+            var_print_and_run "kubectl logs --namespace=${parts[1]} --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
           fi
         fi
         ;;
@@ -185,27 +180,30 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(_kube_resources "${@}")"
 
         if [[ -n ${parts[1]:-} ]]; then
-          _kube_print_and_run "kubectl rollout restart --namespace=${parts[1]} ${parts[0]} ${parts[2]}"
+          var_print_and_run "kubectl rollout restart --namespace=${parts[1]} ${parts[0]} ${parts[2]}"
         fi
         ;;
 
       "watch")
-        _kube_print_and_run "kubectl get pods --all-namespaces --watch ${*}"
+        var_print_and_run "kubectl get pods --all-namespaces --watch ${*}"
         ;;
 
       *)
-        printf "%bUsage: kube ACTION%b\n" "${RED}" "${RESET}" 1>&2
-        printf "%b\nPossibles actions are                            | args\n%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - context | Switch context                      | <context name>%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - desc    | Describe an object                  | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - env     | Generate .env file from deployments | <deployment name> <container name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - forward | Port-forward to a service           | <service name> <service port number>? <exposed port number>? (default 4000)%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - image   | Print image name                    | <deployment name>%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - info    | Print yaml output of an object      | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - logs    | Tail logs                           | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - ns      | Change default namespace            | <namespace name>%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - restart | Perform a rollout restart           | <object type or deployment name> <object name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-        printf "%b - watch   | Watch pods of all namespaces        | <any additionnals 'kubectl get pods' args...>%b\n" "${BLUE}" "${RESET}" 1>&2
+        var_red "Usage: kube ACTION"
+
+        var_info "\nPossibles actions are                            | args\n"
+        var_info " - context | Switch context                      | <context name>"
+        var_info " - desc    | Describe an object                  | <object type or deployment name> <object name>?"
+        var_info " - env     | Generate .env file from deployments | <deployment name> <container name>?"
+        var_info " - forward | Port-forward to a service           | <service name> <service port number>? <exposed port number>? (default 4000)"
+        var_info " - image   | Print image name                    | <deployment name>"
+        var_info " - info    | Print yaml output of an object      | <object type or deployment name> <object name>?"
+        var_info " - logs    | Tail logs                           | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>"
+        var_info " - ns      | Change default namespace            | <namespace name>"
+        var_info " - restart | Perform a rollout restart           | <object type or deployment name> <object name>?"
+        var_info " - watch   | Watch pods of all namespaces        | <any additionnals 'kubectl get pods' args...>"
+
+        return 1
         ;;
       esac
     }

@@ -42,7 +42,7 @@ install() {
   if command -v helm >/dev/null 2>&1; then
     helm completion bash >"${SCRIPT_DIR}/../sources/helm-completion"
   else
-    printf "%bhelm was not found in path. Please run 'helm completion bash >'%s/../sources/helm-completion''%b\n" "${RED}" "${SCRIPT_DIR}" "${RESET}"
+    var_error "helm was not found in path. Please run 'helm completion bash >'${SCRIPT_DIR}/../sources/helm-completion'"
   fi
 
   local FLUX_VERSION="0.30.2"

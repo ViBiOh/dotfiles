@@ -6,13 +6,8 @@
 # JIRAS_URL["https://my.atlassian.net"]="my/jira"
 
 jira() {
-  local RED='\033[0;31m'
-  local BLUE='\033[0;34m'
-  local YELLOW='\033[33m'
-  local RESET='\033[0m'
-
   if [[ ${#JIRAS_URL[@]} -eq 0 ]]; then
-    printf "%bNo JIRA configuration defined%b\n" "${YELLOW}" "${RESET}"
+    var_warning "No JIRA configuration defined"
     return
   fi
 
@@ -42,7 +37,7 @@ jira() {
 
   if [[ -z ${ACTION} ]]; then
     _jira_help
-    return
+    return 1
   fi
 
   local JIRA_DOMAIN
@@ -66,7 +61,7 @@ jira() {
 
   "branch")
     if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
-      printf "%bnot in a git directory%b\n" "${RED}" "${RESET}" 1>&2
+      var_error "not in a git directory"
     fi
 
     local JIRA_BRANCH_NAME="${JIRA_TICKET}"
@@ -111,7 +106,7 @@ jira() {
     fi
 
     _jira_request "/rest/api/2/issue/${JIRA_TICKET}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq -n -c --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
-    printf "%s transitionned to status %s\n" "${JIRA_TICKET}" "${JIRA_TRANSITION}"
+    var_info "%s transitionned to status %s" "${JIRA_TICKET}" "${JIRA_TRANSITION}"
 
     ;;
 
@@ -121,21 +116,22 @@ jira() {
 
   *)
     _jira_help
+    return 1
     ;;
   esac
 }
 
 _jira_help() {
-  printf "%bUsage: jira ACTION%b\n" "${RED}" "${RESET}" 1>&2
-  printf "%b\nPossibles actions are                               | args\n%b\n" "${BLUE}" "${RESET}" 1>&2
-  printf "%b - browse      Open browser for ticket                 | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-  printf "%b - branch      Switch git repository branch to ticket  | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-  printf "%b - print       Print ticket ID                         | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
-  printf "%b - transition  Transition ticket to another state      | <ticket name>?%b\n" "${BLUE}" "${RESET}" 1>&2
+  var_red "Usage: jira [options?] ACTION"
 
-  printf "%b\nPossibles options are\n%b\n" "${BLUE}" "${RESET}" 1>&2
-  printf "%b - -a List tickets for all users (not just current)%b\n" "${BLUE}" "${RESET}" 1>&2
-  return 1
+  var_info "\nPossibles actions are                               | args\n"
+  var_info " - browse      Open browser for ticket                 | <ticket name>?"
+  var_info " - branch      Switch git repository branch to ticket  | <ticket name>?"
+  var_info " - print       Print ticket ID                         | <ticket name>?"
+  var_info " - transition  Transition ticket to another state      | <ticket name>?"
+
+  var_info "\nPossibles options are\n"
+  var_info " - -a List tickets for all users (not just current)"
 }
 
 _jira_auth() {
@@ -144,7 +140,7 @@ _jira_auth() {
 
 _jira_request() {
   if [[ ${#} -lt 1 ]]; then
-    printf "%bUsage: _jira_request PATH [EXTRA_CURL_ARGS]%b\n" "${RED}" "${RESET}"
+    var_error "Usage: _jira_request PATH [EXTRA_CURL_ARGS]"
     return 1
   fi
 
