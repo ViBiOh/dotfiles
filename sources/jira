@@ -96,7 +96,7 @@ jira() {
 
     local JIRA_TRANSITION
     JIRA_TRANSITION="$(
-      printf "%s" "${JIRA_TRANSITIONS}" | jq -r '.transitions[] | .id + " - " + .name' |
+      printf "%s" "${JIRA_TRANSITIONS}" | jq --raw-output '.transitions[] | .id + " - " + .name' |
         fzf --height=20 --ansi --reverse --exit-0 |
         awk '{printf("%s", $1)}'
     )"
@@ -105,7 +105,7 @@ jira() {
       return
     fi
 
-    _jira_request "/rest/api/2/issue/${JIRA_TICKET}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq -n -c --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
+    _jira_request "/rest/api/2/issue/${JIRA_TICKET}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
     var_info "%s transitionned to status %s" "${JIRA_TICKET}" "${JIRA_TRANSITION}"
 
     ;;
@@ -191,7 +191,7 @@ _jira_ticket() {
   JIRA_OUTPUT="$(_jira_request "/rest/api/2/search" --get --data-urlencode "maxResults=200" --data-urlencode "jql=${JIRA_JQL}")"
 
   if [[ -n ${JIRA_OUTPUT} ]]; then
-    printf "%s" "${JIRA_OUTPUT}" | jq -r '.issues[] | .key + " " + .fields.summary'
+    printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .key + " " + .fields.summary'
   fi
 }
 

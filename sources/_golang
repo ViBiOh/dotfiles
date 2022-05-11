@@ -18,7 +18,7 @@ alias pprof_goroutine='go tool pprof -http localhost:8080 http://localhost:9999/
 if command -v fzf >/dev/null 2>&1; then
   go_bump() {
     local MODULE_TO_BUMP
-    MODULE_TO_BUMP="$(go list -m -json all | jq -r 'select(.Indirect != true) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
+    MODULE_TO_BUMP="$(go list -m -json all | jq --raw-output 'select(.Indirect != true) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
 
     if [[ -z ${MODULE_TO_BUMP} ]]; then
       return
@@ -33,8 +33,8 @@ if command -v fzf >/dev/null 2>&1; then
       MODULE_VERSION="$(
         cat \
           <(printf "latest\n") \
-          <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/branches?per_page=100" | jq -r '.[].name') \
-          <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/tags?per_page=100" | jq -r '.[].name') |
+          <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/branches?per_page=100" | jq --raw-output '.[].name') \
+          <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/tags?per_page=100" | jq --raw-output '.[].name') |
           fzf --height=20 --ansi --reverse
       )"
     else
@@ -54,7 +54,7 @@ go_mod_loop() {
   declare -A MODULES
 
   local CURRENT_MODULE
-  CURRENT_MODULE="$(go mod edit -json | jq -r '.Module.Path')"
+  CURRENT_MODULE="$(go mod edit -json | jq --raw-output '.Module.Path')"
 
   MODULES[${CURRENT_MODULE}]="true"
 
@@ -77,13 +77,13 @@ go_mod_loop() {
 
 go_mod_local() {
   local MODULE_TO_LOCAL
-  MODULE_TO_LOCAL="$(go list -m -json all | jq --arg currentModule "$(go mod edit -json | jq -r '.Module.Path')" -r 'select(.Indirect != true and $currentModule != .Path) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
+  MODULE_TO_LOCAL="$(go list -m -json all | jq --arg currentModule "$(go mod edit -json | jq --raw-output '.Module.Path')" -r 'select(.Indirect != true and $currentModule != .Path) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
 
   if [[ -z ${MODULE_TO_LOCAL} ]]; then
     return
   fi
 
-  if [[ $(go list -m -json "${MODULE_TO_LOCAL}" | jq -r 'select(.Replace != null) | .Path' | wc -l) -gt 0 ]]; then
+  if [[ $(go list -m -json "${MODULE_TO_LOCAL}" | jq --raw-output 'select(.Replace != null) | .Path' | wc -l) -gt 0 ]]; then
     printf "Module %s was already replaced, removing it..." "${MODULE_TO_LOCAL}"
     go mod edit -dropreplace="${MODULE_TO_LOCAL}"
     return
