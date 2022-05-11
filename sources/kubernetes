@@ -305,10 +305,13 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
       yq eval '.manifest' - | yq eval --prettyPrint 'sortKeys(..)' -
     }
 
-    helm status --output=yaml --namespace="${NAMESPACE}" "${NAME}" | extract_manifest >"/tmp/${NAME}_helm.yaml"
-    helm upgrade --output=yaml --namespace="${NAMESPACE}" "${NAME}" "${CHART}" --version "${VERSION}" --debug --dry-run ${*} | extract_manifest >"/tmp/${NAME}_new.yaml"
-    delta "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
-    rm "/tmp/${NAME}_helm.yaml" "/tmp/${NAME}_new.yaml"
+    local TEMP_FOLDER
+    TEMP_FOLDER="$(mktemp -d)"
+
+    helm status --output=yaml --namespace="${NAMESPACE}" "${NAME}" | extract_manifest >"${TEMP_FOLDER}/${NAME}_helm.yaml"
+    helm upgrade --output=yaml --namespace="${NAMESPACE}" "${NAME}" "${CHART}" --version "${VERSION}" --debug --dry-run ${*} | extract_manifest >"${TEMP_FOLDER}/${NAME}_new.yaml"
+    delta "${TEMP_FOLDER}/${NAME}_helm.yaml" "${TEMP_FOLDER}/${NAME}_new.yaml"
+    rm -rf "${TEMP_FOLDER}"
 
     if var_confirm "Perform upgrade"; then
       var_print_and_run "helm upgrade --namespace=${NAMESPACE} ${NAME} ${CHART} --version ${VERSION} ${*}"
@@ -328,7 +331,9 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     CURRENT_DIR="$(pwd)"
 
     (
-      cd "/tmp" || false
+      local TEMP_FOLDER
+      TEMP_FOLDER="$(mktemp -d)"
+      cd "${TEMP_FOLDER}" || false
 
       local CHART_BASENAME
       CHART_BASENAME="$(basename "${CHART}")"
@@ -343,7 +348,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
         rg -- "^kind: CustomResourceDefinition" "${CHART_BASENAME}/"
       fi
 
-      rm -rf "${CHART_BASENAME}"
+      rm -rf "${CHART_BASENAME}" "${TEMP_FOLDER}"
     )
   }
 fi

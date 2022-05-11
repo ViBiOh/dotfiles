@@ -23,7 +23,9 @@ archive_to_binary() {
     return 1
   fi
 
-  local TEMP_FOLDER="/tmp"
+  local TEMP_FOLDER
+  TEMP_FOLDER="$(mktemp -d)"
+
   local ARCHIVE_PATH="${TEMP_FOLDER}/${ARCHIVE_FILENAME}.${ARCHIVE_EXTENSION}"
 
   curl --disable --silent --show-error --location --max-time 300 --output "${ARCHIVE_PATH}" -- "${ARCHIVE_URL}"
@@ -46,9 +48,9 @@ archive_to_binary() {
     else
       chmod +x "${BINARY_DESTINATION}"
     fi
-
-    rm -rf "${ARCHIVE_PATH}" "${ARCHIVE_FILENAME}"
   )
+
+  rm -rf "${ARCHIVE_FILENAME}" "${TEMP_FOLDER}"
 }
 
 curl_to_binary() {
