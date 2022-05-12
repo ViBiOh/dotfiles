@@ -169,6 +169,7 @@ if command -v hidapitester >/dev/null 2>&1; then
   # 2/17/22 Litra Glow aliases from https://github.com/kharyam/litra-driver/issues/13
   light() {
     _hid_litra_glow 0x11,0xff,0x04,0x1c,0x01
+    _hid_litra_glow 0x11,0xff,0x04,0x4c,0x01,100
   }
 
   dark() {
