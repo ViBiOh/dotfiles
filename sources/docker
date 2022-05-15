@@ -13,7 +13,7 @@ if command -v docker >/dev/null 2>&1; then
     docker ps --all --quiet | xargs docker rm --force --volumes
     docker images --quiet | xargs docker rmi --force
     docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi --force
-    docker network ls --quiet | xargs docker network rm
+    docker network ls --format '{{ json .}}' | jq --raw-output 'select(.Name != "bridge" and .ID != "") | .Name' | xargs docker network rm
     docker volume ls --quiet | xargs docker volume rm
   }
 
