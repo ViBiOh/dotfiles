@@ -62,7 +62,8 @@ _fzf_complete_date_in() {
 
 if [[ ${OSTYPE} =~ ^darwin ]]; then
   temperature() {
-    sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep "temperature"
+    sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep -i "temperature"
+    sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep -i "fan"
   }
 fi
 
