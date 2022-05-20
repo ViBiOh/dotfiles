@@ -29,7 +29,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
             else:
                 return current_function
 
-        return ""
+        return current_function
 
     def run(self, kill=False):
         if kill:
