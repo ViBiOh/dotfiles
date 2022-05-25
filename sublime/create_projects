@@ -36,7 +36,7 @@ browse_folder() {
       var_info "Adding ${projectName}"
 
       fileName="${PROJECT_FOLDER}/${projectName}.sublime-project"
-      jq -c -n --arg path "${dir}" '{folders: [{path: $path}]}' >"${fileName}"
+      jq --compact-output --null-input --arg path "${dir}" '{folders: [{path: $path}]}' >"${fileName}"
       subl --project "${fileName}"
     )
   done < <(find "${1}" -type d -maxdepth 1 -print0)
