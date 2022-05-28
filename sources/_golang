@@ -9,6 +9,7 @@ if ! command -v go >/dev/null 2>&1; then
 fi
 
 export GOPATH="${HOME}/opt/gopath"
+export GOPROXY="direct"
 export PATH="${GOPATH}/bin:${PATH}"
 
 alias pprof_cpu='go tool pprof -http localhost:8080 http://localhost:9999/debug/pprof/profile'
