@@ -45,7 +45,7 @@ install() {
     var_error "helm was not found in path. Please run 'helm completion bash >'${SCRIPT_DIR}/../sources/helm-completion'"
   fi
 
-  local FLUX_VERSION="0.30.2"
+  local FLUX_VERSION="0.31.0"
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
