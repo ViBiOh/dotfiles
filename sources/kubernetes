@@ -57,12 +57,15 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(_kube_resources "${@}")"
 
         if [[ -n ${parts[2]:-} ]]; then
-          local EXTRA_ARGS=""
-          if [[ -n ${parts[1]:-} ]]; then
-            local EXTRA_ARGS+=" --namespace=${parts[1]}"
-          fi
+          var_print_and_run "kubectl describe ${parts[0]} --namespace=${parts[1]} ${parts[2]}"
+        fi
+        ;;
 
-          var_print_and_run "kubectl describe ${parts[0]}${EXTRA_ARGS} ${parts[2]}"
+      "edit")
+        IFS='/' read -r -a parts <<<"$(_kube_resources "${@}")"
+
+        if [[ -n ${parts[2]:-} ]]; then
+          var_print_and_run "kubectl edit ${parts[0]} --namespace=${parts[1]} ${parts[2]}"
         fi
         ;;
 
@@ -120,17 +123,12 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(_kube_resources "${@}")"
 
         if [[ -n ${parts[2]:-} ]]; then
-          local EXTRA_ARGS=""
-          if [[ -n ${parts[1]:-} ]]; then
-            local EXTRA_ARGS+=" --namespace=${parts[1]}"
-          fi
-
           local QUERY="."
           if [[ ${parts[0]} =~ secrets? ]]; then
             QUERY=".data[] |= @base64d"
           fi
 
-          var_print_and_run "kubectl get ${parts[0]}${EXTRA_ARGS} ${parts[2]} --output=yaml | yq eval --prettyPrint '${QUERY}'"
+          var_print_and_run "kubectl get ${parts[0]} --namespace=${parts[1]} ${parts[2]} --output=yaml | yq eval --prettyPrint '${QUERY}'"
         fi
         ;;
 
@@ -185,7 +183,7 @@ if command -v kubectl >/dev/null 2>&1; then
         ;;
 
       "watch")
-        var_print_and_run "kubectl get pods --all-namespaces --watch ${*}"
+        var_print_and_run "kubectl get pods --watch ${*}"
         ;;
 
       *)
@@ -194,6 +192,7 @@ if command -v kubectl >/dev/null 2>&1; then
         var_info "\nPossibles actions are                            | args\n"
         var_info " - context | Switch context                      | <context name>"
         var_info " - desc    | Describe an object                  | <object type or deployment name> <object name>?"
+        var_info " - edit    | Edit an object                      | <object type or deployment name> <object name>?"
         var_info " - env     | Generate .env file from deployments | <deployment name> <container name>?"
         var_info " - forward | Port-forward to a service           | <service name> <service port number>? <exposed port number>? (default 4000)"
         var_info " - image   | Print image name                    | <deployment name>"
@@ -210,7 +209,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
     _fzf_complete_kube() {
       if [[ ${COMP_CWORD} -eq 1 ]]; then
-        mapfile -t COMPREPLY < <(compgen -W "context desc env forward image info logs ns restart watch" -- "${COMP_WORDS[COMP_CWORD]}")
+        mapfile -t COMPREPLY < <(compgen -W "context desc edit env forward image info logs ns restart watch" -- "${COMP_WORDS[COMP_CWORD]}")
         return
       fi
 
@@ -224,6 +223,12 @@ if command -v kubectl >/dev/null 2>&1; then
       "forward")
         FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
           kubectl get services --all-namespaces --output=json | jq --raw-output '.items[].metadata.name'
+        )
+        ;;
+
+      "edit")
+        FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
+          kubectl get deployments.apps --all-namespaces --output=json | jq --raw-output '.items[].metadata.name'
         )
         ;;
 
