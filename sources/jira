@@ -106,7 +106,7 @@ jira() {
     fi
 
     _jira_request "/rest/api/2/issue/${JIRA_TICKET}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
-    var_info "%s transitionned to status %s" "${JIRA_TICKET}" "${JIRA_TRANSITION}"
+    var_info "${JIRA_TICKET} transitionned to status ${JIRA_TRANSITION}"
 
     ;;
 
