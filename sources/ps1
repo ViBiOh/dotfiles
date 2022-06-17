@@ -25,6 +25,10 @@ if [[ "$(type -t __kube_ps1)" == "function" ]]; then
   PS1+="${BLUE}\$(__kube_ps1)${RESET}"
 fi
 
+if [[ "$(type -t __terraform_ps1)" == "function" ]]; then
+  PS1+="${PURPLE}\$(__terraform_ps1)${RESET}"
+fi
+
 PS1+=" \$(printf '⏰ %(%H:%M:%S)T')"
 PS1+=" \$(_previous_status)\n> "
 

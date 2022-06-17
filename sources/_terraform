@@ -20,3 +20,14 @@ terraform_install() {
   rm -f "${TERRAFORM_PATH}"
   ln -s "${TERRAFORM_VERSION_PATH}" "${TERRAFORM_PATH}"
 }
+
+__terraform_ps1() {
+  # preserve exit status
+  local exit="${?}"
+
+  if [[ $(find . -maxdepth 1 -type f -name "*.tf" | wc -l) -gt 0 ]]; then
+    printf " 🔧 %s" "$(terraform workspace show)"
+  fi
+
+  return "${exit}"
+}
