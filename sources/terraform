@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if ! command -v terraform >/dev/null 2>&1; then
+  return
+fi
+
+complete -C "${HOME}/opt/bin/terraform" terraform
+
 terraform_install() {
   local TERRAFORM_VERSION=${1}
   shift
