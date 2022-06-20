@@ -53,6 +53,24 @@ if command -v kubectl >/dev/null 2>&1; then
         fi
         ;;
 
+      "cross")
+        if [[ ${#} -lt 2 ]]; then
+          var_error "Usage: cross <context's regexp> command..."
+          return 1
+        fi
+
+        local CONTEXT_REGEXP="${1:-}"
+        shift
+
+        for ctx in $(kubectl config get-contexts --output name); do
+          if ! [[ ${ctx} =~ ${CONTEXT_REGEXP} ]]; then
+            continue
+          fi
+
+          var_print_and_run "kubectl --context '${ctx}' ${*}"
+        done
+        ;;
+
       "desc")
         IFS='/' read -r -a parts <<<"$(_kube_resources "${@}")"
 
@@ -191,6 +209,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
         var_info "\nPossibles actions are                            | args\n"
         var_info " - context | Switch context                      | <context name>"
+        var_info " - cross   | Run command in multiple context     | <context regex> command..."
         var_info " - desc    | Describe an object                  | <object type or deployment name> <object name>?"
         var_info " - edit    | Edit an object                      | <object type or deployment name> <object name>?"
         var_info " - env     | Generate .env file from deployments | <deployment name> <container name>?"
@@ -209,7 +228,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
     _fzf_complete_kube() {
       if [[ ${COMP_CWORD} -eq 1 ]]; then
-        mapfile -t COMPREPLY < <(compgen -W "context desc edit env forward image info logs ns restart watch" -- "${COMP_WORDS[COMP_CWORD]}")
+        mapfile -t COMPREPLY < <(compgen -W "context cross desc edit env forward image info logs ns restart watch" -- "${COMP_WORDS[COMP_CWORD]}")
         return
       fi
 
