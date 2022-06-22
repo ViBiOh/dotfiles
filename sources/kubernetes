@@ -93,11 +93,11 @@ if command -v kubectl >/dev/null 2>&1; then
             kubectl get "${envConfig[0]}" --namespace="${parts[1]}" "${envConfig[1]}" --output=yaml | yq eval "${YQ_QUERY}"
           done
 
-          yq eval '.spec.template.spec.containers[] | select(.name == '\""${KUBE_CONTAINER}"\"' and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]"; "\n"))' "${DEPLOYMENT_YAML}"
+          KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]"; "\n"))' "${DEPLOYMENT_YAML}"
 
-          eval "$(yq eval '.spec.template.spec.containers[] | select(.name == '\""${KUBE_CONTAINER}"\"' and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("fieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'." + .valueFrom.fieldRef.fieldPath + "'"'"' \"'"${DEPLOYMENT_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
+          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("fieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'." + .valueFrom.fieldRef.fieldPath + "'"'"' \"'"${DEPLOYMENT_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
 
-          eval "$(yq eval '.spec.template.spec.containers[] | select(.name == '\""${KUBE_CONTAINER}"\"' and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("resourceFieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'.spec.template.spec.containers[] | select(.name == \"" + .valueFrom.resourceFieldRef.containerName + "\") | .resources." + .valueFrom.resourceFieldRef.resource + "'"'"' \"'"${DEPLOYMENT_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
+          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("resourceFieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'.spec.template.spec.containers[] | select(.name == \"" + .valueFrom.resourceFieldRef.containerName + "\") | .resources." + .valueFrom.resourceFieldRef.resource + "'"'"' \"'"${DEPLOYMENT_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
 
           rm "${DEPLOYMENT_YAML}"
         fi
@@ -159,7 +159,7 @@ if command -v kubectl >/dev/null 2>&1; then
           local PODS_LABELS
 
           if [[ ${parts[0]} =~ ^cronjobs? ]]; then
-            PODS_LABELS="job-name in ($(kubectl get jobs --namespace="${parts[1]}" --output yaml | yq eval '.items[] | select(.metadata.ownerReferences[].name == '\""${parts[2]}\""') | .metadata.name' | paste -sd, -))"
+            PODS_LABELS="job-name in ($(kubectl get jobs --namespace="${parts[1]}" --output yaml | OWNER_NAME="${parts[2]}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -))"
           elif [[ ${parts[0]} =~ ^jobs? ]]; then
             PODS_LABELS="job-name=${parts[2]}"
           elif [[ ${parts[0]} =~ ^deployments? ]]; then
