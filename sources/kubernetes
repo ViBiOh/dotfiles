@@ -81,7 +81,7 @@ if command -v kubectl >/dev/null 2>&1; then
           kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml >"${DEPLOYMENT_YAML}"
 
           local ENV_FROMS
-          ENV_FROMS="$(yq eval '.spec.template.spec.containers[] | select(.name == '\""${KUBE_CONTAINER}"\"' and has("envFrom")) | .envFrom[] | to_entries | .[] | (.key | sub("Ref$", "")) + "/" + .value.name' "${DEPLOYMENT_YAML}")"
+          ENV_FROMS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("envFrom")) | .envFrom[] | to_entries | .[] | (.key | sub("Ref$", "")) + "/" + .value.name' "${DEPLOYMENT_YAML}")"
           for envFrom in ${ENV_FROMS}; do
             IFS='/' read -r -a envConfig <<<"$(printf "%s" "${envFrom}")"
             local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value | sub("[\n]"; "\n"))'
