@@ -86,7 +86,7 @@ if command -v kubectl >/dev/null 2>&1; then
             IFS='/' read -r -a envConfig <<<"$(printf "%s" "${envFrom}")"
             local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value | sub("[\n]"; "\n"))'
             if [[ ${envConfig[0]} == "secret" ]]; then
-              local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value | @base64d | sub("[\\n]"; "\\n"))'
+              local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value | @base64d | sub("[\n]"; "\n"))'
             fi
 
             var_warning "${envConfig[0]} ${parts[1]}/${envConfig[1]}"
