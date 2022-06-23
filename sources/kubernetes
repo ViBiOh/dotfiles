@@ -95,9 +95,9 @@ if command -v kubectl >/dev/null 2>&1; then
 
           KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]", "\n"))' "${DEPLOYMENT_YAML}"
 
-          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("fieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'." + .valueFrom.fieldRef.fieldPath + "'"'"' \"'"${DEPLOYMENT_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
+          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("fieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'." + (.valueFrom.fieldRef.fieldPath | sub("'"'"'", "\"")) + "'"'"' \"'"${DEPLOYMENT_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
 
-          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("resourceFieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'.spec.template.spec.containers[] | select(.name == \"" + .valueFrom.resourceFieldRef.containerName + "\") | .resources." + .valueFrom.resourceFieldRef.resource + "'"'"' \"'"${DEPLOYMENT_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
+          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("resourceFieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'.spec.template.spec.containers[] | select(.name == \"" + .valueFrom.resourceFieldRef.containerName + "\") | .resources." + (.valueFrom.resourceFieldRef.resource | sub("'"'"'", "\"")) + "'"'"' \"'"${DEPLOYMENT_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
 
           rm "${DEPLOYMENT_YAML}"
         fi
