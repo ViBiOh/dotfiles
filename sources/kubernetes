@@ -83,34 +83,56 @@ if command -v kubectl >/dev/null 2>&1; then
           local ENV_FROMS
           ENV_FROMS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("envFrom")) | .envFrom[] | to_entries | .[] | (.key | sub("Ref$", "")) + "/" + .value.name' "${DEPLOYMENT_YAML}")"
           for envFrom in ${ENV_FROMS}; do
-            IFS='/' read -r -a envConfig <<<"$(printf "%s" "${envFrom}")"
+            IFS='/' read -r -a objectRef <<<"$(printf "%s" "${envFrom}")"
             local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value | sub("[\n]", "\n"))'
-            if [[ ${envConfig[0]} == "secret" ]]; then
+            if [[ ${objectRef[0]} == "secret" ]]; then
               local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value | @base64d | sub("[\n]", "\n"))'
             fi
 
-            var_warning "${envConfig[0]} ${parts[1]}/${envConfig[1]}"
-            kubectl get "${envConfig[0]}" --namespace="${parts[1]}" "${envConfig[1]}" --output=yaml | yq eval "${YQ_QUERY}"
+            var_warning "${objectRef[0]} ${parts[1]}/${objectRef[1]}"
+            kubectl get "${objectRef[0]}" --namespace="${parts[1]}" "${objectRef[1]}" --output=yaml | yq eval "${YQ_QUERY}"
+          done
+
+          local INLINE_CONFIG_MAP
+          INLINE_CONFIG_MAP="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("end")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("configMapKeyRef"))) | .valueFrom.configMapKeyRef.name + "/" + .valueFrom.configMapKeyRef.key' "${DEPLOYMENT_YAML}")"
+          for inlineSecret in ${INLINE_CONFIG_MAP}; do
+            IFS='/' read -r -a configMapRef <<<"$(printf "%s" "${inlineSecret}")"
+            kubectl get configmaps --namespace="${parts[1]}" "${configMapRef[0]}" --output=yaml | SECRET_KEY="${configMapRef[1]}" yq eval '.data[strenv(SECRET_KEY)]| sub("[\n]", "\n")'
+          done
+
+          local INLINE_SECRETS
+          INLINE_SECRETS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("end")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | .valueFrom.secretKeyRef.name + "/" + .valueFrom.secretKeyRef.key' "${DEPLOYMENT_YAML}")"
+          for inlineSecret in ${INLINE_SECRETS}; do
+            IFS='/' read -r -a secretRef <<<"$(printf "%s" "${inlineSecret}")"
+            kubectl get secrets --namespace="${parts[1]}" "${secretRef[0]}" --output=yaml | SECRET_KEY="${secretRef[1]}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
           done
 
           KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]", "\n"))' "${DEPLOYMENT_YAML}"
 
-          local PODS_LABELS
-          PODS_LABELS="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+          local FIELD_REFS
+          FIELD_REFS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] |
+            (
+              select(select(has("valueFrom")) | .valueFrom | has("fieldRef")) | .name + "=." + .valueFrom.fieldRef.fieldPath,
+              select(select(has("valueFrom")) | .valueFrom | has("resourceFieldRef")) | .name + "=.spec.containers[] | select(.name=\"" + .valueFrom.resourceFieldRef.containerName + "\") | .resources." + (.valueFrom.resourceFieldRef.resource | sub("'"'"'", "\""))
+            )' "${DEPLOYMENT_YAML}")"
 
-          local POD_YAML
-          POD_YAML="$(mktemp)"
-          kubectl get pods --namespace="${parts[1]}" "--selector=${PODS_LABELS}" --output=yaml | yq eval '[.items[] | select(.status.phase == "Running")] | .[0]' >"${POD_YAML}"
+          if [[ -n ${FIELD_REFS:-} ]]; then
+            local PODS_LABELS
+            PODS_LABELS="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
 
-          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("fieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'." + (.valueFrom.fieldRef.fieldPath | sub("'"'"'", "\"")) + "'"'"' \"'"${POD_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
+            local POD_YAML
+            POD_YAML="$(mktemp)"
+            kubectl get pods --namespace="${parts[1]}" "--selector=${PODS_LABELS}" --output=yaml | yq eval '[.items[] | select(.status.phase == "Running")] | .[0]' >"${POD_YAML}"
 
-          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("resourceFieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'.spec.containers[] | select(.name == \"" + .valueFrom.resourceFieldRef.containerName + "\") | .resources." + (.valueFrom.resourceFieldRef.resource | sub("'"'"'", "\"")) + "'"'"' \"'"${POD_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
+            for fieldRef in ${FIELD_REFS}; do
+              IFS='=' read -r -a podRef <<<"$(printf "%s" "${fieldRef}")"
+              printf "%s=%s\n" "${podRef[0]}" "$(yq eval "${podRef[1]}" "${POD_YAML}")"
+            done
 
-          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("configMapKeyRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(kubectl get configmaps --namespace \"'"${parts[1]}"'\" " + .valueFrom.configMapKeyRef.name + " --output=yaml | yq eval '"'"'.data[\"" + .valueFrom.configMapKeyRef.key + "\"] | sub(\"[\n]\", \"\n\")'"'"')\""' "${DEPLOYMENT_YAML}")"
+            rm "${POD_YAML}"
+          fi
 
-          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(kubectl get configmaps --namespace \"'"${parts[1]}"'\" " + .valueFrom.secretKeyRef.name + " --output=yaml | yq eval '"'"'.data[\"" + .valueFrom.secretKeyRef.key + "\"] | @base64d | sub(\"[\n]\", \"\n\")'"'"')\""' "${DEPLOYMENT_YAML}")"
-
-          rm "${DEPLOYMENT_YAML}" "${POD_YAML}"
+          rm "${DEPLOYMENT_YAML}"
         fi
         ;;
 
