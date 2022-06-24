@@ -80,39 +80,39 @@ if command -v kubectl >/dev/null 2>&1; then
           DEPLOYMENT_YAML="$(mktemp)"
           kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml >"${DEPLOYMENT_YAML}"
 
+          KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]", "\n"))' "${DEPLOYMENT_YAML}"
+
           local ENV_FROMS
           ENV_FROMS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("envFrom")) | .envFrom[] | to_entries | .[] | (.key | sub("Ref$", "")) + "/" + .value.name' "${DEPLOYMENT_YAML}")"
           for envFrom in ${ENV_FROMS}; do
-            IFS='/' read -r -a objectRef <<<"$(printf "%s" "${envFrom}")"
+            IFS='/' read -r -a envFromParts <<<"$(printf "%s" "${envFrom}")"
 
             local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value'
-            if [[ ${objectRef[0]} == "secret" ]]; then
+            if [[ ${envFromParts[0]} == "secret" ]]; then
               YQ_QUERY+=' | @base64d'
             fi
             YQ_QUERY+=' | sub("[\n]", "\n"))'
 
-            var_warning "${objectRef[0]} ${parts[1]}/${objectRef[1]}"
-            kubectl get "${objectRef[0]}" --namespace="${parts[1]}" "${objectRef[1]}" --output=yaml | yq eval "${YQ_QUERY}"
+            var_warning "${envFromParts[0]} ${parts[1]}/${envFromParts[1]}"
+            kubectl get "${envFromParts[0]}" --namespace="${parts[1]}" "${envFromParts[1]}" --output=yaml | yq eval "${YQ_QUERY}"
           done
 
-          KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]", "\n"))' "${DEPLOYMENT_YAML}"
-
-          local INLINE_VALUES
-          INLINE_VALUES="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("end")) | .env[] |
+          local INLINE_REFS
+          INLINE_REFS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("end")) | .env[] |
             (
               select((select(has("valueFrom")) | .valueFrom | has("configMapKeyRef"))) | "configmap/" + .valueFrom.configMapKeyRef.name + "/" + .valueFrom.configMapKeyRef.key,
               select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | "secret/" + .valueFrom.secretKeyRef.name + "/" + .valueFrom.secretKeyRef.key
             )' "${DEPLOYMENT_YAML}")"
-          for inlineValue in ${INLINE_VALUES}; do
-            IFS='/' read -r -a inlineRef <<<"$(printf "%s" "${inlineValue}")"
+          for inlineRef in ${INLINE_REFS}; do
+            IFS='/' read -r -a inlineRefParts <<<"$(printf "%s" "${inlineRef}")"
 
             YQ_QUERY='.data[strenv(SECRET_KEY)]'
-            if [[ ${inlineRef[0]} == "secret" ]]; then
+            if [[ ${inlineRefParts[0]} == "secret" ]]; then
               YQ_QUERY+=' | @base64d'
             fi
             YQ_QUERY+=' | sub("[\n]", "\n")'
 
-            kubectl get "${inlineRef[0]}" --namespace="${parts[1]}" "${inlineRef[1]}" --output=yaml | SECRET_KEY="${inlineRef[2]}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
+            kubectl get "${inlineRefParts[0]}" --namespace="${parts[1]}" "${inlineRefParts[1]}" --output=yaml | SECRET_KEY="${inlineRefParts[2]}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
           done
 
           local FIELD_REFS
@@ -131,14 +131,14 @@ if command -v kubectl >/dev/null 2>&1; then
             kubectl get pods --namespace="${parts[1]}" "--selector=${PODS_LABELS}" --output=yaml | yq eval '[.items[] | select(.status.phase == "Running")] | .[0]' >"${POD_YAML}"
 
             for fieldRef in ${FIELD_REFS}; do
-              IFS='=' read -r -a podRef <<<"$(printf "%s" "${fieldRef}")"
-              printf "%s=%s\n" "${podRef[0]}" "$(yq eval "${podRef[1]}" "${POD_YAML}")"
+              IFS='=' read -r -a fieldRefParts <<<"$(printf "%s" "${fieldRef}")"
+              printf "%s=%s\n" "${fieldRefParts[0]}" "$(yq eval "${fieldRefParts[1]}" "${POD_YAML}")"
             done
 
             rm "${POD_YAML}"
           fi
 
-          # rm "${DEPLOYMENT_YAML}"
+          rm "${DEPLOYMENT_YAML}"
         fi
         ;;
 
