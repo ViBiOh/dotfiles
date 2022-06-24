@@ -106,6 +106,10 @@ if command -v kubectl >/dev/null 2>&1; then
 
           eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("resourceFieldRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(yq eval '"'"'.spec.containers[] | select(.name == \"" + .valueFrom.resourceFieldRef.containerName + "\") | .resources." + (.valueFrom.resourceFieldRef.resource | sub("'"'"'", "\"")) + "'"'"' \"'"${POD_YAML}"'\")\""' "${DEPLOYMENT_YAML}")"
 
+          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("configMapKeyRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(kubectl get configmaps --namespace \"'"${parts[1]}"'\" " + .valueFrom.configMapKeyRef.name + " --output=yaml | yq eval '"'"'.data[\"" + .valueFrom.configMapKeyRef.key + "\"] | sub(\"[\n]\", \"\n\")'"'"')\""' "${DEPLOYMENT_YAML}")"
+
+          eval "$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | "printf \"%s=%s\n\" \"" + .name  + "\" \"$(kubectl get configmaps --namespace \"'"${parts[1]}"'\" " + .valueFrom.secretKeyRef.name + " --output=yaml | yq eval '"'"'.data[\"" + .valueFrom.secretKeyRef.key + "\"] | @base64d | sub(\"[\n]\", \"\n\")'"'"')\""' "${DEPLOYMENT_YAML}")"
+
           rm "${DEPLOYMENT_YAML}" "${POD_YAML}"
         fi
         ;;
