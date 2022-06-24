@@ -84,30 +84,36 @@ if command -v kubectl >/dev/null 2>&1; then
           ENV_FROMS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("envFrom")) | .envFrom[] | to_entries | .[] | (.key | sub("Ref$", "")) + "/" + .value.name' "${DEPLOYMENT_YAML}")"
           for envFrom in ${ENV_FROMS}; do
             IFS='/' read -r -a objectRef <<<"$(printf "%s" "${envFrom}")"
-            local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value | sub("[\n]", "\n"))'
+
+            local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value'
             if [[ ${objectRef[0]} == "secret" ]]; then
-              local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value | @base64d | sub("[\n]", "\n"))'
+              YQ_QUERY+=' | @base64d'
             fi
+            YQ_QUERY+=' | sub("[\n]", "\n"))'
 
             var_warning "${objectRef[0]} ${parts[1]}/${objectRef[1]}"
             kubectl get "${objectRef[0]}" --namespace="${parts[1]}" "${objectRef[1]}" --output=yaml | yq eval "${YQ_QUERY}"
           done
 
-          local INLINE_CONFIG_MAP
-          INLINE_CONFIG_MAP="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("end")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("configMapKeyRef"))) | .valueFrom.configMapKeyRef.name + "/" + .valueFrom.configMapKeyRef.key' "${DEPLOYMENT_YAML}")"
-          for inlineSecret in ${INLINE_CONFIG_MAP}; do
-            IFS='/' read -r -a configMapRef <<<"$(printf "%s" "${inlineSecret}")"
-            kubectl get configmaps --namespace="${parts[1]}" "${configMapRef[0]}" --output=yaml | SECRET_KEY="${configMapRef[1]}" yq eval '.data[strenv(SECRET_KEY)]| sub("[\n]", "\n")'
-          done
-
-          local INLINE_SECRETS
-          INLINE_SECRETS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("end")) | .env[] | select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | .valueFrom.secretKeyRef.name + "/" + .valueFrom.secretKeyRef.key' "${DEPLOYMENT_YAML}")"
-          for inlineSecret in ${INLINE_SECRETS}; do
-            IFS='/' read -r -a secretRef <<<"$(printf "%s" "${inlineSecret}")"
-            kubectl get secrets --namespace="${parts[1]}" "${secretRef[0]}" --output=yaml | SECRET_KEY="${secretRef[1]}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
-          done
-
           KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]", "\n"))' "${DEPLOYMENT_YAML}"
+
+          local INLINE_VALUES
+          INLINE_VALUES="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("end")) | .env[] |
+            (
+              select((select(has("valueFrom")) | .valueFrom | has("configMapKeyRef"))) | "configmap/" + .valueFrom.configMapKeyRef.name + "/" + .valueFrom.configMapKeyRef.key,
+              select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | "secret/" + .valueFrom.secretKeyRef.name + "/" + .valueFrom.secretKeyRef.key
+            )' "${DEPLOYMENT_YAML}")"
+          for inlineValue in ${INLINE_VALUES}; do
+            IFS='/' read -r -a inlineRef <<<"$(printf "%s" "${inlineValue}")"
+
+            YQ_QUERY='.data[strenv(SECRET_KEY)]'
+            if [[ ${inlineRef[0]} == "secret" ]]; then
+              YQ_QUERY+=' | @base64d'
+            fi
+            YQ_QUERY+=' | sub("[\n]", "\n")'
+
+            kubectl get "${inlineRef[0]}" --namespace="${parts[1]}" "${inlineRef[1]}" --output=yaml | SECRET_KEY="${inlineRef[2]}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
+          done
 
           local FIELD_REFS
           FIELD_REFS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] |
@@ -132,7 +138,7 @@ if command -v kubectl >/dev/null 2>&1; then
             rm "${POD_YAML}"
           fi
 
-          rm "${DEPLOYMENT_YAML}"
+          # rm "${DEPLOYMENT_YAML}"
         fi
         ;;
 
