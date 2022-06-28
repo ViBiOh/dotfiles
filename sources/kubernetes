@@ -89,7 +89,7 @@ if command -v kubectl >/dev/null 2>&1; then
               select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | "secret/" + .valueFrom.secretKeyRef.name + "/" + .valueFrom.secretKeyRef.key
             )' "${DEPLOYMENT_YAML}")"
           for inlineRef in ${INLINE_REFS}; do
-            IFS='/' read -r -a inlineRefParts <<<"$(printf "%s" "${inlineRef}")"
+            IFS='/' read -r -a inlineRefParts <<<"${inlineRef}"
 
             YQ_QUERY='.data[strenv(SECRET_KEY)]'
             if [[ ${inlineRefParts[0]} == "secret" ]]; then
@@ -103,7 +103,7 @@ if command -v kubectl >/dev/null 2>&1; then
           local ENV_FROMS
           ENV_FROMS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("envFrom")) | .envFrom[] | to_entries | .[] | (.key | sub("Ref$", "")) + "/" + .value.name' "${DEPLOYMENT_YAML}")"
           for envFrom in ${ENV_FROMS}; do
-            IFS='/' read -r -a envFromParts <<<"$(printf "%s" "${envFrom}")"
+            IFS='/' read -r -a envFromParts <<<"${envFrom}"
 
             local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value'
             if [[ ${envFromParts[0]} == "secret" ]]; then
@@ -118,8 +118,8 @@ if command -v kubectl >/dev/null 2>&1; then
           local FIELD_REFS
           FIELD_REFS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] |
             (
-              select(select(has("valueFrom")) | .valueFrom | has("fieldRef")) | .name + "=." + .valueFrom.fieldRef.fieldPath,
-              select(select(has("valueFrom")) | .valueFrom | has("resourceFieldRef")) | .name + "=.spec.containers[] | select(.name=\"" + .valueFrom.resourceFieldRef.containerName + "\") | .resources." + (.valueFrom.resourceFieldRef.resource | sub("'"'"'", "\""))
+              select(select(has("valueFrom")) | .valueFrom | has("fieldRef")) | .name + "@." + (.valueFrom.fieldRef.fieldPath | sub("'"'"'", "\"")),
+              select(select(has("valueFrom")) | .valueFrom | has("resourceFieldRef")) | .name + "@.spec.containers[]|select(.name=\"" + .valueFrom.resourceFieldRef.containerName + "\")|.resources." + (.valueFrom.resourceFieldRef.resource|sub("'"'"'", "\""))
             )' "${DEPLOYMENT_YAML}")"
 
           if [[ -n ${FIELD_REFS:-} ]]; then
@@ -132,7 +132,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
             var_warning "Values from first 'Running' pod found"
             for fieldRef in ${FIELD_REFS}; do
-              IFS='=' read -r -a fieldRefParts <<<"$(printf "%s" "${fieldRef}")"
+              IFS='@' read -r -a fieldRefParts <<<"${fieldRef}"
               printf "%s=%s\n" "${fieldRefParts[0]}" "$(yq eval "${fieldRefParts[1]}" "${POD_YAML}")"
             done
 
