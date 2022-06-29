@@ -33,6 +33,25 @@ if command -v kubectl >/dev/null 2>&1; then
         printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=yaml | yq eval '.items[].metadata | .namespace + "/" + .name' | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
       }
 
+      _kube_help() {
+        var_info "Usage: kube ACTION"
+
+        var_info "\nPossibles actions are                            | args\n"
+        var_info " - context | Switch context                      | <context name>"
+        var_info " - desc    | Describe an object                  | <object type or deployment name> <object name>?"
+        var_info " - edit    | Edit an object                      | <object type or deployment name> <object name>?"
+        var_info " - env     | Generate .env file from deployments | <deployment name> <container name>?"
+        var_info " - forward | Port-forward to a service           | <service name> <service port number>? <exposed port number>? (default 4000)"
+        var_info " - help    | Print this help                     |"
+        var_info " - image   | Print image name                    | <deployment name>"
+        var_info " - info    | Print yaml output of an object      | <object type or deployment name> <object name>?"
+        var_info " - logs    | Tail logs                           | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>"
+        var_info " - ns      | Change default namespace            | <namespace name>"
+        var_info " - restart | Perform a rollout restart           | <object type or deployment name> <object name>?"
+        var_info " - watch   | Watch pods of all namespaces        | <any additionnals 'kubectl get pods' args...>"
+        var_info " - *       | Call kubectl directly               | <any additionnals 'kubectl' args...>"
+      }
+
       local ACTION="${1}"
       shift
 
@@ -159,6 +178,10 @@ if command -v kubectl >/dev/null 2>&1; then
         fi
         ;;
 
+      "help")
+        _kube_help
+        ;;
+
       "image")
         IFS='/' read -r -a parts <<<"$(_kube_resources "deployments.apps" "${1:- }")"
 
@@ -182,13 +205,13 @@ if command -v kubectl >/dev/null 2>&1; then
 
       "log" | "logs")
         local FIRST=""
-        if ! [[ ${1:-} =~ ^- ]]; then
+        if [[ -n ${1:-} ]] && ! [[ ${1:-} =~ ^- ]]; then
           FIRST="${1}"
           shift
         fi
 
         local SECOND=""
-        if ! [[ ${1:-} =~ ^- ]]; then
+        if [[ -n ${1:-} ]] && ! [[ ${1:-} =~ ^- ]]; then
           SECOND="${1}"
           shift
         fi
@@ -235,20 +258,7 @@ if command -v kubectl >/dev/null 2>&1; then
         ;;
 
       *)
-        var_red "Usage: kube ACTION"
-
-        var_info "\nPossibles actions are                            | args\n"
-        var_info " - context | Switch context                      | <context name>"
-        var_info " - desc    | Describe an object                  | <object type or deployment name> <object name>?"
-        var_info " - edit    | Edit an object                      | <object type or deployment name> <object name>?"
-        var_info " - env     | Generate .env file from deployments | <deployment name> <container name>?"
-        var_info " - forward | Port-forward to a service           | <service name> <service port number>? <exposed port number>? (default 4000)"
-        var_info " - image   | Print image name                    | <deployment name>"
-        var_info " - info    | Print yaml output of an object      | <object type or deployment name> <object name>?"
-        var_info " - logs    | Tail logs                           | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>"
-        var_info " - ns      | Change default namespace            | <namespace name>"
-        var_info " - restart | Perform a rollout restart           | <object type or deployment name> <object name>?"
-        var_info " - watch   | Watch pods of all namespaces        | <any additionnals 'kubectl get pods' args...>"
+        kubectl "${ACTION}" "${@}"
 
         return 1
         ;;
