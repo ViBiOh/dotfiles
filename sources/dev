@@ -106,13 +106,15 @@ emergency() {
 
   "$(_emergency_script_dir)/../init" -c
 
-  stop_ssh_agent
+  ssh_agent_stop
   gpg_agent_stop
 
   sudo rm -rf \
     "${HOME}/.ssh" \
     "${HOME}/.gnupg" \
+    "${HOME}/.local" \
     "${HOME}/.localrc" \
+    "${HOME}/.config" \
     "${HOME}/.bash_history" \
     "${HOME}/.bash_profile" \
     "${PASSWORD_STORE_DIR:-${HOME}/.password-store}" \

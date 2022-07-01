@@ -3,9 +3,9 @@
 set -o nounset -o pipefail -o errexit
 
 clean() {
-  if command -v stop_ssh_agent >/dev/null 2>&1; then
+  if command -v ssh_agent_stop >/dev/null 2>&1; then
     set +e
-    stop_ssh_agent
+    ssh_agent_stop
     set -e
   fi
 
