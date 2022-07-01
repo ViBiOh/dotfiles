@@ -1,15 +1,20 @@
 {
-  "clients": {
-    "gopls": {
-      "enabled": true,
-      "command": ["gopls"],
-      "selector": "source.go",
-      "initializationOptions": {
-        "experimentalWorkspaceModule": false
-      }
-    },
-    "pyls": {
-      "enabled": true
-    }
-  }
+	"clients": {
+		"gopls": {
+			"enabled": true,
+			"command": ["gopls"],
+			"selector": "source.go",
+			"initializationOptions": {
+				"experimentalWorkspaceModule": false
+			}
+		},
+		"pyls": {
+			"enabled": true
+		},
+		"terraform": {
+			"enabled": true,
+			"command": ["terraform-ls", "serve"],
+			"selector": "source.terraform"
+		}
+	}
 }
