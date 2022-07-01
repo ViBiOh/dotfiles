@@ -23,6 +23,9 @@ clean() {
   SCRIPT_DIR="$(script_dir)"
   rm -rf "${SCRIPT_DIR}/../scripts"
   rm -rf "${SCRIPT_DIR}/../sources/"*-completion
+
+  # Clean broken symlinks in home directory
+  find "${HOME}" -maxdepth 1 -type l ! -exec test -e {} \; -exec rm {} \;
 }
 
 install() {
