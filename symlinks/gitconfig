@@ -79,9 +79,9 @@
 	set-default-branch = ! git config branch.default "$(git get-default-branch)"
 	get-default-branch = ! git remote show origin | grep 'HEAD branch:' | awk '{printf(\"%s\", $3)}'
 	default = ! git switch "$(git default-branch)"
-	log-pretty = log --color --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+	log-pretty = log --color --date=local --pretty=format:'%C(red)%h%C(reset)%C(yellow)%d%C(reset) %s %C(green)(%cr) %C(magenta)(%cd) %C(bold blue)<%an>%C(reset)'
 	lg = log-pretty --graph
-	changelog = ! git log --no-merges --pretty=format:'%Cred%h%Creset %s' "${2:-HEAD}...${1:-$(git last-tag)}"
+	changelog = ! git log --no-merges --pretty=format:'%C(red)%h%C(reset) %s' "${2:-HEAD}...${1:-$(git last-tag)}"
 	find = log-pretty -S
 	filehistory = log-pretty --
 	linehistory = log-pretty -L
