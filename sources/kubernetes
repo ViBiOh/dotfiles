@@ -61,14 +61,15 @@ if command -v kubectl >/dev/null 2>&1; then
         CONTEXT="$(kubectl config get-contexts --output name | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
 
         if [[ -n ${CONTEXT:-} ]]; then
-          KUBECONFIG_TMP=$(mktemp)
-          cp "${KUBECONFIG:-${HOME}/.kube/config}" "${KUBECONFIG_TMP}"
-          export KUBECONFIG="${KUBECONFIG_TMP}"
-          var_print_and_run "kubectl config use-context ${CONTEXT}"
-
           if [[ -n ${TMUX:-} ]]; then
+            KUBECONFIG_TMP=$(mktemp)
+            cp "${KUBECONFIG:-${HOME}/.kube/config}" "${KUBECONFIG_TMP}"
+
+            export KUBECONFIG="${KUBECONFIG_TMP}"
             tmux setenv KUBECONFIG "${KUBECONFIG}"
           fi
+
+          var_print_and_run "kubectl config use-context ${CONTEXT}"
         fi
         ;;
 
