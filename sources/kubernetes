@@ -61,7 +61,7 @@ if command -v kubectl >/dev/null 2>&1; then
         CONTEXT="$(kubectl config get-contexts --output name | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
 
         if [[ -n ${CONTEXT:-} ]]; then
-          if [[ "$(kubectl config view --minify --output=jsonpath --template='{..current-context}' 2>/dev/null)" -eq ${CONTEXT} ]]; then
+          if [[ "$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")" == "${CONTEXT}" ]]; then
             var_info "Already on context '${CONTEXT}'"
             return
           fi
