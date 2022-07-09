@@ -45,7 +45,7 @@ if command -v kubectl >/dev/null 2>&1; then
         var_info " - help    | Print this help                     |"
         var_info " - image   | Print image name                    | <deployment name>"
         var_info " - info    | Print yaml output of an object      | <object type or deployment name> <object name>?"
-        var_info " - logs    | Tail logs                           | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>"
+        var_info " - log     | Tail logs                           | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>"
         var_info " - ns      | Change default namespace            | <namespace name>"
         var_info " - restart | Perform a rollout restart           | <object type or deployment name> <object name>?"
         var_info " - watch   | Watch pods of all namespaces        | <any additionnals 'kubectl get pods' args...>"
@@ -209,7 +209,7 @@ if command -v kubectl >/dev/null 2>&1; then
         fi
         ;;
 
-      "log" | "logs")
+      "log")
         local FIRST=""
         if [[ -n ${1:-} ]] && ! [[ ${1:-} =~ ^- ]]; then
           FIRST="${1}"
@@ -273,7 +273,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
     _fzf_complete_kube() {
       if [[ ${COMP_CWORD} -eq 1 ]]; then
-        mapfile -t COMPREPLY < <(compgen -W "context desc edit env forward image info logs ns restart watch" -- "${COMP_WORDS[COMP_CWORD]}")
+        mapfile -t COMPREPLY < <(compgen -W "context desc edit env forward image info log ns restart watch" -- "${COMP_WORDS[COMP_CWORD]}")
         return
       fi
 
@@ -290,21 +290,9 @@ if command -v kubectl >/dev/null 2>&1; then
         )
         ;;
 
-      "edit")
+      "desc" | "edit" | "env" | "image" | "info" | "log" | "restart")
         FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-          kubectl get deployments.apps --all-namespaces --output=yaml | yq eval '.items[].metadata.name'
-        )
-        ;;
-
-      "env")
-        FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-          kubectl get deployments.apps --all-namespaces --output=yaml | yq eval '.items[].metadata.name'
-        )
-        ;;
-
-      "image")
-        FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-          kubectl get deployments.apps --all-namespaces --output=yaml | yq eval '.items[].metadata.name'
+          kubectl get deployments.app --all-namespaces --output=yaml | yq eval '.items[].metadata.name'
         )
         ;;
 
