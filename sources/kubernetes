@@ -67,10 +67,14 @@ if command -v kubectl >/dev/null 2>&1; then
           fi
 
           if [[ -n ${TMUX:-} ]]; then
-            KUBECONFIG_TMP=$(mktemp)
-            cp "${KUBECONFIG:-${HOME}/.kube/config}" "${KUBECONFIG_TMP}"
+            local TMP_CONTEXT_LOCATION="${HOME}/.kube/contexts"
 
-            export KUBECONFIG="${KUBECONFIG_TMP}"
+            if ! [[ -e "${TMP_CONTEXT_LOCATION}/${CONTEXT}" ]]; then
+              mkdir -p "${TMP_CONTEXT_LOCATION}"
+              cp "${KUBECONFIG:-${HOME}/.kube/config}" "${TMP_CONTEXT_LOCATION}/${CONTEXT}"
+            fi
+
+            export KUBECONFIG="${TMP_CONTEXT_LOCATION}/${CONTEXT}"
             tmux setenv KUBECONFIG "${KUBECONFIG}"
           fi
 
