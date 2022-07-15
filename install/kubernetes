@@ -54,7 +54,7 @@ install() {
     archive_to_binary "https://github.com/derailed/popeye/releases/download/v${POPEYE_VERSION}/popeye_${OS^}_$(normalized_arch "" "arm" "arm64").tar.gz" "popeye"
   fi
 
-  local KUBESEAL_VERSION="0.18.0"
+  local KUBESEAL_VERSION="0.18.1"
   archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-${OS}-${ARCH}.tar.gz" "kubeseal"
 
   if [[ ${ARCH} == "amd64" ]]; then
