@@ -6,7 +6,7 @@ main() {
   local INSTALL_PATH="${HOME}/code"
   local GITHUB_USER="ViBiOh"
   local REPOSITORY_NAME="dotfiles"
-  local DOTFILES_BRANCH="main"
+  local DOTFILES_BRANCH="${DOTFILES_BRANCH:-main}"
   local ARCHIVE_FILENAME="${INSTALL_PATH}/${REPOSITORY_NAME}.zip"
 
   mkdir -p "${INSTALL_PATH}"
