@@ -14,6 +14,10 @@ script_dir() {
   fi
 }
 
+clean() {
+  rm -rf "${HOME}/.iredis_history"
+}
+
 install() {
   source "$(script_dir)/../sources/_python"
 
@@ -22,5 +26,5 @@ install() {
     exit
   fi
 
-  pip install --user checkov
+  pip install --user iredis
 }
