@@ -9,8 +9,8 @@ script_dir() {
     dirname "$(readlink "${FILE_SOURCE}")"
   else
     (
-    cd "$(dirname "${FILE_SOURCE}")" && pwd
-  )
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
   fi
 }
 
@@ -27,5 +27,6 @@ install() {
     packages_install "colima"
     colima completion bash >"$(script_dir)/../sources/colima-completion"
     colima nerdctl install --path "${HOME}/opt/bin/docker" --force
+    docker completion bash | sed 's|nerdctl|docker|g' >"$(script_dir)/../sources/docker-completion"
   fi
 }
