@@ -30,7 +30,13 @@ if command -v kubectl >/dev/null 2>&1; then
           RESOURCE="deployments.apps"
         fi
 
-        printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=yaml | yq eval '.items[].metadata | .namespace + "/" + .name' | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
+        local YAML_QUERY='.items[].metadata | .namespace + "/" + .name'
+
+        if [[ ${RESOURCE} == "ns" || ${RESOURCE} =~ namespaces? ]]; then
+          YAML_QUERY='.items[].metadata | "/" + .name'
+        fi
+
+        printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
       }
 
       _kube_help() {
