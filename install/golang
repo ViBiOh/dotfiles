@@ -66,7 +66,7 @@ install() {
     go install "github.com/ViBiOh/registry-cleaner@latest"
   fi
 
-  local GOLANGCI_LINT_VERSION="1.47.1"
+  local GOLANGCI_LINT_VERSION="1.47.2"
   archive_to_binary "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/golangci-lint-${GOLANGCI_LINT_VERSION}-${OS}-${ARCH}.tar.gz" "golangci-lint-${GOLANGCI_LINT_VERSION}-${OS}-${ARCH}/golangci-lint"
 
   golangci-lint completion bash >"${SCRIPT_DIR}/../sources/golangci-lint-completion"
