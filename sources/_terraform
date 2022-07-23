@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-if ! command -v terraform >/dev/null 2>&1; then
-  return
-fi
-
-complete -C "${HOME}/opt/bin/terraform" terraform
-
 terraform_install() {
   local TERRAFORM_VERSION=${1}
   shift
@@ -21,13 +15,17 @@ terraform_install() {
   ln -s "${TERRAFORM_VERSION_PATH}" "${TERRAFORM_PATH}"
 }
 
-__terraform_ps1() {
-  # preserve exit status
-  local exit="${?}"
+if command -v terraform >/dev/null 2>&1; then
+  complete -C "${HOME}/opt/bin/terraform" terraform
 
-  if [[ $(find . -maxdepth 1 -type f -name "*.tf" | wc -l) -gt 0 ]]; then
-    printf " 🔧 %s" "$(terraform workspace show)"
-  fi
+  __terraform_ps1() {
+    # preserve exit status
+    local exit="${?}"
 
-  return "${exit}"
-}
+    if [[ $(find . -maxdepth 1 -type f -name "*.tf" | wc -l) -gt 0 ]]; then
+      printf " 🔧 %s" "$(terraform workspace show)"
+    fi
+
+    return "${exit}"
+  }
+fi

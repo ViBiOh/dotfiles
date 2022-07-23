@@ -1,19 +1,26 @@
 #!/usr/bin/env bash
 
 if command -v kubectl >/dev/null 2>&1; then
-  __kube_ps1() {
-    # preserve exit status
-    local exit="${?}"
+  if command -v yq >/dev/null 2>&1; then
+    __kube_ps1() {
+      # preserve exit status
+      local exit="${?}"
 
-    local K8S_CONTEXT
-    K8S_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
+      local CONFIG_FILE="${KUBECONFIG:-${HOME}/.kube/config}"
+      if ! [[ -e ${CONFIG_FILE} ]]; then
+        return "${exit}"
+      fi
 
-    if [[ -n ${K8S_CONTEXT} ]]; then
-      printf " ☸️ %s" "${K8S_CONTEXT}"
-    fi
+      local K8S_CONTEXT
+      K8S_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
 
-    return "${exit}"
-  }
+      if [[ -n ${K8S_CONTEXT} ]]; then
+        printf " ☸️ %s" "${K8S_CONTEXT}"
+      fi
+
+      return "${exit}"
+    }
+  fi
 
   if command -v fzf >/dev/null 2>&1 && command -v yq >/dev/null 2>&1; then
     kube() {

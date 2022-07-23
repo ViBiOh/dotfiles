@@ -4,6 +4,10 @@ if command -v colima >/dev/null 2>&1; then
   docker_start() {
     colima start --runtime=containerd
   }
+
+  docker_stop() {
+    colima stop
+  }
 fi
 
 if command -v docker >/dev/null 2>&1; then
