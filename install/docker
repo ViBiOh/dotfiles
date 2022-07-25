@@ -23,14 +23,16 @@ clean() {
 }
 
 install() {
+  local SCRIPT_DIR="$(script_dir)"
+
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install "colima"
-    colima completion bash >"$(script_dir)/../sources/colima-completion"
+    colima completion bash >"${SCRIPT_DIR}/../sources/colima-completion"
     colima nerdctl install --path "${HOME}/opt/bin/docker" --force
 
     source "${SCRIPT_DIR}/../sources/docker"
 
     docker_start
-    docker completion bash | sed 's|nerdctl|docker|g' >"$(script_dir)/../sources/docker-completion"
+    docker completion bash | sed 's|nerdctl|docker|g' >"${SCRIPT_DIR}/../sources/docker-completion"
   fi
 }
