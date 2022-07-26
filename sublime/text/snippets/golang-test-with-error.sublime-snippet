@@ -19,23 +19,23 @@ func Test${1:FuncName}(t *testing.T) {
 		},
 	}
 
-	for intention, tc := range cases {
+	for intention, testCase := range cases {
 		t.Run(intention, func(t *testing.T) {
-			got, gotErr := ${1:FuncName}(tc.args.content)
+			got, gotErr := ${1:FuncName}(testCase.args.content)
 
 			failed := false
 
 			switch {
 			case
-				tc.wantErr == nil && gotErr != nil,
-				tc.wantErr != nil && gotErr == nil,
-				tc.wantErr != nil && !strings.Contains(gotErr.Error(), tc.wantErr.Error()),
-				got != tc.want:
+				testCase.wantErr == nil && gotErr != nil,
+				testCase.wantErr != nil && gotErr == nil,
+				testCase.wantErr != nil && !strings.Contains(gotErr.Error(), testCase.wantErr.Error()),
+				got != testCase.want:
 				failed = true
 			}
 
 			if failed {
-				t.Errorf("${1:FuncName}() = (%t, `%s`), want (%t, `%s`)", got, gotErr, tc.want, tc.wantErr)
+				t.Errorf("${1:FuncName}() = (%t, `%s`), want (%t, `%s`)", got, gotErr, testCase.want, testCase.wantErr)
 			}
 		})
 	}

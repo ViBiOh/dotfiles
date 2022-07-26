@@ -15,21 +15,21 @@ func Test${1:FuncName}(t *testing.T) {
 		},
 	}
 
-	for intention, tc := range cases {
+	for intention, testCase := range cases {
 		t.Run(intention, func(t *testing.T) {
 			writer := httptest.NewRecorder()
-			${1:FuncName}(writer, tc.request)
+			${1:FuncName}(writer, testCase.request)
 
-			if got := writer.Code; got != tc.wantStatus {
-				t.Errorf("${1:FuncName} = HTTP/%d, want HTTP/%d", got, tc.wantStatus)
+			if got := writer.Code; got != testCase.wantStatus {
+				t.Errorf("${1:FuncName} = HTTP/%d, want HTTP/%d", got, testCase.wantStatus)
 			}
 
-			if got, _ := request.ReadBodyResponse(writer.Result()); string(got) != tc.want {
-				t.Errorf("${1:FuncName} = `%s`, want `%s`", string(got), tc.want)
+			if got, _ := request.ReadBodyResponse(writer.Result()); string(got) != testCase.want {
+				t.Errorf("${1:FuncName} = `%s`, want `%s`", string(got), testCase.want)
 			}
 
-			for key := range tc.wantHeader {
-				want := tc.wantHeader.Get(key)
+			for key := range testCase.wantHeader {
+				want := testCase.wantHeader.Get(key)
 				if got := writer.Header().Get(key); got != want {
 					t.Errorf("`%s` Header = `%s`, want `%s`", key, got, want)
 				}

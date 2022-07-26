@@ -5,9 +5,9 @@ defer ctrl.Finish()
 
 mock${1} := mocks.New${1}(ctrl)
 
-tc.instance.${1} = mock${1}
+testCase.instance.${1} = mock${1}
 
-switch tc.intention {
+switch testCase.intention {
 case "":
 	mock${1}.EXPECT().
 }
