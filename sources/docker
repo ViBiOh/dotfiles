@@ -21,7 +21,7 @@ if command -v docker >/dev/null 2>&1; then
     docker volume ls --quiet | xargs docker volume rm
   }
 
-  sidecars() {
+  docker_sidecars() {
     docker rm --force --volumes "rabbit"
     docker run --detach --name "rabbit" --publish "127.0.0.1:5672:5672" --publish "127.0.0.1:15672:15672" "rabbitmq:management"
 
