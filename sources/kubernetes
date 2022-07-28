@@ -65,6 +65,20 @@ if command -v kubectl >/dev/null 2>&1; then
         var_info " - *       | Call kubectl directly               | <any additionnals 'kubectl' args...>"
       }
 
+      local KUBECTL_COMMAND="kubectl"
+      local KUBECTL_CONTEXT=""
+      if [[ ${1:-} =~ "--context=" ]]; then
+        KUBECTL_CONTEXT+=" ${1}"
+        shift
+      elif [[ ${1:-} =~ "--context" && -n ${2:-} ]]; then
+        KUBECTL_CONTEXT+=" ${1} ${2}"
+        shift 2
+      fi
+
+      if [[ -n ${KUBECTL_CONTEXT} ]]; then
+        KUBECTL_COMMAND+=" ${KUBECTL_CONTEXT}"
+      fi
+
       local ACTION="${1}"
       shift
 
@@ -91,7 +105,7 @@ if command -v kubectl >/dev/null 2>&1; then
             tmux setenv KUBECONFIG "${KUBECONFIG}"
           fi
 
-          var_print_and_run "kubectl config use-context ${CONTEXT}"
+          var_print_and_run "${KUBECTL_COMMAND} config use-context ${CONTEXT}"
         fi
         ;;
 
@@ -99,7 +113,7 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(_kube_resources "${@}")"
 
         if [[ -n ${parts[2]:-} ]]; then
-          var_print_and_run "kubectl describe ${parts[0]} --namespace=${parts[1]} ${parts[2]}"
+          var_print_and_run "${KUBECTL_COMMAND} describe ${parts[0]} --namespace=${parts[1]} ${parts[2]}"
         fi
         ;;
 
@@ -107,7 +121,7 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(_kube_resources "${@}")"
 
         if [[ -n ${parts[2]:-} ]]; then
-          var_print_and_run "kubectl edit ${parts[0]} --namespace=${parts[1]} ${parts[2]}"
+          var_print_and_run "${KUBECTL_COMMAND} edit ${parts[0]} --namespace=${parts[1]} ${parts[2]}"
         fi
         ;;
 
@@ -116,11 +130,11 @@ if command -v kubectl >/dev/null 2>&1; then
 
         if [[ -n ${parts[1]:-} ]]; then
           local KUBE_CONTAINER
-          KUBE_CONTAINER="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.spec.template.spec.containers[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}" --prompt="Container:")"
+          KUBE_CONTAINER="$(${KUBECTL_COMMAND} get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.spec.template.spec.containers[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}" --prompt="Container:")"
 
           local DEPLOYMENT_YAML
           DEPLOYMENT_YAML="$(mktemp)"
-          kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml >"${DEPLOYMENT_YAML}"
+          ${KUBECTL_COMMAND} get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml >"${DEPLOYMENT_YAML}"
 
           KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]", "\n"))' "${DEPLOYMENT_YAML}"
 
@@ -139,7 +153,7 @@ if command -v kubectl >/dev/null 2>&1; then
             fi
             YQ_QUERY+=' | sub("[\n]", "\n")'
 
-            kubectl get "${inlineRefParts[0]}" --namespace="${parts[1]}" "${inlineRefParts[1]}" --output=yaml | SECRET_KEY="${inlineRefParts[2]}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
+            ${KUBECTL_COMMAND} get "${inlineRefParts[0]}" --namespace="${parts[1]}" "${inlineRefParts[1]}" --output=yaml | SECRET_KEY="${inlineRefParts[2]}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
           done
 
           local ENV_FROMS
@@ -154,7 +168,7 @@ if command -v kubectl >/dev/null 2>&1; then
             YQ_QUERY+=' | sub("[\n]", "\n"))'
 
             var_warning "${envFromParts[0]} ${parts[1]}/${envFromParts[1]}"
-            kubectl get "${envFromParts[0]}" --namespace="${parts[1]}" "${envFromParts[1]}" --output=yaml | yq eval "${YQ_QUERY}"
+            ${KUBECTL_COMMAND} get "${envFromParts[0]}" --namespace="${parts[1]}" "${envFromParts[1]}" --output=yaml | yq eval "${YQ_QUERY}"
           done
 
           local FIELD_REFS
@@ -166,11 +180,11 @@ if command -v kubectl >/dev/null 2>&1; then
 
           if [[ -n ${FIELD_REFS:-} ]]; then
             local PODS_LABELS
-            PODS_LABELS="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+            PODS_LABELS="$(${KUBECTL_COMMAND} get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
 
             local POD_YAML
             POD_YAML="$(mktemp)"
-            kubectl get pods --namespace="${parts[1]}" "--selector=${PODS_LABELS}" --output=yaml | yq eval '[.items[] | select(.status.phase == "Running")] | .[0]' >"${POD_YAML}"
+            ${KUBECTL_COMMAND} get pods --namespace="${parts[1]}" "--selector=${PODS_LABELS}" --output=yaml | yq eval '[.items[] | select(.status.phase == "Running")] | .[0]' >"${POD_YAML}"
 
             var_warning "Values from first 'Running' pod found"
             for fieldRef in ${FIELD_REFS}; do
@@ -190,13 +204,13 @@ if command -v kubectl >/dev/null 2>&1; then
 
         if [[ -n ${parts[1]:-} ]]; then
           local KUBE_PORT
-          KUBE_PORT="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.spec.ports[] | .name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}" --prompt="Port:")"
+          KUBE_PORT="$(${KUBECTL_COMMAND} get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.spec.ports[] | .name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}" --prompt="Port:")"
 
           if [[ -n ${KUBE_PORT:-} ]]; then
             local LOCAL_PORT="${3:-4000}"
 
             printf "%bForwarding %s from %s to %s%b\n" "${BLUE}" "${parts[0]}/${parts[1]}/${parts[2]}" "${LOCAL_PORT}" "${KUBE_PORT}" "${RESET}"
-            var_print_and_run "kubectl port-forward --namespace=${parts[1]} ${parts[0]}/${parts[2]} ${LOCAL_PORT}:${KUBE_PORT}"
+            var_print_and_run "${KUBECTL_COMMAND} port-forward --namespace=${parts[1]} ${parts[0]}/${parts[2]} ${LOCAL_PORT}:${KUBE_PORT}"
           fi
         fi
         ;;
@@ -209,7 +223,7 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(_kube_resources "deployments.apps" "${1:- }")"
 
         if [[ -n ${parts[1]:-} ]]; then
-          var_print_and_run "kubectl get ${parts[0]} --namespace=${parts[1]} ${parts[2]} --output=yaml | yq eval '.spec.template.spec.containers[].image'"
+          var_print_and_run "${KUBECTL_COMMAND} get ${parts[0]} --namespace=${parts[1]} ${parts[2]} --output=yaml | yq eval '.spec.template.spec.containers[].image'"
         fi
         ;;
 
@@ -222,7 +236,7 @@ if command -v kubectl >/dev/null 2>&1; then
             QUERY=".data[] |= @base64d"
           fi
 
-          var_print_and_run "kubectl get ${parts[0]} --namespace=${parts[1]} ${parts[2]} --output=yaml | yq eval --prettyPrint '${QUERY}'"
+          var_print_and_run "${KUBECTL_COMMAND} get ${parts[0]} --namespace=${parts[1]} ${parts[2]} --output=yaml | yq eval --prettyPrint '${QUERY}'"
         fi
         ;;
 
@@ -245,43 +259,43 @@ if command -v kubectl >/dev/null 2>&1; then
           local PODS_LABELS
 
           if [[ ${parts[0]} =~ ^cronjobs? ]]; then
-            PODS_LABELS="job-name in ($(kubectl get jobs --namespace="${parts[1]}" --output yaml | OWNER_NAME="${parts[2]}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -))"
+            PODS_LABELS="job-name in ($(${KUBECTL_COMMAND} get jobs --namespace="${parts[1]}" --output yaml | OWNER_NAME="${parts[2]}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -))"
           elif [[ ${parts[0]} =~ ^jobs? ]]; then
             PODS_LABELS="job-name=${parts[2]}"
           elif [[ ${parts[0]} =~ ^deployments? ]]; then
-            PODS_LABELS="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+            PODS_LABELS="$(${KUBECTL_COMMAND} get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
           else
-            PODS_LABELS="$(kubectl get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+            PODS_LABELS="$(${KUBECTL_COMMAND} get "${parts[0]}" --namespace="${parts[1]}" "${parts[2]}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
           fi
 
           printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${parts[0]}/${parts[1]}/${parts[2]}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
           if command -v kail >/dev/null 2>&1; then
-            var_print_and_run "kail --ns='${parts[1]}' --label='${PODS_LABELS}' --since=24h ${*}"
+            var_print_and_run "kail ${KUBECTL_CONTEXT} --ns='${parts[1]}' --label='${PODS_LABELS}' --since=24h ${*}"
           else
-            var_print_and_run "kubectl logs --namespace=${parts[1]} --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
+            var_print_and_run "${KUBECTL_COMMAND} logs --namespace=${parts[1]} --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
           fi
         fi
         ;;
 
       "ns")
-        kubectl get namespaces --output=yaml | yq eval '.items[].metadata.name' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}" | xargs kubectl config set-context --current --namespace
+        ${KUBECTL_COMMAND} get namespaces --output=yaml | yq eval '.items[].metadata.name' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}" | xargs ${KUBECTL_COMMAND} config set-context --current --namespace
         ;;
 
       "restart")
         IFS='/' read -r -a parts <<<"$(_kube_resources "${@}")"
 
         if [[ -n ${parts[1]:-} ]]; then
-          var_print_and_run "kubectl rollout restart --namespace=${parts[1]} ${parts[0]} ${parts[2]}"
+          var_print_and_run "${KUBECTL_COMMAND} rollout restart --namespace=${parts[1]} ${parts[0]} ${parts[2]}"
         fi
         ;;
 
       "watch")
-        var_print_and_run "kubectl get pods --watch ${*}"
+        var_print_and_run "${KUBECTL_COMMAND} get pods --watch ${*}"
         ;;
 
       *)
-        kubectl "${ACTION}" "${@}"
+        ${KUBECTL_COMMAND} "${ACTION}" "${@}"
 
         return 1
         ;;
@@ -329,7 +343,8 @@ if command -v kubectl >/dev/null 2>&1; then
       var_red "Usage: kross [options?] <context's regexp> ARGS..."
 
       var_info "\nPossibles options are\n"
-      var_info " - -c Run alternative program than kubectl (with --context arg)"
+      var_info " - -c Run alternative program than kube command (with --context arg)"
+      var_info " - -k Contexts regexp selector"
     }
 
     if [[ ${#} -lt 2 ]]; then
@@ -337,13 +352,17 @@ if command -v kubectl >/dev/null 2>&1; then
       return 1
     fi
 
-    local COMMAND="kubectl"
+    local COMMAND="kube"
+    local CONTEXT_REGEXP=".*"
 
     OPTIND=0
-    while getopts ":c:" option; do
+    while getopts ":c:k:" option; do
       case "${option}" in
       c)
         COMMAND="${OPTARG}"
+        ;;
+      k)
+        CONTEXT_REGEXP="${OPTARG}"
         ;;
       :)
         printf "option -%s requires a value\n" "${OPTARG}" >&2
@@ -361,9 +380,6 @@ if command -v kubectl >/dev/null 2>&1; then
     done
 
     shift $((OPTIND - 1))
-
-    local CONTEXT_REGEXP="${1:-}"
-    shift
 
     for ctx in $(kubectl config get-contexts --output name); do
       if ! [[ ${ctx} =~ ${CONTEXT_REGEXP} ]]; then
