@@ -68,10 +68,10 @@ if command -v kubectl >/dev/null 2>&1; then
       local KUBECTL_COMMAND="kubectl"
       local KUBECTL_CONTEXT=""
       if [[ ${1:-} =~ "--context=" ]]; then
-        KUBECTL_CONTEXT+=" ${1}"
+        KUBECTL_CONTEXT+="${1}"
         shift
       elif [[ ${1:-} =~ "--context" && -n ${2:-} ]]; then
-        KUBECTL_CONTEXT+=" ${1} ${2}"
+        KUBECTL_CONTEXT+="${1} ${2}"
         shift 2
       fi
 
@@ -347,7 +347,7 @@ if command -v kubectl >/dev/null 2>&1; then
       var_info " - -k Contexts regexp selector"
     }
 
-    if [[ ${#} -lt 2 ]]; then
+    if [[ ${#} -lt 1 ]]; then
       _kross_help
       return 1
     fi
