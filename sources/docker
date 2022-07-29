@@ -28,7 +28,7 @@ if command -v docker >/dev/null 2>&1; then
   }
 
   sidecars_start() {
-    docker_sidecars_stop
+    sidecars_stop
 
     docker run --detach --name "rabbit" --publish "127.0.0.1:5672:5672" --publish "127.0.0.1:15672:15672" "rabbitmq:management"
     docker run --detach --name "postgres" --publish "127.0.0.1:5432:5432" --env "POSTGRES_PASSWORD=postgres" "postgres"
