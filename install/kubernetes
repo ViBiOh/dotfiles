@@ -45,19 +45,23 @@ install() {
     var_error "helm was not found in path. Please run 'helm completion bash >'${SCRIPT_DIR}/../sources/helm-completion'"
   fi
 
+  # renovate: datasource=github-releases depName=fluxcd/flux2
   local FLUX_VERSION="0.31.5"
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
   if [[ ${BASH_VERSINFO:-3} -ge 4 ]]; then
+    # renovate: datasource=github-releases depName=derailed/popeye
     local POPEYE_VERSION="0.10.1"
     archive_to_binary "https://github.com/derailed/popeye/releases/download/v${POPEYE_VERSION}/popeye_${OS^}_$(normalized_arch "" "arm" "arm64").tar.gz" "popeye"
   fi
 
+  # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
   local KUBESEAL_VERSION="0.18.1"
   archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-${OS}-${ARCH}.tar.gz" "kubeseal"
 
   if [[ ${ARCH} == "amd64" ]]; then
+    # renovate: datasource=github-releases depName=boz/kail
     local KAIL_VERSION="0.15.0"
     archive_to_binary "https://github.com/boz/kail/releases/download/v${KAIL_VERSION}/kail_${KAIL_VERSION}_${OS}_${ARCH}.tar.gz" "kail"
   fi
