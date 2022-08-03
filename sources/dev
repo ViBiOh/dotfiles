@@ -66,8 +66,13 @@ if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep -i "fan"
   }
 
-  cpu_throttling() {
-    pmset -g thermlog
+  system_state() {
+    printf "%bThermal%b\n" "${BLUE}" "${RESET}"
+    pmset -g therm
+    printf "%bAC Power adapter%b\n" "${BLUE}" "${RESET}"
+    pmset -g ac
+    printf "%bBattery%b\n" "${BLUE}" "${RESET}"
+    pmset -g batt
   }
 fi
 
