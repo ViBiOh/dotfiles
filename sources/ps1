@@ -8,7 +8,16 @@ export GIT_PS1_COMPRESSSPARSESTATE="true"
 
 export PROMPT_DIRTRIM="3"
 
-_previous_status() {
+_ps1_date_time() {
+  # preserve exit status
+  local exit="${?}"
+
+  printf '⏰ %(%H:%M:%S)T'
+
+  return "${exit}"
+}
+
+_ps1_previous_status() {
   if [[ ${?} -eq 0 ]]; then
     printf -- "%b✔%b" "${GREEN}" "${RESET}"
   else
@@ -29,7 +38,7 @@ if [[ "$(type -t __terraform_ps1)" == "function" ]]; then
   PS1+="${PURPLE}\$(__terraform_ps1)${RESET}"
 fi
 
-PS1+=" \$(printf '⏰ %(%H:%M:%S)T')"
-PS1+=" \$(_previous_status)\n> "
+PS1+=' $(_ps1_date_time)'
+PS1+=" \$(_ps1_previous_status)\n> "
 
 export PS1
