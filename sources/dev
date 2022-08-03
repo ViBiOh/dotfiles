@@ -65,6 +65,10 @@ if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep -i "temperature"
     sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep -i "fan"
   }
+
+  thermal_throttling() {
+    pmset -g thermlog
+  }
 fi
 
 rainbow() {
