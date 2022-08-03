@@ -61,7 +61,7 @@ if command -v kubectl >/dev/null 2>&1; then
         var_info " - log     | Tail logs                           | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>"
         var_info " - ns      | Change default namespace            | <namespace name>"
         var_info " - restart | Perform a rollout restart           | <object type or deployment name> <object name>?"
-        var_info " - watch   | Watch pods of all namespaces        | <any additionnals 'kubectl get pods' args...>"
+        var_info " - watch   | Watch pods                          | <any additionnals 'kubectl get pods' args...>"
         var_info " - *       | Call kubectl directly               | <any additionnals 'kubectl' args...>"
       }
 
@@ -96,12 +96,15 @@ if command -v kubectl >/dev/null 2>&1; then
           if [[ -n ${TMUX:-} ]]; then
             local TMP_CONTEXT_LOCATION="${HOME}/.kube/contexts"
 
-            if ! [[ -e "${TMP_CONTEXT_LOCATION}/${CONTEXT}" ]]; then
+            local CONTEXT_FILENAME
+            CONTEXT_FILENAME="$(printf '%s' "${CONTEXT}" | md5)"
+
+            if ! [[ -e "${TMP_CONTEXT_LOCATION}/${CONTEXT_FILENAME}" ]]; then
               mkdir -p "${TMP_CONTEXT_LOCATION}"
-              cp "${KUBECONFIG:-${HOME}/.kube/config}" "${TMP_CONTEXT_LOCATION}/${CONTEXT}"
+              cp "${KUBECONFIG:-${HOME}/.kube/config}" "${TMP_CONTEXT_LOCATION}/${CONTEXT_FILENAME}"
             fi
 
-            export KUBECONFIG="${TMP_CONTEXT_LOCATION}/${CONTEXT}"
+            export KUBECONFIG="${TMP_CONTEXT_LOCATION}/${CONTEXT_FILENAME}"
             tmux setenv KUBECONFIG "${KUBECONFIG}"
           fi
 
