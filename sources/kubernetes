@@ -289,8 +289,14 @@ if command -v kubectl >/dev/null 2>&1; then
         IFS='/' read -r -a parts <<<"$(_kube_resources "${@}")"
 
         if [[ -n ${parts[1]:-} ]]; then
-          var_print_and_run "${KUBECTL_COMMAND} rollout restart --namespace=${parts[1]} ${parts[0]} ${parts[2]}"
+
+          if [[ ${parts[0]} =~ ^jobs? ]]; then
+            var_print_and_run "${KUBECTL_COMMAND} get --namespace=${parts[1]} ${parts[0]} ${parts[2]} --output yaml | yq eval 'del(.spec.selector)' | yq eval 'del(.spec.template.metadata.labels)' | ${KUBECTL_COMMAND} replace --force --filename -"
+          else
+            var_print_and_run "${KUBECTL_COMMAND} rollout restart --namespace=${parts[1]} ${parts[0]} ${parts[2]}"
+          fi
         fi
+
         ;;
 
       "watch")
