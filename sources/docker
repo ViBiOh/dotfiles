@@ -7,6 +7,7 @@ if command -v colima >/dev/null 2>&1; then
 
   docker_stop() {
     colima stop
+    colima delete
   }
 fi
 
