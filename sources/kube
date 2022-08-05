@@ -22,6 +22,20 @@ kube() {
     printf -- "%b%b %b\n" "${YELLOW}" "${*}" "${RESET}" 1>&2
   }
 
+  local KUBECTL_COMMAND="kubectl"
+  local KUBECTL_CONTEXT=""
+  if [[ ${1:-} =~ "--context=" ]]; then
+    KUBECTL_CONTEXT+="${1}"
+    shift
+  elif [[ ${1:-} =~ "--context" && -n ${2:-} ]]; then
+    KUBECTL_CONTEXT+="${1} ${2}"
+    shift 2
+  fi
+
+  if [[ -n ${KUBECTL_CONTEXT} ]]; then
+    KUBECTL_COMMAND+=" ${KUBECTL_CONTEXT}"
+  fi
+
   _kube_resources() {
     local RESOURCE="${1:-}"
     local QUERY="${2:-}"
@@ -41,7 +55,7 @@ kube() {
       YAML_QUERY='.items[].metadata | "/" + .name'
     fi
 
-    printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
+    printf "%s/%s" "${RESOURCE}" "$(${KUBECTL_COMMAND} get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
   }
 
   _kube_help() {
@@ -62,20 +76,6 @@ kube() {
     _kube_info " - watch   | Watch pods                          | <any additionnals 'kubectl get pods' args...>"
     _kube_info " - *       | Call kubectl directly               | <any additionnals 'kubectl' args...>"
   }
-
-  local KUBECTL_COMMAND="kubectl"
-  local KUBECTL_CONTEXT=""
-  if [[ ${1:-} =~ "--context=" ]]; then
-    KUBECTL_CONTEXT+="${1}"
-    shift
-  elif [[ ${1:-} =~ "--context" && -n ${2:-} ]]; then
-    KUBECTL_CONTEXT+="${1} ${2}"
-    shift 2
-  fi
-
-  if [[ -n ${KUBECTL_CONTEXT} ]]; then
-    KUBECTL_COMMAND+=" ${KUBECTL_CONTEXT}"
-  fi
 
   local ACTION
   if [[ ${#} -gt 0 ]]; then
