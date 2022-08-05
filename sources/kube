@@ -1,0 +1,426 @@
+#!/usr/bin/env bash
+
+if ! command -v fzf >/dev/null 2>&1 || ! command -v yq >/dev/null 2>&1 || ! command -v kubectl >/dev/null 2>&1; then
+  return
+fi
+
+kube() {
+  local YELLOW='\033[33m'
+  export BLUE='\033[0;34m'
+  local RESET='\033[0m'
+
+  _kube_print_and_run() {
+    printf -- "%b%b%b\n" "${YELLOW}" "${@}" "${RESET}" 1>&2
+    eval "${@}"
+  }
+
+  _kube_info() {
+    printf -- "%b%b %b\n" "${BLUE}" "${*}" "${RESET}" 1>&2
+  }
+
+  _kube_warning() {
+    printf -- "%b%b %b\n" "${YELLOW}" "${*}" "${RESET}" 1>&2
+  }
+
+  _kube_resources() {
+    local RESOURCE="${1:-}"
+    local QUERY="${2:-}"
+
+    if [[ -n ${RESOURCE} ]] && [[ -z ${QUERY} ]]; then
+      QUERY="${RESOURCE}"
+      RESOURCE=""
+    fi
+
+    if [[ -z ${RESOURCE} ]]; then
+      RESOURCE="deployments.apps"
+    fi
+
+    local YAML_QUERY='.items[].metadata | .namespace + "/" + .name'
+
+    if [[ ${RESOURCE} == "ns" || ${RESOURCE} =~ namespaces? ]]; then
+      YAML_QUERY='.items[].metadata | "/" + .name'
+    fi
+
+    printf "%s/%s" "${RESOURCE}" "$(kubectl get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
+  }
+
+  _kube_help() {
+    _kube_info "Usage: kube ACTION"
+
+    _kube_info "\nPossibles actions are                            | args\n"
+    _kube_info " - context | Switch context                      | <context name>"
+    _kube_info " - desc    | Describe an object                  | <object type or deployment name> <object name>?"
+    _kube_info " - edit    | Edit an object                      | <object type or deployment name> <object name>?"
+    _kube_info " - env     | Generate .env file from deployments | <deployment name> <container name>?"
+    _kube_info " - forward | Port-forward to a service           | <service name> <service port number>? <exposed port number>? (default 4000)"
+    _kube_info " - help    | Print this help                     |"
+    _kube_info " - image   | Print image name                    | <deployment name>"
+    _kube_info " - info    | Print yaml output of an object      | <object type or deployment name> <object name>?"
+    _kube_info " - log     | Tail logs                           | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>"
+    _kube_info " - ns      | Change default namespace            | <namespace name>"
+    _kube_info " - restart | Perform a rollout restart           | <object type or deployment name> <object name>?"
+    _kube_info " - watch   | Watch pods                          | <any additionnals 'kubectl get pods' args...>"
+    _kube_info " - *       | Call kubectl directly               | <any additionnals 'kubectl' args...>"
+  }
+
+  local KUBECTL_COMMAND="kubectl"
+  local KUBECTL_CONTEXT=""
+  if [[ ${1:-} =~ "--context=" ]]; then
+    KUBECTL_CONTEXT+="${1}"
+    shift
+  elif [[ ${1:-} =~ "--context" && -n ${2:-} ]]; then
+    KUBECTL_CONTEXT+="${1} ${2}"
+    shift 2
+  fi
+
+  if [[ -n ${KUBECTL_CONTEXT} ]]; then
+    KUBECTL_COMMAND+=" ${KUBECTL_CONTEXT}"
+  fi
+
+  local ACTION="${1}"
+  shift
+
+  case ${ACTION} in
+  "context")
+    local CONTEXT
+    CONTEXT="$(kubectl config get-contexts --output name | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
+
+    if [[ -n ${CONTEXT:-} ]]; then
+      if [[ "$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")" == "${CONTEXT}" ]]; then
+        _kube_info "Already on context '${CONTEXT}'"
+        return
+      fi
+
+      if [[ -n ${TMUX:-} ]]; then
+        local TMP_CONTEXT_LOCATION="${HOME}/.kube/contexts"
+
+        local CONTEXT_FILENAME
+        CONTEXT_FILENAME="$(printf '%s' "${CONTEXT}" | md5)"
+
+        if ! [[ -e "${TMP_CONTEXT_LOCATION}/${CONTEXT_FILENAME}" ]]; then
+          mkdir -p "${TMP_CONTEXT_LOCATION}"
+          cp "${KUBECONFIG:-${HOME}/.kube/config}" "${TMP_CONTEXT_LOCATION}/${CONTEXT_FILENAME}"
+        fi
+
+        export KUBECONFIG="${TMP_CONTEXT_LOCATION}/${CONTEXT_FILENAME}"
+        tmux setenv KUBECONFIG "${KUBECONFIG}"
+      fi
+
+      _kube_print_and_run "${KUBECTL_COMMAND} config use-context ${CONTEXT}"
+    fi
+    ;;
+
+  "desc")
+    local KUBE_RESOURCE
+    KUBE_RESOURCE="$(_kube_resources "${@}")"
+
+    local RESOURCE_TYPE
+    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
+    local RESOURCE_NAMESPACE
+    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
+    local RESOURCE_NAME
+    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
+      _kube_print_and_run "${KUBECTL_COMMAND} describe ${RESOURCE_TYPE} --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_NAME}"
+    fi
+    ;;
+
+  "edit")
+    local KUBE_RESOURCE
+    KUBE_RESOURCE="$(_kube_resources "${@}")"
+
+    local RESOURCE_TYPE
+    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
+    local RESOURCE_NAMESPACE
+    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
+    local RESOURCE_NAME
+    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
+      _kube_print_and_run "${KUBECTL_COMMAND} edit ${RESOURCE_TYPE} --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_NAME}"
+    fi
+    ;;
+
+  "env")
+    local KUBE_RESOURCE
+    KUBE_RESOURCE="$(_kube_resources "deployments.apps" "${1:- }")"
+
+    local RESOURCE_TYPE
+    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
+    local RESOURCE_NAMESPACE
+    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
+    local RESOURCE_NAME
+    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
+      local KUBE_CONTAINER
+      KUBE_CONTAINER="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.template.spec.containers[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}" --prompt="Container:")"
+
+      local DEPLOYMENT_YAML
+      DEPLOYMENT_YAML="$(mktemp)"
+      ${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml >"${DEPLOYMENT_YAML}"
+
+      KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]", "\n"))' "${DEPLOYMENT_YAML}"
+
+      local INLINE_REFS
+      INLINE_REFS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("end")) | .env[] |
+            (
+              select((select(has("valueFrom")) | .valueFrom | has("configMapKeyRef"))) | "configmap/" + .valueFrom.configMapKeyRef.name + "/" + .valueFrom.configMapKeyRef.key,
+              select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | "secret/" + .valueFrom.secretKeyRef.name + "/" + .valueFrom.secretKeyRef.key
+            )' "${DEPLOYMENT_YAML}")"
+
+      if [[ -n ${INLINE_REFS:-} ]]; then
+        while read -r inlineRef; do
+          local INLINE_RESOURCE_TYPE
+          INLINE_RESOURCE_TYPE="$(printf '%s' "${inlineRef}" | awk -F '/' '{ print $1 }')"
+          local INLINE_RESOURCE_NAME
+          INLINE_RESOURCE_NAME="$(printf '%s' "${inlineRef}" | awk -F '/' '{ print $2 }')"
+          local INLINE_REF_KEY
+          INLINE_REF_KEY="$(printf '%s' "${inlineRef}" | awk -F '/' '{ print $3 }')"
+
+          YQ_QUERY='.data[strenv(SECRET_KEY)]'
+          if [[ ${INLINE_RESOURCE_TYPE} == "secret" ]]; then
+            YQ_QUERY+=' | @base64d'
+          fi
+          YQ_QUERY+=' | sub("[\n]", "\n")'
+
+          ${KUBECTL_COMMAND} get "${INLINE_RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${INLINE_RESOURCE_NAME}" --output=yaml | SECRET_KEY="${INLINE_REF_KEY}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
+        done <<<"${INLINE_REFS}"
+      fi
+
+      local ENV_FROMS
+      ENV_FROMS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("envFrom")) | .envFrom[] | to_entries | .[] | (.key | sub("Ref$", "")) + "/" + .value.name' "${DEPLOYMENT_YAML}")"
+
+      if [[ -n ${ENV_FROMS:-} ]]; then
+        while read -r envFrom; do
+          local ENVFROM_RESOURCE_TYPE
+          ENVFROM_RESOURCE_TYPE="$(printf '%s' "${envFrom}" | awk -F '/' '{ print $1 }')"
+          local ENVFROM_RESOURCE_NAME
+          ENVFROM_RESOURCE_NAME="$(printf '%s' "${envFrom}" | awk -F '/' '{ print $2 }')"
+
+          local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value'
+          if [[ ${ENVFROM_RESOURCE_TYPE} == "secret" ]]; then
+            YQ_QUERY+=' | @base64d'
+          fi
+          YQ_QUERY+=' | sub("[\n]", "\n"))'
+
+          _kube_warning "${ENVFROM_RESOURCE_TYPE} ${RESOURCE_NAMESPACE}/${ENVFROM_RESOURCE_NAME}"
+          ${KUBECTL_COMMAND} get "${ENVFROM_RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${ENVFROM_RESOURCE_NAME}" --output=yaml | yq eval "${YQ_QUERY}"
+        done <<<"${ENV_FROMS}"
+      fi
+
+      local FIELD_REFS
+      FIELD_REFS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] |
+            (
+              select(select(has("valueFrom")) | .valueFrom | has("fieldRef")) | .name + "@." + (.valueFrom.fieldRef.fieldPath | sub("'"'"'", "\"")),
+              select(select(has("valueFrom")) | .valueFrom | has("resourceFieldRef")) | .name + "@.spec.containers[]|select(.name=\"" + .valueFrom.resourceFieldRef.containerName + "\")|.resources." + (.valueFrom.resourceFieldRef.resource|sub("'"'"'", "\""))
+            )' "${DEPLOYMENT_YAML}")"
+
+      if [[ -n ${FIELD_REFS:-} ]]; then
+        local PODS_LABELS
+        PODS_LABELS="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+
+        local POD_YAML
+        POD_YAML="$(mktemp)"
+        ${KUBECTL_COMMAND} get pods --namespace="${RESOURCE_NAMESPACE}" "--selector=${PODS_LABELS}" --output=yaml | yq eval '[.items[] | select(.status.phase == "Running")] | .[0]' >"${POD_YAML}"
+
+        _kube_warning "Values from first 'Running' pod found"
+        while read -r fieldRef; do
+          local FIELDREF_NAME
+          FIELDREF_NAME="$(printf '%s' "${fieldRef}" | awk -F '@' '{ print $1 }')"
+          local FIELDREF_PATH
+          FIELDREF_PATH="$(printf '%s' "${fieldRef}" | awk -F '@' '{ print $2 }')"
+
+          printf "%s=%s\n" "${FIELDREF_NAME}" "$(yq eval "${FIELDREF_PATH}" "${POD_YAML}")"
+        done <<<"${FIELD_REFS}"
+
+        rm "${POD_YAML}"
+      fi
+
+      rm "${DEPLOYMENT_YAML}"
+    fi
+    ;;
+
+  "forward")
+    local KUBE_RESOURCE
+    KUBE_RESOURCE="$(_kube_resources "services" "${1:- }")"
+
+    local RESOURCE_TYPE
+    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
+    local RESOURCE_NAMESPACE
+    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
+    local RESOURCE_NAME
+    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
+      local KUBE_PORT
+      KUBE_PORT="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}" --prompt="Port:")"
+
+      if [[ -n ${KUBE_PORT:-} ]]; then
+        local LOCAL_PORT="${3:-4000}"
+
+        printf "%bForwarding %s from %s to %s%b\n" "${BLUE}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${LOCAL_PORT}" "${KUBE_PORT}" "${RESET}"
+        _kube_print_and_run "${KUBECTL_COMMAND} port-forward --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_TYPE}/${RESOURCE_NAME} ${LOCAL_PORT}:${KUBE_PORT}"
+      fi
+    fi
+    ;;
+
+  "help")
+    _kube_help
+    ;;
+
+  "image")
+    local KUBE_RESOURCE
+    KUBE_RESOURCE="$(_kube_resources "deployments.apps" "${1:- }")"
+
+    local RESOURCE_TYPE
+    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
+    local RESOURCE_NAMESPACE
+    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
+    local RESOURCE_NAME
+    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
+      _kube_print_and_run "${KUBECTL_COMMAND} get ${RESOURCE_TYPE} --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval '.spec.template.spec.containers[].image'"
+    fi
+    ;;
+
+  "info")
+    local KUBE_RESOURCE
+    KUBE_RESOURCE="$(_kube_resources "${@}")"
+
+    local RESOURCE_TYPE
+    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
+    local RESOURCE_NAMESPACE
+    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
+    local RESOURCE_NAME
+    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
+      local QUERY="."
+      if [[ ${RESOURCE_TYPE} =~ secrets? ]]; then
+        QUERY=".data[] |= @base64d"
+      fi
+
+      _kube_print_and_run "${KUBECTL_COMMAND} get ${RESOURCE_TYPE} --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '${QUERY}'"
+    fi
+    ;;
+
+  "log")
+    local FIRST=""
+    if [[ -n ${1:-} ]] && ! [[ ${1:-} =~ ^- ]]; then
+      FIRST="${1}"
+      shift
+    fi
+
+    local SECOND=""
+    if [[ -n ${1:-} ]] && ! [[ ${1:-} =~ ^- ]]; then
+      SECOND="${1}"
+      shift
+    fi
+
+    local KUBE_RESOURCE
+    KUBE_RESOURCE="$(_kube_resources "${FIRST}" "${SECOND}")"
+
+    local RESOURCE_TYPE
+    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
+    local RESOURCE_NAMESPACE
+    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
+    local RESOURCE_NAME
+    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
+      local PODS_LABELS
+
+      if [[ ${RESOURCE_TYPE} =~ ^cronjobs? ]]; then
+        PODS_LABELS="job-name in ($(${KUBECTL_COMMAND} get jobs --namespace="${RESOURCE_NAMESPACE}" --output yaml | OWNER_NAME="${RESOURCE_NAME}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -))"
+      elif [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
+        PODS_LABELS="job-name=${RESOURCE_NAME}"
+      elif [[ ${RESOURCE_TYPE} =~ ^deployments? ]]; then
+        PODS_LABELS="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+      else
+        PODS_LABELS="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+      fi
+
+      printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
+
+      if command -v kail >/dev/null 2>&1; then
+        _kube_print_and_run "kail ${KUBECTL_CONTEXT} --ns='${RESOURCE_NAMESPACE}' --label='${PODS_LABELS}' --since=24h ${*}"
+      else
+        _kube_print_and_run "${KUBECTL_COMMAND} logs --namespace=${RESOURCE_NAMESPACE} --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
+      fi
+    fi
+    ;;
+
+  "ns")
+    ${KUBECTL_COMMAND} get namespaces --output=yaml | yq eval '.items[].metadata.name' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}" | xargs ${KUBECTL_COMMAND} config set-context --current --namespace
+    ;;
+
+  "restart")
+    local KUBE_RESOURCE
+    KUBE_RESOURCE="$(_kube_resources "${@}")"
+
+    local RESOURCE_TYPE
+    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
+    local RESOURCE_NAMESPACE
+    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
+    local RESOURCE_NAME
+    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
+      if [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
+        _kube_print_and_run "${KUBECTL_COMMAND} get --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_TYPE} ${RESOURCE_NAME} --output yaml | yq eval 'del(.spec.selector)' | yq eval 'del(.spec.template.metadata.labels)' | ${KUBECTL_COMMAND} replace --force --filename -"
+      else
+        _kube_print_and_run "${KUBECTL_COMMAND} rollout restart --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_TYPE} ${RESOURCE_NAME}"
+      fi
+    fi
+
+    ;;
+
+  "watch")
+    _kube_print_and_run "${KUBECTL_COMMAND} get pods --watch ${*}"
+    ;;
+
+  *)
+    ${KUBECTL_COMMAND} "${ACTION}" "${@}"
+
+    return 1
+    ;;
+  esac
+}
+
+_fzf_complete_kube() {
+  if [[ ${COMP_CWORD} -eq 1 ]]; then
+    mapfile -t COMPREPLY < <(compgen -W "context desc edit env forward image info log ns restart watch" -- "${COMP_WORDS[COMP_CWORD]}")
+    return
+  fi
+
+  case ${COMP_WORDS[COMP_CWORD - 1]} in
+  "context")
+    FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
+      kubectl config get-contexts --output name
+    )
+    ;;
+
+  "forward")
+    FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
+      kubectl get services --all-namespaces --output=yaml | yq eval '.items[].metadata.name'
+    )
+    ;;
+
+  "desc" | "edit" | "env" | "image" | "info" | "log" | "restart")
+    FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
+      kubectl get deployments.app --all-namespaces --output=yaml | yq eval '.items[].metadata.name'
+    )
+    ;;
+
+  "ns")
+    FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
+      kubectl get namespaces --output=yaml | yq eval '.items[].metadata.name'
+    )
+    ;;
+  esac
+}
+
+[[ -n ${BASH} ]] && complete -F _fzf_complete_kube -o default -o bashdefault kube
