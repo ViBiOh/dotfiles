@@ -77,8 +77,11 @@ kube() {
     KUBECTL_COMMAND+=" ${KUBECTL_CONTEXT}"
   fi
 
-  local ACTION="${1}"
-  shift
+  local ACTION
+  if [[ ${#} -gt 0 ]]; then
+    ACTION="${1}"
+    shift
+  fi
 
   case ${ACTION} in
   "context")
