@@ -7,12 +7,12 @@ install() {
   local SYNCTHING_VERSION="v1.20.4"
 
   local SYNCTHING_RELEASE
-  SYNCTHING_RELEASE="syncthing-$(normalized_os "macos")-$(normalized_arch "amd64" "arm" "arm64")-v${SYNCTHING_VERSION}"
+  SYNCTHING_RELEASE="syncthing-$(normalized_os "macos")-$(normalized_arch "amd64" "arm" "arm64")-${SYNCTHING_VERSION}"
 
   local SYNCTHING_ARCHIVE_TYPE="tar.gz"
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     SYNCTHING_ARCHIVE_TYPE="zip"
   fi
 
-  archive_to_binary "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/${SYNCTHING_RELEASE}.${SYNCTHING_ARCHIVE_TYPE}" "${SYNCTHING_RELEASE}/syncthing"
+  archive_to_binary "https://github.com/syncthing/syncthing/releases/download/${SYNCTHING_VERSION}/${SYNCTHING_RELEASE}.${SYNCTHING_ARCHIVE_TYPE}" "${SYNCTHING_RELEASE}/syncthing"
 }
