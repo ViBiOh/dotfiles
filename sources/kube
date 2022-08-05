@@ -6,7 +6,7 @@ fi
 
 kube() {
   local YELLOW='\033[33m'
-  export BLUE='\033[0;34m'
+  local BLUE='\033[0;34m'
   local RESET='\033[0m'
 
   _kube_print_and_run() {
