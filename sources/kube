@@ -72,7 +72,7 @@ kube() {
     _kube_info " - info    | Print yaml output of an object      | <object type or deployment name> <object name>?"
     _kube_info " - log     | Tail logs                           | <object type or deployment name> <object name>? <any additionnals 'kubectl logs' args...>"
     _kube_info " - ns      | Change default namespace            | <namespace name>"
-    _kube_info " - restart | Perform a rollout restart           | <object type or deployment name> <object name>?"
+    _kube_info " - restart | Perform a restart of pod            | <object type or deployment name> <object name>?"
     _kube_info " - watch   | Watch pods                          | <any additionnals 'kubectl get pods' args...>"
     _kube_info " - *       | Call kubectl directly               | <any additionnals 'kubectl' args...>"
   }
@@ -109,7 +109,7 @@ kube() {
         tmux setenv KUBECONFIG "${KUBECONFIG}"
       fi
 
-      _kube_print_and_run "${KUBECTL_COMMAND} config use-context ${CONTEXT}"
+      _kube_print_and_run "kubectl config use-context ${CONTEXT}"
     fi
     ;;
 
