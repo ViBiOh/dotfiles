@@ -106,22 +106,31 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
   }
 
   helm_delta() {
-    IFS='/' read -r -a release <<<"$(helm list --all-namespaces --output yaml | yq eval '.[] | .namespace + "/" + .name' - | fzf --height=20 --ansi --reverse)"
-    if [[ -z ${release[0]:-} ]] || [[ -z ${release[1]:-} ]]; then
+    local HELM_RELEASE
+    HELM_RELEASE="$(helm list --all-namespaces --output yaml | yq eval '.[] | .namespace + "/" + .name' - | fzf --height=20 --ansi --reverse)"
+
+    local NAMESPACE
+    NAMESPACE="$(printf '%s' "${HELM_RELEASE}" | awk -F '/' '{ print $1 }')"
+    local NAME
+    NAME="$(printf '%s' "${HELM_RELEASE}" | awk -F '/' '{ print $2 }')"
+
+    if [[ -z ${NAMESPACE:-} ]] || [[ -z ${NAME:-} ]]; then
       return 1
     fi
 
-    local NAMESPACE="${release[0]}"
-    local NAME="${release[1]}"
     var_info "Release: ${NAMESPACE}/${NAME}"
 
-    IFS='@' read -r -a chart <<<"$(helm_select_chart "" "" "")"
-    if [[ -z ${chart[0]:-} ]] || [[ -z ${chart[1]:-} ]]; then
+    local HELM_CHART
+    HELM_CHART="$(helm_select_chart "" "" "")"
+
+    local CHART
+    CHART="$(printf '%s' "${HELM_CHART}" | awk -F '@' '{ print $1 }')"
+    local VERSION
+    VERSION="$(printf '%s' "${HELM_CHART}" | awk -F '@' '{ print $2 }')"
+
+    if [[ -z ${CHART:-} ]] || [[ -z ${VERSION:-} ]]; then
       return 1
     fi
-
-    local CHART="${chart[0]}"
-    local VERSION="${chart[1]}"
 
     extract_manifest() {
       yq eval '.manifest' - | yq eval --prettyPrint 'sortKeys(..)' -
@@ -141,13 +150,17 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
   }
 
   helm_crds_manifests() {
-    IFS='@' read -r -a chart <<<"$(helm_select_chart "" "" "")"
-    if [[ -z ${chart[0]:-} ]] || [[ -z ${chart[1]:-} ]]; then
+    local HELM_CHART
+    HELM_CHART="$(helm_select_chart "" "" "")"
+
+    local CHART
+    CHART="$(printf '%s' "${HELM_CHART}" | awk -F '@' '{ print $1 }')"
+    local VERSION
+    VERSION="$(printf '%s' "${HELM_CHART}" | awk -F '@' '{ print $2 }')"
+
+    if [[ -z ${CHART:-} ]] || [[ -z ${VERSION:-} ]]; then
       return 1
     fi
-
-    local CHART="${chart[0]}"
-    local VERSION="${chart[1]}"
 
     local CURRENT_DIR
     CURRENT_DIR="$(pwd)"
