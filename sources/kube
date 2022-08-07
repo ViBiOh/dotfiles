@@ -49,13 +49,13 @@ kube() {
       RESOURCE="deployments.apps"
     fi
 
-    local YAML_QUERY='.items[].metadata | .namespace + "/" + .name'
+    local YAML_QUERY='.items[] | (.kind | downcase) + "/" + .metadata.namespace + "/" + .metadata.name'
 
-    if [[ ${RESOURCE} == "ns" || ${RESOURCE} =~ namespaces? ]]; then
-      YAML_QUERY='.items[].metadata | "/" + .name'
+    if [[ ${RESOURCE} == "ns" || ${RESOURCE} =~ ^namespaces? ]]; then
+      YAML_QUERY='.items[] | (.kind | downcase) + "//" + .metadata.name'
     fi
 
-    printf "%s/%s" "${RESOURCE}" "$(${KUBECTL_COMMAND} get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
+    printf "%s" "$(${KUBECTL_COMMAND} get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
   }
 
   _kube_help() {
@@ -342,6 +342,9 @@ kube() {
         PODS_LABELS="job-name=${RESOURCE_NAME}"
       elif [[ ${RESOURCE_TYPE} =~ ^deployments? ]]; then
         PODS_LABELS="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+      elif [[ ${RESOURCE_TYPE} =~ ^namespaces? ]]; then
+        PODS_LABELS=""
+        RESOURCE_NAMESPACE="${RESOURCE_NAME}"
       else
         PODS_LABELS="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
       fi
