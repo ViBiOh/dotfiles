@@ -1,0 +1,17 @@
+<snippet>
+	<content><![CDATA[
+func Test${2:FuncName}(t *testing.T) {
+	t.Parallel()
+
+	want := "success"
+
+	if got := ${2:FuncName}(); got != want {
+		t.Errorf("${2:FuncName}() = `%s`, want `%s`", got, want)
+	}
+}
+
+]]></content>
+	<tabTrigger>gst</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang Simple Test</description>
+</snippet>

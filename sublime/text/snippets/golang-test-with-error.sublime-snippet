@@ -1,6 +1,8 @@
 <snippet>
 	<content><![CDATA[
 func Test${1:FuncName}(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		content string
 	}
@@ -20,7 +22,12 @@ func Test${1:FuncName}(t *testing.T) {
 	}
 
 	for intention, testCase := range cases {
+		intention := intention
+		testCase := testCase
+
 		t.Run(intention, func(t *testing.T) {
+			t.Parallel()
+
 			got, gotErr := ${1:FuncName}(testCase.args.content)
 
 			failed := false
