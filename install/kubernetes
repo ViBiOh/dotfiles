@@ -47,7 +47,7 @@ install() {
 
   # renovate: datasource=github-releases depName=fluxcd/flux2
   local FLUX_VERSION="v0.32.0"
-  archive_to_binary "https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION#s}_${OS}_${ARCH}.tar.gz" "flux"
+  archive_to_binary "https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION#v}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
   if [[ ${BASH_VERSINFO:-3} -ge 4 ]]; then
