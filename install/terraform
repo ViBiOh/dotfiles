@@ -8,7 +8,7 @@ clean() {
 
 install() {
   # renovate: datasource=github-releases depName=hashicorp/terraform-ls
-  local TERRAFORM_LS_VERSION="0.28.1"
+  local TERRAFORM_LS_VERSION="v0.29.0"
 
   terraform_install "1.2.7"
 
