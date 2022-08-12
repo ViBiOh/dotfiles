@@ -60,11 +60,10 @@ install() {
   local KUBESEAL_VERSION="0.18.1"
   archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-${OS}-${ARCH}.tar.gz" "kubeseal"
 
-  if [[ ${ARCH} == "amd64" ]]; then
-    # renovate: datasource=github-releases depName=boz/kail
-    local KAIL_VERSION="0.15.0"
-    archive_to_binary "https://github.com/boz/kail/releases/download/v${KAIL_VERSION}/kail_${KAIL_VERSION}_${OS}_${ARCH}.tar.gz" "kail"
-  fi
+  # renovate: datasource=github-releases depName=ViBiOh/kmux
+  local KMUX_VERSION="v0.0.3"
+  curl_to_binary "https://github.com/ViBiOh/kmux/releases/download/${KMUX_VERSION}/kmux_${OS}_${ARCH}" "kmux"
+  kmux completion bash >"${SCRIPT_DIR}/../sources/kmux-completion"
 }
 
 credentials() {

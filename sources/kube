@@ -285,7 +285,11 @@ kube() {
     RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
-      _kube_print_and_run "${KUBECTL_COMMAND} get ${RESOURCE_TYPE} --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval '.spec.template.spec.containers[].image'"
+      if command -v kmux >/dev/null 2>&1; then
+        _kube_print_and_run "kmux ${KUBECTL_CONTEXT} --namespace=${RESOURCE_NAMESPACE} image ${RESOURCE_TYPE} ${RESOURCE_NAME}"
+      else
+        _kube_print_and_run "${KUBECTL_COMMAND} get ${RESOURCE_TYPE} --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval '.spec.template.spec.containers[].image'"
+      fi
     fi
     ;;
 
@@ -334,26 +338,26 @@ kube() {
     RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
-      local PODS_LABELS
-
-      if [[ ${RESOURCE_TYPE} =~ ^cronjobs? ]]; then
-        PODS_LABELS="job-name in ($(${KUBECTL_COMMAND} get jobs --namespace="${RESOURCE_NAMESPACE}" --output yaml | OWNER_NAME="${RESOURCE_NAME}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -))"
-      elif [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
-        PODS_LABELS="job-name=${RESOURCE_NAME}"
-      elif [[ ${RESOURCE_TYPE} =~ ^deployments? ]]; then
-        PODS_LABELS="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
-      elif [[ ${RESOURCE_TYPE} =~ ^namespaces? ]]; then
-        PODS_LABELS=""
-        RESOURCE_NAMESPACE="${RESOURCE_NAME}"
+      if [[ ${RESOURCE_TYPE} =~ ^(cronjob|daemonset|deployment|job|namespace|service|node)s? ]] && command -v kmux >/dev/null 2>&1; then
+        _kube_print_and_run "kmux ${KUBECTL_CONTEXT} --namespace '${RESOURCE_NAMESPACE}' log ${RESOURCE_TYPE} ${RESOURCE_NAME} --since=24h ${*}"
       else
-        PODS_LABELS="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
-      fi
+        local PODS_LABELS
 
-      printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
+        if [[ ${RESOURCE_TYPE} =~ ^cronjobs? ]]; then
+          PODS_LABELS="job-name in ($(${KUBECTL_COMMAND} get jobs --namespace="${RESOURCE_NAMESPACE}" --output yaml | OWNER_NAME="${RESOURCE_NAME}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -))"
+        elif [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
+          PODS_LABELS="job-name=${RESOURCE_NAME}"
+        elif [[ ${RESOURCE_TYPE} =~ ^deployments? ]]; then
+          PODS_LABELS="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+        elif [[ ${RESOURCE_TYPE} =~ ^namespaces? ]]; then
+          PODS_LABELS=""
+          RESOURCE_NAMESPACE="${RESOURCE_NAME}"
+        else
+          PODS_LABELS="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+        fi
 
-      if command -v kail >/dev/null 2>&1; then
-        _kube_print_and_run "kail ${KUBECTL_CONTEXT} --ns='${RESOURCE_NAMESPACE}' --label='${PODS_LABELS}' --since=24h ${*}"
-      else
+        printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
+
         _kube_print_and_run "${KUBECTL_COMMAND} logs --namespace=${RESOURCE_NAMESPACE} --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
       fi
     fi
@@ -375,17 +379,25 @@ kube() {
     RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
-      if [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
-        _kube_print_and_run "${KUBECTL_COMMAND} get --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_TYPE} ${RESOURCE_NAME} --output yaml | yq eval 'del(.spec.selector)' | yq eval 'del(.spec.template.metadata.labels)' | ${KUBECTL_COMMAND} replace --force --filename -"
+      if command -v kmux >/dev/null 2>&1; then
+        _kube_print_and_run "kmux ${KUBECTL_CONTEXT} --namespace '${RESOURCE_NAMESPACE}' restart ${RESOURCE_TYPE} ${RESOURCE_NAME}"
       else
-        _kube_print_and_run "${KUBECTL_COMMAND} rollout restart --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_TYPE} ${RESOURCE_NAME}"
+        if [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
+          _kube_print_and_run "${KUBECTL_COMMAND} get --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_TYPE} ${RESOURCE_NAME} --output yaml | yq eval 'del(.spec.selector)' | yq eval 'del(.spec.template.metadata.labels)' | ${KUBECTL_COMMAND} replace --force --filename -"
+        else
+          _kube_print_and_run "${KUBECTL_COMMAND} rollout restart --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_TYPE} ${RESOURCE_NAME}"
+        fi
       fi
     fi
 
     ;;
 
   "watch")
-    _kube_print_and_run "${KUBECTL_COMMAND} get pods --watch ${*}"
+    if command -v kmux >/dev/null 2>&1; then
+      _kube_print_and_run "kmux ${KUBECTL_CONTEXT} watch ${*}"
+    else
+      _kube_print_and_run "${KUBECTL_COMMAND} get pods --watch ${*}"
+    fi
     ;;
 
   *)
