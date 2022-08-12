@@ -21,58 +21,6 @@ if command -v kubectl >/dev/null 2>&1; then
       return "${exit}"
     }
   fi
-
-  kross() {
-    _kross_help() {
-      var_red "Usage: kross [options?] <context's regexp> ARGS..."
-
-      var_info "\nPossibles options are\n"
-      var_info " - -c Run alternative program than kube command (with --context arg)"
-      var_info " - -k Contexts regexp selector"
-    }
-
-    if [[ ${#} -lt 1 ]]; then
-      _kross_help
-      return 1
-    fi
-
-    local COMMAND="kube"
-    local CONTEXT_REGEXP=".*"
-
-    OPTIND=0
-    while getopts ":c:k:" option; do
-      case "${option}" in
-      c)
-        COMMAND="${OPTARG}"
-        ;;
-      k)
-        CONTEXT_REGEXP="${OPTARG}"
-        ;;
-      :)
-        printf "option -%s requires a value\n" "${OPTARG}" >&2
-        return 1
-        ;;
-      \?)
-        printf "option -%s is invalid\n" "${OPTARG}" >&2
-        return 2
-        ;;
-      *)
-        _kross_help
-        return 1
-        ;;
-      esac
-    done
-
-    shift $((OPTIND - 1))
-
-    for ctx in $(kubectl config get-contexts --output name); do
-      if ! [[ ${ctx} =~ ${CONTEXT_REGEXP} ]]; then
-        continue
-      fi
-
-      tmux_split_cmd "var_print_and_run \"${COMMAND} --context '${ctx}' ${*}\""
-    done
-  }
 fi
 
 if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
