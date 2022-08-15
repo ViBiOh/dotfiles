@@ -1,6 +1,5 @@
 <snippet>
 	<content><![CDATA[
-// Handler for request. Should be use with net/http
 func (a app) Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		${1}
