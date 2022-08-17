@@ -24,13 +24,20 @@ kube() {
 
   local KUBECTL_COMMAND="kubectl"
   local KUBECTL_CONTEXT=""
-  if [[ ${1:-} =~ "--context=" ]]; then
-    KUBECTL_CONTEXT+="${1}"
-    shift
-  elif [[ ${1:-} =~ "--context" && -n ${2:-} ]]; then
-    KUBECTL_CONTEXT+="${1} ${2}"
-    shift 2
-  fi
+
+  while [[ ${1:-} =~ ^--context ]]; do
+    if [[ ${#KUBECTL_CONTEXT} -gt 0 ]]; then
+      KUBECTL_CONTEXT+=" "
+    fi
+
+    if [[ ${1:-} =~ ^--context && -n ${2:-} ]]; then
+      KUBECTL_CONTEXT+="${1} ${2}"
+      shift 2
+    else
+      KUBECTL_CONTEXT+="${1}"
+      shift
+    fi
+  done
 
   if [[ -n ${KUBECTL_CONTEXT} ]]; then
     KUBECTL_COMMAND+=" ${KUBECTL_CONTEXT}"
