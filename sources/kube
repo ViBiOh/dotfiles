@@ -24,18 +24,23 @@ kube() {
 
   local KUBECTL_COMMAND="kubectl"
   local KUBECTL_CONTEXT=""
+  local KUBECTL_FULL_CONTEXT=""
 
   while [[ ${1:-} =~ ^--context ]]; do
-    if [[ ${#KUBECTL_CONTEXT} -gt 0 ]]; then
-      KUBECTL_CONTEXT+=" "
+    if [[ -n ${KUBECTL_FULL_CONTEXT} ]]; then
+      KUBECTL_FULL_CONTEXT+=" "
     fi
 
     if [[ ${1:-} =~ ^--context && -n ${2:-} ]]; then
-      KUBECTL_CONTEXT+="${1} ${2}"
+      KUBECTL_FULL_CONTEXT+="${1} ${2}"
       shift 2
     else
-      KUBECTL_CONTEXT+="${1}"
+      KUBECTL_FULL_CONTEXT+="${1}"
       shift
+    fi
+
+    if [[ -z ${KUBECTL_CONTEXT} ]]; then
+      KUBECTL_CONTEXT="${KUBECTL_FULL_CONTEXT}"
     fi
   done
 
@@ -293,7 +298,7 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
-        _kube_print_and_run "kmux ${KUBECTL_CONTEXT} --namespace=${RESOURCE_NAMESPACE} image ${RESOURCE_TYPE} ${RESOURCE_NAME}"
+        _kube_print_and_run "kmux ${KUBECTL_FULL_CONTEXT} --namespace=${RESOURCE_NAMESPACE} image ${RESOURCE_TYPE} ${RESOURCE_NAME}"
       else
         _kube_print_and_run "${KUBECTL_COMMAND} get ${RESOURCE_TYPE} --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval '.spec.template.spec.containers[].image'"
       fi
@@ -346,7 +351,7 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       if [[ ${RESOURCE_TYPE} =~ ^(cronjob|daemonset|deployment|job|namespace|service|node|statefulset)s? ]] && command -v kmux >/dev/null 2>&1; then
-        _kube_print_and_run "kmux ${KUBECTL_CONTEXT} --namespace '${RESOURCE_NAMESPACE}' log ${RESOURCE_TYPE} ${RESOURCE_NAME} --since=24h ${*}"
+        _kube_print_and_run "kmux ${KUBECTL_FULL_CONTEXT} --namespace '${RESOURCE_NAMESPACE}' log ${RESOURCE_TYPE} ${RESOURCE_NAME} --since=24h ${*}"
       else
         local PODS_LABELS
 
@@ -384,7 +389,7 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
-        _kube_print_and_run "kmux ${KUBECTL_CONTEXT} --namespace '${RESOURCE_NAMESPACE}' restart ${RESOURCE_TYPE} ${RESOURCE_NAME}"
+        _kube_print_and_run "kmux ${KUBECTL_FULL_CONTEXT} --namespace '${RESOURCE_NAMESPACE}' restart ${RESOURCE_TYPE} ${RESOURCE_NAME}"
       else
         if [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
           _kube_print_and_run "${KUBECTL_COMMAND} get --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_TYPE} ${RESOURCE_NAME} --output yaml | yq eval 'del(.spec.selector)' | yq eval 'del(.spec.template.metadata.labels)' | ${KUBECTL_COMMAND} replace --force --filename -"
@@ -398,7 +403,7 @@ kube() {
 
   "watch")
     if command -v kmux >/dev/null 2>&1; then
-      _kube_print_and_run "kmux ${KUBECTL_CONTEXT} watch ${*}"
+      _kube_print_and_run "kmux ${KUBECTL_FULL_CONTEXT} watch ${*}"
     else
       _kube_print_and_run "${KUBECTL_COMMAND} get pods --watch ${*}"
     fi
