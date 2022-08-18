@@ -350,7 +350,7 @@ kube() {
     RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
-      if [[ ${RESOURCE_TYPE} =~ ^(cronjob|daemonset|deployment|job|namespace|service|node|statefulset)s? ]] && command -v kmux >/dev/null 2>&1; then
+      if [[ ${RESOURCE_TYPE} =~ ^(cronjob|daemonset|deployment|job|pod|namespace|service|node|statefulset)s? ]] && command -v kmux >/dev/null 2>&1; then
         _kube_print_and_run "kmux ${KUBECTL_FULL_CONTEXT} --namespace '${RESOURCE_NAMESPACE}' log ${RESOURCE_TYPE} ${RESOURCE_NAME} --since=24h ${*}"
       else
         local PODS_LABELS
@@ -367,7 +367,7 @@ kube() {
 
         printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
-        _kube_print_and_run "${KUBECTL_COMMAND} logs --namespace=${RESOURCE_NAMESPACE} --ignore-errors --prefix --all-containers=true --selector='${PODS_LABELS}' --follow --since=24h ${*}"
+        _kube_print_and_run "${KUBECTL_COMMAND} logs --namespace=${RESOURCE_NAMESPACE} --ignore-errors --prefix --selector='${PODS_LABELS}' --follow --since=24h ${*}"
       fi
     fi
     ;;
