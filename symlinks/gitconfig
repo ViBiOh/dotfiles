@@ -36,6 +36,9 @@
 [commit]
 	gpgsign = true
 
+[tag]
+	gpgsign = true
+
 [rebase]
 	autosquash = true
 
