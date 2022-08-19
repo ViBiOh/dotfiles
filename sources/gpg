@@ -13,7 +13,7 @@ cipher() {
 
 cipher_for() {
   if [[ ${#} -lt 2 ]]; then
-    var_red "Usage: cipher_for GITHUB_USERNAME FILE_TO_ENCRYPT"
+    printf "%bUsage: cipher_for GITHUB_USERNAME FILE_TO_ENCRYPT%n\n" "${RED}" "${RESET}"
     return 1
   fi
 
@@ -27,7 +27,7 @@ cipher_for() {
   gpg --homedir "${TEMP_GNUPGHOME}" --import "${PUBLIC_KEY}"
 
   local RECIPIENT
-  RECIPIENT="$(gpg --homedir "${TEMP_GNUPGHOME}" --list-keys --with-colons | grep uid | awk -F: '{print $10}' | head -1)"
+  RECIPIENT="$(gpg --homedir "${TEMP_GNUPGHOME}" --list-keys --with-colons | grep uid | awk -F: '{print $10}' | uniq | fzf --height=20 --ansi --reverse --prompt "Email:")"
 
   gpg --homedir "${TEMP_GNUPGHOME}" --encrypt --recipient "${RECIPIENT}" "${2}"
 
