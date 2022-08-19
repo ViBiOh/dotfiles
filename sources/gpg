@@ -17,21 +17,21 @@ cipher_for() {
     return 1
   fi
 
-  local KEYRING
-  KEYRING="$(mktemp)"
+  local TEMP_GNUPGHOME
+  TEMP_GNUPGHOME="$(mktemp -d)"
 
   local PUBLIC_KEY
   PUBLIC_KEY="$(mktemp)"
 
   curl --disable --silent --show-error --location --max-time 10 "https://github.com/${1}.gpg" >"${PUBLIC_KEY}"
+  gpg --homedir "${TEMP_GNUPGHOME}" --import "${PUBLIC_KEY}"
 
   local RECIPIENT
-  RECIPIENT="$(gpg --primary-keyring "${KEYRING}" --list-keys --with-colons | grep uid | awk -F: '{print $10}' | head -1)"
+  RECIPIENT="$(gpg --homedir "${TEMP_GNUPGHOME}" --list-keys --with-colons | grep uid | awk -F: '{print $10}' | head -1)"
 
-  gpg --primary-keyring "${KEYRING}" --import "${PUBLIC_KEY}"
-  gpg --primary-keyring "${KEYRING}" --encrypt --recipient "${RECIPIENT}" "${2}"
+  gpg --homedir "${TEMP_GNUPGHOME}" --encrypt --recipient "${RECIPIENT}" "${2}"
 
-  rm "${KEYRING}" "${PUBLIC_KEY}"
+  rm -rf "${TEMP_GNUPGHOME}" "${PUBLIC_KEY}"
 }
 
 decipher() {
