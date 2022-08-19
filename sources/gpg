@@ -6,3 +6,31 @@ export GPG_TTY
 gpg_agent_stop() {
   gpgconf --kill gpg-agent
 }
+
+cipher() {
+  gpg --symmetric --cipher-algo AES256 "${@}" | base64
+}
+
+cipher_for() {
+  if [[ ${#} -lt 2 ]]; then
+    var_red "Usage: cipher_for GITHUB_USERNAME FILE_TO_ENCRYPT"
+    return 1
+  fi
+
+  local KEYRING
+  KEYRING="$(mktemp)"
+
+  local PUBLIC_KEY
+  PUBLIC_KEY="$(mktemp)"
+
+  curl --disable --silent --show-error --location --max-time 10 "https://github.com/${1}.gpg" >"${PUBLIC_KEY}"
+
+  gpg --primary-keyring "${KEYRING}" --import "${PUBLIC_KEY}"
+  gpg --primary-keyring "${KEYRING}" --encrypt --recipient "$(gpg --list-keys --with-colons | grep uid | awk -F: '{print $10}' | head -1)" "${2}"
+
+  rm "${KEYRING}" "${PUBLIC_KEY}"
+}
+
+decipher() {
+  base64 -D | gpg --decrypt "${@}"
+}
