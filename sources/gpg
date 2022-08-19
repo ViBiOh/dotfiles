@@ -13,7 +13,7 @@ cipher() {
 
 cipher_for() {
   if [[ ${#} -lt 2 ]]; then
-    printf "%bUsage: cipher_for GITHUB_USERNAME FILE_TO_ENCRYPT%n\n" "${RED}" "${RESET}"
+    printf "%bUsage: cipher_for GITHUB_USERNAME FILE_TO_ENCRYPT%b\n" "${RED}" "${RESET}"
     return 1
   fi
 
