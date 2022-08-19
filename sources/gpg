@@ -25,8 +25,11 @@ cipher_for() {
 
   curl --disable --silent --show-error --location --max-time 10 "https://github.com/${1}.gpg" >"${PUBLIC_KEY}"
 
+  local RECIPIENT
+  RECIPIENT="$(gpg --primary-keyring "${KEYRING}" --list-keys --with-colons | grep uid | awk -F: '{print $10}' | head -1)"
+
   gpg --primary-keyring "${KEYRING}" --import "${PUBLIC_KEY}"
-  gpg --primary-keyring "${KEYRING}" --encrypt --recipient "$(gpg --list-keys --with-colons | grep uid | awk -F: '{print $10}' | head -1)" "${2}"
+  gpg --primary-keyring "${KEYRING}" --encrypt --recipient "${RECIPIENT}" "${2}"
 
   rm "${KEYRING}" "${PUBLIC_KEY}"
 }
