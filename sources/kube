@@ -11,7 +11,7 @@ kube() {
 
   _kube_print_and_run() {
     printf -- "%b%b%b\n" "${YELLOW}" "${@}" "${RESET}" 1>&2
-    eval "${@}"
+    eval "${*}"
   }
 
   _kube_info() {
