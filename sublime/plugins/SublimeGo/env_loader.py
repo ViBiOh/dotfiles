@@ -6,7 +6,7 @@ import threading
 from os.path import exists, join
 
 
-env_regex = re.compile("^(export )?([A-Za-z][A-Za-z_0-9]+)=(.*)")
+env_regex = re.compile("^(export )?([A-Za-z]\\w+)=(.*)")
 
 
 def load_env(cwd):
