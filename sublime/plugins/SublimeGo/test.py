@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 import threading
 from .async_task import AsyncTask
+from .env_loader import load_env
 
 
 class GoTest(sublime_plugin.WindowCommand):
@@ -29,12 +30,15 @@ class GoTest(sublime_plugin.WindowCommand):
             self.panel = self.window.create_output_panel("gotest")
             self.window.run_command("show_panel", {"panel": "output.gotest"})
 
+        env = load_env(working_dir)
+
         self.queue_write("Running go test...\n")
 
         self.task = AsyncTask(
             command=["go", "test", "-cover", "-race"],
             output=self.queue_write,
             cwd=working_dir,
+            env=env,
         )
 
     def queue_write(self, text):

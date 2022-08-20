@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 import threading
 from .async_task import AsyncTask
+from .env_loader import load_env
 
 
 class GoFunctionTest(sublime_plugin.WindowCommand):
@@ -50,6 +51,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
             window.run_command("show_panel", {"panel": "output.gotest"})
 
         function_name = self.get_function_name(window)
+        env = load_env(working_dir)
 
         self.queue_write("Running go test for {}...\n".format(function_name))
 
@@ -57,6 +59,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
             command=["go", "test", "-cover", "-race", "-run", function_name],
             output=self.queue_write,
             cwd=working_dir,
+            env=env,
         )
 
     def queue_write(self, text):

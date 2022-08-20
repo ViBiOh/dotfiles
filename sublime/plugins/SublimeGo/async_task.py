@@ -8,7 +8,7 @@ class AsyncTask:
     killed = False
     proc = None
 
-    def __init__(self, command=["printf", "Hello"], cwd=None, output=print):
+    def __init__(self, command=["printf", "Hello"], cwd=None, env=None, output=print):
         self.output = output
 
         if self.proc is not None:
@@ -16,7 +16,11 @@ class AsyncTask:
             self.proc = None
 
         self.proc = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=cwd
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=cwd,
+            env=env,
         )
         self.killed = False
 
@@ -33,7 +37,7 @@ class AsyncTask:
             self.proc.terminate()
 
     def read(self, handle):
-        chunk_size = 2 ** 13
+        chunk_size = 2**13
         out = b""
 
         while True:
