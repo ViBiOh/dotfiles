@@ -48,6 +48,10 @@ kube() {
     KUBECTL_COMMAND+=" ${KUBECTL_CONTEXT}"
   fi
 
+  local RESOURCE_TYPE
+  local RESOURCE_NAMESPACE
+  local RESOURCE_NAME
+
   _kube_resources() {
     local RESOURCE="${1:-}"
     local QUERY="${2:-}"
@@ -67,7 +71,12 @@ kube() {
       YAML_QUERY='.items[] | (.kind | downcase) + "//" + .metadata.name'
     fi
 
-    printf "%s" "$(${KUBECTL_COMMAND} get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
+    local KUBE_RESOURCE
+    KUBE_RESOURCE="$(${KUBECTL_COMMAND} get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
+
+    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
+    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
+    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
   }
 
   _kube_help() {
@@ -126,15 +135,7 @@ kube() {
     ;;
 
   "desc")
-    local KUBE_RESOURCE
-    KUBE_RESOURCE="$(_kube_resources "${@}")"
-
-    local RESOURCE_TYPE
-    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
-    local RESOURCE_NAMESPACE
-    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
-    local RESOURCE_NAME
-    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+    _kube_resources "${@}"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       _kube_print_and_run "${KUBECTL_COMMAND} describe ${RESOURCE_TYPE} --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_NAME}"
@@ -142,15 +143,7 @@ kube() {
     ;;
 
   "edit")
-    local KUBE_RESOURCE
-    KUBE_RESOURCE="$(_kube_resources "${@}")"
-
-    local RESOURCE_TYPE
-    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
-    local RESOURCE_NAMESPACE
-    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
-    local RESOURCE_NAME
-    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+    _kube_resources "${@}"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       _kube_print_and_run "${KUBECTL_COMMAND} edit ${RESOURCE_TYPE} --namespace=${RESOURCE_NAMESPACE} ${RESOURCE_NAME}"
@@ -158,15 +151,7 @@ kube() {
     ;;
 
   "env")
-    local KUBE_RESOURCE
-    KUBE_RESOURCE="$(_kube_resources "deployments.apps" "${1:- }")"
-
-    local RESOURCE_TYPE
-    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
-    local RESOURCE_NAMESPACE
-    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
-    local RESOURCE_NAME
-    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+    _kube_resources "deployments.apps" "${1:- }"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       local KUBE_CONTAINER
@@ -258,15 +243,7 @@ kube() {
     ;;
 
   "forward")
-    local KUBE_RESOURCE
-    KUBE_RESOURCE="$(_kube_resources "services" "${1:- }")"
-
-    local RESOURCE_TYPE
-    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
-    local RESOURCE_NAMESPACE
-    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
-    local RESOURCE_NAME
-    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+    _kube_resources "services" "${1:- }"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       local KUBE_PORT
@@ -290,15 +267,7 @@ kube() {
     ;;
 
   "image")
-    local KUBE_RESOURCE
-    KUBE_RESOURCE="$(_kube_resources "deployments.apps" "${1:- }")"
-
-    local RESOURCE_TYPE
-    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
-    local RESOURCE_NAMESPACE
-    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
-    local RESOURCE_NAME
-    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+    _kube_resources "deployments.apps" "${1:- }"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
@@ -310,15 +279,7 @@ kube() {
     ;;
 
   "info")
-    local KUBE_RESOURCE
-    KUBE_RESOURCE="$(_kube_resources "${@}")"
-
-    local RESOURCE_TYPE
-    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
-    local RESOURCE_NAMESPACE
-    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
-    local RESOURCE_NAME
-    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+    _kube_resources "${@}"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       local QUERY="."
@@ -343,15 +304,7 @@ kube() {
       shift
     fi
 
-    local KUBE_RESOURCE
-    KUBE_RESOURCE="$(_kube_resources "${FIRST}" "${SECOND}")"
-
-    local RESOURCE_TYPE
-    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
-    local RESOURCE_NAMESPACE
-    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
-    local RESOURCE_NAME
-    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+    _kube_resources "${FIRST}" "${SECOND}"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       if [[ ${RESOURCE_TYPE} =~ ^(cronjob|daemonset|deployment|job|pod|namespace|service|node|statefulset)s? ]] && command -v kmux >/dev/null 2>&1; then
@@ -381,15 +334,7 @@ kube() {
     ;;
 
   "restart")
-    local KUBE_RESOURCE
-    KUBE_RESOURCE="$(_kube_resources "${@}")"
-
-    local RESOURCE_TYPE
-    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
-    local RESOURCE_NAMESPACE
-    RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
-    local RESOURCE_NAME
-    RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
+    _kube_resources "${@}"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
