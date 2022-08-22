@@ -247,7 +247,7 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       local KUBE_PORT
-      KUBE_PORT="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .name' | fzf --height=20 --ansi --reverse --select-1 --query="${3:-}" --prompt="Port:")"
+      KUBE_PORT="$(${KUBECTL_COMMAND} get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --height=20 --ansi --reverse --select-1 --query="${3:-}" --prompt="Port:")"
 
       if [[ -n ${KUBE_PORT:-} ]]; then
         local LOCAL_PORT="${2:-4000}"
