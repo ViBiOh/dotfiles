@@ -37,7 +37,9 @@ install() {
   curl_to_binary "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl" "kubectl"
   kubectl completion bash >"${SCRIPT_DIR}/../sources/kubectl-completion"
 
-  local HELM_VERSION="v3.9.3"
+  # renovate: datasource=github-releases depName=helm/helm
+  local HELM_VERSION="v3.9.4"
+
   archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz" "${OS}-${ARCH}/helm"
   if command -v helm >/dev/null 2>&1; then
     helm completion bash >"${SCRIPT_DIR}/../sources/helm-completion"

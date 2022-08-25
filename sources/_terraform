@@ -5,10 +5,10 @@ terraform_install() {
   shift
 
   local TERRAFORM_PATH="${HOME}/opt/bin/terraform"
-  local TERRAFORM_VERSION_PATH="${HOME}/opt/bin/terraform_${TERRAFORM_VERSION}"
+  local TERRAFORM_VERSION_PATH="${HOME}/opt/bin/terraform_${TERRAFORM_VERSION#v}"
 
-  if ! [[ -e "${HOME}/opt/bin/terraform_${TERRAFORM_VERSION}" ]]; then
-    archive_to_binary "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").zip" "terraform" "${TERRAFORM_VERSION_PATH}"
+  if ! [[ -e "${HOME}/opt/bin/terraform_${TERRAFORM_VERSION#v}" ]]; then
+    archive_to_binary "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION#v}/terraform_${TERRAFORM_VERSION#v}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").zip" "terraform" "${TERRAFORM_VERSION_PATH}"
   fi
 
   rm -f "${TERRAFORM_PATH}"

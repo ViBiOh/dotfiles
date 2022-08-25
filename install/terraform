@@ -7,7 +7,10 @@ clean() {
 }
 
 install() {
-  terraform_install "1.2.7"
+  # renovate: datasource=github-releases depName=hashicorp/terraform
+  local TERRAFORM_VERSION="v1.2.8"
+
+  terraform_install "${TERRAFORM_VERSION}"
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
   printf "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\ndisable_checkpoint = true\n" "${HOME}" >"${HOME}/.terraformrc"
