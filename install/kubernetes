@@ -60,7 +60,7 @@ install() {
 
   # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
   local KUBESEAL_VERSION="v0.18.2"
-  archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-${OS}-${ARCH}.tar.gz" "kubeseal"
+  archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-${OS}-${ARCH}.tar.gz" "kubeseal"
 
   # renovate: datasource=github-releases depName=ViBiOh/kmux
   local KMUX_VERSION="v0.0.10"
