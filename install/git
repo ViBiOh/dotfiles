@@ -24,7 +24,7 @@ install() {
   curl --disable --silent --show-error --location --max-time 30 --output "$(script_dir)/../sources/git-prompt" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{printf("%s", $3)}')/contrib/completion/git-prompt.sh"
 
   # renovate: datasource=github-releases depName=dandavison/delta
-  local DELTA_VERSION="0.13.0"
+  local DELTA_VERSION="0.14.0"
 
   local OS="unknown-linux-musl"
   local ARCH
