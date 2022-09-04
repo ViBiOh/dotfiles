@@ -20,6 +20,8 @@ cipher_for() {
   local TEMP_GNUPGHOME
   TEMP_GNUPGHOME="$(mktemp -d)"
 
+  cp "${GNUPGHOME:-${HOME}/.gnupg/gpg.conf}" "${TEMP_GNUPGHOME}/gpg.conf"
+
   local PUBLIC_KEY
   PUBLIC_KEY="$(mktemp)"
 
