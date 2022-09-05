@@ -5,12 +5,7 @@ defer ctrl.Finish()
 
 mock${1} := mocks.New${1}(ctrl)
 
-testCase.instance.${1} = mock${1}
-
-switch testCase.intention {
-case "":
-	mock${1}.EXPECT().
-}
+testCase.expect(mock${1})
 
 ]]></content>
 	<tabTrigger>gmo</tabTrigger>
