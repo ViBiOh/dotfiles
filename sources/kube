@@ -24,25 +24,24 @@ kube() {
 
   local KUBECTL_COMMAND="kubectl"
   local KUBECTL_CONTEXT=""
-  local KUBECTL_FULL_CONTEXT=""
+  declare -a KUBECTL_CONTEXTS
 
   while [[ ${1:-} =~ ^--context ]]; do
-    if [[ -n ${KUBECTL_FULL_CONTEXT} ]]; then
-      KUBECTL_FULL_CONTEXT+=" "
-    fi
-
     if [[ ${1:-} =~ ^--context && -n ${2:-} ]]; then
-      KUBECTL_FULL_CONTEXT+="${1} ${2}"
+      KUBECTL_CONTEXTS+=("${1} ${2}")
       shift 2
     else
-      KUBECTL_FULL_CONTEXT+="${1}"
+      KUBECTL_CONTEXTS+=("${1}")
       shift
     fi
 
     if [[ -z ${KUBECTL_CONTEXT} ]]; then
-      KUBECTL_CONTEXT="${KUBECTL_FULL_CONTEXT}"
+      KUBECTL_CONTEXT="${KUBECTL_CONTEXTS[0]}"
     fi
   done
+
+  local KUBECTL_FULL_CONTEXT
+  KUBECTL_FULL_CONTEXT="$(printf "%s " "${KUBECTL_CONTEXTS[@]}")"
 
   if [[ -n ${KUBECTL_CONTEXT} ]]; then
     KUBECTL_COMMAND+=" ${KUBECTL_CONTEXT}"
@@ -359,7 +358,13 @@ kube() {
     ;;
 
   *)
-    ${KUBECTL_COMMAND} "${ACTION}" "${@}"
+    if [[ ${#KUBECTL_CONTEXTS} -gt 1 ]]; then
+      for context in "${KUBECTL_CONTEXTS[@]}"; do
+        _kube_print_and_run "kubectl ${context} ${ACTION} ${*}"
+      done
+    else
+      _kube_print_and_run "${KUBECTL_COMMAND} ${ACTION} ${*}"
+    fi
 
     return 1
     ;;
