@@ -23,6 +23,10 @@ if command -v docker >/dev/null 2>&1; then
   }
 
   sidecars_stop() {
+    docker stop "rabbit"
+    docker stop "postgres"
+    docker stop "redis"
+
     docker rm --volumes "rabbit"
     docker rm --volumes "postgres"
     docker rm --volumes "redis"
