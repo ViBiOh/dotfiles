@@ -28,7 +28,7 @@ loop() {
   fi
 
   while true; do
-    ${1}
+    eval "${1}"
     sleep "${2:-60}"
   done
 }
