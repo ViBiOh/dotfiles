@@ -94,6 +94,11 @@ forward-zone:
       sudo networksetup -setdnsservers "USB 10/100/1000 LAN" 127.0.0.1
       sudo networksetup -setsearchdomains "USB 10/100/1000 LAN" local
     fi
+
+    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i 'Thunderbolt Ethernet Slot 1') -gt 0 ]]; then
+      sudo networksetup -setdnsservers "Thunderbolt Ethernet Slot 1" 127.0.0.1
+      sudo networksetup -setsearchdomains "Thunderbolt Ethernet Slot 1" local
+    fi
   fi
 
   if command -v systemctl >/dev/null 2>&1; then
