@@ -70,6 +70,7 @@
 	commend = ci --amend --no-edit
 	pushu = push --set-upstream
 	pushf = push --force-with-lease
+	pp = ! git pull && git push
 	pur = ! git pushu && git pr
 	co = checkout
 	ci = commit --signoff
