@@ -4,7 +4,7 @@ import sublime_plugin
 import subprocess
 
 
-origin_regex = re.compile("^.*@(.*):(.*).git\\n?$")
+origin_regex = re.compile("^.*@(.*):(.*)(.git)?\\n?$")
 
 
 class SublimeGitWeb(sublime_plugin.WindowCommand):
