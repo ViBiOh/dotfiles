@@ -43,23 +43,95 @@ jira() {
   local JIRA_DOMAIN
   JIRA_DOMAIN="$(printf "%s\n" "${!JIRAS_URL[@]}" | fzf --height=20 --ansi --reverse --select-1)"
 
-  local JIRA_TICKET
-  JIRA_TICKET="$(
-    _jira_ticket "${scope}" |
-      fzf --height=20 --ansi --reverse --select-1 --query="${1:-}" --exit-0 |
-      awk '{printf("%s", $1)}'
-  )"
-
-  if [[ -z ${JIRA_TICKET:-} ]]; then
-    return
-  fi
-
   case ${ACTION} in
   "browse")
+    local JIRA_TICKET
+    JIRA_TICKET="$(_jira_ticket "${scope}")"
+
+    if [[ -z ${JIRA_TICKET} ]]; then
+      return
+    fi
+
+    var_info "Issue ${JIRA_TICKET}"
     open "${JIRA_DOMAIN}/browse/${JIRA_TICKET}"
     ;;
 
+  "create")
+    local JIRA_PROJECT
+    JIRA_PROJECT="$(_jira_project)"
+
+    if [[ -z ${JIRA_PROJECT} ]]; then
+      return
+    fi
+
+    var_info "Project: ${JIRA_PROJECT}"
+
+    local JIRA_ISSUE_TYPE
+    JIRA_ISSUE_TYPE="$(_jira_issue_type "${JIRA_PROJECT}")"
+
+    if [[ -z ${JIRA_ISSUE_TYPE} ]]; then
+      return
+    fi
+
+    var_info "Type: ${JIRA_ISSUE_TYPE}"
+
+    local JIRA_ISSUE_SUMMARY
+    var_read "JIRA_ISSUE_SUMMARY"
+
+    local JIRA_USER
+    if var_confirm "Self assign"; then
+      JIRA_USER="$(_jira_self_user)"
+      var_info "User: ${JIRA_ISSUE_TYPE}"
+    fi
+
+    _jira_create_issue_metadata "${JIRA_PROJECT}" "${JIRA_ISSUE_TYPE}"
+
+    local JIRA_CREATE_ISSUE_PAYLOAD
+    JIRA_CREATE_ISSUE_PAYLOAD="$(jq --compact-output --null-input \
+      --arg project "${JIRA_PROJECT}" \
+      --arg user "${JIRA_USER}" \
+      --arg issuetype "${JIRA_ISSUE_TYPE}" \
+      --arg summary "${JIRA_ISSUE_SUMMARY}" \
+      '{
+        fields: {
+          summary: $summary,
+          project: {
+            id: $project
+          },
+          issuetype: {
+            id: $issuetype
+          },
+          assignee: {
+            id: $user
+          }
+        }
+      }')"
+
+    printf "%s" "${JIRA_CREATE_ISSUE_PAYLOAD}"
+
+    local JIRA_ISSUE_CREATION
+    JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request POST --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
+
+    local JIRA_TICKET
+    JIRA_TICKET="$(printf "%s" "${JIRA_ISSUE_CREATION}" | jq --raw-output '.key')"
+
+    var_info "Issue ${JIRA_PROJECT} created"
+    if var_confirm "Open"; then
+      open "${JIRA_DOMAIN}/browse/${JIRA_TICKET}"
+    fi
+
+    ;;
+
   "branch")
+    local JIRA_TICKET
+    JIRA_TICKET="$(_jira_ticket "${scope}")"
+
+    if [[ -z ${JIRA_TICKET} ]]; then
+      return
+    fi
+
+    var_info "Issue ${JIRA_TICKET}"
+
     if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
       var_error "not in a git directory"
     fi
@@ -87,8 +159,15 @@ jira() {
     ;;
 
   "transition")
+    local JIRA_TICKET
+    JIRA_TICKET="$(_jira_ticket "${scope}")"
+
+    if [[ -z ${JIRA_TICKET} ]]; then
+      return
+    fi
+
     local JIRA_TRANSITIONS
-    JIRA_TRANSITIONS="$(_jira_request "/rest/api/2/issue/${JIRA_TICKET}/transitions" --get)"
+    JIRA_TRANSITIONS="$(_jira_request "/rest/api/3/issue/${JIRA_TICKET}/transitions" --get)"
 
     if [[ -z ${JIRA_TRANSITIONS} ]]; then
       return
@@ -105,12 +184,19 @@ jira() {
       return
     fi
 
-    _jira_request "/rest/api/2/issue/${JIRA_TICKET}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
+    _jira_request "/rest/api/3/issue/${JIRA_TICKET}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
     var_info "${JIRA_TICKET} transitionned to status ${JIRA_TRANSITION}"
 
     ;;
 
   "print")
+    local JIRA_TICKET
+    JIRA_TICKET="$(_jira_ticket "${scope}")"
+
+    if [[ -z ${JIRA_TICKET} ]]; then
+      return
+    fi
+
     printf "%s" "${JIRA_TICKET}"
     ;;
 
@@ -188,26 +274,69 @@ _jira_ticket() {
   JIRA_JQL+=" ORDER BY updated DESC"
 
   local JIRA_OUTPUT
-  JIRA_OUTPUT="$(_jira_request "/rest/api/2/search" --get --data-urlencode "maxResults=200" --data-urlencode "jql=${JIRA_JQL}")"
+  JIRA_OUTPUT="$(_jira_request "/rest/api/3/search" --get --data-urlencode "maxResults=200" --data-urlencode "jql=${JIRA_JQL}")"
 
-  if [[ -n ${JIRA_OUTPUT} ]]; then
-    printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .key + " " + .fields.summary'
-  fi
-}
-
-_fzf_complete_jira() {
-  if [[ ${COMP_CWORD} -eq 1 ]]; then
-    mapfile -t COMPREPLY < <(compgen -W "browse branch print transition" -- "${COMP_WORDS[COMP_CWORD]}")
+  if [[ -z ${JIRA_OUTPUT} ]]; then
     return
   fi
 
-  FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-    _jira_ticket "self"
-  )
+  printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .key + " " + .fields.summary' |
+    fzf --height=20 --ansi --reverse --exit-0 |
+    awk '{printf("%s", $1)}'
 }
 
-_fzf_complete_jira_post() {
-  awk '{printf("%s", $1)}'
+_jira_project() {
+  local JIRA_PROJECTS
+  JIRA_PROJECTS="$(_jira_request "/rest/api/3/project/recent" --get)"
+
+  if [[ -z ${JIRA_PROJECTS} ]]; then
+    return
+  fi
+
+  printf "%s" "${JIRA_PROJECTS}" | jq --raw-output '.[] | .id + " " + .key + " - " + .name' |
+    fzf --height=20 --ansi --reverse --exit-0 |
+    awk '{printf("%s", $1)}'
 }
 
-[[ -n ${BASH} ]] && complete -F _fzf_complete_jira -o default -o bashdefault jira
+_jira_issue_type() {
+  local JIRA_PROJECT="${1}"
+  shift
+
+  local JIRA_ISSUE_TYPES
+  JIRA_ISSUE_TYPES="$(_jira_request "/rest/api/3/issuetype/project" --get --data-urlencode "projectId=${JIRA_PROJECT}" --data-urlencode "level=0")"
+
+  if [[ -z ${JIRA_ISSUE_TYPES} ]]; then
+    return
+  fi
+
+  printf "%s" "${JIRA_ISSUE_TYPES}" | jq --raw-output '.[] | .id + " " + .name' |
+    fzf --height=20 --ansi --reverse --exit-0 |
+    awk '{printf("%s", $1)}'
+}
+
+_jira_self_user() {
+  local JIRA_USER
+  JIRA_USER="$(_jira_request "/rest/api/3/myself" --get)"
+
+  if [[ -z ${JIRA_USER} ]]; then
+    return
+  fi
+
+  printf "%s" "${JIRA_USER}" | jq --raw-output '.accountId'
+}
+
+_jira_create_issue_metadata() {
+  local JIRA_PROJECT="${1}"
+  shift
+  local JIRA_ISSUE_TYPE="${1}"
+  shift
+
+  local JIRA_CREATE_ISSUE_META
+  JIRA_CREATE_ISSUE_META="$(_jira_request "/rest/api/3/issue/createmeta" --get --data-urlencode "projectIds=${JIRA_PROJECT}" --data-urlencode "issuetypeIds=${JIRA_ISSUE_TYPE}" --data-urlencode "expand=projects.issuetypes.fields")"
+
+  if [[ -z ${JIRA_CREATE_ISSUE_META} ]]; then
+    return
+  fi
+
+  printf "%s" "${JIRA_CREATE_ISSUE_META}" | jq --raw-output --arg projectId "${JIRA_PROJECT}" --arg issueTypeId "${JIRA_ISSUE_TYPE}" '.projects[] | select(.id == $projectId) | .issuetypes[] | select(.id == $issueTypeId) | .fields | to_entries | .[] | select(.value.required) | select(.key != "project") | select(.key != "issuetype") | select(.key != "summary") | .key'
+}
