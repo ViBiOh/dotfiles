@@ -45,15 +45,15 @@ jira() {
 
   case ${ACTION} in
   "browse")
-    local JIRA_TICKET
-    JIRA_TICKET="$(_jira_ticket "${scope}")"
+    local JIRA_ISSUE
+    JIRA_ISSUE="$(_jira_issue "${scope}")"
 
-    if [[ -z ${JIRA_TICKET} ]]; then
+    if [[ -z ${JIRA_ISSUE} ]]; then
       return
     fi
 
-    var_info "Issue ${JIRA_TICKET}"
-    open "${JIRA_DOMAIN}/browse/${JIRA_TICKET}"
+    var_info "Issue ${JIRA_ISSUE}"
+    open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
     ;;
 
   "create")
@@ -64,7 +64,8 @@ jira() {
       return
     fi
 
-    var_info "Project: ${JIRA_PROJECT}"
+    var_info "Project: $(printf "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $2)}')"
+    JIRA_PROJECT="$(printf "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_TYPE
     JIRA_ISSUE_TYPE="$(_jira_issue_type "${JIRA_PROJECT}")"
@@ -73,7 +74,8 @@ jira() {
       return
     fi
 
-    var_info "Type: ${JIRA_ISSUE_TYPE}"
+    var_info "Type: $(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $2)}')"
+    JIRA_ISSUE_TYPE="$(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_SUMMARY
     var_read "JIRA_ISSUE_SUMMARY"
@@ -83,8 +85,6 @@ jira() {
       JIRA_USER="$(_jira_self_user)"
       var_info "User: ${JIRA_ISSUE_TYPE}"
     fi
-
-    _jira_create_issue_metadata "${JIRA_PROJECT}" "${JIRA_ISSUE_TYPE}"
 
     local JIRA_CREATE_ISSUE_PAYLOAD
     JIRA_CREATE_ISSUE_PAYLOAD="$(jq --compact-output --null-input \
@@ -107,36 +107,36 @@ jira() {
         }
       }')"
 
-    printf "%s" "${JIRA_CREATE_ISSUE_PAYLOAD}"
-
     local JIRA_ISSUE_CREATION
-    JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request POST --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
+    JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request "POST" --header "Content-Type: application/json" --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
 
-    local JIRA_TICKET
-    JIRA_TICKET="$(printf "%s" "${JIRA_ISSUE_CREATION}" | jq --raw-output '.key')"
+    if [[ -n ${JIRA_ISSUE_CREATION} ]]; then
+      local JIRA_ISSUE
+      JIRA_ISSUE="$(printf "%s" "${JIRA_ISSUE_CREATION}" | jq --raw-output '.key')"
 
-    var_info "Issue ${JIRA_PROJECT} created"
-    if var_confirm "Open"; then
-      open "${JIRA_DOMAIN}/browse/${JIRA_TICKET}"
+      var_info "Issue ${JIRA_ISSUE} created"
+      if var_confirm "Open"; then
+        open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
+      fi
     fi
 
     ;;
 
   "branch")
-    local JIRA_TICKET
-    JIRA_TICKET="$(_jira_ticket "${scope}")"
+    local JIRA_ISSUE
+    JIRA_ISSUE="$(_jira_issue "${scope}")"
 
-    if [[ -z ${JIRA_TICKET} ]]; then
+    if [[ -z ${JIRA_ISSUE} ]]; then
       return
     fi
 
-    var_info "Issue ${JIRA_TICKET}"
+    var_info "Issue ${JIRA_ISSUE}"
 
     if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
       var_error "not in a git directory"
     fi
 
-    local JIRA_BRANCH_NAME="${JIRA_TICKET}"
+    local JIRA_BRANCH_NAME="${JIRA_ISSUE}"
 
     local BRANCH_PREFIX
     read -r -p "BRANCH_PREFIX=" BRANCH_PREFIX
@@ -159,15 +159,15 @@ jira() {
     ;;
 
   "transition")
-    local JIRA_TICKET
-    JIRA_TICKET="$(_jira_ticket "${scope}")"
+    local JIRA_ISSUE
+    JIRA_ISSUE="$(_jira_issue "${scope}")"
 
-    if [[ -z ${JIRA_TICKET} ]]; then
+    if [[ -z ${JIRA_ISSUE} ]]; then
       return
     fi
 
     local JIRA_TRANSITIONS
-    JIRA_TRANSITIONS="$(_jira_request "/rest/api/3/issue/${JIRA_TICKET}/transitions" --get)"
+    JIRA_TRANSITIONS="$(_jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --get)"
 
     if [[ -z ${JIRA_TRANSITIONS} ]]; then
       return
@@ -184,20 +184,20 @@ jira() {
       return
     fi
 
-    _jira_request "/rest/api/3/issue/${JIRA_TICKET}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
-    var_info "${JIRA_TICKET} transitionned to status ${JIRA_TRANSITION}"
+    _jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
+    var_info "${JIRA_ISSUE} transitionned to status ${JIRA_TRANSITION}"
 
     ;;
 
   "print")
-    local JIRA_TICKET
-    JIRA_TICKET="$(_jira_ticket "${scope}")"
+    local JIRA_ISSUE
+    JIRA_ISSUE="$(_jira_issue "${scope}")"
 
-    if [[ -z ${JIRA_TICKET} ]]; then
+    if [[ -z ${JIRA_ISSUE} ]]; then
       return
     fi
 
-    printf "%s" "${JIRA_TICKET}"
+    printf "%s" "${JIRA_ISSUE}"
     ;;
 
   *)
@@ -266,7 +266,7 @@ _jira_request() {
   printf "%s" "${JIRA_OUTPUT}"
 }
 
-_jira_ticket() {
+_jira_issue() {
   local JIRA_JQL="status NOT IN (Done, Closed, Resolved)"
   if [[ ${1:-} == "self" ]]; then
     JIRA_JQL+=" AND assignee = currentUser()"
@@ -293,9 +293,8 @@ _jira_project() {
     return
   fi
 
-  printf "%s" "${JIRA_PROJECTS}" | jq --raw-output '.[] | .id + " " + .key + " - " + .name' |
-    fzf --height=20 --ansi --reverse --exit-0 |
-    awk '{printf("%s", $1)}'
+  printf "%s" "${JIRA_PROJECTS}" | jq --raw-output '.[] | .id + " " + .key + " " + .name' |
+    fzf --height=20 --ansi --reverse --exit-0
 }
 
 _jira_issue_type() {
@@ -310,8 +309,7 @@ _jira_issue_type() {
   fi
 
   printf "%s" "${JIRA_ISSUE_TYPES}" | jq --raw-output '.[] | .id + " " + .name' |
-    fzf --height=20 --ansi --reverse --exit-0 |
-    awk '{printf("%s", $1)}'
+    fzf --height=20 --ansi --reverse --exit-0
 }
 
 _jira_self_user() {
@@ -323,20 +321,4 @@ _jira_self_user() {
   fi
 
   printf "%s" "${JIRA_USER}" | jq --raw-output '.accountId'
-}
-
-_jira_create_issue_metadata() {
-  local JIRA_PROJECT="${1}"
-  shift
-  local JIRA_ISSUE_TYPE="${1}"
-  shift
-
-  local JIRA_CREATE_ISSUE_META
-  JIRA_CREATE_ISSUE_META="$(_jira_request "/rest/api/3/issue/createmeta" --get --data-urlencode "projectIds=${JIRA_PROJECT}" --data-urlencode "issuetypeIds=${JIRA_ISSUE_TYPE}" --data-urlencode "expand=projects.issuetypes.fields")"
-
-  if [[ -z ${JIRA_CREATE_ISSUE_META} ]]; then
-    return
-  fi
-
-  printf "%s" "${JIRA_CREATE_ISSUE_META}" | jq --raw-output --arg projectId "${JIRA_PROJECT}" --arg issueTypeId "${JIRA_ISSUE_TYPE}" '.projects[] | select(.id == $projectId) | .issuetypes[] | select(.id == $issueTypeId) | .fields | to_entries | .[] | select(.value.required) | select(.key != "project") | select(.key != "issuetype") | select(.key != "summary") | .key'
 }
