@@ -48,7 +48,7 @@ dns_block() {
     sort --unique |
     grep --extended-regexp '^0.0.0.0 ' |
     awk '{print "local-zone: \""$2"\" refuse"}' |
-    sort --unique >"${HOME}/.unbound-blocklist"
+    sort --unique >"${1:-${HOME}/.unbound-blocklist}"
 }
 
 dns_allow() {

@@ -9,6 +9,7 @@ install() {
   local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
   local UNBOUND_CA_CERT="${UNBOUND_CONF_FOLDER}/ca-certificates.pem"
   local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
+  local UNBOUND_BLOCKLIST="${UNBOUND_BLOCKLIST:-${HOME}}/.unbound-blocklist"
 
   sudo curl --disable --silent --show-error --location --max-time 30 "https://curl.se/ca/cacert.pem" --output "${UNBOUND_CA_CERT}"
   sudo chmod 600 "${UNBOUND_CA_CERT}"
@@ -50,7 +51,7 @@ install() {
   logfile: /var/log/unbound.log
   log-queries: no
 
-  include: \"${HOME}/.unbound-blocklist\"
+  include: \"${UNBOUND_BLOCKLIST}\"
 ${UNBOUND_EXTRA_SERVER_CONF:-}
 remote-control:
   control-enable: yes
@@ -69,7 +70,7 @@ forward-zone:
   forward-ssl-upstream: yes
 " | sudo tee "${UNBOUND_CONF_FILE}" >/dev/null
 
-  dns_block
+  dns_block "${UNBOUND_BLOCKLIST}"
 
   sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
   if ! [[ -e "${UNBOUND_CONF_FOLDER}/unbound_server.key" ]]; then
@@ -112,7 +113,7 @@ forward-zone:
     fi
 
     echo "resolv_conf=/etc/resolv.conf
-name_servers=127.0.0.1" | sudo tee "/etc/resolvconf.conf" >/dev/null
+nameserver 127.0.0.1" | sudo tee "/etc/resolvconf.conf" >/dev/null
     sudo resolvconf -u
   fi
 }
