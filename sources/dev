@@ -166,20 +166,3 @@ fi
 aziz() {
   curl --disable --silent --show-error --location --max-time 30 --request POST "http://${HUE_API}/api/groups/a66c32cb-c5ac-4060-9a39-e9a0742c2bea" --data state=on --data method=PATCH >/dev/null
 }
-
-if command -v hidapitester >/dev/null 2>&1; then
-  # from https://ultracrepidarian.phfactor.net/2022/03/09/controlling-the-logitech-litra-on-macos/
-  _hid_litra_glow() {
-    hidapitester --vidpid "046D/C900" --open --length 20 --send-output "${1}"
-  }
-
-  # 2/17/22 Litra Glow aliases from https://github.com/kharyam/litra-driver/issues/13
-  light() {
-    _hid_litra_glow 0x11,0xff,0x04,0x1c,0x01
-    _hid_litra_glow 0x11,0xff,0x04,0x4c,0x00,100
-  }
-
-  dark() {
-    _hid_litra_glow 0x11,0xff,0x04,0x1c
-  }
-fi
