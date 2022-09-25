@@ -30,6 +30,7 @@ You can set following environment variables for customizing installation behavio
 # Server configuration example
 
 export DOTFILES_NO__MACOS="true"
+export DOTFILES_NO__PASS="true"
 export DOTFILES_NO_ALACRITTY="true"
 export DOTFILES_NO_APPLE="true"
 export DOTFILES_NO_DNS="true"
@@ -41,7 +42,6 @@ export DOTFILES_NO_JSONNET="true"
 export DOTFILES_NO_KUBERNETES="true"
 export DOTFILES_NO_MINIO="true"
 export DOTFILES_NO_NODE="true"
-export DOTFILES_NO_PASS="true"
 export DOTFILES_NO_PYTHON="true"
 export DOTFILES_NO_PYTHON_ANSIBLE="true"
 export DOTFILES_NO_PYTHON_IREDIS="true"
