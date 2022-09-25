@@ -7,7 +7,7 @@
 
 jira() {
   if [[ ${#JIRAS_URL[@]} -eq 0 ]]; then
-    var_warning "No JIRA configuration defined"
+    _jira_warning "No JIRA configuration defined"
     return
   fi
 
@@ -52,7 +52,7 @@ jira() {
       return
     fi
 
-    var_info "Issue ${JIRA_ISSUE}"
+    _jira_info "Issue ${JIRA_ISSUE}"
     open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
     ;;
 
@@ -64,7 +64,7 @@ jira() {
       return
     fi
 
-    var_info "Project: $(printf "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $2)}')"
+    _jira_info "Project: $(printf "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $2)}')"
     JIRA_PROJECT="$(printf "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_TYPE
@@ -74,16 +74,16 @@ jira() {
       return
     fi
 
-    var_info "Type: $(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $2)}')"
+    _jira_info "Type: $(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $2)}')"
     JIRA_ISSUE_TYPE="$(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_SUMMARY
-    var_read "JIRA_ISSUE_SUMMARY"
+    read -r -p "JIRA_ISSUE_SUMMARY=" JIRA_ISSUE_SUMMARY
 
     local JIRA_USER
-    if var_confirm "Self assign"; then
+    if _jira_confirm "Self assign"; then
       JIRA_USER="$(_jira_self_user)"
-      var_info "User: ${JIRA_ISSUE_TYPE}"
+      _jira_info "User: ${JIRA_ISSUE_TYPE}"
     fi
 
     local JIRA_CREATE_ISSUE_PAYLOAD
@@ -114,8 +114,8 @@ jira() {
       local JIRA_ISSUE
       JIRA_ISSUE="$(printf "%s" "${JIRA_ISSUE_CREATION}" | jq --raw-output '.key')"
 
-      var_info "Issue ${JIRA_ISSUE} created"
-      if var_confirm "Open"; then
+      _jira_info "Issue ${JIRA_ISSUE} created"
+      if _jira_confirm "Open"; then
         open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
       fi
     fi
@@ -130,10 +130,10 @@ jira() {
       return
     fi
 
-    var_info "Issue ${JIRA_ISSUE}"
+    _jira_info "Issue ${JIRA_ISSUE}"
 
     if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
-      var_error "not in a git directory"
+      _jira_error "not in a git directory"
     fi
 
     local JIRA_BRANCH_NAME="${JIRA_ISSUE}"
@@ -185,7 +185,7 @@ jira() {
     fi
 
     _jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
-    var_info "${JIRA_ISSUE} transitionned to status ${JIRA_TRANSITION}"
+    _jira_info "${JIRA_ISSUE} transitionned to status ${JIRA_TRANSITION}"
 
     ;;
 
@@ -207,17 +207,45 @@ jira() {
   esac
 }
 
+_jira_info() {
+  printf -- "%b%b %b\n" "${BLUE}" "${*}" "${RESET}" 1>&2
+}
+
+_jira_warning() {
+  printf -- "%b%b %b\n" "${YELLOW}" "${*}" "${RESET}" 1>&2
+}
+
+_jira_error() {
+  printf -- "%b%b %b\n" "${RED}" "${*}" "${RESET}" 1>&2
+}
+
+_jira_confirm() {
+  local CONFIRM_MESSAGE="${1:-Are you sure}"
+
+  read -r -p "${CONFIRM_MESSAGE}? [y/N] " input </dev/tty
+
+  case "${input}" in
+  [yY][eE][sS] | [yY])
+    return 0
+    ;;
+
+  *)
+    return 1
+    ;;
+  esac
+}
+
 _jira_help() {
-  var_red "Usage: jira [options?] ACTION"
+  _jira_error "Usage: jira [options?] ACTION"
 
-  var_info "\nPossibles actions are                               | args\n"
-  var_info " - browse      Open browser for ticket                 | <ticket name>?"
-  var_info " - branch      Switch git repository branch to ticket  | <ticket name>?"
-  var_info " - print       Print ticket ID                         | <ticket name>?"
-  var_info " - transition  Transition ticket to another state      | <ticket name>?"
+  _jira_info "\nPossibles actions are                               | args\n"
+  _jira_info " - browse      Open browser for ticket                 | <ticket name>?"
+  _jira_info " - branch      Switch git repository branch to ticket  | <ticket name>?"
+  _jira_info " - print       Print ticket ID                         | <ticket name>?"
+  _jira_info " - transition  Transition ticket to another state      | <ticket name>?"
 
-  var_info "\nPossibles options are\n"
-  var_info " - -a List tickets for all users (not just current)"
+  _jira_info "\nPossibles options are\n"
+  _jira_info " - -a List tickets for all users (not just current)"
 }
 
 _jira_auth() {
@@ -226,7 +254,7 @@ _jira_auth() {
 
 _jira_request() {
   if [[ ${#} -lt 1 ]]; then
-    var_error "Usage: _jira_request PATH [EXTRA_CURL_ARGS]"
+    _jira_error "Usage: _jira_request PATH [EXTRA_CURL_ARGS]"
     return 1
   fi
 
