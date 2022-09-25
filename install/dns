@@ -9,7 +9,9 @@ install() {
   local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
   local UNBOUND_CA_CERT="${UNBOUND_CONF_FOLDER}/ca-certificates.pem"
   local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
-  local UNBOUND_BLOCKLIST="${UNBOUND_BLOCKLIST:-${HOME}}/.unbound-blocklist"
+  local UNBOUND_BLOCKLIST="${UNBOUND_BLOCKLIST:-${HOME}/.unbound-blocklist}"
+  local UNBOUND_PORT="${UNBOUND_PORT:-53}"
+  local UNBOUND_CONTROL="${UNBOUND_CONTROL:-yes}"
 
   sudo curl --disable --silent --show-error --location --max-time 30 "https://curl.se/ca/cacert.pem" --output "${UNBOUND_CA_CERT}"
   sudo chmod 600 "${UNBOUND_CA_CERT}"
@@ -21,7 +23,7 @@ install() {
   chroot: \"\"
 
   interface: 127.0.0.1
-  port: ${UNBOUND_PORT:-53}
+  port: ${UNBOUND_PORT}
   num-threads: 4
 
   access-control: 0.0.0.0/0 refuse
@@ -54,7 +56,7 @@ install() {
   include: \"${UNBOUND_BLOCKLIST}\"
 ${UNBOUND_EXTRA_SERVER_CONF:-}
 remote-control:
-  control-enable: yes
+  control-enable: ${UNBOUND_CONTROL}
   control-interface: 127.0.0.1
   server-key-file: \"${UNBOUND_CONF_FOLDER}/unbound_server.key\"
   server-cert-file: \"${UNBOUND_CONF_FOLDER}/unbound_server.pem\"
@@ -77,15 +79,24 @@ forward-zone:
     sudo unbound-control-setup -d "${UNBOUND_CONF_FOLDER}"
   fi
 
-  sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload || true
-  sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop || true
+  if [[ ${UNBOUND_CONTROL} == "yes" ]]; then
+    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload || true
+    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop || true
 
-  printf "Waiting 1 second before starting unbound...\n"
-  sleep 1
+    printf "Waiting 1 second before starting unbound...\n"
+    sleep 1
 
-  sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
+    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
+  fi
 
-  echo "nameserver 127.0.0.1" | sudo tee "/etc/resolv.conf" >/dev/null
+  if [[ ${UNBOUND_PORT} -eq 53 ]]; then
+    echo "nameserver 127.0.0.1" | sudo tee "/etc/resolv.conf" >/dev/null
+  else
+    if [[ $(systemctl list-unit-files | grep -c unbound-resolvconf) -ne 0 ]]; then
+      sudo systemctl disable unbound-resolvconf.service
+      sudo systemctl stop unbound-resolvconf.service
+    fi
+  fi
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
@@ -112,8 +123,10 @@ forward-zone:
       printf "dns=none\n" | sudo tee "/etc/NetworkManager/NetworkManager.conf" >/dev/null
     fi
 
-    echo "resolv_conf=/etc/resolv.conf
-nameserver 127.0.0.1" | sudo tee "/etc/resolvconf.conf" >/dev/null
-    sudo resolvconf -u
+    if [[ ${UNBOUND_PORT} -eq 53 ]]; then
+      echo "resolv_conf=/etc/resolv.conf
+  nameserver 127.0.0.1" | sudo tee "/etc/resolvconf.conf" >/dev/null
+      sudo resolvconf -u
+    fi
   fi
 }
