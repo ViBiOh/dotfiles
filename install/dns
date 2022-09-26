@@ -75,11 +75,12 @@ forward-zone:
   dns_block "${UNBOUND_BLOCKLIST}"
 
   sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
-  if ! [[ -e "${UNBOUND_CONF_FOLDER}/unbound_server.key" ]]; then
-    sudo unbound-control-setup -d "${UNBOUND_CONF_FOLDER}"
-  fi
 
   if [[ ${UNBOUND_CONTROL} == "yes" ]]; then
+    if ! [[ -e "${UNBOUND_CONF_FOLDER}/unbound_server.key" ]]; then
+      sudo unbound-control-setup -d "${UNBOUND_CONF_FOLDER}"
+    fi
+
     sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload || true
     sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop || true
 
