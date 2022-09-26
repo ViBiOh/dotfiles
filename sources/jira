@@ -115,9 +115,19 @@ jira() {
       JIRA_ISSUE="$(printf "%s" "${JIRA_ISSUE_CREATION}" | jq --raw-output '.key')"
 
       _jira_info "Issue ${JIRA_ISSUE} created"
-      if _jira_confirm "Open"; then
+
+      if _jira_confirm "Open in browser"; then
         open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
       fi
+
+      if _jira_confirm "Change status"; then
+        _jira_transition
+      fi
+
+      if _jira_confirm "Create branch"; then
+        _jira_branch
+      fi
+
     fi
 
     ;;
@@ -131,31 +141,7 @@ jira() {
     fi
 
     _jira_info "Issue ${JIRA_ISSUE}"
-
-    if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
-      _jira_error "not in a git directory"
-    fi
-
-    local JIRA_BRANCH_NAME="${JIRA_ISSUE}"
-
-    local BRANCH_PREFIX
-    read -r -p "BRANCH_PREFIX=" BRANCH_PREFIX
-    if [[ -n ${BRANCH_SUFFIX} ]]; then
-      JIRA_BRANCH_NAME="${BRANCH_PREFIX}${JIRA_BRANCH_NAME}"
-    fi
-
-    local BRANCH_SUFFIX
-    read -r -p "BRANCH_SUFFIX=" BRANCH_SUFFIX
-    if [[ -n ${BRANCH_SUFFIX} ]]; then
-      JIRA_BRANCH_NAME="${JIRA_BRANCH_NAME}${BRANCH_SUFFIX}"
-    fi
-
-    local CHECKOUT_OPTION=""
-    if ! git rev-parse --quiet --verify "${JIRA_BRANCH_NAME}" >/dev/null 2>&1; then
-      CHECKOUT_OPTION+=" -b"
-    fi
-
-    git checkout ${CHECKOUT_OPTION} "${JIRA_BRANCH_NAME}"
+    _jira_branch
     ;;
 
   "transition")
@@ -166,27 +152,7 @@ jira() {
       return
     fi
 
-    local JIRA_TRANSITIONS
-    JIRA_TRANSITIONS="$(_jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --get)"
-
-    if [[ -z ${JIRA_TRANSITIONS} ]]; then
-      return
-    fi
-
-    local JIRA_TRANSITION
-    JIRA_TRANSITION="$(
-      printf "%s" "${JIRA_TRANSITIONS}" | jq --raw-output '.transitions[] | .id + " - " + .name' |
-        fzf --height=20 --ansi --reverse --exit-0 |
-        awk '{printf("%s", $1)}'
-    )"
-
-    if [[ -z ${JIRA_TRANSITION} ]]; then
-      return
-    fi
-
-    _jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
-    _jira_info "${JIRA_ISSUE} transitionned to status ${JIRA_TRANSITION}"
-
+    _jira_transition
     ;;
 
   "print")
@@ -205,6 +171,56 @@ jira() {
     return 1
     ;;
   esac
+}
+
+_jira_branch() {
+  if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
+    _jira_error "not in a git directory"
+  fi
+
+  local JIRA_BRANCH_NAME="${JIRA_ISSUE}"
+
+  local BRANCH_PREFIX
+  read -r -p "BRANCH_PREFIX=" BRANCH_PREFIX
+  if [[ -n ${BRANCH_SUFFIX} ]]; then
+    JIRA_BRANCH_NAME="${BRANCH_PREFIX}${JIRA_BRANCH_NAME}"
+  fi
+
+  local BRANCH_SUFFIX
+  read -r -p "BRANCH_SUFFIX=" BRANCH_SUFFIX
+  if [[ -n ${BRANCH_SUFFIX} ]]; then
+    JIRA_BRANCH_NAME="${JIRA_BRANCH_NAME}${BRANCH_SUFFIX}"
+  fi
+
+  local CHECKOUT_OPTION=""
+  if ! git rev-parse --quiet --verify "${JIRA_BRANCH_NAME}" >/dev/null 2>&1; then
+    CHECKOUT_OPTION+=" -b"
+  fi
+
+  git checkout ${CHECKOUT_OPTION} "${JIRA_BRANCH_NAME}"
+}
+
+_jira_transition() {
+  local JIRA_TRANSITIONS
+  JIRA_TRANSITIONS="$(_jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --get)"
+
+  if [[ -z ${JIRA_TRANSITIONS} ]]; then
+    return
+  fi
+
+  local JIRA_TRANSITION
+  JIRA_TRANSITION="$(
+    printf "%s" "${JIRA_TRANSITIONS}" | jq --raw-output '.transitions[] | .id + " - " + .name' |
+      fzf --height=20 --ansi --reverse --exit-0 |
+      awk '{printf("%s", $1)}'
+  )"
+
+  if [[ -z ${JIRA_TRANSITION} ]]; then
+    return
+  fi
+
+  _jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
+  _jira_info "${JIRA_ISSUE} transitionned to status ${JIRA_TRANSITION}"
 }
 
 _jira_info() {
