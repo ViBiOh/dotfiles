@@ -12,18 +12,23 @@ open_ports() {
 
 dns_flush() {
   if command -v unbound-control >/dev/null 2>&1; then
-    local UNBOUND_CONF_FOLDER="${BREW_PREFIX:-}/etc/unbound"
-    local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
-    local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
+    if [[ ${UNBOUND_CONTROL:-} == "no" ]]; then
+      sudo systemctl enable "unbound.service"
+      sudo systemctl restart "unbound.service"
+    else
+      local UNBOUND_CONF_FOLDER="${BREW_PREFIX:-}/etc/unbound"
+      local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
+      local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
 
-    sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
-    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload 2>/dev/null || true
-    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop 2>/dev/null || true
+      sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
+      sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload 2>/dev/null || true
+      sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop 2>/dev/null || true
 
-    printf "Waiting 1 second before starting again...\n"
-    sleep 1
+      printf "Waiting 1 second before starting again...\n"
+      sleep 1
 
-    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
+      sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
+    fi
   fi
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
