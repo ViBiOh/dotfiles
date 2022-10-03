@@ -3,11 +3,11 @@
 func Test${2:FuncName}(t *testing.T) {
 	t.Parallel()
 
-	want := "success"
+	expected := true
 
-	if got := ${2:FuncName}(); got != want {
-		t.Errorf("${2:FuncName}() = `%s`, want `%s`", got, want)
-	}
+	got := ${2:FuncName}()
+
+	assert.Equal(t, expected, got)
 }
 
 ]]></content>

@@ -5,8 +5,6 @@ defer ctrl.Finish()
 
 mock${1} := mocks.New${1}(ctrl)
 
-testCase.expect(mock${1})
-
 ]]></content>
 	<tabTrigger>gmo</tabTrigger>
 	<scope>source.go</scope>
