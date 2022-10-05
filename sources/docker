@@ -39,4 +39,8 @@ if command -v docker >/dev/null 2>&1; then
     docker run --detach --name "postgres" --publish "127.0.0.1:5432:5432" --env "POSTGRES_PASSWORD=postgres" "postgres"
     docker run --detach --name "redis" --publish "127.0.0.1:6379:6379" "redis"
   }
+
+  datadog_agent() {
+    docker run --name datadog --rm --env "DD_API_KEY=${DATADOG_APIKEY}" --env "DD_ENV=localhost" --env "DD_HOSTNAME=$(whoami)" -p "8126:8126/tcp" datadog/agent
+  }
 fi
