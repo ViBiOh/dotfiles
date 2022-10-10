@@ -29,6 +29,7 @@ class AsyncTask:
     def enabled(self, kill=False):
         if kill:
             return self.proc is not None and self.proc.poll() is None
+
         return False
 
     def kill(self):

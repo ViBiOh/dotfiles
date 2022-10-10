@@ -11,8 +11,8 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
     panel_lock = threading.Lock()
 
     def is_enabled(self, kill=False):
-        if self.task:
-            return self.task.enabled()
+        if kill:
+            return self.task is not None and self.task.enabled(kill=kill)
 
         return True
 
@@ -52,6 +52,9 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
 
         function_name = self.get_function_name(window)
         env = load_env(working_dir)
+
+        if self.task:
+            self.task.kill()
 
         self.queue_write("Running go test for {}...\n".format(function_name))
 
