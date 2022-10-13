@@ -16,7 +16,7 @@ install() {
   printf "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\ndisable_checkpoint = true\n" "${HOME}" >"${HOME}/.terraformrc"
 
   # renovate: datasource=github-releases depName=hashicorp/terraform-ls
-  local TERRAFORM_LS_VERSION="v0.29.2"
+  local TERRAFORM_LS_VERSION="v0.29.3"
   archive_to_binary "https://github.com/hashicorp/terraform-ls/releases/download/${TERRAFORM_LS_VERSION}/terraform-ls_${TERRAFORM_LS_VERSION#v}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").zip" "terraform-ls"
 }
 
