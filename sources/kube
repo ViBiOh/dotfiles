@@ -290,7 +290,7 @@ kube() {
     fi
     ;;
 
-  "log")
+  "log" | "logs")
     local FIRST=""
     if [[ -n ${1:-} ]] && ! [[ ${1:-} =~ ^- ]]; then
       FIRST="${1}"
