@@ -45,7 +45,7 @@ if command -v fzf >/dev/null 2>&1; then
       printf "MODULE_VERSION=%s\n" "${MODULE_VERSION}"
       MODULE_VERSION="@${MODULE_VERSION}"
 
-      var_print_and_run "go get -d '${MODULE_TO_BUMP}${MODULE_VERSION}'"
+      var_print_and_run go get -d "${MODULE_TO_BUMP}${MODULE_VERSION}"
     fi
   }
 fi

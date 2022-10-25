@@ -138,7 +138,7 @@ kube() {
     _kube_resources "${@}"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
-      _kube_print_and_run "${KUBECTL_COMMAND[@]}" describe "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}"
+      _kube_print_and_run "${KUBECTL_COMMAND[@]}" describe "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}"
     fi
     ;;
 
@@ -146,7 +146,7 @@ kube() {
     _kube_resources "${@}"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
-      _kube_print_and_run "${KUBECTL_COMMAND[@]}" edit "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}"
+      _kube_print_and_run "${KUBECTL_COMMAND[@]}" edit "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}"
     fi
     ;;
 
@@ -155,11 +155,11 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       local KUBE_CONTAINER
-      KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.template.spec.containers[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}" --prompt="Container:")"
+      KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.template.spec.containers[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}" --prompt="Container:")"
 
       local DEPLOYMENT_YAML
       DEPLOYMENT_YAML="$(mktemp)"
-      "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml >"${DEPLOYMENT_YAML}"
+      "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml >"${DEPLOYMENT_YAML}"
 
       KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]", "\n"))' "${DEPLOYMENT_YAML}"
 
@@ -185,7 +185,7 @@ kube() {
           fi
           YQ_QUERY+=' | sub("[\n]", "\n")'
 
-          "${KUBECTL_COMMAND[@]}" get "${INLINE_RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${INLINE_RESOURCE_NAME}" --output=yaml | SECRET_KEY="${INLINE_REF_KEY}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
+          "${KUBECTL_COMMAND[@]}" get "${INLINE_RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${INLINE_RESOURCE_NAME}" --output=yaml | SECRET_KEY="${INLINE_REF_KEY}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
         done <<<"${INLINE_REFS}"
       fi
 
@@ -206,7 +206,7 @@ kube() {
           YQ_QUERY+=' | sub("[\n]", "\n"))'
 
           _kube_warning "${ENVFROM_RESOURCE_TYPE} ${RESOURCE_NAMESPACE}/${ENVFROM_RESOURCE_NAME}"
-          "${KUBECTL_COMMAND[@]}" get "${ENVFROM_RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${ENVFROM_RESOURCE_NAME}" --output=yaml | yq eval "${YQ_QUERY}"
+          "${KUBECTL_COMMAND[@]}" get "${ENVFROM_RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${ENVFROM_RESOURCE_NAME}" --output=yaml | yq eval "${YQ_QUERY}"
         done <<<"${ENV_FROMS}"
       fi
 
@@ -219,11 +219,11 @@ kube() {
 
       if [[ -n ${FIELD_REFS:-} ]]; then
         local PODS_LABELS
-        PODS_LABELS="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+        PODS_LABELS="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
 
         local POD_YAML
         POD_YAML="$(mktemp)"
-        "${KUBECTL_COMMAND[@]}" get pods --namespace="${RESOURCE_NAMESPACE}" "--selector=${PODS_LABELS}" --output=yaml | yq eval '[.items[] | select(.status.phase == "Running")] | .[0]' >"${POD_YAML}"
+        "${KUBECTL_COMMAND[@]}" get pods --namespace "${RESOURCE_NAMESPACE}" "--selector=${PODS_LABELS}" --output=yaml | yq eval '[.items[] | select(.status.phase == "Running")] | .[0]' >"${POD_YAML}"
 
         _kube_warning "Values from first 'Running' pod found"
         while read -r fieldRef; do
@@ -247,16 +247,16 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       local KUBE_PORT
-      KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --height=20 --ansi --reverse --select-1 --query="${3:-}" --prompt="Port:")"
+      KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --height=20 --ansi --reverse --select-1 --query="${3:-}" --prompt="Port:")"
 
       if [[ -n ${KUBE_PORT:-} ]]; then
         local LOCAL_PORT="${2:-4000}"
 
         if command -v kmux >/dev/null 2>&1; then
-          _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace="${RESOURCE_NAMESPACE}" port-forward "${RESOURCE_TYPE}" "${RESOURCE_NAME}" "${LOCAL_PORT}:${KUBE_PORT}"
+          _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace "${RESOURCE_NAMESPACE}" port-forward "${RESOURCE_TYPE}" "${RESOURCE_NAME}" "${LOCAL_PORT}:${KUBE_PORT}"
         else
           printf "%bForwarding %s from %s to %s%b\n" "${BLUE}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${LOCAL_PORT}" "${KUBE_PORT}" "${RESET}"
-          _kube_print_and_run "${KUBECTL_COMMAND[@]}" port-forward --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" "${LOCAL_PORT}:${KUBE_PORT}"
+          _kube_print_and_run "${KUBECTL_COMMAND[@]}" port-forward --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" "${LOCAL_PORT}:${KUBE_PORT}"
         fi
       fi
     fi
@@ -271,9 +271,9 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
-        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace="${RESOURCE_NAMESPACE}" image "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
+        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace "${RESOURCE_NAMESPACE}" image "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
       else
-        _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.template.spec.containers[].image'
+        _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.template.spec.containers[].image'
       fi
     fi
     ;;
@@ -287,7 +287,7 @@ kube() {
         QUERY=".data[] |= @base64d"
       fi
 
-      _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval --prettyPrint "${QUERY}"
+      _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval --prettyPrint "${QUERY}"
     fi
     ;;
 
@@ -313,18 +313,18 @@ kube() {
         local PODS_LABELS
 
         if [[ ${RESOURCE_TYPE} =~ ^cronjobs? ]]; then
-          PODS_LABELS="job-name in ($("${KUBECTL_COMMAND[@]}" get jobs --namespace="${RESOURCE_NAMESPACE}" --output yaml | OWNER_NAME="${RESOURCE_NAME}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -))"
+          PODS_LABELS="job-name in ($("${KUBECTL_COMMAND[@]}" get jobs --namespace "${RESOURCE_NAMESPACE}" --output yaml | OWNER_NAME="${RESOURCE_NAME}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -))"
         elif [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
           PODS_LABELS="job-name=${RESOURCE_NAME}"
         elif [[ ${RESOURCE_TYPE} =~ ^(daemonset|deployment|statefulset)s? ]]; then
-          PODS_LABELS="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+          PODS_LABELS="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
         else
-          PODS_LABELS="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
+          PODS_LABELS="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
         fi
 
         printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
-        _kube_print_and_run "${KUBECTL_COMMAND[@]}" logs --namespace="${RESOURCE_NAMESPACE}" --ignore-errors --prefix --selector="${PODS_LABELS}" --follow --since=24h "${@}"
+        _kube_print_and_run "${KUBECTL_COMMAND[@]}" logs --namespace "${RESOURCE_NAMESPACE}" --ignore-errors --prefix --selector="${PODS_LABELS}" --follow --since=24h "${@}"
       fi
     fi
     ;;
@@ -338,12 +338,12 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
-        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace="${RESOURCE_NAMESPACE}" restart "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
+        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace "${RESOURCE_NAMESPACE}" restart "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
       else
         if [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
-          _kube_print_and_run "${KUBECTL_COMMAND[@]}" get --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --output yaml | yq eval 'del(.spec.selector)' | yq eval 'del(.spec.template.metadata.labels)' | "${KUBECTL_COMMAND[@]}" replace --force --filename -
+          _kube_print_and_run "${KUBECTL_COMMAND[@]}" get --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --output yaml | yq eval 'del(.spec.selector)' | yq eval 'del(.spec.template.metadata.labels)' | "${KUBECTL_COMMAND[@]}" replace --force --filename -
         else
-          _kube_print_and_run "${KUBECTL_COMMAND[@]}" rollout restart --namespace="${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
+          _kube_print_and_run "${KUBECTL_COMMAND[@]}" rollout restart --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
         fi
       fi
     fi

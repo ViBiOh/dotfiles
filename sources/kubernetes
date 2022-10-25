@@ -87,13 +87,13 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     local TEMP_FOLDER
     TEMP_FOLDER="$(mktemp -d)"
 
-    helm status --output=yaml --namespace="${NAMESPACE}" "${NAME}" | extract_manifest >"${TEMP_FOLDER}/${NAME}_helm.yaml"
-    helm upgrade --output=yaml --namespace="${NAMESPACE}" "${NAME}" "${CHART}" --version "${VERSION}" --debug --dry-run ${*} | extract_manifest >"${TEMP_FOLDER}/${NAME}_new.yaml"
+    helm status --output yaml --namespace "${NAMESPACE}" "${NAME}" | extract_manifest >"${TEMP_FOLDER}/${NAME}_helm.yaml"
+    helm upgrade --output yaml --namespace "${NAMESPACE}" "${NAME}" "${CHART}" --version "${VERSION}" --debug --dry-run ${*} | extract_manifest >"${TEMP_FOLDER}/${NAME}_new.yaml"
     delta "${TEMP_FOLDER}/${NAME}_helm.yaml" "${TEMP_FOLDER}/${NAME}_new.yaml"
     rm -rf "${TEMP_FOLDER}"
 
     if var_confirm "Perform upgrade"; then
-      var_print_and_run "helm upgrade --namespace=${NAMESPACE} ${NAME} ${CHART} --version ${VERSION} ${*}"
+      var_print_and_run helm upgrade --namespace "${NAMESPACE}" "${NAME}" "${CHART}" --version "${VERSION}" "${@}"
     fi
   }
 
@@ -159,6 +159,6 @@ if command -v kubeseal >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
     local SAFE_CONTENT
     SAFE_CONTENT="$(printf "%s" "${CONTENT}" | sed "s|'|\\\'|g")"
 
-    var_print_and_run "printf '%s' $'${SAFE_CONTENT}' | kubeseal --raw --from-file=/dev/stdin --namespace='${NAMESPACE}' --name='${NAME}' --scope='${SCOPE}' --cert='${CERT}' | pbcopy"
+    var_print_and_run printf '%s' "${SAFE_CONTENT}" | kubeseal --raw --from-file=/dev/stdin --namespace "${NAMESPACE}" --name "${NAME}" --scope "${SCOPE}" --cert "${CERT}" | pbcopy
   }
 fi
