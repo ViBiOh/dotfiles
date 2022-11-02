@@ -27,20 +27,22 @@ kube() {
   declare -a KUBECTL_CONTEXTS
 
   while [[ ${1:-} =~ ^--context ]]; do
-    if [[ ${1:-} =~ ^--context && -n ${2:-} ]]; then
-      KUBECTL_CONTEXTS+=("${1}" "${2}")
-      shift 2
-
-      if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
-        KUBECTL_CONTEXT+=("${1}" "${2}")
-      fi
-    else
+    if [[ ${1:-} =~ ^--context= ]]; then
       KUBECTL_CONTEXTS+=("${1}")
-      shift
 
       if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
         KUBECTL_CONTEXT+=("${1}")
       fi
+
+      shift
+    else
+      KUBECTL_CONTEXTS+=("${1}" "${2}")
+
+      if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
+        KUBECTL_CONTEXT+=("${1}" "${2}")
+      fi
+
+      shift 2
     fi
   done
 
