@@ -4,6 +4,10 @@
 
 set -o nounset -o pipefail -o errexit
 
+if [[ ${TRACE:-0} == "1" ]]; then
+  set -o xtrace
+fi
+
 script_dir() {
   local FILE_SOURCE="\${BASH_SOURCE[0]}"
 
