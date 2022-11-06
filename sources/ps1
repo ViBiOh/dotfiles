@@ -12,7 +12,7 @@ _ps1_date_time() {
   # preserve exit status
   local exit="${?}"
 
-  printf '⏰ %(%H:%M:%S)T'
+  printf '🕰️ %(%H:%M:%S)T'
 
   return "${exit}"
 }
