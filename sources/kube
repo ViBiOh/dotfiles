@@ -370,12 +370,12 @@ kube() {
 
 _fzf_complete_kube() {
   if [[ ${COMP_CWORD} -eq 1 ]]; then
-    mapfile -t COMPREPLY < <(compgen -W "context desc edit env forward image info log ns restart watch" -- "${COMP_WORDS[COMP_CWORD]}")
+    mapfile -t COMPREPLY < <(compgen -W "context desc edit env forward image info log ns restart watch --context --namespace -n" -- "${COMP_WORDS[COMP_CWORD]}")
     return
   fi
 
   case ${COMP_WORDS[COMP_CWORD - 1]} in
-  "context")
+  "context" | "--context")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
       kubectl config get-contexts --output name
     )
@@ -393,7 +393,7 @@ _fzf_complete_kube() {
     )
     ;;
 
-  "ns")
+  "ns" | "-n" | "--namespace")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
       kubectl get namespaces --output=yaml | yq eval '.items[].metadata.name'
     )
