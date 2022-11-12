@@ -8,15 +8,6 @@ export GIT_PS1_COMPRESSSPARSESTATE="true"
 
 export PROMPT_DIRTRIM="3"
 
-_ps1_date_time() {
-  # preserve exit status
-  local exit="${?}"
-
-  printf '🕰️ %(%H:%M:%S)T'
-
-  return "${exit}"
-}
-
 _ps1_previous_status() {
   if [[ ${?} -eq 0 ]]; then
     printf -- "%b✔%b" "${GREEN}" "${RESET}"
