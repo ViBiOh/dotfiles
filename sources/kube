@@ -269,7 +269,7 @@ kube() {
     ;;
 
   "image")
-    _kube_resources "deployments.apps" "${1:- }"
+    _kube_resources "${@}"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
