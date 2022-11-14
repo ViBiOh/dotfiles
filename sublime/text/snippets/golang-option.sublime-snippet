@@ -1,0 +1,17 @@
+<snippet>
+	<content><![CDATA[
+type ${1:Object}OptionFn func(${1:Object}) ${1:Object}
+
+func With${4:Name}(${2:Field} ${3:Type}) ${1:Object}OptionFn {
+	return func(instance ${1:Object}) ${1:Object} {
+		instance.${2:Field} = ${2:Field}
+
+		return instance
+	}
+}
+
+]]></content>
+	<tabTrigger>gof</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang Option Func</description>
+</snippet>
