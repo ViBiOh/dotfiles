@@ -8,7 +8,6 @@ alias fuck='sudo $(history -p \!\!)'
 
 export EDITOR='vim'
 export TERM='xterm-256color'
-export CDPATH="${HOME}/code/"
 
 if command -v xdg-open >/dev/null 2>&1 && ! command -v open >/dev/null 2>&1; then
   alias open='xdg-open'
