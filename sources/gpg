@@ -11,6 +11,10 @@ cipher() {
   gpg --symmetric --cipher-algo AES256 "${@}" | base64
 }
 
+decipher() {
+  base64 -D | gpg --decrypt "${@}"
+}
+
 cipher_for() {
   if [[ ${#} -lt 2 ]]; then
     printf "%bUsage: cipher_for GITHUB_USERNAME FILE_TO_ENCRYPT%b\n" "${RED}" "${RESET}"
@@ -34,8 +38,4 @@ cipher_for() {
   gpg --homedir "${TEMP_GNUPGHOME}" --encrypt --recipient "${RECIPIENT}" "${2}"
 
   rm -rf "${TEMP_GNUPGHOME}" "${PUBLIC_KEY}"
-}
-
-decipher() {
-  base64 -D | gpg --decrypt "${@}"
 }
