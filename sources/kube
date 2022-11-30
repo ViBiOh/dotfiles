@@ -258,7 +258,7 @@ kube() {
           _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace "${RESOURCE_NAMESPACE}" port-forward "${RESOURCE_TYPE}" "${RESOURCE_NAME}" "${LOCAL_PORT}:${KUBE_PORT}"
         else
           printf "%bForwarding %s from %s to %s%b\n" "${BLUE}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${LOCAL_PORT}" "${KUBE_PORT}" "${RESET}"
-          _kube_print_and_run "${KUBECTL_COMMAND[@]}" port-forward --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" "${LOCAL_PORT}:${KUBE_PORT}"
+          _kube_print_and_run "${KUBECTL_COMMAND[@]}" port-forward --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --address "127.0.0.1" "${LOCAL_PORT}:${KUBE_PORT}"
         fi
       fi
     fi
