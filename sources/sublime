@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+SUBLIME_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+sublime_add_project() {
+  local currentDir
+  currentDir="$(pwd)"
+
+  if ! git_is_inside || [[ ${currentDir} != $(git_root) ]]; then
+    return
+  fi
+
+  local projectName
+  projectName="$(basename "${currentDir}")"
+
+  if [[ -n ${NAME_PREFIX} ]]; then
+    projectName="${NAME_PREFIX}_${projectName}"
+  fi
+
+  fileName="${SUBLIME_SCRIPT_DIR}/../sublime/projects/${projectName}.sublime-project"
+  jq --compact-output --null-input --arg path "${currentDir}" '{folders: [{path: $path}]}' >"${fileName}"
+  subl --project "${fileName}"
+}

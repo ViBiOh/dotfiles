@@ -15,29 +15,12 @@ script_dir() {
 }
 
 browse_folder() {
-  local PROJECTS_DIR=${1}
   local NAME_PREFIX=${2:-}
 
   while IFS= read -r -d '' dir; do
     (
       cd "${dir}" || return
-      if ! git_is_inside || [[ $(pwd) != $(git_root) ]]; then
-        return
-      fi
-
-      local projectName="${dir##${PROJECTS_DIR}}"
-      projectName="${projectName#/}"
-      projectName="${projectName////_}"
-
-      if [[ -n ${NAME_PREFIX} ]]; then
-        projectName="${NAME_PREFIX}_${projectName}"
-      fi
-
-      var_info "Adding ${projectName}"
-
-      fileName="${PROJECT_FOLDER}/${projectName}.sublime-project"
-      jq --compact-output --null-input --arg path "${dir}" '{folders: [{path: $path}]}' >"${fileName}"
-      subl --project "${fileName}"
+      NAME_PREFIX=${NAME_PREFIX} sublime_add_project
     )
   done < <(find "${1}" -type d -maxdepth 1 -print0)
 }
