@@ -1,12 +1,23 @@
 <snippet>
 	<content><![CDATA[
-ctrl := gomock.NewController(t)
-defer ctrl.Finish()
+type mocks${1:Instance} struct {
+	${2:Field} *mocks.${3:FieldType}
+}
 
-mock${1} := mocks.New${1}(ctrl)
+func initMocks${1:Instance}(t *testing.T) (${1:Instance}, mocks${1:Instance}, func()) {
+	t.Helper()
+
+	ctrl := gomock.NewController(t)
+
+	${2:Field} := mocks.New${3:FieldType}(ctrl)
+
+	return New${1:Instance}(${2:Field}), mocks${1:Instance}{
+		${2:Field}:   ${2:Field},
+	}, ctrl.Finish
+}
 
 ]]></content>
-	<tabTrigger>gmo</tabTrigger>
+	<tabTrigger>gmi</tabTrigger>
 	<scope>source.go</scope>
-	<description>Gomock</description>
+	<description>Go Mock Instance</description>
 </snippet>
