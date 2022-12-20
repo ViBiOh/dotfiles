@@ -61,9 +61,8 @@ _fzf_complete_cipher_for() {
     local HTTP_OUTPUT
     HTTP_OUTPUT="$(mktemp)"
 
-    local HTTP_STATUS
-
     local HTTP_CLIENT_ARGS=("curl" "--disable" "--silent" "--show-error" "--location" "--max-time" "10" "--output" "${HTTP_OUTPUT}" "--write-out" "%{http_code}" "--header" "Authorization: token ${GITHUB_TOKEN}")
+    local HTTP_STATUS
 
     local FOLLOWERS
     local FOLLOWING
@@ -71,7 +70,7 @@ _fzf_complete_cipher_for() {
 
     HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/user/followers")"
     if [[ ${HTTP_STATUS} != "200" ]]; then
-      http_handle_error "Unable to get followers"
+      printf "%bHTTP/%s: Unable to get followers%b\n" "${RED}" "${HTTP_STATUS}" "${RESET}" 1>&2
       return
     fi
 
@@ -79,7 +78,8 @@ _fzf_complete_cipher_for() {
 
     HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/user/following")"
     if [[ ${HTTP_STATUS} != "200" ]]; then
-      http_handle_error "Unable to get following"
+      printf "%bHTTP/%s: Unable to get following%b\n" "${RED}" "${HTTP_STATUS}" "${RESET}" 1>&2
+      cat "${HTTP_OUTPUT}" 1>&2 && rm "${HTTP_OUTPUT}"
       return
     fi
 
@@ -87,7 +87,8 @@ _fzf_complete_cipher_for() {
 
     HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/user/memberships/orgs")"
     if [[ ${HTTP_STATUS} != "200" ]]; then
-      http_handle_error "Unable to list orgs"
+      printf "%bHTTP/%s: Unable to list orgs%b\n" "${RED}" "${HTTP_STATUS}" "${RESET}" 1>&2
+      cat "${HTTP_OUTPUT}" 1>&2 && rm "${HTTP_OUTPUT}"
       return
     fi
 
@@ -101,7 +102,8 @@ _fzf_complete_cipher_for() {
 
         HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/orgs/${org}/members?per_page=${page_size}&page=${page}")"
         if [[ ${HTTP_STATUS} != "200" ]]; then
-          http_handle_error "Unable to get members of org ${org}"
+          printf "%bHTTP/%s: Unable to get members of org %s%b\n" "${RED}" "${HTTP_STATUS}" "${org}" "${RESET}" 1>&2
+          cat "${HTTP_OUTPUT}" 1>&2 && rm "${HTTP_OUTPUT}"
           return
         fi
 
@@ -109,6 +111,8 @@ _fzf_complete_cipher_for() {
         MEMBERS+="$(jq --raw-output '.[].login' "${HTTP_OUTPUT}")"
       done
     done
+
+    rm "${HTTP_OUTPUT}"
 
     printf "%s\n%s\n%s" "${FOLLOWERS}" "${FOLLOWING}" "${MEMBERS}" | sort --unique
   )
