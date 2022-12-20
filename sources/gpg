@@ -58,13 +58,18 @@ cipher_for() {
 
 _fzf_complete_cipher_for() {
   FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-    http_init_client --header "Authorization: token ${GITHUB_TOKEN}"
+    local HTTP_OUTPUT
+    HTTP_OUTPUT="$(mktemp)"
+
+    local HTTP_STATUS
+
+    local HTTP_CLIENT_ARGS=("curl" "--disable" "--silent" "--show-error" "--location" "--max-time" "10" "--output" "${HTTP_OUTPUT}" "--write-out" "%{http_code}" "--header" "Authorization: token ${GITHUB_TOKEN}")
 
     local FOLLOWERS
     local FOLLOWING
     local MEMBERS
 
-    http_request --header "Accept: application/vnd.github+json" "https://api.github.com/user/followers"
+    HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/user/followers")"
     if [[ ${HTTP_STATUS} != "200" ]]; then
       http_handle_error "Unable to get followers"
       return
@@ -72,7 +77,7 @@ _fzf_complete_cipher_for() {
 
     FOLLOWERS="$(jq --raw-output '.[].login' "${HTTP_OUTPUT}")"
 
-    http_request --header "Accept: application/vnd.github+json" "https://api.github.com/user/following"
+    HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/user/following")"
     if [[ ${HTTP_STATUS} != "200" ]]; then
       http_handle_error "Unable to get following"
       return
@@ -80,7 +85,7 @@ _fzf_complete_cipher_for() {
 
     FOLLOWING="$(jq --raw-output '.[].login' "${HTTP_OUTPUT}")"
 
-    http_request --header "Accept: application/vnd.github+json" "https://api.github.com/user/memberships/orgs"
+    HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/user/memberships/orgs")"
     if [[ ${HTTP_STATUS} != "200" ]]; then
       http_handle_error "Unable to list orgs"
       return
@@ -94,7 +99,7 @@ _fzf_complete_cipher_for() {
       while [[ count -eq ${page_size} ]]; do
         page=$((page + 1))
 
-        http_request --header "Accept: application/vnd.github+json" "https://api.github.com/orgs/${org}/members?per_page=${page_size}&page=${page}"
+        HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/orgs/${org}/members?per_page=${page_size}&page=${page}")"
         if [[ ${HTTP_STATUS} != "200" ]]; then
           http_handle_error "Unable to get members of org ${org}"
           return
@@ -104,8 +109,6 @@ _fzf_complete_cipher_for() {
         MEMBERS+="$(jq --raw-output '.[].login' "${HTTP_OUTPUT}")"
       done
     done
-
-    http_reset
 
     printf "%s\n%s\n%s" "${FOLLOWERS}" "${FOLLOWING}" "${MEMBERS}" | sort --unique
   )
