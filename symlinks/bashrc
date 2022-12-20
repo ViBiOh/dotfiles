@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-[[ -z ${PS1:-} ]] && return
+[[ -z ${PS1-} ]] && return
 
 set_locale() {
   local LOCALES=("en_US.UTF-8" "en_US.utf8" "C.UTF-8" "C")
@@ -37,7 +37,7 @@ source_all() {
   SCRIPT_DIR="$(script_dir)"
 
   if [[ -e "${SCRIPT_DIR}/../scripts/meta" ]]; then
-    source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var" "git" "github" "version" "ssh" "tmux"
+    source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var" "git" "github" "version" "ssh" "tmux" "http"
     var_color
     ssh_init
   fi

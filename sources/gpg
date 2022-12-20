@@ -35,10 +35,80 @@ cipher_for() {
   curl --disable --silent --show-error --location --max-time 10 "https://github.com/${GITHUB_USERNAME}.gpg" >"${PUBLIC_KEY}"
   gpg --homedir "${TEMP_GNUPGHOME}" --import "${PUBLIC_KEY}"
 
-  local RECIPIENT
-  RECIPIENT="$(gpg --homedir "${TEMP_GNUPGHOME}" --list-keys --with-colons | grep uid | awk -F: '{print $10}' | uniq | fzf --height=20 --ansi --reverse --prompt "Email:")"
+  local ENCRYPT_KEY_IDS
+  ENCRYPT_KEY_IDS="$(gpg --homedir "${TEMP_GNUPGHOME}" --list-keys --with-colons | grep pub | awk -F: '{print "{\"id\":\"" $5 "\",\"cap\":\"" $12 "\"}"}' | jq --raw-output 'select(.cap | test("e|E")) | .id')"
 
-  gpg --homedir "${TEMP_GNUPGHOME}" --encrypt --recipient "${RECIPIENT}" "${@}" | base64
+  if [[ -z ${ENCRYPT_KEY_IDS} ]]; then
+    printf "%bno encryption key found%b\n" "${RED}" "${RESET}"
+  else
+    local EMAILS
 
+    for keyID in ${ENCRYPT_KEY_IDS}; do
+      EMAILS+="$(gpg --homedir "${TEMP_GNUPGHOME}" --list-keys --with-colons "${keyID}" | grep uid | awk -F: '{print $10}')"
+      EMAILS+=$'\n'
+    done
+
+    local RECIPIENT
+    RECIPIENT="$(printf "%s" "${EMAILS}" | uniq | fzf --height=20 --ansi --reverse --prompt "Email:")"
+
+    gpg --homedir "${TEMP_GNUPGHOME}" --encrypt --recipient "${RECIPIENT}" "${@}" | base64
+  fi
   rm -rf "${TEMP_GNUPGHOME}" "${PUBLIC_KEY}"
 }
+
+_fzf_complete_cipher_for() {
+  FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
+    http_init_client --header "Authorization: token ${GITHUB_TOKEN}"
+
+    local FOLLOWERS
+    local FOLLOWING
+    local MEMBERS
+
+    http_request --header "Accept: application/vnd.github+json" "https://api.github.com/user/followers"
+    if [[ ${HTTP_STATUS} != "200" ]]; then
+      http_handle_error "Unable to get followers"
+      return
+    fi
+
+    FOLLOWERS="$(jq --raw-output '.[].login' "${HTTP_OUTPUT}")"
+
+    http_request --header "Accept: application/vnd.github+json" "https://api.github.com/user/following"
+    if [[ ${HTTP_STATUS} != "200" ]]; then
+      http_handle_error "Unable to get following"
+      return
+    fi
+
+    FOLLOWING="$(jq --raw-output '.[].login' "${HTTP_OUTPUT}")"
+
+    http_request --header "Accept: application/vnd.github+json" "https://api.github.com/user/memberships/orgs"
+    if [[ ${HTTP_STATUS} != "200" ]]; then
+      http_handle_error "Unable to list orgs"
+      return
+    fi
+
+    for org in $(jq --raw-output '.[].organization.login' "${HTTP_OUTPUT}"); do
+      local page=0
+      local page_size=100
+      local count="${page_size}"
+
+      while [[ count -eq ${page_size} ]]; do
+        page=$((page + 1))
+
+        http_request --header "Accept: application/vnd.github+json" "https://api.github.com/orgs/${org}/members?per_page=${page_size}&page=${page}"
+        if [[ ${HTTP_STATUS} != "200" ]]; then
+          http_handle_error "Unable to get members of org ${org}"
+          return
+        fi
+
+        count="$(jq --raw-output 'length' "${HTTP_OUTPUT}")"
+        MEMBERS+="$(jq --raw-output '.[].login' "${HTTP_OUTPUT}")"
+      done
+    done
+
+    http_reset
+
+    printf "%s\n%s\n%s" "${FOLLOWERS}" "${FOLLOWING}" "${MEMBERS}" | sort --unique
+  )
+}
+
+[[ -n ${BASH} ]] && complete -F _fzf_complete_cipher_for -o default -o bashdefault cipher_for
