@@ -16,10 +16,13 @@ decipher() {
 }
 
 cipher_for() {
-  if [[ ${#} -lt 2 ]]; then
-    printf "%bUsage: cipher_for GITHUB_USERNAME FILE_TO_ENCRYPT%b\n" "${RED}" "${RESET}"
+  if [[ ${#} -lt 1 ]]; then
+    printf "%bUsage: cipher_for GITHUB_USERNAME%b\n" "${RED}" "${RESET}"
     return 1
   fi
+
+  local GITHUB_USERNAME="${1}"
+  shift 1
 
   local TEMP_GNUPGHOME
   TEMP_GNUPGHOME="$(mktemp -d)"
@@ -29,13 +32,13 @@ cipher_for() {
   local PUBLIC_KEY
   PUBLIC_KEY="$(mktemp)"
 
-  curl --disable --silent --show-error --location --max-time 10 "https://github.com/${1}.gpg" >"${PUBLIC_KEY}"
+  curl --disable --silent --show-error --location --max-time 10 "https://github.com/${GITHUB_USERNAME}.gpg" >"${PUBLIC_KEY}"
   gpg --homedir "${TEMP_GNUPGHOME}" --import "${PUBLIC_KEY}"
 
   local RECIPIENT
   RECIPIENT="$(gpg --homedir "${TEMP_GNUPGHOME}" --list-keys --with-colons | grep uid | awk -F: '{print $10}' | uniq | fzf --height=20 --ansi --reverse --prompt "Email:")"
 
-  gpg --homedir "${TEMP_GNUPGHOME}" --encrypt --recipient "${RECIPIENT}" "${2}"
+  gpg --homedir "${TEMP_GNUPGHOME}" --encrypt --recipient "${RECIPIENT}" "${@}" | base64
 
   rm -rf "${TEMP_GNUPGHOME}" "${PUBLIC_KEY}"
 }
