@@ -18,7 +18,7 @@ if command -v mc >/dev/null 2>&1; then
 fi
 
 random() {
-  openssl rand -hex "${1:-30}"
+  openssl rand -hex "${1:-31}"
 }
 
 qrcode() {
