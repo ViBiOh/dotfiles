@@ -18,7 +18,7 @@ alias pprof_goroutine='go tool pprof -http localhost:8080 http://localhost:9999/
 if command -v fzf >/dev/null 2>&1; then
   go_bump() {
     local MODULE_TO_BUMP
-    MODULE_TO_BUMP="$(go list -m -json all | jq --raw-output 'select(.Indirect != true) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
+    MODULE_TO_BUMP="$(go list -m -json all | jq --raw-output 'select(.Indirect != true) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1-}")"
 
     if [[ -z ${MODULE_TO_BUMP} ]]; then
       return
@@ -27,7 +27,7 @@ if command -v fzf >/dev/null 2>&1; then
     printf "MODULE=%s\n" "${MODULE_TO_BUMP}"
     local MODULE_VERSION=""
 
-    if [[ -z ${2:-} ]] && [[ ${MODULE_TO_BUMP} =~ ^github.com\/([^\/]+)\/([^\/]+)(\/.+)?$ ]] && [[ -n ${GITHUB_TOKEN} ]]; then
+    if [[ -z ${2-} ]] && [[ ${MODULE_TO_BUMP} =~ ^github.com\/([^\/]+)\/([^\/]+)(\/.+)?$ ]] && [[ -n ${GITHUB_TOKEN} ]]; then
       local REPOSITORY_NAME="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
 
       MODULE_VERSION="$(
@@ -77,7 +77,7 @@ go_mod_loop() {
 
 go_mod_local() {
   local MODULE_TO_LOCAL
-  MODULE_TO_LOCAL="$(go list -m -json all | jq --arg currentModule "$(go mod edit -json | jq --raw-output '.Module.Path')" -r 'select(.Indirect != true and $currentModule != .Path) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
+  MODULE_TO_LOCAL="$(go list -m -json all | jq --arg currentModule "$(go mod edit -json | jq --raw-output '.Module.Path')" -r 'select(.Indirect != true and $currentModule != .Path) | .Path' | fzf --height=20 --ansi --reverse --select-1 --query="${1-}")"
 
   if [[ -z ${MODULE_TO_LOCAL} ]]; then
     return

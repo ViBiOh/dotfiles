@@ -12,11 +12,11 @@ open_ports() {
 
 dns_flush() {
   if command -v unbound-control >/dev/null 2>&1; then
-    if [[ ${UNBOUND_CONTROL:-} == "no" ]]; then
+    if [[ ${UNBOUND_CONTROL-} == "no" ]]; then
       sudo systemctl enable "unbound.service"
       sudo systemctl restart "unbound.service"
     else
-      local UNBOUND_CONF_FOLDER="${BREW_PREFIX:-}/etc/unbound"
+      local UNBOUND_CONF_FOLDER="${BREW_PREFIX-}/etc/unbound"
       local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
       local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
 
@@ -101,7 +101,7 @@ dns_allow() {
   "
 
   local WEBSITE
-  WEBSITE="$(printf "%s\n" "${!websites[@]}" | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}" --exit-0)"
+  WEBSITE="$(printf "%s\n" "${!websites[@]}" | fzf --height=20 --ansi --reverse --select-1 --query="${1-}" --exit-0)"
 
   if [[ -z ${WEBSITE} ]]; then
     return 1

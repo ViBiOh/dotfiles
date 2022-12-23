@@ -26,7 +26,7 @@ fi
 if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
   helm_select_chart() {
     local CHART_REPOSITORY
-    CHART_REPOSITORY="$(helm repo list --output json | jq --raw-output '.[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${1:-}")"
+    CHART_REPOSITORY="$(helm repo list --output json | jq --raw-output '.[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${1-}")"
     if [[ -z ${CHART_REPOSITORY} ]]; then
       return 1
     fi
@@ -34,7 +34,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     var_info "Repository: ${CHART_REPOSITORY}"
 
     local CHART_NAME
-    CHART_NAME="$(helm search repo "${CHART_REPOSITORY}/" --output json | jq --raw-output '.[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2:-}")"
+    CHART_NAME="$(helm search repo "${CHART_REPOSITORY}/" --output json | jq --raw-output '.[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2-}")"
     if [[ -z ${CHART_NAME} ]]; then
       return 1
     fi
@@ -42,7 +42,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     var_info "Chart: ${CHART_NAME}"
 
     local CHART_VERSION
-    CHART_VERSION="$(helm search repo "${CHART_NAME}" --output json --devel --versions | jq --raw-output '.[].version' | fzf --height=20 --ansi --reverse --select-1 --query="${3:-}")"
+    CHART_VERSION="$(helm search repo "${CHART_NAME}" --output json --devel --versions | jq --raw-output '.[].version' | fzf --height=20 --ansi --reverse --select-1 --query="${3-}")"
 
     if [[ -z ${CHART_VERSION} ]]; then
       return 1
@@ -62,7 +62,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     local NAME
     NAME="$(printf '%s' "${HELM_RELEASE}" | awk -F '/' '{ print $2 }')"
 
-    if [[ -z ${NAMESPACE:-} ]] || [[ -z ${NAME:-} ]]; then
+    if [[ -z ${NAMESPACE-} ]] || [[ -z ${NAME-} ]]; then
       return 1
     fi
 
@@ -76,7 +76,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     local VERSION
     VERSION="$(printf '%s' "${HELM_CHART}" | awk -F '@' '{ print $2 }')"
 
-    if [[ -z ${CHART:-} ]] || [[ -z ${VERSION:-} ]]; then
+    if [[ -z ${CHART-} ]] || [[ -z ${VERSION-} ]]; then
       return 1
     fi
 
@@ -106,7 +106,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     local VERSION
     VERSION="$(printf '%s' "${HELM_CHART}" | awk -F '@' '{ print $2 }')"
 
-    if [[ -z ${CHART:-} ]] || [[ -z ${VERSION:-} ]]; then
+    if [[ -z ${CHART-} ]] || [[ -z ${VERSION-} ]]; then
       return 1
     fi
 
@@ -139,15 +139,15 @@ fi
 if command -v kubeseal >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
   kubeseal_raw() {
     local NAMESPACE
-    var_shift_or_read NAMESPACE "${1:-}"
+    var_shift_or_read NAMESPACE "${1-}"
     shift || true
 
     local NAME
-    var_shift_or_read NAME "${1:-}"
+    var_shift_or_read NAME "${1-}"
     shift || true
 
     local CONTENT
-    var_shift_or_read CONTENT "${1:-}"
+    var_shift_or_read CONTENT "${1-}"
     shift || true
 
     local CERT=""

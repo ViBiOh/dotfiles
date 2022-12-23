@@ -10,7 +10,7 @@ backup_upload() {
 
 backup_dir() {
   (
-    cd "${1:-}" || return
+    cd "${1-}" || return
     backup ""
     backup_upload ""
   )

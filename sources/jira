@@ -32,7 +32,7 @@ jira() {
 
   shift $((OPTIND - 1))
 
-  local ACTION="${1:-}"
+  local ACTION="${1-}"
   shift
 
   if [[ -z ${ACTION} ]]; then
@@ -265,7 +265,7 @@ _jira_help() {
 }
 
 _jira_auth() {
-  printf "Basic %s" "$(pass show "${1:-}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)"
+  printf "Basic %s" "$(pass show "${1-}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)"
 }
 
 _jira_request() {
@@ -281,7 +281,7 @@ _jira_request() {
   JIRA_CREDENTIALS="${JIRAS_URL["${JIRA_DOMAIN}"]}"
 
   local URL
-  URL="${JIRA_DOMAIN}${1:-}"
+  URL="${JIRA_DOMAIN}${1-}"
   shift 1
 
   local JIRA_OUTPUT
@@ -312,7 +312,7 @@ _jira_request() {
 
 _jira_issue() {
   local JIRA_JQL="status NOT IN (Done, Closed, Resolved)"
-  if [[ ${1:-} == "self" ]]; then
+  if [[ ${1-} == "self" ]]; then
     JIRA_JQL+=" AND assignee = currentUser()"
   fi
   JIRA_JQL+=" ORDER BY updated DESC"

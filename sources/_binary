@@ -74,7 +74,7 @@ normalized_os() {
   local OS_NAME
   OS_NAME="$(uname -s | tr "[:upper:]" "[:lower:]")"
 
-  local MACOS_VALUE="${1:-}"
+  local MACOS_VALUE="${1-}"
   shift || true
 
   if [[ ${OS_NAME} == "darwin" ]] && [[ -n ${MACOS_VALUE} ]]; then
@@ -88,13 +88,13 @@ normalized_arch() {
   local ARCH
   ARCH="$(uname -m | tr "[:upper:]" "[:lower:]")"
 
-  local X86_VALUE="${1:-}"
+  local X86_VALUE="${1-}"
   shift || true
 
-  local ARM_VALUE="${1:-}"
+  local ARM_VALUE="${1-}"
   shift || true
 
-  local ARM64_VALUE="${1:-}"
+  local ARM64_VALUE="${1-}"
   shift || true
 
   if [[ ${ARCH} == "x86_64" ]] && [[ -n ${X86_VALUE} ]]; then
