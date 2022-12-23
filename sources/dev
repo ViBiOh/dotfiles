@@ -21,6 +21,19 @@ random() {
   openssl rand -hex "${1:-30}"
 }
 
+qrcode() {
+  qrencode -t UTF8
+}
+
+qrcode_wifi() {
+  if [[ ${#} -lt 2 ]]; then
+    var_red "Usage: qrcode_wifi SSID PASSWORD"
+    return 1
+  fi
+
+  printf "WIFI:S:%s;T:WPA;P:%s;;" "${1}" "${2}" | qrcode
+}
+
 loop() {
   if [[ ${#} -lt 1 ]]; then
     var_red "Usage: 'loop command' [interval?(default 60s)]"
