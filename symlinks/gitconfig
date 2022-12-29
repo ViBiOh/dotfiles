@@ -29,6 +29,7 @@
 
 [push]
 	default = current
+	autoSetupRemote = true
 
 [fetch]
 	prune = true
@@ -68,10 +69,9 @@
 	adiws = ! git diff --no-color --ignore-all-space | git apply --cached
 	adibl = ! git diff --no-color --ignore-blank-lines | git apply --cached
 	commend = ci --amend --no-edit
-	pushu = push --set-upstream
 	pushf = push --force-with-lease
 	pp = ! git pull && git push
-	pur = ! git pushu && git pr
+	pur = ! git push && git pr
 	co = checkout
 	ci = commit --signoff
 	d = diff --ignore-all-space
