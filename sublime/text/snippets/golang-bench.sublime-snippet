@@ -1,6 +1,7 @@
 <snippet>
 	<content><![CDATA[
 func Benchmark${1:FuncName}(b *testing.B) {
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		${1:FuncName}()
 	}
