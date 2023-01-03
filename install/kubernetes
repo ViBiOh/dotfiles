@@ -52,12 +52,6 @@ install() {
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION#v}_${OS}_${ARCH}.tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
-  if [[ ${BASH_VERSINFO:-3} -ge 4 ]]; then
-    # renovate: datasource=github-releases depName=derailed/popeye
-    local POPEYE_VERSION="0.10.1"
-    archive_to_binary "https://github.com/derailed/popeye/releases/download/v${POPEYE_VERSION}/popeye_${OS^}_$(normalized_arch "" "arm" "arm64").tar.gz" "popeye"
-  fi
-
   # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
   local KUBESEAL_VERSION="v0.19.3"
   archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-${OS}-${ARCH}.tar.gz" "kubeseal"
