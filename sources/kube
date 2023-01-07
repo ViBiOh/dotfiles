@@ -89,6 +89,7 @@ kube() {
     _kube_info " - desc    | Describe an object                  | <object type or deployment name> [object name]"
     _kube_info " - edit    | Edit an object                      | <object type or deployment name> [object name]"
     _kube_info " - env     | Generate .env file from deployments | <deployment name> [container name]"
+    _kube_info " - find    | Find a resource and print CLI arg   | <object type or deployment name> [object name]"
     _kube_info " - forward | Port-forward to a service           | <service name> [exposed port number] (default 4000) [service port number]"
     _kube_info " - help    | Print this help                     |"
     _kube_info " - image   | Print image name                    | <deployment name>"
@@ -244,6 +245,14 @@ kube() {
     fi
     ;;
 
+  "find")
+    _kube_resources "${@}"
+
+    if [[ -n ${RESOURCE_NAME-} ]]; then
+      printf "%s --namespace %s %s" "${KUBECTL_CONTEXT[*]}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}"
+    fi
+    ;;
+
   "forward")
     _kube_resources "services" "${1:- }"
 
@@ -387,7 +396,7 @@ _fzf_complete_kube() {
     )
     ;;
 
-  "desc" | "edit" | "env" | "image" | "info" | "log" | "restart")
+  "desc" | "edit" | "env" | "find" | "image" | "info" | "log" | "restart")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
       kubectl get deployments.app --all-namespaces --output=yaml | yq eval '.items[].metadata.name'
     )
