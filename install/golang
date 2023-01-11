@@ -15,7 +15,7 @@ script_dir() {
 }
 
 clean() {
-  if [[ -n ${GOPATH:-} ]]; then
+  if [[ -n ${GOPATH-} ]]; then
     rm -rf "${GOPATH}"
     mkdir -p "${GOPATH}"
   fi
@@ -27,7 +27,7 @@ clean() {
 }
 
 install() {
-  local GO_VERSION="1.19.4"
+  local GO_VERSION="1.19.5"
 
   local ARCH
   ARCH="$(normalized_arch "amd64" "armv6l" "arm64")"
