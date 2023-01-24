@@ -37,40 +37,18 @@ class AsyncTask:
             self.killed = True
             self.proc.terminate()
 
-    def read(self, handle):
-        chunk_size = 2**13
-        out = b""
+    def read(self, reader):
+        for line in reader:
+            self.write(line.decode(self.encoding))
 
-        while True:
-            try:
-                data = os.read(handle.fileno(), chunk_size)
+        if self.killed:
+            msg = "Cancelled"
+        else:
+            msg = "Finished"
 
-                out += data
-                if len(data) == chunk_size:
-                    continue
+        self.write("\n[%s]" % msg)
 
-                if data == b"" and out == b"":
-                    raise IOError("EOF")
-
-                self.write(out.decode(self.encoding))
-                if data == b"":
-                    raise IOError("EOF")
-
-                out = b""
-
-            except (UnicodeDecodeError) as e:
-                msg = "Error decoding output using %s - %s"
-                self.write(msg % (self.encoding, str(e)))
-                break
-
-            except (IOError):
-                if self.killed:
-                    msg = "Cancelled"
-                else:
-                    msg = "Finished"
-
-                self.write("\n[%s]" % msg)
-                break
+        reader.close()
 
     def write(self, text):
         self.output(text)
