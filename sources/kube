@@ -249,7 +249,7 @@ kube() {
     _kube_resources "${@}"
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
-      printf "%s --namespace %s %s" "${KUBECTL_CONTEXT[*]}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}"
+      printf "%s --namespace %s %s" "${KUBECTL_CONTEXT[*]}" "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}"
     fi
     ;;
 
