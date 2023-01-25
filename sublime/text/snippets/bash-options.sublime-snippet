@@ -9,11 +9,11 @@ while getopts ":${2:OptName}:" option; do
     ${1:VarName}="\${OPTARG}"
     ;;
   :)
-    printf "option -%s requires a value\n" "\${OPTARG}" >&2
+    printf "option -%s requires a value\n" "\${OPTARG}" 1>&2
     return 1
     ;;
   \?)
-    printf "option -%s is invalid\n" "\${OPTARG}" >&2
+    printf "option -%s is invalid\n" "\${OPTARG}" 1>&2
     return 2
     ;;
   esac

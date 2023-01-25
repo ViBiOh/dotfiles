@@ -17,7 +17,7 @@ decipher() {
 
 cipher_for() {
   if [[ ${#} -lt 1 ]]; then
-    printf "%bUsage: cipher_for GITHUB_USERNAME%b\n" "${RED}" "${RESET}"
+    printf "%bUsage: cipher_for GITHUB_USERNAME%b\n" "${RED}" "${RESET}" 1>&2
     return 1
   fi
 
@@ -39,7 +39,7 @@ cipher_for() {
   ENCRYPT_KEY_IDS="$(gpg --homedir "${TEMP_GNUPGHOME}" --list-keys --with-colons | grep pub | awk -F: '{print "{\"id\":\"" $5 "\",\"cap\":\"" $12 "\"}"}' | jq --raw-output 'select(.cap | test("e|E")) | .id')"
 
   if [[ -z ${ENCRYPT_KEY_IDS} ]]; then
-    printf "%bno encryption key found%b\n" "${RED}" "${RESET}"
+    printf "%bno encryption key found%b\n" "${RED}" "${RESET}" 1>&2
   else
     local EMAILS
 
@@ -52,7 +52,10 @@ cipher_for() {
     RECIPIENT="$(printf "%s" "${EMAILS}" | uniq | fzf --height=20 --ansi --reverse --prompt "Email:")"
 
     gpg --homedir "${TEMP_GNUPGHOME}" --encrypt --recipient "${RECIPIENT}" "${@}" | base64
+
+    printf "%bDecipher with: base64 -D | gpg --decrypt%b\n" "${YELLOW}" "${RESET}" 1>&2
   fi
+
   rm -rf "${TEMP_GNUPGHOME}" "${PUBLIC_KEY}"
 }
 
