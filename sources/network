@@ -41,6 +41,33 @@ dns_flush() {
   fi
 }
 
+dns_set_for() {
+  sudo networksetup -setdnsservers "${1}" "${2}"
+  sudo networksetup -setsearchdomains "${1}" local
+}
+
+dns_set() {
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    dns_set_for "Wi-Fi" "${1}"
+
+    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i 'USB 10/100/1000 LAN') -gt 0 ]]; then
+      dns_set_for "USB 10/100/1000 LAN" "${1}"
+    fi
+
+    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i 'Thunderbolt Ethernet Slot 1') -gt 0 ]]; then
+      dns_set_for "Thunderbolt Ethernet Slot 1" "${1}"
+    fi
+  fi
+}
+
+dns_set_home() {
+  dns_set "${HOME_DNS:-127.0.0.1}"
+}
+
+dns_set_local() {
+  dns_set "127.0.0.1"
+}
+
 dns_block() {
   cat \
     <(curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/${BLOCKED_HOSTS:-fakenews-gambling-porn-social}/hosts") \

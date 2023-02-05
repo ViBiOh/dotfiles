@@ -5,7 +5,7 @@ set -o nounset -o pipefail -o errexit
 install() {
   packages_install unbound
 
-  local UNBOUND_CONF_FOLDER="${BREW_PREFIX:-}/etc/unbound"
+  local UNBOUND_CONF_FOLDER="${BREW_PREFIX-}/etc/unbound"
   local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
   local UNBOUND_CA_CERT="${UNBOUND_CONF_FOLDER}/ca-certificates.pem"
   local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
@@ -54,7 +54,7 @@ install() {
   log-queries: no
 
   include: \"${UNBOUND_BLOCKLIST}\"
-${UNBOUND_EXTRA_SERVER_CONF:-}
+${UNBOUND_EXTRA_SERVER_CONF-}
 remote-control:
   control-enable: ${UNBOUND_CONTROL}
   control-interface: 127.0.0.1
@@ -62,7 +62,7 @@ remote-control:
   server-cert-file: \"${UNBOUND_CONF_FOLDER}/unbound_server.pem\"
   control-key-file: \"${UNBOUND_CONF_FOLDER}/unbound_control.key\"
   control-cert-file: \"${UNBOUND_CONF_FOLDER}/unbound_control.pem\"
-${UNBOUND_EXTRA_DNS_CONF:-}
+${UNBOUND_EXTRA_DNS_CONF-}
 forward-zone:
   name: \".\"
   forward-addr: 2606:4700:4700::1111@853#cloudflare-dns.com
@@ -100,18 +100,7 @@ forward-zone:
   fi
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    sudo networksetup -setdnsservers "Wi-Fi" 127.0.0.1
-    sudo networksetup -setsearchdomains "Wi-Fi" local
-
-    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i 'USB 10/100/1000 LAN') -gt 0 ]]; then
-      sudo networksetup -setdnsservers "USB 10/100/1000 LAN" 127.0.0.1
-      sudo networksetup -setsearchdomains "USB 10/100/1000 LAN" local
-    fi
-
-    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i 'Thunderbolt Ethernet Slot 1') -gt 0 ]]; then
-      sudo networksetup -setdnsservers "Thunderbolt Ethernet Slot 1" 127.0.0.1
-      sudo networksetup -setsearchdomains "Thunderbolt Ethernet Slot 1" local
-    fi
+    dns_set_local
   fi
 
   if command -v systemctl >/dev/null 2>&1; then
