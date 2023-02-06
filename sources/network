@@ -41,27 +41,17 @@ dns_flush() {
   fi
 }
 
-dns_set_for() {
-  sudo networksetup -setdnsservers "${1}" "${2}"
-  sudo networksetup -setsearchdomains "${1}" local
-}
-
 dns_set() {
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    dns_set_for "Wi-Fi" "${1}"
-
-    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i 'USB 10/100/1000 LAN') -gt 0 ]]; then
-      dns_set_for "USB 10/100/1000 LAN" "${1}"
-    fi
-
-    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i 'Thunderbolt Ethernet Slot 1') -gt 0 ]]; then
-      dns_set_for "Thunderbolt Ethernet Slot 1" "${1}"
-    fi
+  if ! [[ ${OSTYPE} =~ ^darwin ]]; then
+    return
   fi
-}
 
-dns_set_home() {
-  dns_set "${HOME_DNS:-127.0.0.1}"
+  for interface in "Wi-Fi" "USB 10/100/1000 LAN" "Thunderbolt Ethernet Slot 1"; do
+    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i "${interface}") -gt 0 ]]; then
+      sudo networksetup -setdnsservers "${interface}" "${1}"
+      sudo networksetup -setsearchdomains "${interface}" "local"
+    fi
+  done
 }
 
 dns_set_local() {
