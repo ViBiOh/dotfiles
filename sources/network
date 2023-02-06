@@ -52,10 +52,8 @@ dns_set() {
       sudo networksetup -setsearchdomains "${interface}" "local"
     fi
   done
-}
 
-dns_set_local() {
-  dns_set "127.0.0.1"
+  dns_flush
 }
 
 dns_block() {

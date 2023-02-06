@@ -99,8 +99,8 @@ forward-zone:
     fi
   fi
 
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    dns_set_local
+  if [[ ${UNBOUND_PORT} -eq 53 ]]; then
+    dns_set "127.0.0.1"
   fi
 
   if command -v systemctl >/dev/null 2>&1; then
