@@ -16,22 +16,6 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
 
         return True
 
-    def get_function_name(self, window):
-        view = window.active_view()
-
-        current_point = view.sel()[0].begin()
-        current_function = ""
-
-        for function_symbol in [
-            x for x in view.symbol_regions() if x.kind[0] == sublime.KIND_ID_FUNCTION
-        ]:
-            if function_symbol.region.begin() < current_point:
-                current_function = function_symbol.name
-            else:
-                return current_function
-
-        return current_function
-
     def run(self, kill=False):
         if kill:
             if self.task:
@@ -48,13 +32,17 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
 
         with self.panel_lock:
             self.panel = window.create_output_panel("gotest")
+            settings = self.panel.settings()
+            settings.set("result_file_regex", r"^\s*(.*?\.go):(\d+)")
+            settings.set("result_base_dir", working_dir)
             window.run_command("show_panel", {"panel": "output.gotest"})
 
-        function_name = self.get_function_name(window)
         env = load_env(working_dir)
 
         if self.task:
             self.task.kill()
+
+        function_name = self.get_function_name(window)
 
         self.queue_write("Running go test for {}...\n".format(function_name))
 
@@ -71,3 +59,19 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
     def do_write(self, text):
         with self.panel_lock:
             self.panel.run_command("append", {"characters": text})
+
+    def get_function_name(self, window):
+        view = window.active_view()
+
+        current_point = view.sel()[0].begin()
+        current_function = ""
+
+        for function_symbol in [
+            x for x in view.symbol_regions() if x.kind[0] == sublime.KIND_ID_FUNCTION
+        ]:
+            if function_symbol.region.begin() < current_point:
+                current_function = function_symbol.name
+            else:
+                return current_function
+
+        return current_function

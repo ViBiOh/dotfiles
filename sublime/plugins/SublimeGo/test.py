@@ -23,12 +23,19 @@ class GoTest(sublime_plugin.WindowCommand):
 
             return
 
-        variables = self.window.extract_variables()
+        window = self.window
+        if not window:
+            return
+
+        variables = window.extract_variables()
         working_dir = variables["file_path"]
 
         with self.panel_lock:
-            self.panel = self.window.create_output_panel("gotest")
-            self.window.run_command("show_panel", {"panel": "output.gotest"})
+            self.panel = window.create_output_panel("gotest")
+            settings = self.panel.settings()
+            settings.set("result_file_regex", r"^\s*(.*?\.go):(\d+)")
+            settings.set("result_base_dir", working_dir)
+            window.run_command("show_panel", {"panel": "output.gotest"})
 
         env = load_env(working_dir)
 
