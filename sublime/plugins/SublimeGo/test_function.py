@@ -8,7 +8,6 @@ from .env_loader import load_env
 class GoFunctionTest(sublime_plugin.WindowCommand):
     task = None
     panel = None
-    panel_lock = threading.Lock()
 
     def is_enabled(self, kill=False):
         if kill:
@@ -30,12 +29,11 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
         variables = window.extract_variables()
         working_dir = variables["file_path"]
 
-        with self.panel_lock:
-            self.panel = window.create_output_panel("gotest")
-            settings = self.panel.settings()
-            settings.set("result_file_regex", r"^\s*(.*?\.go):(\d+)")
-            settings.set("result_base_dir", working_dir)
-            window.run_command("show_panel", {"panel": "output.gotest"})
+        self.panel = window.create_output_panel("gotest")
+        settings = self.panel.settings()
+        settings.set("result_file_regex", r"^\s*(.*?\.go):(\d+)")
+        settings.set("result_base_dir", working_dir)
+        window.run_command("show_panel", {"panel": "output.gotest"})
 
         env = load_env(working_dir)
 
@@ -57,8 +55,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
         sublime.set_timeout(lambda: self.do_write(text), 1)
 
     def do_write(self, text):
-        with self.panel_lock:
-            self.panel.run_command("append", {"characters": text})
+        self.panel.run_command("append", {"characters": text})
 
     def get_function_name(self, window):
         view = window.active_view()
