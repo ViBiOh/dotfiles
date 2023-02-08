@@ -38,7 +38,7 @@ install() {
   kubectl completion bash >"${SCRIPT_DIR}/../sources/kubectl-completion"
 
   # renovate: datasource=github-releases depName=helm/helm
-  local HELM_VERSION="v3.11.0"
+  local HELM_VERSION="v3.11.1"
 
   archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz" "${OS}-${ARCH}/helm"
   if command -v helm >/dev/null 2>&1; then
