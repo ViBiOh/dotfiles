@@ -37,7 +37,11 @@ source_all() {
   SCRIPT_DIR="$(script_dir)"
 
   if [[ -e "${SCRIPT_DIR}/../scripts/meta" ]]; then
+<<<<<<< Updated upstream
     source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var" "git" "github" "kubernetes" "version" "ssh" "tmux"
+=======
+    source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var" "git" "github" "database" "kubernetes" "version" "ssh" "tmux" "gcloud"
+>>>>>>> Stashed changes
     var_color
     ssh_init
   fi
