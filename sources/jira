@@ -64,7 +64,9 @@ jira() {
       return
     fi
 
-    _jira_info "Project: $(printf "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $2)}')"
+    JIRA_PROJECT_KEY="$(printf "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $2)}')"
+
+    _jira_info "Project: ${JIRA_PROJECT_KEY}"
     JIRA_PROJECT="$(printf "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_TYPE
@@ -74,8 +76,18 @@ jira() {
       return
     fi
 
-    _jira_info "Type: $(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $2)}')"
+    _jira_info "Issue Type: $(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $2)}')"
     JIRA_ISSUE_TYPE="$(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
+
+    local JIRA_EPIC
+    JIRA_EPIC="$(_jira_epic "${JIRA_PROJECT_KEY}")"
+
+    if [[ -z ${JIRA_EPIC} ]]; then
+      return
+    fi
+
+    _jira_info "Epic:$(printf "%s" "${JIRA_EPIC}" | awk '{$1=""; print}')"
+    JIRA_EPIC="$(printf "%s" "${JIRA_EPIC}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_SUMMARY
     read -r -p "JIRA_ISSUE_SUMMARY=" JIRA_ISSUE_SUMMARY
@@ -92,6 +104,7 @@ jira() {
       --arg user "${JIRA_USER}" \
       --arg issuetype "${JIRA_ISSUE_TYPE}" \
       --arg summary "${JIRA_ISSUE_SUMMARY}" \
+      --arg epic "${JIRA_EPIC}" \
       '{
         fields: {
           summary: $summary,
@@ -103,6 +116,9 @@ jira() {
           },
           assignee: {
             id: $user
+          },
+          parent: {
+            id: $epic
           }
         }
       }')"
@@ -211,7 +227,7 @@ _jira_transition() {
   local JIRA_TRANSITION
   JIRA_TRANSITION="$(
     printf "%s" "${JIRA_TRANSITIONS}" | jq --raw-output '.transitions[] | .id + " - " + .name' |
-      fzf --height=20 --ansi --reverse --exit-0 |
+      fzf --height=20 --ansi --reverse --exit-0 --prompt="Status:" |
       awk '{printf("%s", $1)}'
   )"
 
@@ -325,8 +341,25 @@ _jira_issue() {
   fi
 
   printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .key + " " + .fields.summary' |
-    fzf --height=20 --ansi --reverse --exit-0 |
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue:" |
     awk '{printf("%s", $1)}'
+}
+
+_jira_epic() {
+  local JIRA_PROJECT_NAME="${1-}"
+
+  local JIRA_JQL="issuetype = Epic and project = ${JIRA_PROJECT_NAME}"
+  JIRA_JQL+=" ORDER BY updated DESC"
+
+  local JIRA_OUTPUT
+  JIRA_OUTPUT="$(_jira_request "/rest/api/3/search" --get --data-urlencode "maxResults=200" --data-urlencode "jql=${JIRA_JQL}")"
+
+  if [[ -z ${JIRA_OUTPUT} ]]; then
+    return
+  fi
+
+  printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .id + " " + .fields.summary' |
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Epic:"
 }
 
 _jira_project() {
@@ -338,7 +371,7 @@ _jira_project() {
   fi
 
   printf "%s" "${JIRA_PROJECTS}" | jq --raw-output '.[] | .id + " " + .key + " " + .name' |
-    fzf --height=20 --ansi --reverse --exit-0
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Project:"
 }
 
 _jira_issue_type() {
@@ -353,7 +386,7 @@ _jira_issue_type() {
   fi
 
   printf "%s" "${JIRA_ISSUE_TYPES}" | jq --raw-output '.[] | .id + " " + .name' |
-    fzf --height=20 --ansi --reverse --exit-0
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue Type:"
 }
 
 _jira_self_user() {
