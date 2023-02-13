@@ -31,7 +31,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
 
         self.panel = window.create_output_panel("gotest")
         settings = self.panel.settings()
-        settings.set("result_file_regex", r"^\s*(.*?\.go):(\d+)")
+        settings.set("result_file_regex", r"([^\s[]+?):(\d+)")
         settings.set("result_base_dir", working_dir)
         window.run_command("show_panel", {"panel": "output.gotest"})
 

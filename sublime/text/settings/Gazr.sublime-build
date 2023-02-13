@@ -7,6 +7,5 @@
 		{ "name": "build", "cmd": ["make", "build"] }
 	],
 	"cmd": ["make", "format", "style", "test", "build"],
-	"file_regex": "^\\s*(.*?.go):(\\d+)",
-	"quiet": true
+	"file_regex": "([^\\s[]+?):(\\d+)"
 }
