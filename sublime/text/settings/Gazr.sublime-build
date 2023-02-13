@@ -1,0 +1,11 @@
+{
+	"working_dir": "$folder",
+	"variants": [
+		{ "name": "format", "cmd": ["make", "format"] },
+		{ "name": "style", "cmd": ["make", "style"] },
+		{ "name": "test", "cmd": ["make", "test"] },
+		{ "name": "build", "cmd": ["make", "build"] }
+	],
+	"cmd": ["make", "format", "style", "test", "build"],
+	"file_regex": "^\\s*(.*?.go):(\\d+)"
+}
