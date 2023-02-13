@@ -90,7 +90,7 @@ jira() {
     JIRA_EPIC="$(printf "%s" "${JIRA_EPIC}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_SUMMARY
-    read -r -p "JIRA_ISSUE_SUMMARY=" JIRA_ISSUE_SUMMARY
+    read -r -p "Summary:" JIRA_ISSUE_SUMMARY
 
     local JIRA_USER
     if _jira_confirm "Self assign"; then
@@ -122,6 +122,15 @@ jira() {
           }
         }
       }')"
+
+    local EXTRA_FIELD_OUTPUT="init"
+    while [[ -n ${EXTRA_FIELD_OUTPUT} ]]; do
+      EXTRA_FIELD_OUTPUT="$(_jira_extra_fields "${JIRA_PROJECT}" "${JIRA_ISSUE_TYPE}")"
+
+      if [[ -n ${EXTRA_FIELD_OUTPUT} ]]; then
+        JIRA_CREATE_ISSUE_PAYLOAD="$(printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${EXTRA_FIELD_OUTPUT}" | jq --compact-output --slurp '.[0] * .[1]')"
+      fi
+    done
 
     local JIRA_ISSUE_CREATION
     JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request "POST" --header "Content-Type: application/json" --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
@@ -387,6 +396,48 @@ _jira_issue_type() {
 
   printf "%s" "${JIRA_ISSUE_TYPES}" | jq --raw-output '.[] | .id + " " + .name' |
     fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue Type:"
+}
+
+_jira_extra_fields() {
+  local JIRA_PROJECT="${1}"
+  shift
+
+  local JIRA_ISSUE_TYPE="${1}"
+  shift
+
+  local JIRA_EXTRA_FIELDS
+  JIRA_EXTRA_FIELDS="$(_jira_request "/rest/api/3/issue/createmeta" --get --data-urlencode "projectIds=${JIRA_PROJECT}" --data-urlencode "issuetypeIds=${JIRA_ISSUE_TYPE}" --data-urlencode "expand=projects.issuetypes.fields")"
+
+  if [[ -z ${JIRA_EXTRA_FIELDS} ]]; then
+    return
+  fi
+
+  local EXTRA_FIELD
+  EXTRA_FIELD="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.projects[].issuetypes[].fields[] | select(.schema.type == "number" or .schema.type == "string") | select(.key != "summary") | .name' |
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Extra field:")"
+
+  if [[ -z ${EXTRA_FIELD} ]]; then
+    return
+  fi
+
+  local EXTRA_FIELD_VALUE
+  read -r -p "${EXTRA_FIELD}:" EXTRA_FIELD_VALUE
+
+  local EXTRA_FIELD_KEY
+  EXTRA_FIELD_KEY="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output '.projects[].issuetypes[].fields[] | select(.name == $name) | .key')"
+
+  local EXTRA_FIELD_TYPE
+  EXTRA_FIELD_TYPE="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output '.projects[].issuetypes[].fields[] | select(.name == $name) | .schema.type')"
+
+  case "${EXTRA_FIELD_TYPE}" in
+  "string")
+    jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "\"${EXTRA_FIELD_VALUE}\"" '{fields: { ($key): $value} }'
+    ;;
+
+  "number")
+    jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "${EXTRA_FIELD_VALUE}" '{fields: { ($key): $value} }'
+    ;;
+  esac
 }
 
 _jira_self_user() {
