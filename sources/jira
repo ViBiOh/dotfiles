@@ -432,9 +432,9 @@ _jira_fill_extra_fields() {
   fi
 
   local EXTRA_FIELD
-  EXTRA_FIELD="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.name' | fzf --height=20 --ansi --reverse --exit-0 --prompt="Extra field:")"
+  EXTRA_FIELD="$(printf '{"name":"None"} %s' "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.name' | fzf --height=20 --ansi --reverse --exit-0 --prompt="Extra field:")"
 
-  if [[ -z ${EXTRA_FIELD} ]]; then
+  if [[ ${EXTRA_FIELD:-None} == "None" ]]; then
     return
   fi
 
