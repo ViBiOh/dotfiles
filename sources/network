@@ -115,6 +115,11 @@ dns_allow() {
     doubleclick.net
   "
 
+  websites["gtm"]="
+    www.googletagmanager.com
+    googletagmanager.com
+  "
+
   local WEBSITE
   WEBSITE="$(printf "%s\n" "${!websites[@]}" | fzf --height=20 --ansi --reverse --select-1 --query="${1-}" --exit-0)"
 
