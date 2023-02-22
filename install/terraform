@@ -17,7 +17,7 @@ install() {
 
   # renovate: datasource=github-releases depName=hashicorp/terraform-ls
   local TERRAFORM_LS_VERSION="v0.30.3"
-  archive_to_binary "https://github.com/hashicorp/terraform-ls/releases/download/${TERRAFORM_LS_VERSION}/terraform-ls_${TERRAFORM_LS_VERSION#v}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").zip" "terraform-ls"
+  archive_to_binary "https://releases.hashicorp.com/terraform-ls/${TERRAFORM_LS_VERSION#v}/terraform-ls_${TERRAFORM_LS_VERSION#v}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").zip" "terraform-ls"
 }
 
 credentials() {
