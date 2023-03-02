@@ -9,6 +9,10 @@ if command -v colima >/dev/null 2>&1; then
     colima stop
     colima delete --force
   }
+
+  docker_login() {
+    pass show "dev/docker" | head -1 | docker login --username "$(pass show "dev/docker" | awk -F': ' '$1 == "login" {printf("%s", $2)}')" --password-stdin
+  }
 fi
 
 if command -v docker >/dev/null 2>&1; then
