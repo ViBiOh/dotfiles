@@ -1,0 +1,8 @@
+<snippet>
+	<content><![CDATA[
+fmt.Printf("Type: %T, Value: %#v\n", ${1:var}, ${1})
+]]></content>
+	<tabTrigger>gdp</tabTrigger>
+	<scope>source.go</scope>
+	<description>Debug Print</description>
+</snippet>
