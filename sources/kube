@@ -156,11 +156,11 @@ kube() {
         if [[ ${context} =~ ^--context= ]]; then
           DIFF_ARGS+=("<(kubectl ${context} get ${RESOURCE_TYPE} --namespace ${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '${QUERY}')")
         elif ! [[ ${context} =~ ^--context ]]; then
-          DIFF_ARGS+=("<(kubectl --context ${context} get ${RESOURCE_TYPE} --namespace ${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '${QUERY}')")
+          DIFF_ARGS+=("<(kubectl --context ${context} get ${RESOURCE_TYPE} --namespace ${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '\"${context}\", ${QUERY}')")
         fi
       done
 
-      eval "vimdiff ${DIFF_ARGS[*]}"
+      eval "vimdiff -R ${DIFF_ARGS[*]}"
     fi
     ;;
 
