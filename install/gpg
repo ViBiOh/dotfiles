@@ -43,4 +43,13 @@ no-symkey-cache
 use-agent
 throw-keyids
 keyserver hkps://keys.openpgp.org" >"${HOME}/.gnupg/gpg.conf"
+
+}
+
+credentials() {
+  local KEY_ID="DD539006C49CAB71"
+
+  if ! gpg --list-keys "${KEY_ID}"; then
+    gpg --receive-keys --keyserver hkps://keys.openpgp.org "${KEY_ID}"
+  fi
 }
