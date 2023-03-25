@@ -39,7 +39,6 @@ source_all() {
   if [[ -e "${SCRIPT_DIR}/../scripts/meta" ]]; then
     source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var" "git" "github" "kubernetes" "version" "ssh" "tmux"
     var_color
-    ssh_init
   fi
 
   for file in "${SCRIPT_DIR}/../sources/"*; do

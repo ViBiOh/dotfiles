@@ -4,7 +4,7 @@
 [user]
 	name = Vincent Boutour
 	email = bob@vibioh.fr
-	signingkey = F8179BC66B5AA926
+	signingkey = DD539006C49CAB71
 
 [includeIf "gitdir:~/workspace/"]
 	path = ~/.gitconfig_work
