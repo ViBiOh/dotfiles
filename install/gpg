@@ -9,7 +9,7 @@ clean() {
 }
 
 install() {
-  packages_install gnupg yubikey-personalization hopenpgp-tools ykman
+  packages_install gnupg yubikey-personalization hopenpgp-tools
 
   if ! command -v gpg >/dev/null 2>&1; then
     return
