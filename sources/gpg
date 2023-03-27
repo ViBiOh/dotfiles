@@ -6,8 +6,12 @@ export GPG_TTY
 SSH_AUTH_SOCK="$(gpgconf --list-dirs "agent-ssh-socket")"
 export SSH_AUTH_SOCK
 
-gpgconf --launch gpg-agent
-gpg-connect-agent updatestartuptty /bye >/dev/null
+gpg_agent_start() {
+  gpgconf --launch gpg-agent
+  gpg-connect-agent updatestartuptty /bye >/dev/null
+}
+
+gpg_agent_start
 
 gpg_agent_stop() {
   gpgconf --kill gpg-agent
