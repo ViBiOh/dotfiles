@@ -3,6 +3,7 @@
 	"in_process_packages": [
 	],
 	"installed_packages": [
+		"Debugger",
 		"EditorConfig",
 		"LSP",
 		"Package Control",
