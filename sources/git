@@ -11,3 +11,7 @@ fi
 ...() {
   cd "$(git_root)" || return 1
 }
+
+jira_pull_request() {
+  github_pull_request "$(git remote-repository)" "$(jira summary)" "$(git default-branch)" "$(git current-branch)"
+}

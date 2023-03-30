@@ -44,6 +44,18 @@ jira() {
   JIRA_DOMAIN="$(printf "%s\n" "${!JIRAS_URL[@]}" | fzf --height=20 --ansi --reverse --select-1)"
 
   case ${ACTION} in
+  "branch")
+    local JIRA_ISSUE
+    JIRA_ISSUE="$(_jira_issue "${scope}")"
+
+    if [[ -z ${JIRA_ISSUE} ]]; then
+      return
+    fi
+
+    _jira_info "Issue ${JIRA_ISSUE}"
+    _jira_branch
+    ;;
+
   "browse")
     local JIRA_ISSUE
     JIRA_ISSUE="$(_jira_issue "${scope}")"
@@ -165,7 +177,7 @@ jira() {
 
     ;;
 
-  "branch")
+  "print")
     local JIRA_ISSUE
     JIRA_ISSUE="$(_jira_issue "${scope}")"
 
@@ -173,8 +185,18 @@ jira() {
       return
     fi
 
-    _jira_info "Issue ${JIRA_ISSUE}"
-    _jira_branch
+    printf "%s" "${JIRA_ISSUE}"
+    ;;
+
+  "summary")
+    local JIRA_ISSUE
+    JIRA_ISSUE="$(_jira_issue "${scope}")"
+
+    if [[ -z ${JIRA_ISSUE} ]]; then
+      return
+    fi
+
+    _jira_summary "${JIRA_ISSUE}"
     ;;
 
   "transition")
@@ -185,18 +207,7 @@ jira() {
       return
     fi
 
-    _jira_transition
-    ;;
-
-  "print")
-    local JIRA_ISSUE
-    JIRA_ISSUE="$(_jira_issue "${scope}")"
-
-    if [[ -z ${JIRA_ISSUE} ]]; then
-      return
-    fi
-
-    printf "%s" "${JIRA_ISSUE}"
+    _jira_transition "${JIRA_ISSUE}"
     ;;
 
   *)
@@ -288,9 +299,11 @@ _jira_help() {
   _jira_error "Usage: jira [options?] ACTION"
 
   _jira_info "\nPossibles actions are                               | args\n"
-  _jira_info " - browse      Open browser for ticket                 | <ticket name>?"
   _jira_info " - branch      Switch git repository branch to ticket  | <ticket name>?"
+  _jira_info " - browse      Open browser for ticket                 | <ticket name>?"
+  _jira_info " - create      Create a ticket interactively           |"
   _jira_info " - print       Print ticket ID                         | <ticket name>?"
+  _jira_info " - summary     Print the summary of a ticket           | <ticket name>?"
   _jira_info " - transition  Transition ticket to another state      | <ticket name>?"
 
   _jira_info "\nPossibles options are\n"
@@ -389,6 +402,17 @@ _jira_project() {
 
   printf "%s" "${JIRA_PROJECTS}" | jq --raw-output '.[] | .id + " " + .key + " " + .name' |
     fzf --height=20 --ansi --reverse --exit-0 --prompt="Project:"
+}
+
+_jira_summary() {
+  local JIRA_ISSUE_PAYLOAD
+  JIRA_ISSUE_PAYLOAD="$(_jira_request "/rest/api/latest/issue/${JIRA_ISSUE}" --get)"
+
+  if [[ -z ${JIRA_ISSUE_PAYLOAD} ]]; then
+    return
+  fi
+
+  printf "%s" "${JIRA_ISSUE_PAYLOAD}" | jq --raw-output '.key + " " + .fields.summary'
 }
 
 _jira_issue_type() {
