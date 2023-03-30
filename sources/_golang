@@ -27,6 +27,9 @@ if command -v fzf >/dev/null 2>&1; then
     printf "MODULE=%s\n" "${MODULE_TO_BUMP}"
     local MODULE_VERSION=""
 
+    local GITHUB_TOKEN
+    GITHUB_TOKEN="$(pass show "dev/github" | awk -F': ' '$1 == "token" {printf("%s", $2)}')"
+
     if [[ -z ${2-} ]] && [[ ${MODULE_TO_BUMP} =~ ^github.com\/([^\/]+)\/([^\/]+)(\/.+)?$ ]] && [[ -n ${GITHUB_TOKEN} ]]; then
       local REPOSITORY_NAME="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
 
