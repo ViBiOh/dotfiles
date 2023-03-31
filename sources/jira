@@ -11,18 +11,22 @@ jira() {
     return
   fi
 
-  local scope="self"
+  local scope="assignee"
+
+  shift $((OPTIND - 1))
 
   OPTIND=0
-  while getopts ":a" option; do
+  while getopts ":s:" option; do
     case "${option}" in
-    a)
-      scope="all"
+    s)
+      scope="${OPTARG}"
       ;;
+
     :)
       printf "option -%s requires a value\n" "${OPTARG}" 1>&2
       return 1
       ;;
+
     \?)
       printf "option -%s is invalid\n" "${OPTARG}" 1>&2
       return 2
@@ -308,7 +312,10 @@ _jira_help() {
   _jira_info " - transition  Transition ticket to another state      | <ticket name>?"
 
   _jira_info "\nPossibles options are\n"
-  _jira_info " - -a List tickets for all users (not just current)"
+  _jira_info " - -s Scope of tickets searched"
+  _jira_info "   \t- 'assignee': only tickets on which current user is assignee (default value)"
+  _jira_info "   \t- 'reporter': only tickets on which current user is reporter (default value)"
+  _jira_info "   \t- 'all': no filter"
 }
 
 _jira_auth() {
@@ -359,8 +366,10 @@ _jira_request() {
 
 _jira_issue() {
   local JIRA_JQL="status NOT IN (Done, Closed, Resolved)"
-  if [[ ${1-} == "self" ]]; then
+  if [[ ${1-} == "assignee" ]]; then
     JIRA_JQL+=" AND assignee = currentUser()"
+  elif [[ ${1-} == "reporter" ]]; then
+    JIRA_JQL+=" AND reporter = currentUser()"
   fi
   JIRA_JQL+=" ORDER BY updated DESC"
 
