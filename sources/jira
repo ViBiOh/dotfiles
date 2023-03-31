@@ -129,14 +129,15 @@ jira() {
           issuetype: {
             id: $issuetype
           },
-          assignee: {
-            id: $user
-          },
           parent: {
             id: $epic
           }
         }
       }')"
+
+    if [[ -n ${JIRA_USER} ]]; then
+      JIRA_CREATE_ISSUE_PAYLOAD="$(printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "$(jq --arg user "${JIRA_USER}" '{assignee: {id: $user}}')" | jq --compact-output --slurp '.[0] * .[1]')"
+    fi
 
     local EXTRA_FIELDS_NAMES
     EXTRA_FIELDS_NAMES="$(_jira_extra_fields "${JIRA_PROJECT}" "${JIRA_ISSUE_TYPE}")"
