@@ -11,7 +11,7 @@ if command -v colima >/dev/null 2>&1; then
   }
 
   docker_login() {
-    pass show "dev/docker" | head -1 | docker login --username "$(pass show "dev/docker" | awk -F': ' '$1 == "login" {printf("%s", $2)}')" --password-stdin
+    pass show "dev/docker" | head -1 | docker login --username "$(pass_get "dev/docker" "login")" --password-stdin
   }
 fi
 

@@ -63,7 +63,7 @@ if command -v pass >/dev/null 2>&1; then
     local PASS_NAME="${1}"
     shift
 
-    pass show "${PASS_NAME}" | awk -F': ' '$1 == "login" {printf("%s", $2)}' | pbcopy
+    pass_get "${PASS_NAME}" "login" | pbcopy
     printf "Copied login of %s to clipboard\n" "${PASS_NAME}"
     read -s -r -p "Press enter for password"
     printf "\n"
