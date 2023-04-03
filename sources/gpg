@@ -7,16 +7,19 @@ SSH_AUTH_SOCK="$(gpgconf --list-dirs "agent-ssh-socket")"
 export SSH_AUTH_SOCK
 
 gpg_agent_start() {
-  if [[ $(pgrep gpg-agent | wc -l) -eq 0 ]]; then
-    gpgconf --launch gpg-agent
+  if [[ $(pgrep gpg-agent | wc -l) -eq 1 ]]; then
+    return 0
   fi
-}
 
-gpg_agent_start
+  gpgconf --launch gpg-agent
+  gpg-connect-agent updatestartuptty /bye >/dev/null
+}
 
 gpg_agent_stop() {
   gpgconf --kill gpg-agent
 }
+
+gpg_agent_start
 
 cipher() {
   gpg --symmetric --cipher-algo AES256 "${@}" | base64
