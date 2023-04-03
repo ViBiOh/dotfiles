@@ -9,7 +9,7 @@ clean() {
 }
 
 install() {
-  packages_install gnupg yubikey-personalization hopenpgp-tools
+  packages_install gnupg yubikey-personalization hopenpgp-tools pinentry-mac
 
   if ! command -v gpg >/dev/null 2>&1; then
     return
@@ -20,7 +20,8 @@ install() {
 
   echo "enable-ssh-support
 default-cache-ttl 3600
-max-cache-ttl 3600" >"${HOME}/.gnupg/gpg-agent.conf"
+max-cache-ttl 3600
+pinentry-program /usr/local/bin/pinentry-mac" >"${HOME}/.gnupg/gpg-agent.conf"
 
   echo "personal-cipher-preferences AES256 AES192 AES
 personal-digest-preferences SHA512 SHA384 SHA256
