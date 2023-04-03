@@ -13,9 +13,8 @@ jira() {
 
   local scope="assignee"
 
-  shift $((OPTIND - 1))
-
   OPTIND=0
+
   while getopts ":s:" option; do
     case "${option}" in
     s)
@@ -366,11 +365,13 @@ _jira_request() {
 
 _jira_issue() {
   local JIRA_JQL="status NOT IN (Done, Closed, Resolved)"
+
   if [[ ${1-} == "assignee" ]]; then
     JIRA_JQL+=" AND assignee = currentUser()"
   elif [[ ${1-} == "reporter" ]]; then
     JIRA_JQL+=" AND reporter = currentUser()"
   fi
+
   JIRA_JQL+=" ORDER BY updated DESC"
 
   local JIRA_OUTPUT
