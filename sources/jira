@@ -138,8 +138,11 @@ jira() {
         }
       }')"
 
-    if [[ -n ${JIRA_USER} ]]; then
-      JIRA_CREATE_ISSUE_PAYLOAD="$(printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "$(jq --arg user "${JIRA_USER}" '{assignee: {id: $user}}')" | jq --compact-output --slurp '.[0] * .[1]')"
+    if [[ -n ${JIRA_USER-} ]]; then
+      local JIRA_ASSIGNEE
+      JIRA_ASSIGNEE="$(jq --null-input --arg user "${JIRA_USER}" '{fields: { assignee: {id: $user} } }')"
+
+      JIRA_CREATE_ISSUE_PAYLOAD="$(printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${JIRA_ASSIGNEE}" | jq --compact-output --slurp '.[0] * .[1]')"
     fi
 
     local EXTRA_FIELDS_NAMES
@@ -355,6 +358,7 @@ _jira_request() {
 
   if [[ ${?} -ne 0 ]]; then
     cat "${HEADER_OUPUT}" >/dev/stderr
+    printf "%s\n" "${JIRA_OUTPUT}" >/dev/stderr
     rm -f "${HEADER_OUPUT}"
     return 1
   fi
