@@ -29,15 +29,9 @@ clean() {
 install() {
   local GO_VERSION="1.20.3"
 
-  local ARCH
-  ARCH="$(normalized_arch "amd64" "armv6l" "arm64")"
-
-  local OS
-  OS="$(normalized_os)"
-
   if [[ ! -d "${HOME}/opt/go" ]]; then
     local GO_ARCHIVE
-    GO_ARCHIVE="go${GO_VERSION}.${OS}-${ARCH}.tar.gz"
+    GO_ARCHIVE="go${GO_VERSION}.$(normalized_os)-$(normalized_arch "amd64" "armv6l" "arm64").tar.gz"
 
     curl --disable --silent --show-error --location --max-time 300 --remote-name "https://dl.google.com/go/${GO_ARCHIVE}"
     tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
@@ -52,7 +46,7 @@ install() {
   packages_install graphviz
 
   if command -v go >/dev/null 2>&1; then
-    if [[ ${ARCH} == "amd64" ]]; then
+    if [[ $(normalized_arch "amd64" "armv6l" "arm64") == "amd64" ]]; then
       go install "github.com/go-delve/delve/cmd/dlv@latest"
     fi
 

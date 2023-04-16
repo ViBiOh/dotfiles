@@ -22,11 +22,6 @@ install() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(script_dir)"
 
-  local OS
-  OS="$(normalized_os)"
-  local ARCH
-  ARCH="$(normalized_arch "amd64" "arm" "arm64")"
-
   if [[ -e "${HOME}/.kube/config" ]]; then
     chmod 0600 "${HOME}/.kube/config"
   fi
@@ -34,13 +29,13 @@ install() {
   local KUBERNETES_VERSION
   KUBERNETES_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://storage.googleapis.com/kubernetes-release/release/stable.txt")"
 
-  curl_to_binary "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/${OS}/${ARCH}/kubectl" "kubectl"
+  curl_to_binary "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/$(normalized_os)/$(normalized_arch "amd64" "arm" "arm64")/kubectl" "kubectl"
   kubectl completion bash >"${SCRIPT_DIR}/../sources/kubectl-completion"
 
   # renovate: datasource=github-releases depName=helm/helm
   local HELM_VERSION="v3.11.3"
 
-  archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz" "${OS}-${ARCH}/helm"
+  archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64").tar.gz" "$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64")/helm"
   if command -v helm >/dev/null 2>&1; then
     helm completion bash >"${SCRIPT_DIR}/../sources/helm-completion"
   else
@@ -49,16 +44,16 @@ install() {
 
   # renovate: datasource=github-releases depName=fluxcd/flux2
   local FLUX_VERSION="v0.41.2"
-  archive_to_binary "https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION#v}_${OS}_${ARCH}.tar.gz" "flux"
+  archive_to_binary "https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION#v}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").tar.gz" "flux"
   flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
 
   # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
   local KUBESEAL_VERSION="v0.20.2"
-  archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-${OS}-${ARCH}.tar.gz" "kubeseal"
+  archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64").tar.gz" "kubeseal"
 
   # renovate: datasource=github-releases depName=ViBiOh/kmux
   local KMUX_VERSION="v0.5.1"
-  curl_to_binary "https://github.com/ViBiOh/kmux/releases/download/${KMUX_VERSION}/kmux_${OS}_${ARCH}" "kmux"
+  curl_to_binary "https://github.com/ViBiOh/kmux/releases/download/${KMUX_VERSION}/kmux_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64")" "kmux"
   kmux completion bash >"${SCRIPT_DIR}/../sources/kmux-completion"
 }
 
