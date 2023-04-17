@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   # renovate: datasource=github-releases depName=google/go-jsonnet
-  local JSONNET_VERSION="v0.19.1"
+  local JSONNET_VERSION="v0.20.0"
 
   archive_to_binary "https://github.com/google/go-jsonnet/releases/download/${JSONNET_VERSION}/go-jsonnet_${JSONNET_VERSION#v}_$(normalized_os "Darwin")_$(normalized_arch).tar.gz" "jsonnet"
 }
