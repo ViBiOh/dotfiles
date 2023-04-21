@@ -23,7 +23,8 @@ clean() {
 }
 
 install() {
-  local SCRIPT_DIR="$(script_dir)"
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(script_dir)"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install "colima"
