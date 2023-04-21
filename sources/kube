@@ -194,10 +194,10 @@ kube() {
       KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]", "\n"))' "${DEPLOYMENT_YAML}"
 
       local INLINE_REFS
-      INLINE_REFS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("end")) | .env[] |
+      INLINE_REFS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] |
             (
-              select((select(has("valueFrom")) | .valueFrom | has("configMapKeyRef"))) | "configmap/" + .valueFrom.configMapKeyRef.name + "/" + .valueFrom.configMapKeyRef.key,
-              select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | "secret/" + .valueFrom.secretKeyRef.name + "/" + .valueFrom.secretKeyRef.key
+              select((select(has("valueFrom")) | .valueFrom | has("configMapKeyRef"))) | "configmap/" + .valueFrom.configMapKeyRef.name + "/" + .valueFrom.configMapKeyRef.key + "/" + .name,
+              select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | "secret/" + .valueFrom.secretKeyRef.name + "/" + .valueFrom.secretKeyRef.key + "/" + .name
             )' "${DEPLOYMENT_YAML}")"
 
       if [[ -n ${INLINE_REFS-} ]]; then
@@ -208,6 +208,8 @@ kube() {
           INLINE_RESOURCE_NAME="$(printf '%s' "${inlineRef}" | awk -F '/' '{ print $2 }')"
           local INLINE_REF_KEY
           INLINE_REF_KEY="$(printf '%s' "${inlineRef}" | awk -F '/' '{ print $3 }')"
+          local INLINE_ENV_NAME
+          INLINE_ENV_NAME="$(printf '%s' "${inlineRef}" | awk -F '/' '{ print $4 }')"
 
           YQ_QUERY='.data[strenv(SECRET_KEY)]'
           if [[ ${INLINE_RESOURCE_TYPE} == "secret" ]]; then
@@ -215,7 +217,8 @@ kube() {
           fi
           YQ_QUERY+=' | sub("[\n]", "\n")'
 
-          "${KUBECTL_COMMAND[@]}" get "${INLINE_RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${INLINE_RESOURCE_NAME}" --output=yaml | SECRET_KEY="${INLINE_REF_KEY}" yq eval '.data[strenv(SECRET_KEY)]| @base64d | sub("[\n]", "\n")'
+          printf "%s=" "${INLINE_ENV_NAME}"
+          "${KUBECTL_COMMAND[@]}" get "${INLINE_RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${INLINE_RESOURCE_NAME}" --output=yaml | SECRET_KEY="${INLINE_REF_KEY}" yq eval "${YQ_QUERY}"
         done <<<"${INLINE_REFS}"
       fi
 
