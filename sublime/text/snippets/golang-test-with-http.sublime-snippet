@@ -1,5 +1,7 @@
 <snippet>
 	<content><![CDATA[
+import "github.com/stretchr/testify/assert"
+
 func Test${1:FuncName}(t *testing.T) {
 	t.Parallel()
 
@@ -26,19 +28,14 @@ func Test${1:FuncName}(t *testing.T) {
 			writer := httptest.NewRecorder()
 			${1:FuncName}(writer, testCase.request)
 
-			if got := writer.Code; got != testCase.wantStatus {
-				t.Errorf("${1:FuncName} = HTTP/%d, want HTTP/%d", got, testCase.wantStatus)
-			}
+			gotStatus := writer.Code
+			gotBody, _ := request.ReadBodyResponse(writer.Result())
 
-			if got, _ := request.ReadBodyResponse(writer.Result()); string(got) != testCase.want {
-				t.Errorf("${1:FuncName} = `%s`, want `%s`", string(got), testCase.want)
-			}
+			assert.Equal(t, testCase.wantStatus, gotStatus)
+			assert.Equal(t, testCase.want, string(gotBody))
 
 			for key := range testCase.wantHeader {
-				want := testCase.wantHeader.Get(key)
-				if got := writer.Header().Get(key); got != want {
-					t.Errorf("`%s` Header = `%s`, want `%s`", key, got, want)
-				}
+				assert.Equal(t, testCase.wantHeader.Get(key), writer.Header().Get(key))
 			}
 		})
 	}

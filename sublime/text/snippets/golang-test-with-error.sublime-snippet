@@ -1,5 +1,7 @@
 <snippet>
 	<content><![CDATA[
+import "github.com/stretchr/testify/assert"
+
 func Test${1:FuncName}(t *testing.T) {
 	t.Parallel()
 
@@ -29,20 +31,8 @@ func Test${1:FuncName}(t *testing.T) {
 
 			got, gotErr := ${1:FuncName}(testCase.args.content)
 
-			failed := false
-
-			switch {
-			case
-				testCase.wantErr == nil && gotErr != nil,
-				testCase.wantErr != nil && gotErr == nil,
-				testCase.wantErr != nil && !strings.Contains(gotErr.Error(), testCase.wantErr.Error()),
-				got != testCase.want:
-				failed = true
-			}
-
-			if failed {
-				t.Errorf("${1:FuncName}() = (%t, `%s`), want (%t, `%s`)", got, gotErr, testCase.want, testCase.wantErr)
-			}
+			assert.Equal(t, testCase.want, got)
+			assert.Equal(t, testCase.wantErr, gotErr)
 		})
 	}
 }
