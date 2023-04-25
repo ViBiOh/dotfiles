@@ -4,4 +4,20 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   packages_install_desktop firefox
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    local PROFILE_DIRECTORY="${HOME}/Library/Application Support/Firefox/Profiles/"
+    local PROFILE_NAME="ViBiOh"
+
+    if [[ $(find "${PROFILE_DIRECTORY}" -type d -name "*.${PROFILE_NAME}" | wc -l) -eq 0 ]]; then
+      /Applications/Firefox.app/Contents/MacOS/firefox --ProfileManager
+    fi
+
+    if [[ $(find "${PROFILE_DIRECTORY}" -type d -name "*.${PROFILE_NAME}" | wc -l) -ne 0 ]]; then
+      (
+        cd "$(find "${PROFILE_DIRECTORY}" -type d -name "*.${PROFILE_NAME}")" || return
+        curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/yokoffing/Betterfox/master/user.js" --output user.js
+      )
+    fi
+  fi
 }
