@@ -214,7 +214,7 @@ jira() {
       return
     fi
 
-    _jira_transition "${JIRA_ISSUE}"
+    _jira_transition "${JIRA_ISSUE}" "${2-}"
     ;;
 
   *)
@@ -262,7 +262,7 @@ _jira_transition() {
   local JIRA_TRANSITION
   JIRA_TRANSITION="$(
     printf "%s" "${JIRA_TRANSITIONS}" | jq --raw-output '.transitions[] | .id + " - " + .name' |
-      fzf --height=20 --ansi --reverse --exit-0 --prompt="Status:" |
+      fzf --height=20 --ansi --reverse --exit-0 --prompt="Status:" --select-1 --query "${2-}" |
       awk '{printf("%s", $1)}'
   )"
 
