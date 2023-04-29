@@ -11,5 +11,5 @@ install() {
   # renovate: datasource=github-releases depName=grafana/mimir
   local MIMIR_VERSION="2.7.2"
 
-  curl_to_binary "https://github.com/grafana/mimir/releases/download/mimir-${MIMIR_VERSION}/mimirtool-$(normalized_os)-$(normalized_arch)" "mimirtool"
+  curl_to_binary "https://github.com/grafana/mimir/releases/download/mimir-${MIMIR_VERSION}/mimirtool-$(normalized_os)-$(normalized_arch "amd64")" "mimirtool"
 }

@@ -156,6 +156,6 @@ if command -v kubeseal >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
     local SCOPE=""
     SCOPE="$(printf "strict\nnamespace-wide\ncluster-wide" | fzf --height=20 --ansi --reverse)"
 
-    var_print_and_run printf '%s' "${CONTENT}" | kubeseal --raw --from-file=/dev/stdin --namespace "${NAMESPACE}" --name "${NAME}" --scope "${SCOPE}" --cert "${CERT}" | pbcopy
+    var_print_and_run "printf '%s' \"${CONTENT}\" | kubeseal --raw --from-file=/dev/stdin --namespace '${NAMESPACE}' --name '${NAME}' --scope '${SCOPE}' --cert '${CERT}' | pbcopy"
   }
 fi
