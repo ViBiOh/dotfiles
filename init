@@ -70,7 +70,7 @@ browse_install() {
       unset -f "${action}"
     done
 
-    source "${CURRENT_DIR}/install/${BROWSED_FILE}"
+    source "${CURRENT_DIR}/installations/${BROWSED_FILE}"
 
     for action in "${@}"; do
       if [[ $(type -t "${action}") == "function" ]]; then

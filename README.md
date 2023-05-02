@@ -22,7 +22,7 @@ curl "https://dotfiles.vibioh.fr/bootstrap" | bash
 
 You can set following environment variables for customizing installation behavior:
 
-- `DOTFILES_NO_NODE="true"` doesn't perform install of `install/node` file (replace `NODE` by any uppercase filename in `install/` dir)
+- `DOTFILES_NO_NODE="true"` doesn't perform install of `installations/node` file (replace `NODE` by any uppercase filename in `installations/` dir)
 
 ```bash
 #!/usr/bin/env bash
