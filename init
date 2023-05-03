@@ -63,7 +63,7 @@ browse_install() {
     fi
 
     BROWSED_FILES+=("${BASENAME_FILE}")
-  done < <(find "${CURRENT_DIR}/install" -type f -print0 | LC_ALL=C sort --zero-terminated)
+  done < <(find "${CURRENT_DIR}/installations" -type f -print0 | LC_ALL=C sort --zero-terminated)
 
   for BROWSED_FILE in "${BROWSED_FILES[@]}"; do
     for action in "${@}"; do
