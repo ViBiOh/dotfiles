@@ -58,5 +58,13 @@ install() {
 }
 
 credentials() {
+  if ! command -v pass >/dev/null 2>&1; then
+    return
+  fi
+
+  if [[ ! -d ${PASSWORD_STORE_DIR:-${HOME}/.password-store} ]]; then
+    return
+  fi
+
   extract_secret "infra/kube" ".kube/config"
 }

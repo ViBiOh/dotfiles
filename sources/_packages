@@ -33,6 +33,24 @@ packages_install() {
   fi
 }
 
+package_exists() {
+  if command -v brew >/dev/null 2>&1; then
+    if brew search "^${1}$"; then
+      return 1
+    fi
+  elif command -v apt-cache >/dev/null 2>&1; then
+    if [[ $(apt-cache search "${1}" | wc -l) -eq 0 ]]; then
+      return 1
+    fi
+  elif command -v pacman >/dev/null 2>&1; then
+    if [[ $(pacman --sync --search "^${1}$" | wc -l) -eq 0 ]]; then
+      return 1
+    fi
+  fi
+
+  return 0
+}
+
 packages_clean() {
   if command -v brew >/dev/null 2>&1; then
     brew cleanup -s

@@ -11,6 +11,10 @@ clean() {
 install() {
   packages_install gnupg yubikey-personalization hopenpgp-tools pinentry-mac
 
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    packages_install pinentry-mac
+  fi
+
   if ! command -v gpg >/dev/null 2>&1; then
     return
   fi

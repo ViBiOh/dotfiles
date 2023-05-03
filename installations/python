@@ -24,7 +24,7 @@ install() {
 
   packages_install python
 
-  if ! [[ ${OSTYPE} =~ ^darwin ]]; then
+  if package_exists python-pip; then
     packages_install python-pip
   fi
 

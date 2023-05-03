@@ -3,7 +3,9 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  packages_install_desktop alacritty
+  if package_exists alacritty; then
+    packages_install_desktop alacritty
+  fi
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     ln -f -s "/Applications/Alacritty.app/Contents/MacOS/alacritty" "${HOME}/opt/bin/alacritty"

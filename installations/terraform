@@ -22,7 +22,11 @@ install() {
 
 credentials() {
   if ! command -v pass >/dev/null 2>&1; then
-    exit
+    return
+  fi
+
+  if [[ ! -d ${PASSWORD_STORE_DIR:-${HOME}/.password-store} ]]; then
+    return
   fi
 
   if [[ $(pass find terraform | wc -l) -gt 1 ]]; then
