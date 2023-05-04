@@ -27,7 +27,7 @@ clean() {
 }
 
 install() {
-  local GO_VERSION="1.20.3"
+  local GO_VERSION="1.20.4"
 
   if [[ ! -d "${HOME}/opt/go" ]]; then
     local GO_ARCHIVE
