@@ -9,7 +9,7 @@ clean() {
 }
 
 install() {
-  packages_install gnupg yubikey-personalization hopenpgp-tools pinentry-mac
+  packages_install gnupg yubikey-personalization hopenpgp-tools
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install pinentry-mac

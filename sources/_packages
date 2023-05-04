@@ -35,11 +35,11 @@ packages_install() {
 
 package_exists() {
   if command -v brew >/dev/null 2>&1; then
-    if brew search "^${1}$"; then
+    if [[ $(brew search "/^${1}$/" | wc -l) ]]; then
       return 1
     fi
   elif command -v apt-cache >/dev/null 2>&1; then
-    if [[ $(apt-cache search "${1}" | wc -l) -eq 0 ]]; then
+    if [[ $(apt-cache search "^${1}$" | wc -l) -eq 0 ]]; then
       return 1
     fi
   elif command -v pacman >/dev/null 2>&1; then
