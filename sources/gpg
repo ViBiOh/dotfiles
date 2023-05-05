@@ -63,7 +63,7 @@ cipher_for() {
     done
 
     local RECIPIENT
-    RECIPIENT="$(printf "%s" "${EMAILS}" | uniq | fzf --height=20 --ansi --reverse --prompt "Email:")"
+    RECIPIENT="$(printf "%s" "${EMAILS}" | uniq | fzf --height=20 --ansi --reverse --prompt "Email: ")"
 
     gpg --homedir "${TEMP_GNUPGHOME}" --encrypt --recipient "${RECIPIENT}" "${@}" | base64
 

@@ -185,7 +185,7 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
       local KUBE_CONTAINER
-      KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.template.spec.containers[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2-}" --prompt="Container:")"
+      KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.template.spec.containers[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2-}" --prompt="Container: ")"
 
       local DEPLOYMENT_YAML
       DEPLOYMENT_YAML="$(mktemp)"
@@ -280,7 +280,7 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
       local KUBE_PORT
-      KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --height=20 --ansi --reverse --select-1 --query="${3-}" --prompt="Port:")"
+      KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --height=20 --ansi --reverse --select-1 --query="${3-}" --prompt="Port: ")"
 
       if [[ -n ${KUBE_PORT-} ]]; then
         local LOCAL_PORT="${2:-4000}"

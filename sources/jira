@@ -262,7 +262,7 @@ _jira_transition() {
   local JIRA_TRANSITION
   JIRA_TRANSITION="$(
     printf "%s" "${JIRA_TRANSITIONS}" | jq --raw-output '.transitions[] | .id + " - " + .name' |
-      fzf --height=20 --ansi --reverse --exit-0 --prompt="Status:" --select-1 --query "${2-}" |
+      fzf --height=20 --ansi --reverse --exit-0 --prompt="Status: " --select-1 --query "${2-}" |
       awk '{printf("%s", $1)}'
   )"
 
@@ -386,7 +386,7 @@ _jira_issue() {
   fi
 
   printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .key + " " + .fields.summary' |
-    fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue:" --select-1 --query "${2-}" |
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue: " --select-1 --query "${2-}" |
     awk '{printf("%s", $1)}'
 }
 
@@ -404,7 +404,7 @@ _jira_epic() {
   fi
 
   printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .id + " " + .fields.summary' |
-    fzf --height=20 --ansi --reverse --exit-0 --prompt="Epic:"
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Epic: "
 }
 
 _jira_project() {
@@ -416,7 +416,7 @@ _jira_project() {
   fi
 
   printf "%s" "${JIRA_PROJECTS}" | jq --raw-output '.[] | .id + " " + .key + " " + .name' |
-    fzf --height=20 --ansi --reverse --exit-0 --prompt="Project:"
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Project: "
 }
 
 _jira_summary() {
@@ -442,7 +442,7 @@ _jira_issue_type() {
   fi
 
   printf "%s" "${JIRA_ISSUE_TYPES}" | jq --raw-output '.[] | .id + " " + .name' |
-    fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue Type:"
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue Type: "
 }
 
 _jira_extra_fields() {
@@ -471,7 +471,7 @@ _jira_fill_extra_fields() {
   fi
 
   local EXTRA_FIELD
-  EXTRA_FIELD="$(printf '{"name":"None"} %s' "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.name' | fzf --height=20 --ansi --reverse --exit-0 --prompt="Extra field:")"
+  EXTRA_FIELD="$(printf '{"name":"None"} %s' "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.name' | fzf --height=20 --ansi --reverse --exit-0 --prompt="Extra field: ")"
 
   if [[ ${EXTRA_FIELD:-None} == "None" ]]; then
     return
