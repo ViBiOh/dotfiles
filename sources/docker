@@ -19,7 +19,7 @@ if command -v docker >/dev/null 2>&1; then
   export DOCKER_CONTENT_TRUST="1"
 
   docker_clean() {
-    docker ps --all --quiet | xargs docker rm --volumes
+    docker ps --all --quiet | xargs docker rm --force --volumes
     docker images --quiet | xargs docker rmi
     docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi
     docker network ls --format '{{ json .}}' | jq --raw-output 'select(.Name != "bridge" and .ID != "") | .Name' | xargs docker network rm
