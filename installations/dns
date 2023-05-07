@@ -3,10 +3,6 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  if ! [[ ${OSTYPE} =~ ^darwin ]]; then
-    return
-  fi
-
   packages_install unbound
 
   local UNBOUND_CONF_FOLDER="${BREW_PREFIX-}/etc/unbound"
