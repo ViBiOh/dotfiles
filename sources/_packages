@@ -26,9 +26,12 @@ packages_install() {
   if command -v brew >/dev/null 2>&1; then
     brew install "${@}"
   elif command -v apt-get >/dev/null 2>&1; then
-    export DEBIAN_FRONTEND=noninteractive
-    export RUNLEVEL=1
-    sudo apt-get install -qq --no-install-recommends "${@}"
+    (
+      sudo su -
+      export DEBIAN_FRONTEND=noninteractive
+      export RUNLEVEL=1
+      apt-get install -qq --no-install-recommends "${@}"
+    )
   elif command -v pacman >/dev/null 2>&1; then
     sudo pacman --sync --noconfirm --needed "${@}"
   fi
