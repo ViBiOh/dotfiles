@@ -181,97 +181,27 @@ kube() {
     ;;
 
   "env")
-    _kube_resources "deployments.apps" "${1:- }"
+    local FIRST=""
+    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      FIRST="${1}"
+      shift
+    fi
+
+    local SECOND=""
+    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      SECOND="${1}"
+      shift
+    fi
+
+    _kube_resources "${FIRST}" "${SECOND}"
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
-      local KUBE_CONTAINER
-      KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.template.spec.containers[].name' | fzf --height=20 --ansi --reverse --select-1 --query="${2-}" --prompt="Container: ")"
-
-      local DEPLOYMENT_YAML
-      DEPLOYMENT_YAML="$(mktemp)"
-      "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml >"${DEPLOYMENT_YAML}"
-
-      KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] | select(has("value")) | .name + "=" + (.value | sub("[\n]", "\n"))' "${DEPLOYMENT_YAML}"
-
-      local INLINE_REFS
-      INLINE_REFS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] |
-            (
-              select((select(has("valueFrom")) | .valueFrom | has("configMapKeyRef"))) | "configmap/" + .valueFrom.configMapKeyRef.name + "/" + .valueFrom.configMapKeyRef.key + "/" + .name,
-              select((select(has("valueFrom")) | .valueFrom | has("secretKeyRef"))) | "secret/" + .valueFrom.secretKeyRef.name + "/" + .valueFrom.secretKeyRef.key + "/" + .name
-            )' "${DEPLOYMENT_YAML}")"
-
-      if [[ -n ${INLINE_REFS-} ]]; then
-        while read -r inlineRef; do
-          local INLINE_RESOURCE_TYPE
-          INLINE_RESOURCE_TYPE="$(printf '%s' "${inlineRef}" | awk -F '/' '{ print $1 }')"
-          local INLINE_RESOURCE_NAME
-          INLINE_RESOURCE_NAME="$(printf '%s' "${inlineRef}" | awk -F '/' '{ print $2 }')"
-          local INLINE_REF_KEY
-          INLINE_REF_KEY="$(printf '%s' "${inlineRef}" | awk -F '/' '{ print $3 }')"
-          local INLINE_ENV_NAME
-          INLINE_ENV_NAME="$(printf '%s' "${inlineRef}" | awk -F '/' '{ print $4 }')"
-
-          YQ_QUERY='.data[strenv(SECRET_KEY)]'
-          if [[ ${INLINE_RESOURCE_TYPE} == "secret" ]]; then
-            YQ_QUERY+=' | @base64d'
-          fi
-          YQ_QUERY+=' | sub("[\n]", "\n")'
-
-          printf "%s=" "${INLINE_ENV_NAME}"
-          "${KUBECTL_COMMAND[@]}" get "${INLINE_RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${INLINE_RESOURCE_NAME}" --output=yaml | SECRET_KEY="${INLINE_REF_KEY}" yq eval "${YQ_QUERY}"
-        done <<<"${INLINE_REFS}"
+      if command -v kmux >/dev/null 2>&1; then
+        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace "${RESOURCE_NAMESPACE}" env "${RESOURCE_TYPE}" "${RESOURCE_NAME}" "${@}"
+      else
+        _kube_warning "env is only available if you have github.com/ViBiOh/kmux in your PATH"
+        return 1
       fi
-
-      local ENV_FROMS
-      ENV_FROMS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("envFrom")) | .envFrom[] | to_entries | .[] | (.key | sub("Ref$", "")) + "/" + .value.name' "${DEPLOYMENT_YAML}")"
-
-      if [[ -n ${ENV_FROMS-} ]]; then
-        while read -r envFrom; do
-          local ENVFROM_RESOURCE_TYPE
-          ENVFROM_RESOURCE_TYPE="$(printf '%s' "${envFrom}" | awk -F '/' '{ print $1 }')"
-          local ENVFROM_RESOURCE_NAME
-          ENVFROM_RESOURCE_NAME="$(printf '%s' "${envFrom}" | awk -F '/' '{ print $2 }')"
-
-          local YQ_QUERY='.data | to_entries | .[] | .key + "=" + (.value'
-          if [[ ${ENVFROM_RESOURCE_TYPE} == "secret" ]]; then
-            YQ_QUERY+=' | @base64d'
-          fi
-          YQ_QUERY+=' | sub("[\n]", "\n"))'
-
-          _kube_warning "${ENVFROM_RESOURCE_TYPE} ${RESOURCE_NAMESPACE}/${ENVFROM_RESOURCE_NAME}"
-          "${KUBECTL_COMMAND[@]}" get "${ENVFROM_RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${ENVFROM_RESOURCE_NAME}" --output=yaml | yq eval "${YQ_QUERY}"
-        done <<<"${ENV_FROMS}"
-      fi
-
-      local FIELD_REFS
-      FIELD_REFS="$(KUBE_CONTAINER="${KUBE_CONTAINER}" yq eval '.spec.template.spec.containers[] | select(.name == strenv(KUBE_CONTAINER) and has("env")) | .env[] |
-            (
-              select(select(has("valueFrom")) | .valueFrom | has("fieldRef")) | .name + "@." + (.valueFrom.fieldRef.fieldPath | sub("'"'"'", "\"")),
-              select(select(has("valueFrom")) | .valueFrom | has("resourceFieldRef")) | .name + "@.spec.containers[]|select(.name=\"" + .valueFrom.resourceFieldRef.containerName + "\")|.resources." + (.valueFrom.resourceFieldRef.resource|sub("'"'"'", "\""))
-            )' "${DEPLOYMENT_YAML}")"
-
-      if [[ -n ${FIELD_REFS-} ]]; then
-        local PODS_LABELS
-        PODS_LABELS="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
-
-        local POD_YAML
-        POD_YAML="$(mktemp)"
-        "${KUBECTL_COMMAND[@]}" get pods --namespace "${RESOURCE_NAMESPACE}" "--selector=${PODS_LABELS}" --output=yaml | yq eval '[.items[] | select(.status.phase == "Running")] | .[0]' >"${POD_YAML}"
-
-        _kube_warning "Values from first 'Running' pod found"
-        while read -r fieldRef; do
-          local FIELDREF_NAME
-          FIELDREF_NAME="$(printf '%s' "${fieldRef}" | awk -F '@' '{ print $1 }')"
-          local FIELDREF_PATH
-          FIELDREF_PATH="$(printf '%s' "${fieldRef}" | awk -F '@' '{ print $2 }')"
-
-          printf "%s=%s\n" "${FIELDREF_NAME}" "$(yq eval "${FIELDREF_PATH}" "${POD_YAML}")"
-        done <<<"${FIELD_REFS}"
-
-        rm "${POD_YAML}"
-      fi
-
-      rm "${DEPLOYMENT_YAML}"
     fi
     ;;
 
