@@ -47,6 +47,4 @@ install() {
   )
 
   source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var"
-
-  curl --disable --silent --show-error --location --max-time 30 --output "${SCRIPT_DIR}/../sources/z" "https://raw.githubusercontent.com/rupa/z/master/z.sh"
 }
