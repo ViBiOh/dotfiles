@@ -8,9 +8,6 @@
 				"experimentalWorkspaceModule": false
 			}
 		},
-		"pyls": {
-			"enabled": true
-		},
 		"terraform": {
 			"enabled": true,
 			"command": ["terraform-ls", "serve"],
