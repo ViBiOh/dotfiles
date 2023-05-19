@@ -145,9 +145,14 @@ install() {
   sudo systemsetup -f -setremotelogin off
   sudo systemsetup -setcomputername macbook
 
+  sudo pmset -a autopoweroff 0
+  sudo pmset -a destroyfvkeyonstandby 1
   sudo pmset -a hibernatemode 0
   sudo pmset -a lidwake 1
+  sudo pmset -a powernap 0
   sudo pmset -a sms 0
+  sudo pmset -a standby 0
+  sudo pmset -a standbydelay 0
   sudo pmset -b displaysleep 5
   sudo pmset -b sleep 10
   sudo pmset -c displaysleep 10
