@@ -97,8 +97,6 @@ if command -v pgcli >/dev/null 2>&1; then
     fi
 
     FZF_COMPLETION_TRIGGER="" _fzf_complete --ansi --select-1 "${@}" < <(
-      var_color
-
       local comment=""
 
       while IFS=":" read -r host port db user pass; do

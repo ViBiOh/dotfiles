@@ -46,8 +46,6 @@ source_all() {
       "tmux" \
       "var" \
       "version"
-
-    var_color
   fi
 
   for file in "${SCRIPT_DIR}/../sources/"*; do
