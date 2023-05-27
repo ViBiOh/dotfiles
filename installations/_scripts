@@ -46,5 +46,5 @@ install() {
     fi
   )
 
-  source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var"
+  source "${SCRIPT_DIR}/../scripts/meta" && meta_check "var"
 }
