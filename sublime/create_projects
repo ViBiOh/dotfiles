@@ -15,7 +15,7 @@ script_dir() {
 }
 
 browse_folder() {
-  local NAME_PREFIX=${2:-}
+  local NAME_PREFIX=${2-}
 
   while IFS= read -r -d '' dir; do
     (
@@ -28,6 +28,7 @@ browse_folder() {
 main() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(script_dir)"
+
   local PROJECT_FOLDER="${SCRIPT_DIR}/projects"
 
   if [[ -e "${SCRIPT_DIR}/../scripts/meta" ]]; then
@@ -36,6 +37,8 @@ main() {
     printf "scripts' folder not found"
     return 1
   fi
+
+  source "${SCRIPT_DIR}/../sources/sublime"
 
   rm -rf "${PROJECT_FOLDER}"
   mkdir -p "${PROJECT_FOLDER}"

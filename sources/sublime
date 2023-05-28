@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
-SUBLIME_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
+SUBLIME_SCRIPT_DIR="$(script_dir)"
 
 sublime_add_project() {
   local currentDir
