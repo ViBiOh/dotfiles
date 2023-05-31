@@ -477,17 +477,25 @@ _jira_fill_extra_fields() {
     return
   fi
 
-  local EXTRA_FIELD_VALUE
-  read -r -p "${EXTRA_FIELD}: " EXTRA_FIELD_VALUE
-
-  local EXTRA_FIELD_KEY
-  EXTRA_FIELD_KEY="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .key')"
+  local EXTRA_FIELD_HINT=""
 
   local EXTRA_FIELD_TYPE
   EXTRA_FIELD_TYPE="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .schema.type')"
 
   case "${EXTRA_FIELD_TYPE}" in
-  "string")
+  "date")
+    EXTRA_FIELD_HINT=" (in ISO format YYYY-MM-DD)"
+    ;;
+  esac
+
+  local EXTRA_FIELD_VALUE
+  read -r -p "${EXTRA_FIELD}${EXTRA_FIELD_HINT}: " EXTRA_FIELD_VALUE
+
+  local EXTRA_FIELD_KEY
+  EXTRA_FIELD_KEY="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .key')"
+
+  case "${EXTRA_FIELD_TYPE}" in
+  "string" | "date")
     jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "\"${EXTRA_FIELD_VALUE}\"" '{fields: { ($key): $value} }'
     ;;
 
