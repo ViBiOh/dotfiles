@@ -91,11 +91,8 @@ jira() {
       return
     fi
 
-    _jira_info "Issue Type: $(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $2)}')"
+    _jira_info "Issue Type: $(printf "%s" "${JIRA_ISSUE_TYPE}" | cut -f 2- -d ' ')"
     JIRA_ISSUE_TYPE="$(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
-
-    local EXTRA_FIELDS_NAMES
-    EXTRA_FIELDS_NAMES="$(_jira_extra_fields "${JIRA_PROJECT}" "${JIRA_ISSUE_TYPE}")"
 
     local JIRA_EPIC
     JIRA_EPIC="$(_jira_epic "${JIRA_PROJECT_KEY}")"
@@ -459,7 +456,7 @@ _jira_extra_fields() {
     return
   fi
 
-  printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.projects[].issuetypes[].fields[] | select(.schema.type == "number" or .schema.type == "string") | select(.key != "summary")'
+  printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.projects[].issuetypes[].fields[] | select(.required) | select(.key | startswith("customfield")) | select(.schema.type == "number" or .schema.type == "string" or .schema.type == "date") | select(.key != "summary")'
 }
 
 _jira_fill_extra_fields() {
