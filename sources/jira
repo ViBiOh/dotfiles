@@ -157,7 +157,7 @@ jira() {
     done
 
     local JIRA_ISSUE_CREATION
-    JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request "POST" --header "Content-Type: application/json" --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
+    # JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request "POST" --header "Content-Type: application/json" --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
 
     if [[ -n ${JIRA_ISSUE_CREATION} ]]; then
       local JIRA_ISSUE
@@ -456,7 +456,7 @@ _jira_extra_fields() {
     return
   fi
 
-  printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.projects[].issuetypes[].fields[] | select(.required) | select(.key | startswith("customfield")) | select(.schema.type == "number" or .schema.type == "string" or .schema.type == "date") | select(.key != "summary")'
+  printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.projects[].issuetypes[].fields[] | select(.required) | select(.key | startswith("customfield")) | select(.schema.type == "number" or .schema.type == "string" or .schema.type == "date" or .schema.type == "option")'
 }
 
 _jira_fill_extra_fields() {
@@ -474,25 +474,30 @@ _jira_fill_extra_fields() {
     return
   fi
 
-  local EXTRA_FIELD_HINT=""
-
   local EXTRA_FIELD_TYPE
   EXTRA_FIELD_TYPE="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .schema.type')"
 
+  local EXTRA_FIELD_VALUE
+
   case "${EXTRA_FIELD_TYPE}" in
+  "option")
+    EXTRA_FIELD_VALUE="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .allowedValues[] | .value' | fzf --height=20 --ansi --reverse --exit-0 --prompt="${EXTRA_FIELD}: ")"
+    ;;
+
   "date")
-    EXTRA_FIELD_HINT=" (in ISO format YYYY-MM-DD)"
+    read -r -p "${EXTRA_FIELD} (in ISO format YYYY-MM-DD): " EXTRA_FIELD_VALUE
+    ;;
+
+  "string" | "number")
+    read -r -p "${EXTRA_FIELD}: " EXTRA_FIELD_VALUE
     ;;
   esac
-
-  local EXTRA_FIELD_VALUE
-  read -r -p "${EXTRA_FIELD}${EXTRA_FIELD_HINT}: " EXTRA_FIELD_VALUE
 
   local EXTRA_FIELD_KEY
   EXTRA_FIELD_KEY="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .key')"
 
   case "${EXTRA_FIELD_TYPE}" in
-  "string" | "date")
+  "string" | "date" | "option")
     jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "\"${EXTRA_FIELD_VALUE}\"" '{fields: { ($key): $value} }'
     ;;
 
