@@ -94,16 +94,6 @@ jira() {
     _jira_info "Issue Type: $(printf "%s" "${JIRA_ISSUE_TYPE}" | cut -f 2- -d ' ')"
     JIRA_ISSUE_TYPE="$(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
 
-    local JIRA_EPIC
-    JIRA_EPIC="$(_jira_epic "${JIRA_PROJECT_KEY}")"
-
-    if [[ -z ${JIRA_EPIC} ]]; then
-      return
-    fi
-
-    _jira_info "Epic:$(printf "%s" "${JIRA_EPIC}" | awk '{$1=""; print}')"
-    JIRA_EPIC="$(printf "%s" "${JIRA_EPIC}" | awk '{printf("%s", $1)}')"
-
     local JIRA_ISSUE_SUMMARY
     read -r -p "Summary:" JIRA_ISSUE_SUMMARY
 
@@ -128,9 +118,6 @@ jira() {
           },
           issuetype: {
             id: $issuetype
-          },
-          parent: {
-            id: $epic
           }
         }
       }')"
@@ -140,6 +127,19 @@ jira() {
       JIRA_ASSIGNEE="$(jq --null-input --arg user "${JIRA_USER}" '{fields: { assignee: {id: $user} } }')"
 
       JIRA_CREATE_ISSUE_PAYLOAD="$(printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${JIRA_ASSIGNEE}" | jq --compact-output --slurp '.[0] * .[1]')"
+    fi
+
+    local JIRA_EPIC
+    JIRA_EPIC="$(_jira_epic "${JIRA_PROJECT_KEY}")"
+
+    if [[ ${JIRA_EPIC:-None} != "None" ]]; then
+      _jira_info "Epic:$(printf "%s" "${JIRA_EPIC}" | awk '{$1=""; print}')"
+      JIRA_EPIC="$(printf "%s" "${JIRA_EPIC}" | awk '{printf("%s", $1)}')"
+
+      local JIRA_PARENT_JSON
+      JIRA_PARENT_JSON="$(jq --null-input --arg user "${JIRA_USER}" '{fields: { parent: {id: $JIRA_EPIC} } }')"
+
+      JIRA_CREATE_ISSUE_PAYLOAD="$(printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${JIRA_PARENT_JSON}" | jq --compact-output --slurp '.[0] * .[1]')"
     fi
 
     local EXTRA_FIELDS_NAMES
@@ -157,7 +157,7 @@ jira() {
     done
 
     local JIRA_ISSUE_CREATION
-    # JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request "POST" --header "Content-Type: application/json" --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
+    JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request "POST" --header "Content-Type: application/json" --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
 
     if [[ -n ${JIRA_ISSUE_CREATION} ]]; then
       local JIRA_ISSUE
@@ -400,7 +400,7 @@ _jira_epic() {
     return
   fi
 
-  printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .id + " " + .fields.summary' |
+  printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .id + " " + .fields.summary' | awk 'BEGIN{print "None"}1' |
     fzf --height=20 --ansi --reverse --exit-0 --prompt="Epic: "
 }
 
@@ -468,7 +468,7 @@ _jira_fill_extra_fields() {
   fi
 
   local EXTRA_FIELD
-  EXTRA_FIELD="$(printf '{"name":"None"} %s' "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.name' | fzf --height=20 --ansi --reverse --exit-0 --prompt="Extra field: ")"
+  EXTRA_FIELD="$(printf '%s' "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.name' | awk 'BEGIN{print "None"}1' | fzf --height=20 --ansi --reverse --exit-0 --prompt="Extra field: ")"
 
   if [[ ${EXTRA_FIELD:-None} == "None" ]]; then
     return
