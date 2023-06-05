@@ -95,7 +95,7 @@ jira() {
     JIRA_ISSUE_TYPE="$(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_SUMMARY
-    read -r -p "Summary:" JIRA_ISSUE_SUMMARY
+    read -r -p "Summary: " JIRA_ISSUE_SUMMARY
 
     local JIRA_USER
     if _jira_confirm "Self assign"; then
@@ -456,7 +456,7 @@ _jira_extra_fields() {
     return
   fi
 
-  printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.projects[].issuetypes[].fields[] | select(.required) | select(.key | startswith("customfield")) | select(.schema.type == "number" or .schema.type == "string" or .schema.type == "date" or .schema.type == "option")'
+  printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.projects[].issuetypes[].fields[] | select(.key | startswith("customfield")) | select(.schema.type == "number" or .schema.type == "string" or .schema.type == "date" or .schema.type == "option")'
 }
 
 _jira_fill_extra_fields() {
