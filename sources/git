@@ -13,5 +13,12 @@ fi
 }
 
 jira_pull_request() {
-  github_pull_request "$(git remote-repository)" "$(jira summary)" "$(git default-branch)" "$(git current-branch)"
+  local GIT_CURRENT_BRANCH
+  GIT_CURRENT_BRANCH="$(git current-branch)"
+
+  local JIRA_TICKET_ID
+  JIRA_TICKET_ID="$(jira print "${GIT_CURRENT_BRANCH}")"
+
+  github_pull_request "$(git remote-repository)" "$(jira summary "${JIRA_TICKET_ID}")" "$(git default-branch)" "${GIT_CURRENT_BRANCH}"
+  jira transition "${JIRA_TICKET_ID}" "in review"
 }
