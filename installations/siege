@@ -8,17 +8,4 @@ clean() {
 
 install() {
   packages_install siege
-
-  mkdir -p "${HOME}/.siege"
-
-  echo "verbose = true
-color = on
-json_output = false
-gmethod = GET
-parser = false
-cache = false
-concurrent = 10
-delay = 5
-internet = false
-benchmark = false" >"${HOME}/.siege/siege.conf"
 }
