@@ -17,7 +17,12 @@ _ps1_previous_status() {
 }
 
 _ps1_new_line_if_not() {
+  # preserve exit status
+  local exit="${?}"
+
   printf "%$(($(tput cols) - 1))s\r"
+
+  return "${exit}"
 }
 
 PS1="\$(_ps1_new_line_if_not)${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
