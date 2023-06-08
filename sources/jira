@@ -59,18 +59,6 @@ jira() {
     _jira_branch
     ;;
 
-  "browse")
-    local JIRA_ISSUE
-    JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
-
-    if [[ -z ${JIRA_ISSUE} ]]; then
-      return
-    fi
-
-    _jira_info "Issue ${JIRA_ISSUE}"
-    open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
-    ;;
-
   "create")
     local JIRA_PROJECT
     JIRA_PROJECT="$(_jira_project)"
@@ -214,6 +202,17 @@ jira() {
     _jira_transition "${JIRA_ISSUE}" "${2-}"
     ;;
 
+  "url")
+    local JIRA_ISSUE
+    JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
+
+    if [[ -z ${JIRA_ISSUE} ]]; then
+      return
+    fi
+
+    printf "%s/browse/%s" "${JIRA_DOMAIN}" "${JIRA_ISSUE}"
+    ;;
+
   *)
     _jira_help
     return 1
@@ -258,17 +257,22 @@ _jira_transition() {
 
   local JIRA_TRANSITION
   JIRA_TRANSITION="$(
-    printf "%s" "${JIRA_TRANSITIONS}" | jq --raw-output '.transitions[] | .id + " - " + .name' |
-      fzf --height=20 --ansi --reverse --exit-0 --prompt="Status: " --select-1 --query "${2-}" |
-      awk '{printf("%s", $1)}'
+    printf "%s" "${JIRA_TRANSITIONS}" | jq --raw-output '.transitions[] | .id + " " + .name' |
+      fzf --height=20 --ansi --reverse --exit-0 --prompt="Status: " --select-1 --query "${2-}"
   )"
+
+  local JIRA_TRANSITION_ID
+  JIRA_TRANSITION_ID="$(printf "%s" "${JIRA_TRANSITION}" | awk '{printf("%s", $1)}')"
+
+  local JIRA_TRANSITION_NAME
+  JIRA_TRANSITION_NAME="$(printf "%s" "${JIRA_TRANSITION}" | awk '{$1=""; print}')"
 
   if [[ -z ${JIRA_TRANSITION} ]]; then
     return
   fi
 
-  _jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION}" '{transition: $transition_id}')"
-  _jira_info "${JIRA_ISSUE} transitionned to status ${JIRA_TRANSITION}"
+  _jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION_ID}" '{transition: $transition_id}')"
+  _jira_info "${JIRA_ISSUE} transitionned to status ${JIRA_TRANSITION_NAME}"
 }
 
 _jira_info() {
@@ -304,11 +308,11 @@ _jira_help() {
 
   _jira_info "\nPossibles actions are                               | args\n"
   _jira_info " - branch      Switch git repository branch to ticket  | <ticket name>?"
-  _jira_info " - browse      Open browser for ticket                 | <ticket name>?"
   _jira_info " - create      Create a ticket interactively           |"
   _jira_info " - print       Print ticket ID                         | <ticket name>?"
   _jira_info " - summary     Print the summary of a ticket           | <ticket name>?"
   _jira_info " - transition  Transition ticket to another state      | <ticket name>?"
+  _jira_info " - url         Print URL for ticket                    | <ticket name>?"
 
   _jira_info "\nPossibles options are\n"
   _jira_info " - -s Scope of tickets searched"
