@@ -97,7 +97,6 @@ jira() {
       --arg user "${JIRA_USER}" \
       --arg issuetype "${JIRA_ISSUE_TYPE}" \
       --arg summary "${JIRA_ISSUE_SUMMARY}" \
-      --arg epic "${JIRA_EPIC}" \
       '{
         fields: {
           summary: $summary,
@@ -125,7 +124,7 @@ jira() {
       JIRA_EPIC="$(printf "%s" "${JIRA_EPIC}" | awk '{printf("%s", $1)}')"
 
       local JIRA_PARENT_JSON
-      JIRA_PARENT_JSON="$(jq --null-input --arg user "${JIRA_USER}" '{fields: { parent: {id: $JIRA_EPIC} } }')"
+      JIRA_PARENT_JSON="$(jq --null-input --arg epic "${JIRA_EPIC}" '{fields: { parent: {id: $epic} } }')"
 
       JIRA_CREATE_ISSUE_PAYLOAD="$(printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${JIRA_PARENT_JSON}" | jq --compact-output --slurp '.[0] * .[1]')"
     fi
