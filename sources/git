@@ -13,6 +13,8 @@ fi
 }
 
 jira_pull_request() {
+  git push
+
   local GIT_CURRENT_BRANCH
   GIT_CURRENT_BRANCH="$(git current-branch)"
 

@@ -260,18 +260,18 @@ _jira_transition() {
       fzf --height=20 --ansi --reverse --exit-0 --prompt="Status: " --select-1 --query "${2-}"
   )"
 
+  if [[ -z ${JIRA_TRANSITION} ]]; then
+    return
+  fi
+
   local JIRA_TRANSITION_ID
   JIRA_TRANSITION_ID="$(printf "%s" "${JIRA_TRANSITION}" | awk '{printf("%s", $1)}')"
 
   local JIRA_TRANSITION_NAME
   JIRA_TRANSITION_NAME="$(printf "%s" "${JIRA_TRANSITION}" | awk '{$1=""; print}')"
 
-  if [[ -z ${JIRA_TRANSITION} ]]; then
-    return
-  fi
-
   _jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION_ID}" '{transition: $transition_id}')"
-  _jira_info "${JIRA_ISSUE} transitionned to status ${JIRA_TRANSITION_NAME}"
+  _jira_info "${JIRA_ISSUE} transitionned to status${JIRA_TRANSITION_NAME}"
 }
 
 _jira_info() {

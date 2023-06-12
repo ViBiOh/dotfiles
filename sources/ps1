@@ -25,7 +25,7 @@ _ps1_new_line_if_not() {
   return "${exit}"
 }
 
-PS1="\$(_ps1_new_line_if_not)${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
+PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
 if [[ "$(type -t __git_ps1)" == "function" ]]; then
   PS1+="${YELLOW}\$(__git_ps1)${RESET}"
 fi
