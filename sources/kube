@@ -4,6 +4,12 @@ if ! command -v fzf >/dev/null 2>&1 || ! command -v yq >/dev/null 2>&1 || ! comm
   return
 fi
 
+export TMP_CONTEXT_LOCATION="${HOME}/.kube/contexts"
+
+kube_clean_contexts() {
+  rm -rf "${TMP_CONTEXT_LOCATION}"
+}
+
 kube() {
   local YELLOW='\033[33m'
   local BLUE='\033[0;34m'
@@ -119,8 +125,6 @@ kube() {
       fi
 
       if [[ -n ${TMUX-} ]]; then
-        local TMP_CONTEXT_LOCATION="${HOME}/.kube/contexts"
-
         local CONTEXT_FILENAME
         CONTEXT_FILENAME="$(printf '%s' "${CONTEXT}" | md5)"
 

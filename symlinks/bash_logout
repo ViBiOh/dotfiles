@@ -10,8 +10,8 @@ if [[ $(pgrep -a bash | wc -l) -eq 2 ]]; then
     gpg_agent_stop
   fi
 
-  if [[ -d "${HOME}/.kube/contexts" ]]; then
-    rm -rf "${HOME}/.kube/contexts"
+  if [[ $(type -t kube_clean_contexts) == "function" ]]; then
+    kube_clean_contexts
   fi
 fi
 
