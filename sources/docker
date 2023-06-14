@@ -66,6 +66,10 @@ if command -v docker >/dev/null 2>&1; then
   }
 
   pubsub_emulator() {
-    docker run --name "pubsub" --rm --publish "127.0.0.1:8085:8085" "gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators" gcloud beta emulators pubsub start --project=localhost --host-port=0.0.0.0:8085
+    docker run --name "pubsub" \
+      --rm \
+      --publish "127.0.0.1:8085:8085" "gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators" gcloud beta emulators pubsub start \
+      --project=localhost \
+      --host-port=0.0.0.0:8085
   }
 fi
