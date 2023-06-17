@@ -305,7 +305,7 @@ _jira_confirm() {
 _jira_help() {
   _jira_error "Usage: jira [options?] ACTION"
 
-  _jira_info "\nPossibles actions are                               | args\n"
+  _jira_info "\nPossibles actions are                                  | args\n"
   _jira_info " - branch      Switch git repository branch to ticket  | <ticket name>?"
   _jira_info " - create      Create a ticket interactively           |"
   _jira_info " - print       Print ticket ID                         | <ticket name>?"
@@ -374,6 +374,10 @@ _jira_issue() {
     JIRA_JQL+=" AND assignee = currentUser()"
   elif [[ ${1-} == "reporter" ]]; then
     JIRA_JQL+=" AND reporter = currentUser()"
+  fi
+
+  if [[ -n ${2-} ]]; then
+    JIRA_JQL+=" AND text ~ \"${2}\""
   fi
 
   JIRA_JQL+=" ORDER BY updated DESC"
