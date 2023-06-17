@@ -316,7 +316,7 @@ _jira_help() {
   _jira_info "\nPossibles options are\n"
   _jira_info " - -s Scope of tickets searched"
   _jira_info "   \t- 'assignee': only tickets on which current user is assignee (default value)"
-  _jira_info "   \t- 'reporter': only tickets on which current user is reporter (default value)"
+  _jira_info "   \t- 'reporter': only tickets on which current user is reporter"
   _jira_info "   \t- 'all': no filter"
 }
 
@@ -500,12 +500,16 @@ _jira_fill_extra_fields() {
   EXTRA_FIELD_KEY="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .key')"
 
   case "${EXTRA_FIELD_TYPE}" in
-  "string" | "date" | "option")
-    jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "\"${EXTRA_FIELD_VALUE}\"" '{fields: { ($key): $value} }'
+  "string" | "date")
+    jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "\"${EXTRA_FIELD_VALUE}\"" '{ fields: { ($key): $value } }'
+    ;;
+
+  "option")
+    jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "\"${EXTRA_FIELD_VALUE}\"" '{ fields: { ($key): {value: $value} } }'
     ;;
 
   "number")
-    jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "${EXTRA_FIELD_VALUE}" '{fields: { ($key): $value} }'
+    jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "${EXTRA_FIELD_VALUE}" '{ fields: { ($key): $value } }'
     ;;
   esac
 }
