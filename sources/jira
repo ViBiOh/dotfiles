@@ -110,10 +110,7 @@ jira() {
       }')"
 
     if [[ -n ${JIRA_USER-} ]]; then
-      local JIRA_ASSIGNEE
-      JIRA_ASSIGNEE="$(jq --null-input --arg user "${JIRA_USER}" '{fields: { assignee: {id: $user} } }')"
-
-      JIRA_CREATE_ISSUE_PAYLOAD="$(printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${JIRA_ASSIGNEE}" | jq --compact-output --slurp '.[0] * .[1]')"
+      JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --arg user "${JIRA_USER}" '{fields: { assignee: {id: $user} } }')")"
     fi
 
     local JIRA_EPIC
@@ -121,12 +118,8 @@ jira() {
 
     if [[ ${JIRA_EPIC:-None} != "None" ]]; then
       _jira_info "Epic:$(printf "%s" "${JIRA_EPIC}" | awk '{$1=""; print}')"
-      JIRA_EPIC="$(printf "%s" "${JIRA_EPIC}" | awk '{printf("%s", $1)}')"
 
-      local JIRA_PARENT_JSON
-      JIRA_PARENT_JSON="$(jq --null-input --arg epic "${JIRA_EPIC}" '{fields: { parent: {id: $epic} } }')"
-
-      JIRA_CREATE_ISSUE_PAYLOAD="$(printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${JIRA_PARENT_JSON}" | jq --compact-output --slurp '.[0] * .[1]')"
+      JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --arg epic "$(printf "%s" "${JIRA_EPIC}" | awk '{printf("%s", $1)}')" '{fields: { parent: {id: $epic} } }')")"
     fi
 
     local EXTRA_FIELDS_NAMES
@@ -140,7 +133,7 @@ jira() {
         break
       fi
 
-      JIRA_CREATE_ISSUE_PAYLOAD="$(printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${EXTRA_FIELD_OUTPUT}" | jq --compact-output --slurp '.[0] * .[1]')"
+      JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "${EXTRA_FIELD_OUTPUT}")"
     done
 
     local JIRA_ISSUE_CREATION
@@ -217,6 +210,10 @@ jira() {
     return 1
     ;;
   esac
+}
+
+_jira_append_create() {
+  printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${1}" | jq --compact-output --slurp '.[0] * .[1]'
 }
 
 _jira_branch() {
@@ -306,12 +303,12 @@ _jira_help() {
   _jira_error "Usage: jira [options?] ACTION"
 
   _jira_info "\nPossibles actions are                                  | args\n"
-  _jira_info " - branch      Switch git repository branch to ticket  | <ticket name>?"
+  _jira_info " - branch      Switch git repository branch to ticket  | <search text>?"
   _jira_info " - create      Create a ticket interactively           |"
-  _jira_info " - print       Print ticket ID                         | <ticket name>?"
-  _jira_info " - summary     Print the summary of a ticket           | <ticket name>?"
-  _jira_info " - transition  Transition ticket to another state      | <ticket name>?"
-  _jira_info " - url         Print URL for ticket                    | <ticket name>?"
+  _jira_info " - print       Print ticket ID                         | <search text>?"
+  _jira_info " - summary     Print the summary of a ticket           | <search text>?"
+  _jira_info " - transition  Transition ticket to another state      | <search text>?"
+  _jira_info " - url         Print URL for ticket                    | <search text>?"
 
   _jira_info "\nPossibles options are\n"
   _jira_info " - -s Scope of tickets searched"
