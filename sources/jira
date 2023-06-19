@@ -374,7 +374,7 @@ _jira_issue() {
   fi
 
   if [[ -n ${2-} ]]; then
-    JIRA_JQL+=" AND text ~ \"${2}\""
+    JIRA_JQL+=" AND (text ~ \"${2}\" OR id = ${2})"
   fi
 
   JIRA_JQL+=" ORDER BY updated DESC"
