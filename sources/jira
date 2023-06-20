@@ -374,7 +374,11 @@ _jira_issue() {
   fi
 
   if [[ -n ${2-} ]]; then
-    JIRA_JQL+=" AND (text ~ \"${2}\" OR id = ${2})"
+    if [[ ${2} =~ ([A-Z0-9]+[-_][0-9]+) ]]; then
+      JIRA_JQL+=" AND id = '${BASH_REMATCH[1]}'"
+    else
+      JIRA_JQL+=" AND text ~ \"${2}\""
+    fi
   fi
 
   JIRA_JQL+=" ORDER BY updated DESC"
@@ -387,7 +391,7 @@ _jira_issue() {
   fi
 
   printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .key + " " + .fields.summary' |
-    fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue: " --select-1 --query "${2-}" |
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue: " --select-1 |
     awk '{printf("%s", $1)}'
 }
 
