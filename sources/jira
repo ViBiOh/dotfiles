@@ -46,6 +46,9 @@ jira() {
   local JIRA_DOMAIN
   JIRA_DOMAIN="$(printf "%s\n" "${!JIRAS_URL[@]}" | fzf --height=20 --ansi --reverse --select-1)"
 
+  local JIRA_AUTHORIZATION
+  JIRA_AUTHORIZATION="$(_jira_auth "${JIRAS_URL["${JIRA_DOMAIN}"]}")"
+
   case ${ACTION} in
   "branch")
     local JIRA_ISSUE
@@ -330,9 +333,6 @@ _jira_request() {
   local HEADER_OUPUT
   HEADER_OUPUT=$(mktemp)
 
-  local JIRA_CREDENTIALS
-  JIRA_CREDENTIALS="${JIRAS_URL["${JIRA_DOMAIN}"]}"
-
   local URL
   URL="${JIRA_DOMAIN}${1-}"
   shift 1
@@ -348,7 +348,7 @@ _jira_request() {
       --dump-header "${HEADER_OUPUT}" \
       --fail-with-body \
       --header "Accept: application/json" \
-      --header "Authorization: $(_jira_auth "${JIRA_CREDENTIALS}")" \
+      --header "Authorization: ${JIRA_AUTHORIZATION}" \
       "${URL}" \
       "${@}"
   )"
