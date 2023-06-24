@@ -213,8 +213,11 @@ kube() {
     _kube_resources "services" "${1:- }"
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
-      local KUBE_PORT
-      KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --height=20 --ansi --reverse --select-1 --query="${3-}" --prompt="Port: ")"
+      local KUBE_PORT="${3:-}"
+
+      if [[ -z ${KUBE_PORT:-} ]]; then
+        KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --height=20 --ansi --reverse --select-1 --prompt="Port: ")"
+      fi
 
       if [[ -n ${KUBE_PORT-} ]]; then
         local LOCAL_PORT="${2:-4000}"
