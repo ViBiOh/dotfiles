@@ -21,9 +21,12 @@ jira_pull_request() {
   local JIRA_TICKET_ID
   JIRA_TICKET_ID="$(jira print "${GIT_CURRENT_BRANCH}")"
 
+  local GITHUB_PR_TEMPLATE
+  GITHUB_PR_TEMPLATE="$(git_root)/.github/PULL_REQUEST_TEMPLATE.md"
+
   local PULL_REQUEST_BODY
-  if [[ -e ".github/PULL_REQUEST_TEMPLATE.md" ]]; then
-    PULL_REQUEST_BODY="$(cat ".github/PULL_REQUEST_TEMPLATE.md")"
+  if [[ -e ${GITHUB_PR_TEMPLATE} ]]; then
+    PULL_REQUEST_BODY="$(cat "${GITHUB_PR_TEMPLATE}")"
   else
     PULL_REQUEST_BODY="[${JIRA_TICKET_ID}]($(jira url "${JIRA_TICKET_ID}"))"
   fi
