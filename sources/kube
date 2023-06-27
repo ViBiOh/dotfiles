@@ -87,6 +87,18 @@ kube() {
     RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
   }
 
+  _kube_pod_labels() {
+    if [[ ${RESOURCE_TYPE} =~ ^cronjobs? ]]; then
+      printf "job-name in (%s)" "$("${KUBECTL_COMMAND[@]}" get jobs --namespace "${RESOURCE_NAMESPACE}" --output yaml | OWNER_NAME="${RESOURCE_NAME}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -)"
+    elif [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
+      printf "job-name=%s" "${RESOURCE_NAME}"
+    elif [[ ${RESOURCE_TYPE} =~ ^(daemonset|deployment|statefulset)s? ]]; then
+      "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -
+    else
+      "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -
+    fi
+  }
+
   _kube_help() {
     _kube_info "Usage: kube ACTION"
 
@@ -103,7 +115,7 @@ kube() {
     _kube_info " - log     | Tail logs                           | <object type or deployment name> [object name] <any additionnals args...>"
     _kube_info " - ns      | Change default namespace            | <namespace name>"
     _kube_info " - restart | Perform a restart of pod            | <object type or deployment name> [object name]"
-    _kube_info " - watch   | Watch pods                          | <any additionnals args...>"
+    _kube_info " - watch   | Watch pods                          | <object type or deployment name> <object name> <any additionnals args...>"
     _kube_info " - *       | Call kubectl directly               | <any additionnals 'kubectl' args...>"
   }
 
@@ -281,16 +293,7 @@ kube() {
         _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace "${RESOURCE_NAMESPACE}" log "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --since=24h "${@}"
       else
         local PODS_LABELS
-
-        if [[ ${RESOURCE_TYPE} =~ ^cronjobs? ]]; then
-          PODS_LABELS="job-name in ($("${KUBECTL_COMMAND[@]}" get jobs --namespace "${RESOURCE_NAMESPACE}" --output yaml | OWNER_NAME="${RESOURCE_NAME}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -))"
-        elif [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
-          PODS_LABELS="job-name=${RESOURCE_NAME}"
-        elif [[ ${RESOURCE_TYPE} =~ ^(daemonset|deployment|statefulset)s? ]]; then
-          PODS_LABELS="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
-        else
-          PODS_LABELS="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -)"
-        fi
+        PODS_LABELS="$(_kube_pod_labels)"
 
         printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
@@ -321,10 +324,35 @@ kube() {
     ;;
 
   "watch")
+    local FIRST=""
+    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      FIRST="${1}"
+      shift
+    fi
+
+    local SECOND=""
+    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      SECOND="${1}"
+      shift
+    fi
+
+    _kube_resources "${FIRST}" "${SECOND}"
+
+    local EXTRA_ARGS=()
+
+    if [[ -n ${RESOURCE_NAME-} ]]; then
+      local PODS_LABELS
+      PODS_LABELS="$(_kube_pod_labels)"
+
+      if [[ -n ${PODS_LABELS-} ]]; then
+        EXTRA_ARGS+=("--selector=${PODS_LABELS}" --namespace="${RESOURCE_NAMESPACE}")
+      fi
+    fi
+
     if command -v kmux >/dev/null 2>&1; then
-      _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" watch "${@}"
+      _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" watch "${EXTRA_ARGS[@]}" "${@}"
     else
-      _kube_print_and_run "${KUBECTL_COMMAND[@]}" get pods --watch "${@}"
+      _kube_print_and_run "${KUBECTL_COMMAND[@]}" get pods --watch "${EXTRA_ARGS[@]}" "${@}"
     fi
     ;;
 
