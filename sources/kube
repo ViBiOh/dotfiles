@@ -324,19 +324,19 @@ kube() {
     ;;
 
   "watch")
-    local FIRST=""
     if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      local FIRST=""
       FIRST="${1}"
       shift
-    fi
 
-    local SECOND=""
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
-      SECOND="${1}"
-      shift
-    fi
+      local SECOND=""
+      if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+        SECOND="${1}"
+        shift
+      fi
 
-    _kube_resources "${FIRST}" "${SECOND}"
+      _kube_resources "${FIRST}" "${SECOND}"
+    fi
 
     local EXTRA_ARGS=()
 
