@@ -42,10 +42,10 @@ kube() {
 
       shift
     else
-      KUBECTL_CONTEXTS+=("${1}" "${2}")
+      KUBECTL_CONTEXTS+=("--context=${2}")
 
       if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
-        KUBECTL_CONTEXT+=("${1}" "${2}")
+        KUBECTL_CONTEXT+=("--context=${2}")
       fi
 
       shift 2
@@ -271,6 +271,12 @@ kube() {
 
       _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval --prettyPrint "${QUERY}"
     fi
+    ;;
+
+  "top")
+    for context in "${KUBECTL_CONTEXTS[@]}"; do
+      _kube_print_and_run "kubectl" "${context}" top "${@}"
+    done
     ;;
 
   "log" | "logs")
