@@ -274,8 +274,43 @@ kube() {
     ;;
 
   "top")
+    local EXTRA_ARGS=()
+    local TOP_SUB_COMMAND="pod"
+
+    if [[ -n ${1-} ]] && [[ ${1-} =~ ^(pod|node) ]]; then
+      TOP_SUB_COMMAND="${1}"
+      shift
+    fi
+
+    if [[ ${TOP_SUB_COMMAND} == "pod" ]]; then
+      if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+        local FIRST=""
+        FIRST="${1}"
+        shift
+      fi
+
+      local SECOND=""
+      if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+        SECOND="${1}"
+        shift
+      fi
+
+      _kube_resources "${FIRST}" "${SECOND}"
+
+      local EXTRA_ARGS=()
+
+      if [[ -n ${RESOURCE_NAME-} ]]; then
+        local PODS_LABELS
+        PODS_LABELS="$(_kube_pod_labels)"
+
+        if [[ -n ${PODS_LABELS-} ]]; then
+          EXTRA_ARGS+=("--selector=${PODS_LABELS}" --namespace="${RESOURCE_NAMESPACE}")
+        fi
+      fi
+    fi
+
     for context in "${KUBECTL_CONTEXTS[@]}"; do
-      _kube_print_and_run "kubectl" "${context}" top "${@}"
+      _kube_print_and_run "kubectl" "${context}" top "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
     done
     ;;
 
