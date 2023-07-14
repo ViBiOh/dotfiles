@@ -283,8 +283,8 @@ kube() {
     fi
 
     if [[ ${TOP_SUB_COMMAND} == "pod" ]]; then
+      local FIRST=""
       if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
-        local FIRST=""
         FIRST="${1}"
         shift
       fi
@@ -295,23 +295,29 @@ kube() {
         shift
       fi
 
-      _kube_resources "${FIRST}" "${SECOND}"
+      if [[ -n ${FIRST:-} ]]; then
+        _kube_resources "${FIRST}" "${SECOND}"
 
-      local EXTRA_ARGS=()
+        local EXTRA_ARGS=()
 
-      if [[ -n ${RESOURCE_NAME-} ]]; then
-        local PODS_LABELS
-        PODS_LABELS="$(_kube_pod_labels)"
+        if [[ -n ${RESOURCE_NAME-} ]]; then
+          local PODS_LABELS
+          PODS_LABELS="$(_kube_pod_labels)"
 
-        if [[ -n ${PODS_LABELS-} ]]; then
-          EXTRA_ARGS+=("--selector=${PODS_LABELS}" --namespace="${RESOURCE_NAMESPACE}")
+          if [[ -n ${PODS_LABELS-} ]]; then
+            EXTRA_ARGS+=("--selector=${PODS_LABELS}" --namespace="${RESOURCE_NAMESPACE}")
+          fi
         fi
       fi
     fi
 
-    for context in "${KUBECTL_CONTEXTS[@]}"; do
-      _kube_print_and_run "kubectl" "${context}" top "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
-    done
+    if [[ ${#KUBECTL_CONTEXTS} -eq 0 ]]; then
+      _kube_print_and_run "kubectl" top "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
+    else
+      for context in "${KUBECTL_CONTEXTS[@]}"; do
+        _kube_print_and_run "kubectl" "${context}" top "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
+      done
+    fi
     ;;
 
   "log" | "logs")
