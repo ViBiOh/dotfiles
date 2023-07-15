@@ -59,5 +59,9 @@ install() {
     go install "mvdan.cc/gofumpt@latest"
   fi
 
+  # renovate: datasource=github-releases depName=golang-migrate/migrate
+  local GOLANG_MIGRATE_VERSION="v4.16.2"
+  archive_to_binary "https://github.com/golang-migrate/migrate/releases/download/${GOLANG_MIGRATE_VERSION}/migrate.$(normalized_os)-$(normalized_arch "amd64" "armv7" "arm64").tar.gz" "migrate"
+
   golangci-lint completion bash >"${SCRIPT_DIR}/../sources/golangci-lint-completion"
 }
