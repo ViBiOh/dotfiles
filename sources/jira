@@ -287,9 +287,15 @@ _jira_error() {
 }
 
 _jira_confirm() {
-  local CONFIRM_MESSAGE="${1:-Are you sure}"
+  local VAR_CONFIRM_MESSAGE="${1:-Are you sure}"
 
-  read -r -p "${CONFIRM_MESSAGE}? [y/N] " input </dev/tty
+  if [[ -n ${BASH_VERSION} ]]; then
+    read -r -p "${VAR_CONFIRM_MESSAGE}? [y/N] " input </dev/tty
+  elif [[ -n ${ZSH_VERSION} ]]; then
+    read -r "input?${VAR_CONFIRM_MESSAGE}? [y/N] " </dev/tty
+  else
+    return 0
+  fi
 
   case "${input}" in
   [yY][eE][sS] | [yY])
