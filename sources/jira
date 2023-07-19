@@ -138,27 +138,28 @@ _jira() {
       JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "${EXTRA_FIELD_OUTPUT}")"
     done
 
-    local JIRA_ISSUE_CREATION
-    JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request "POST" --header "Content-Type: application/json" --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
+    if _jira_confirm "Submit"; then
+      local JIRA_ISSUE_CREATION
+      JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request "POST" --header "Content-Type: application/json" --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
 
-    if [[ -n ${JIRA_ISSUE_CREATION} ]]; then
-      local JIRA_ISSUE
-      JIRA_ISSUE="$(printf "%s" "${JIRA_ISSUE_CREATION}" | jq --raw-output '.key')"
+      if [[ -n ${JIRA_ISSUE_CREATION} ]]; then
+        local JIRA_ISSUE
+        JIRA_ISSUE="$(printf "%s" "${JIRA_ISSUE_CREATION}" | jq --raw-output '.key')"
 
-      _jira_info "Issue ${JIRA_ISSUE} created"
+        _jira_info "Issue ${JIRA_ISSUE} created"
 
-      if _jira_confirm "Open in browser"; then
-        open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
+        if _jira_confirm "Open in browser"; then
+          open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
+        fi
+
+        if _jira_confirm "Change status"; then
+          _jira_transition
+        fi
+
+        if _jira_confirm "Create branch"; then
+          _jira_branch
+        fi
       fi
-
-      if _jira_confirm "Change status"; then
-        _jira_transition
-      fi
-
-      if _jira_confirm "Create branch"; then
-        _jira_branch
-      fi
-
     fi
 
     ;;
