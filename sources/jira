@@ -86,7 +86,7 @@ jira() {
     JIRA_ISSUE_TYPE="$(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_SUMMARY
-    _jira_read "Summary" JIRA_ISSUE_SUMMARY
+    _jira_read_input "Summary" JIRA_ISSUE_SUMMARY
 
     local JIRA_USER
     if _jira_confirm "Self assign"; then
@@ -227,13 +227,13 @@ _jira_branch() {
   local JIRA_BRANCH_NAME="${JIRA_ISSUE}"
 
   local BRANCH_PREFIX
-  _jira_read BRANCH_PREFIX BRANCH_PREFIX
+  _jira_read_input BRANCH_PREFIX BRANCH_PREFIX
   if [[ -n ${BRANCH_PREFIX} ]]; then
     JIRA_BRANCH_NAME="${BRANCH_PREFIX}${JIRA_BRANCH_NAME}"
   fi
 
   local BRANCH_SUFFIX
-  _jira_read BRANCH_SUFFIX BRANCH_SUFFIX
+  _jira_read_input BRANCH_SUFFIX BRANCH_SUFFIX
   if [[ -n ${BRANCH_SUFFIX} ]]; then
     JIRA_BRANCH_NAME="${JIRA_BRANCH_NAME}${BRANCH_SUFFIX}"
   fi
@@ -286,19 +286,19 @@ _jira_error() {
   printf -- "%b%b %b\n" "${RED}" "${*}" "${RESET}" 1>&2
 }
 
-_jira_read() {
+_jira_read_input() {
   if [[ -n ${BASH_VERSION} ]]; then
     read -r -p "${1}=" "${2}" </dev/tty
   elif [[ -n ${ZSH_VERSION} ]]; then
     read -r "${2}?${1}=" </dev/tty
   else
-    return 0
+    return 1
   fi
 }
 
 _jira_confirm() {
   local input
-  _jira_read "${1:-Are you sure}? [y/N] " input
+  _jira_read_input "${1:-Are you sure}? [y/N] " input
 
   case "${input}" in
   [yY][eE][sS] | [yY])
@@ -502,11 +502,11 @@ _jira_fill_extra_fields() {
     ;;
 
   "date")
-    _jira_read "${EXTRA_FIELD} (in ISO format YYYY-MM-DD): " EXTRA_FIELD_VALUE
+    _jira_read_input "${EXTRA_FIELD} (in ISO format YYYY-MM-DD): " EXTRA_FIELD_VALUE
     ;;
 
   "string" | "number")
-    _jira_read "${EXTRA_FIELD}: " EXTRA_FIELD_VALUE
+    _jira_read_input "${EXTRA_FIELD}: " EXTRA_FIELD_VALUE
     ;;
   esac
 
