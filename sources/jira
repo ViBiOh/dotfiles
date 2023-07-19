@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 
-# Declare configuration in the form of an associative array
-#
-# declare -g -A JIRAS_URL
-# JIRAS_URL["https://my.atlassian.net"]="my/jira"
-
 jira() {
-  if [[ ${#JIRAS_URL[@]} -eq 0 ]]; then
-    _jira_warning "No JIRA configuration defined"
-    return
+  _jira "${JIRA_DOMAIN}" "Basic $(pass show "${JIRA_PASS}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)" "${@}"
+}
+
+_jira() {
+  if [[ ${#} -lt 2 ]]; then
+    _jira_help
+    return 1
   fi
+
+  local JIRA_DOMAIN="${1}"
+  shift
+
+  local JIRA_AUTHORIZATION="${1}"
+  shift
 
   local scope="assignee"
 
@@ -42,12 +47,6 @@ jira() {
     _jira_help
     return 1
   fi
-
-  local JIRA_DOMAIN
-  JIRA_DOMAIN="$(printf "%s\n" "${!JIRAS_URL[@]}" | fzf --height=20 --ansi --reverse --select-1)"
-
-  local JIRA_AUTHORIZATION
-  JIRA_AUTHORIZATION="$(_jira_auth "${JIRAS_URL["${JIRA_DOMAIN}"]}")"
 
   case ${ACTION} in
   "branch")
@@ -312,7 +311,17 @@ _jira_confirm() {
 }
 
 _jira_help() {
-  _jira_error "Usage: jira [options?] ACTION"
+  _jira_error "Usage: jira JIRA_DOMAIN JIRA_AUTHORIZATION [options?] ACTION"
+
+  _jira_warning "\n"
+  _jira_warning "\tJIRA_DOMAIN         like  https://my.atlassian.net"
+  _jira_warning "\tJIRA_AUTHORIZATION  like  Basic YWRtaW46cGFzc3dvcmQ= (i.e. printf 'admin:password' | base64)"
+
+  _jira_info "\nPossibles options are\n"
+  _jira_info " - -s Scope of tickets searched"
+  _jira_info "   \t- 'assignee': only tickets on which current user is assignee (default value)"
+  _jira_info "   \t- 'reporter': only tickets on which current user is reporter"
+  _jira_info "   \t- 'all': no filter"
 
   _jira_info "\nPossibles actions are                                  | args\n"
   _jira_info " - branch      Switch git repository branch to ticket  | <search text>?"
@@ -321,16 +330,6 @@ _jira_help() {
   _jira_info " - summary     Print the summary of a ticket           | <search text>?"
   _jira_info " - transition  Transition ticket to another state      | <search text>?"
   _jira_info " - url         Print URL for ticket                    | <search text>?"
-
-  _jira_info "\nPossibles options are\n"
-  _jira_info " - -s Scope of tickets searched"
-  _jira_info "   \t- 'assignee': only tickets on which current user is assignee (default value)"
-  _jira_info "   \t- 'reporter': only tickets on which current user is reporter"
-  _jira_info "   \t- 'all': no filter"
-}
-
-_jira_auth() {
-  printf "Basic %s" "$(pass show "${1-}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)"
 }
 
 _jira_request() {
