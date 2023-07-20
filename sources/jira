@@ -244,7 +244,7 @@ _jira_branch() {
     CHECKOUT_OPTION+=" -b"
   fi
 
-  git checkout ${CHECKOUT_OPTION} "${JIRA_BRANCH_NAME}"
+  eval "git checkout ${CHECKOUT_OPTION} ${JIRA_BRANCH_NAME}"
 }
 
 _jira_transition() {
