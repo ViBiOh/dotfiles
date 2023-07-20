@@ -41,12 +41,13 @@ _jira() {
   shift $((OPTIND - 1))
 
   local ACTION="${1-}"
-  shift
 
   if [[ -z ${ACTION} ]]; then
     _jira_help
     return 1
   fi
+
+  shift
 
   case ${ACTION} in
   "branch")
