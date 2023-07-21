@@ -14,8 +14,8 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
             return
 
         variables = window.extract_variables()
-        working_dir = variables["file_path"]
-        file_name = variables["file_name"]
+        working_dir = variables.get("file_path")
+        file_name = variables.get("file_name")
 
         if not file_name or len(file_name) == 0:
             return

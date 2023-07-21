@@ -12,7 +12,7 @@ class GoTestDebug(sublime_plugin.WindowCommand):
 
     def run(self, kill=False):
         variables = self.window.extract_variables()
-        working_dir = variables["file_path"]
+        working_dir = variables.get("file_path")
 
         with self.panel_lock:
             self.panel = self.window.create_output_panel("gotestdebug")

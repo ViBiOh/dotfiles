@@ -1,8 +1,0 @@
-{
-	"target": "go_function_test",
-	"selector": "source.go",
-	"file_patterns": ["*_test.go"],
-	"cancel": {
-		"kill": true
-	}
-}

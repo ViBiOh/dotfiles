@@ -83,7 +83,7 @@ class Formatter(sublime_plugin.TextCommand):
             return
 
         variables = window.extract_variables()
-        working_dir = variables["file_path"]
+        working_dir = variables.get("file_path")
 
         allowed_selectors = get_allowed_selectors(file)
 

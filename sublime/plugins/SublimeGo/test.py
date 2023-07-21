@@ -27,7 +27,7 @@ class GoTest(sublime_plugin.WindowCommand):
             return
 
         variables = window.extract_variables()
-        working_dir = variables["file_path"]
+        working_dir = variables.get("file_path")
 
         self.panel = window.create_output_panel("gotest")
         settings = self.panel.settings()
