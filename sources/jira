@@ -86,10 +86,10 @@ _jira() {
     JIRA_ISSUE_TYPE="$(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_SUMMARY
-    _jira_read_input "Summary: " JIRA_ISSUE_SUMMARY
+    _jira_read_input "Summary=" JIRA_ISSUE_SUMMARY
 
     local JIRA_USER
-    if _jira_confirm "Self assign"; then
+    if _jira_confirm "Self assign" "true"; then
       JIRA_USER="$(_jira_self_user)"
       _jira_info "User: ${JIRA_ISSUE_TYPE}"
     fi
@@ -149,15 +149,15 @@ _jira() {
 
         _jira_info "Issue ${JIRA_ISSUE} created"
 
-        if _jira_confirm "Open in browser"; then
+        if _jira_confirm "Open in browser" "true"; then
           open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
         fi
 
-        if _jira_confirm "Change status"; then
+        if _jira_confirm "Change status" "true"; then
           _jira_transition
         fi
 
-        if _jira_confirm "Create branch"; then
+        if _jira_confirm "Create branch" "true"; then
           _jira_branch
         fi
       fi
@@ -228,13 +228,13 @@ _jira_branch() {
   local JIRA_BRANCH_NAME="${JIRA_ISSUE}"
 
   local BRANCH_PREFIX
-  _jira_read_input "BRANCH_PREFIX: " BRANCH_PREFIX
+  _jira_read_input "BRANCH_PREFIX=" BRANCH_PREFIX
   if [[ -n ${BRANCH_PREFIX} ]]; then
     JIRA_BRANCH_NAME="${BRANCH_PREFIX}${JIRA_BRANCH_NAME}"
   fi
 
   local BRANCH_SUFFIX
-  _jira_read_input "BRANCH_SUFFIX: " BRANCH_SUFFIX
+  _jira_read_input "BRANCH_SUFFIX=" BRANCH_SUFFIX
   if [[ -n ${BRANCH_SUFFIX} ]]; then
     JIRA_BRANCH_NAME="${JIRA_BRANCH_NAME}${BRANCH_SUFFIX}"
   fi
@@ -298,16 +298,28 @@ _jira_read_input() {
 }
 
 _jira_confirm() {
+  local DEFAULT_PROMPT="[y/N]"
+  local DEFAULT_RETURN=1
+
+  if [[ ${2:-} == "true" ]] || [[ ${2:-} == "0" ]]; then
+    DEFAULT_RETURN=0
+    DEFAULT_PROMPT="[Y/n]"
+  fi
+
   local input
-  _jira_read_input "${1:-Are you sure}? [y/N] " input
+  _jira_read_input "${1:-Are you sure}? ${DEFAULT_PROMPT} " input
 
   case "${input}" in
   [yY][eE][sS] | [yY])
     return 0
     ;;
 
-  *)
+  [nN][oO] | [nN])
     return 1
+    ;;
+
+  *)
+    return ${DEFAULT_RETURN}
     ;;
   esac
 }
@@ -503,11 +515,11 @@ _jira_fill_extra_fields() {
     ;;
 
   "date")
-    _jira_read_input "${EXTRA_FIELD} (in ISO format YYYY-MM-DD): " EXTRA_FIELD_VALUE
+    _jira_read_input "${EXTRA_FIELD} (in ISO format YYYY-MM-DD)=" EXTRA_FIELD_VALUE
     ;;
 
   "string" | "number")
-    _jira_read_input "${EXTRA_FIELD}: " EXTRA_FIELD_VALUE
+    _jira_read_input "${EXTRA_FIELD}=" EXTRA_FIELD_VALUE
     ;;
   esac
 
