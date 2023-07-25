@@ -7,8 +7,7 @@
   "mode": "auto",
   "cwd": "${workspaceFolder}",
   "program": "${workspaceFolder}/cmd/",
-  "envFile": "${workspaceFolder}/.env",
-  "debugAdapter": "legacy"
+  "envFile": "${workspaceFolder}/.env"
 }
 ]]></content>
   <tabTrigger>vsd</tabTrigger>
