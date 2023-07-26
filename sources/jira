@@ -125,6 +125,15 @@ _jira() {
       JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --arg epic "$(printf "%s" "${JIRA_EPIC}" | awk '{printf("%s", $1)}')" '{fields: { parent: {id: $epic} } }')")"
     fi
 
+    local JIRA_LABELS
+    JIRA_LABELS="$(_jira_issue_labels)"
+
+    if [[ -n ${JIRA_LABELS:-} ]] && ! [[ ${JIRA_LABELS:-} =~ "None" ]]; then
+      _jira_info "Labels: $(printf "%s" "${JIRA_LABELS}" | tr "\n" "," | sed 's|.$||')"
+
+      JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --argjson labels "$(printf "%s" "${JIRA_LABELS}" | jq --raw-input . | jq --slurp .)" '{fields: { labels: [$labels] } }')")"
+    fi
+
     local EXTRA_FIELDS_NAMES
     EXTRA_FIELDS_NAMES="$(_jira_extra_fields "${JIRA_PROJECT}" "${JIRA_ISSUE_TYPE}")"
 
@@ -138,6 +147,8 @@ _jira() {
 
       JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "${EXTRA_FIELD_OUTPUT}")"
     done
+
+    printf "%s" "${JIRA_CREATE_ISSUE_PAYLOAD}" | jq
 
     if _jira_confirm "Submit"; then
       local JIRA_ISSUE_CREATION
@@ -470,6 +481,33 @@ _jira_issue_type() {
 
   printf "%s" "${JIRA_ISSUE_TYPES}" | jq --raw-output '.[] | .id + " " + .name' |
     fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue Type: "
+}
+
+_jira_issue_labels() {
+  local READ_LABELS=0
+
+  while
+    printf "None\n"
+
+    local JIRA_LABEL_PAYLOAD
+    JIRA_LABEL_PAYLOAD="$(_jira_request "/rest/api/3/label" --get --data-urlencode "startAt=${READ_LABELS}")"
+
+    if [[ -z ${JIRA_LABEL_PAYLOAD} ]]; then
+      break
+    fi
+
+    for label in $(printf "%s" "${JIRA_LABEL_PAYLOAD}" | jq --raw-output '.values[]'); do
+      if [[ ${label} =~ [a-zA-Z0-9_-]{2,} ]]; then
+        printf "%s\n" "${label}"
+      fi
+
+      READ_LABELS=$((READ_LABELS + 1))
+    done
+
+    if [[ $(printf "%s" "${JIRA_LABEL_PAYLOAD}" | jq --raw-output '.isLast') == "true" ]]; then
+      break
+    fi
+  do true; done | fzf --height=20 --ansi --reverse --exit-0 --multi --prompt="Labels (multi-select with Tab): "
 }
 
 _jira_extra_fields() {
