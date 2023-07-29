@@ -19,6 +19,10 @@ gpg_agent_stop() {
   gpgconf --kill gpg-agent
 }
 
+gpg_eject_card() {
+  gpg-connect-agent "scd serialno" "learn --force" /bye
+}
+
 gpg_agent_start
 
 cipher() {
