@@ -94,12 +94,19 @@ _jira() {
       _jira_info "User: ${JIRA_ISSUE_TYPE}"
     fi
 
+    local JIRA_PRIORITY
+    JIRA_PRIORITY="$(_jira_priority)"
+
+    _jira_info "Piority: $(printf "%s" "${JIRA_PRIORITY}" | cut -f 2- -d ' ')"
+    JIRA_PRIORITY="$(printf "%s" "${JIRA_PRIORITY}" | awk '{printf("%s", $1)}')"
+
     local JIRA_CREATE_ISSUE_PAYLOAD
     JIRA_CREATE_ISSUE_PAYLOAD="$(jq --compact-output --null-input \
       --arg project "${JIRA_PROJECT}" \
       --arg user "${JIRA_USER}" \
       --arg issuetype "${JIRA_ISSUE_TYPE}" \
       --arg summary "${JIRA_ISSUE_SUMMARY}" \
+      --arg priority "${JIRA_PRIORITY}" \
       '{
         fields: {
           summary: $summary,
@@ -108,6 +115,9 @@ _jira() {
           },
           issuetype: {
             id: $issuetype
+          },
+          priority: {
+            id: $priority
           }
         }
       }')"
@@ -481,6 +491,18 @@ _jira_issue_type() {
 
   printf "%s" "${JIRA_ISSUE_TYPES}" | jq --raw-output '.[] | .id + " " + .name' |
     fzf --height=20 --ansi --reverse --exit-0 --prompt="Issue Type: "
+}
+
+_jira_priority() {
+  local JIRA_PRIORITY
+  JIRA_PRIORITY="$(_jira_request "/rest/api/3/priority" --get)"
+
+  if [[ -z ${JIRA_PRIORITY} ]]; then
+    return
+  fi
+
+  printf "%s" "${JIRA_PRIORITY}" | jq --raw-output '.[] | .id + " " + .name' |
+    fzf --height=20 --ansi --reverse --exit-0 --prompt="Priority: "
 }
 
 _jira_issue_labels() {
