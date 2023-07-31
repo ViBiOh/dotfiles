@@ -86,7 +86,7 @@ _jira() {
     JIRA_ISSUE_TYPE="$(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_SUMMARY
-    _jira_read_input "Summary=" JIRA_ISSUE_SUMMARY
+    _jira_read_input "Summary: " JIRA_ISSUE_SUMMARY
 
     local JIRA_USER
     if _jira_confirm "Self assign" "true"; then
@@ -141,7 +141,7 @@ _jira() {
     if [[ -n ${JIRA_LABELS:-} ]] && ! [[ ${JIRA_LABELS:-} =~ "None" ]]; then
       _jira_info "Labels: $(printf "%s" "${JIRA_LABELS}" | tr "\n" "," | sed 's|.$||')"
 
-      JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --argjson labels "$(printf "%s" "${JIRA_LABELS}" | jq --raw-input . | jq --slurp .)" '{fields: { labels: [$labels] } }')")"
+      JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --argjson labels "$(printf "%s" "${JIRA_LABELS}" | jq --raw-input . | jq --slurp .)" '{fields: { labels: $labels } }')")"
     fi
 
     local EXTRA_FIELDS_NAMES
@@ -579,7 +579,7 @@ _jira_fill_extra_fields() {
     ;;
 
   "string" | "number")
-    _jira_read_input "${EXTRA_FIELD}=" EXTRA_FIELD_VALUE
+    _jira_read_input "${EXTRA_FIELD}: " EXTRA_FIELD_VALUE
     ;;
   esac
 
