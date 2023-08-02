@@ -3,12 +3,12 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  if [[ ${OSTYPE} =~ ^darwin ]] && [[ $(normalized_arch) == "aarch64" ]]; then
-    return
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    packages_install shellcheck
+  else
+    # renovate: datasource=github-releases depName=koalaman/shellcheck
+    local SHELLCHECK_VERSION="v0.9.0"
+
+    archive_to_binary "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.$(normalized_os).$(normalized_arch "" "armv6hf").tar.xz" "shellcheck-${SHELLCHECK_VERSION}/shellcheck"
   fi
-
-  # renovate: datasource=github-releases depName=koalaman/shellcheck
-  local SHELLCHECK_VERSION="v0.9.0"
-
-  archive_to_binary "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.$(normalized_os).$(normalized_arch "" "armv6hf").tar.xz" "shellcheck-${SHELLCHECK_VERSION}/shellcheck"
 }
