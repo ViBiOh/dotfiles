@@ -101,7 +101,7 @@ normalized_arch() {
     ARCH="${X86_VALUE}"
   elif [[ ${ARCH} =~ ^armv ]] && [[ -n ${ARM_VALUE} ]]; then
     ARCH="${ARM_VALUE}"
-  elif [[ ${ARCH} == "aarch64" ]] && [[ -n ${ARM64_VALUE} ]]; then
+  elif [[ ${ARCH} == "aarch64" || ${ARCH} == "arm64" ]] && [[ -n ${ARM64_VALUE} ]]; then
     ARCH="${ARM64_VALUE}"
   fi
 

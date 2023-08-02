@@ -6,5 +6,5 @@ install() {
   # renovate: datasource=github-releases depName=koalaman/shellcheck
   local SHELLCHECK_VERSION="v0.9.0"
 
-  archive_to_binary "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.$(normalized_os).$(normalized_arch "" "armv6hf").tar.xz" "shellcheck-${SHELLCHECK_VERSION}/shellcheck"
+  archive_to_binary "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.$(normalized_os).$(normalized_arch "" "armv6hf" "aarch64").tar.xz" "shellcheck-${SHELLCHECK_VERSION}/shellcheck"
 }
