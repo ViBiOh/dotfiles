@@ -4,13 +4,13 @@
   "name": "Launch Main",
   "type": "go",
   "request": "launch",
-  "mode": "auto",
-  "cwd": "${workspaceFolder}",
-  "program": "${workspaceFolder}/cmd/",
-  "envFile": "${workspaceFolder}/.env"
+  "mode": "debug",
+  "cwd": "${folder}",
+  "program": "${folder}/cmd/",
+  "envFile": "${folder}/.env"
 }
 ]]></content>
-  <tabTrigger>vsd</tabTrigger>
+  <tabTrigger>dlm</tabTrigger>
   <scope>source.json</scope>
-  <description>VSCode Launch Debug</description>
+  <description>Debugger Launch Main</description>
 </snippet>

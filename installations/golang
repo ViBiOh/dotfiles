@@ -45,10 +45,7 @@ install() {
   packages_install graphviz
 
   if command -v go >/dev/null 2>&1; then
-    if [[ $(normalized_arch "amd64" "armv6l" "arm64") == "amd64" ]]; then
-      go install "github.com/go-delve/delve/cmd/dlv@latest"
-    fi
-
+    go install "github.com/go-delve/delve/cmd/dlv@latest"
     go install "github.com/derailed/popeye@latest"
     go install "go.uber.org/mock/mockgen@latest"
     go install "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
@@ -57,11 +54,11 @@ install() {
     go install "golang.org/x/tools/cmd/goimports@latest"
     go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
     go install "mvdan.cc/gofumpt@latest"
+
+    golangci-lint completion bash >"${SCRIPT_DIR}/../sources/golangci-lint-completion"
   fi
 
   # renovate: datasource=github-releases depName=golang-migrate/migrate
   local GOLANG_MIGRATE_VERSION="v4.16.2"
   archive_to_binary "https://github.com/golang-migrate/migrate/releases/download/${GOLANG_MIGRATE_VERSION}/migrate.$(normalized_os)-$(normalized_arch "amd64" "armv7" "arm64").tar.gz" "migrate"
-
-  golangci-lint completion bash >"${SCRIPT_DIR}/../sources/golangci-lint-completion"
 }
