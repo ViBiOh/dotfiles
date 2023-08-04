@@ -15,29 +15,11 @@ script_dir() {
 }
 
 install() {
-  packages_install git git-lfs
+  packages_install git git-lfs git-delta
 
   if ! command -v git >/dev/null 2>&1; then
     return
   fi
 
   curl --disable --silent --show-error --location --max-time 30 --output "$(script_dir)/../sources/git-prompt" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{printf("%s", $3)}')/contrib/completion/git-prompt.sh"
-
-  # renovate: datasource=github-releases depName=dandavison/delta
-  local DELTA_VERSION="0.16.5"
-
-  local OS="unknown-linux-musl"
-  local ARCH
-  ARCH="$(normalized_arch "" "arm")"
-
-  if [[ $(normalized_os) =~ ^darwin ]]; then
-    OS="apple-darwin"
-  elif [[ ${ARCH} == "aarch64" ]]; then
-    OS="unknown-linux-gnu"
-  elif [[ ${ARCH} == "arm" ]]; then
-    OS="unknown-linux-gnueabihf"
-  fi
-
-  local DELTA_RELEASE="delta-${DELTA_VERSION}-${ARCH}-${OS}"
-  archive_to_binary "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/${DELTA_RELEASE}.tar.gz" "${DELTA_RELEASE}/delta"
 }
