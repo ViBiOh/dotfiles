@@ -2,7 +2,7 @@ import sublime
 import sublime_plugin
 import threading
 from .async_task import AsyncTask
-from .env_loader import load_env
+from .env_loader import load_git_root_env
 
 
 class GoFunctionTest(sublime_plugin.WindowCommand):
