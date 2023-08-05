@@ -2,7 +2,7 @@ import sublime
 import sublime_plugin
 import threading
 from .async_task import AsyncTask
-from .env_loader import load_env
+from .env_loader import load_git_root_env
 
 
 class GoTest(sublime_plugin.WindowCommand):
@@ -35,7 +35,9 @@ class GoTest(sublime_plugin.WindowCommand):
         settings.set("result_base_dir", working_dir)
         window.run_command("show_panel", {"panel": "output.gotest"})
 
-        env = load_env(working_dir)
+        env = load_git_root_env(working_dir)
+
+        print(env)
 
         if self.task:
             self.task.kill()
