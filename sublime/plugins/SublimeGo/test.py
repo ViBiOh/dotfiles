@@ -3,6 +3,7 @@ import sublime_plugin
 import threading
 from .async_task import AsyncTask
 from .env_loader import load_git_root_env
+import os
 
 
 class GoTest(sublime_plugin.WindowCommand):
@@ -35,10 +36,6 @@ class GoTest(sublime_plugin.WindowCommand):
         settings.set("result_base_dir", working_dir)
         window.run_command("show_panel", {"panel": "output.gotest"})
 
-        env = load_git_root_env(working_dir)
-
-        print(env)
-
         if self.task:
             self.task.kill()
 
@@ -48,7 +45,7 @@ class GoTest(sublime_plugin.WindowCommand):
             command=["go", "test", "-cover", "-race"],
             output=self.queue_write,
             cwd=working_dir,
-            env=env,
+            env=load_git_root_env(working_dir),
         )
 
     def queue_write(self, text):

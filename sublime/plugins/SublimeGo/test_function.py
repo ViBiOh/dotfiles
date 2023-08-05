@@ -35,8 +35,6 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
         settings.set("result_base_dir", working_dir)
         window.run_command("show_panel", {"panel": "output.gotest"})
 
-        env = load_env(working_dir)
-
         if self.task:
             self.task.kill()
 
@@ -48,7 +46,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
             command=["go", "test", "-cover", "-race", "-run", function_name],
             output=self.queue_write,
             cwd=working_dir,
-            env=env,
+            env=load_git_root_env(working_dir),
         )
 
     def queue_write(self, text):
