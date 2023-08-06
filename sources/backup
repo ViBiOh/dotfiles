@@ -26,3 +26,7 @@ backup_restore() {
   mkdir "${BASE_FILENAME}"
   gpg --decrypt --batch --passphrase "${2:-$(pass_get "infra/backup" "aes")}" "${BASE_FILENAME}.tar.gz.gpg" | pv | tar -xz -C "${BASE_FILENAME}" -
 }
+
+backup_clean() {
+  mc rm "scw/fibr/" --incomplete --recursive --force
+}
