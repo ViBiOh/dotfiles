@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+kube_ssh_tunnel() {
+  ssh_forward_local 6443 6443 "${KUBERNETES_MASTER}"
+}
+
 if command -v kubectl >/dev/null 2>&1; then
   if command -v yq >/dev/null 2>&1; then
     __kube_ps1() {
