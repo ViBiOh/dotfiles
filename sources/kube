@@ -279,12 +279,12 @@ kube() {
     local EXTRA_ARGS=()
     local TOP_SUB_COMMAND="pod"
 
-    if [[ -n ${1-} ]] && [[ ${1-} =~ ^(pod|node) ]]; then
+    if [[ -n ${1-} ]] && [[ ${1-} =~ ^(pod|node)s?$ ]]; then
       TOP_SUB_COMMAND="${1}"
       shift
     fi
 
-    if [[ ${TOP_SUB_COMMAND} == "pod" ]]; then
+    if [[ ${TOP_SUB_COMMAND} =~ ^pods? ]]; then
       local FIRST=""
       if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
         FIRST="${1}"
