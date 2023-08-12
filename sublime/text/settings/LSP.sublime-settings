@@ -8,6 +8,11 @@
 				"experimentalWorkspaceModule": false
 			}
 		},
+		"python": {
+			"enabled": true,
+			"command": ["pylsp"],
+			"selector": "source.python"
+		},
 		"terraform": {
 			"enabled": true,
 			"command": ["terraform-ls", "serve"],
