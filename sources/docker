@@ -27,7 +27,7 @@ if command -v docker >/dev/null 2>&1; then
   }
 
   redis() {
-    docker run --name "redis" --rm --publish "127.0.0.1:6379:6379" "redis"
+    docker run --name "redis" --rm --publish "127.0.0.1:6379:6379" "redis" redis-server --save "" --appendonly no
   }
 
   postgres() {
