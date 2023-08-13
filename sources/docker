@@ -26,25 +26,16 @@ if command -v docker >/dev/null 2>&1; then
     docker volume ls --quiet | xargs docker volume rm
   }
 
-  sidecars_stop() {
-    docker stop "postgres"
-    docker stop "redis"
-
-    docker rm --volumes "postgres"
-    docker rm --volumes "redis"
+  redis() {
+    docker run --name "redis" --rm --publish "127.0.0.1:6379:6379" "redis"
   }
 
-  sidecars_start() {
-    sidecars_stop
-
-    docker run --detach --name "postgres" --env "POSTGRES_PASSWORD=postgres" --publish "127.0.0.1:5432:5432" "postgres"
-    docker run --detach --name "redis" --publish "127.0.0.1:6379:6379" "redis"
+  postgres() {
+    docker run --name "postgres" --rm --env "POSTGRES_PASSWORD=postgres" --publish "127.0.0.1:5432:5432" "postgres"
   }
 
-  rabbitmq() {
-    docker stop "rabbit"
-    docker rm --volumes "rabbit"
-    docker run --detach --name "rabbit" --publish "127.0.0.1:5672:5672" --publish "127.0.0.1:15672:15672" "rabbitmq:management"
+  rabbit() {
+    docker run --name "rabbit" --rm --publish "127.0.0.1:5672:5672" --publish "127.0.0.1:15672:15672" "rabbitmq:management"
   }
 
   datadog_agent() {
