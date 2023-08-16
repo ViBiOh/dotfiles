@@ -5,7 +5,7 @@ backup() {
 }
 
 backup_upload() {
-  MC_UPLOAD_MULTIPART_SIZE=104857600 mc mv "${1:-$(basename "$(pwd)")}.tar.gz.gpg" "scw/fibr/"
+  MC_UPLOAD_MULTIPART_SIZE=104857600 mc mv --storage-class ONEZONE_IA "${1:-$(basename "$(pwd)")}.tar.gz.gpg" "scw/fibr/"
 }
 
 backup_dir() {
