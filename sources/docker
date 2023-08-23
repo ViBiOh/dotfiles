@@ -38,6 +38,10 @@ if command -v docker >/dev/null 2>&1; then
     docker run --name "rabbit" --rm --publish "127.0.0.1:5672:5672" --publish "127.0.0.1:15672:15672" "rabbitmq:management"
   }
 
+  otel-collector() {
+    docker run --name otel-collector --rm --publish "127.0.0.1:4317:4317/tcp" otel/opentelemetry-collector
+  }
+
   datadog_agent() {
     docker run --name "datadog" \
       --rm \
