@@ -39,7 +39,42 @@ if command -v docker >/dev/null 2>&1; then
   }
 
   otel-collector() {
-    docker run --name otel-collector --rm --publish "127.0.0.1:4317:4317/tcp" otel/opentelemetry-collector
+    local OTEL_CONFIG_FILE="${HOME}/Downloads/otel-collector.yaml"
+
+    cat >"${OTEL_CONFIG_FILE}" <<EOF
+---
+receivers:
+  otlp:
+    protocols:
+      grpc:
+
+exporters:
+  logging:
+    verbosity: detailed
+
+service:
+  pipelines:
+    metrics:
+      receivers:
+        - otlp
+      exporters:
+        - logging
+
+    traces:
+      receivers:
+        - otlp
+      exporters:
+        - logging
+EOF
+
+    docker run \
+      --name otel-collector \
+      --rm \
+      --publish "127.0.0.1:4317:4317/tcp" \
+      --volume "${OTEL_CONFIG_FILE}:/var/config.yaml:ro" \
+      otel/opentelemetry-collector -- --config "/var/config.yaml"
+
+    rm -f "${OTEL_CONFIG_FILE}"
   }
 
   datadog_agent() {
