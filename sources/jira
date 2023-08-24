@@ -270,7 +270,7 @@ _jira_branch() {
 
 _jira_transition() {
   local JIRA_TRANSITIONS
-  JIRA_TRANSITIONS="$(_jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --get)"
+  JIRA_TRANSITIONS="$(_jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --get --data-urlencode "expand=transitions.fields")"
 
   if [[ -z ${JIRA_TRANSITIONS} ]]; then
     return
@@ -292,7 +292,24 @@ _jira_transition() {
   local JIRA_TRANSITION_NAME
   JIRA_TRANSITION_NAME="$(printf "%s" "${JIRA_TRANSITION}" | awk '{$1=""; print}')"
 
-  _jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --request "POST" --header "Content-Type: application/json" --data "$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION_ID}" '{transition: $transition_id}')"
+  local JIRA_TRANSITION_PAYLOAD
+  JIRA_TRANSITION_PAYLOAD="$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION_ID}" '{transition: $transition_id}')"
+
+  local JIRA_TRANSITION_FIELDS
+  JIRA_TRANSITION_FIELDS="$(printf "%s" "${JIRA_TRANSITIONS}" | jq --arg transitionID "${JIRA_TRANSITION_ID}" '.transitions[] | select(.id == $transitionID) | .fields[]')"
+
+  while true; do
+    local EXTRA_FIELD_OUTPUT
+    EXTRA_FIELD_OUTPUT="$(_jira_fill_extra_fields "${JIRA_TRANSITION_FIELDS}")"
+
+    if [[ -z ${EXTRA_FIELD_OUTPUT} ]]; then
+      break
+    fi
+
+    JIRA_TRANSITION_PAYLOAD="$(printf "%s %s" "${JIRA_TRANSITION_PAYLOAD}" "${EXTRA_FIELD_OUTPUT}" | jq --compact-output --slurp '.[0] * .[1]')"
+  done
+
+  _jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --request "POST" --header "Content-Type: application/json" --data "${JIRA_TRANSITION_PAYLOAD}"
   _jira_info "${JIRA_ISSUE} transitionned to status${JIRA_TRANSITION_NAME}"
 }
 
@@ -574,6 +591,10 @@ _jira_fill_extra_fields() {
     EXTRA_FIELD_VALUE="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .allowedValues[] | .value' | fzf --height=20 --ansi --reverse --exit-0 --prompt="${EXTRA_FIELD}: ")"
     ;;
 
+  "resolution" | "array")
+    EXTRA_FIELD_VALUE="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .allowedValues[] | .name' | fzf --height=20 --ansi --reverse --exit-0 --prompt="${EXTRA_FIELD}: ")"
+    ;;
+
   "date")
     _jira_read_input "${EXTRA_FIELD} (in ISO format YYYY-MM-DD)=" EXTRA_FIELD_VALUE
     ;;
@@ -593,6 +614,10 @@ _jira_fill_extra_fields() {
 
   "option")
     jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "\"${EXTRA_FIELD_VALUE}\"" '{ fields: { ($key): {value: $value} } }'
+    ;;
+
+  "resolution" | "array")
+    jq --compact-output --null-input --arg key "${EXTRA_FIELD_KEY}" --argjson value "\"${EXTRA_FIELD_VALUE}\"" '{ fields: { ($key): {name: $value} } }'
     ;;
 
   "number")
