@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-type App struct {
+type Service struct {
 	${1:FlagName} string
 }
 
@@ -14,8 +14,8 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) Config 
 	}
 }
 
-func New(config Config) App {
-	return App{
+func New(config Config) Service {
+	return Service{
 		${1:FlagName}: strings.TrimSpace(*config.${1:FlagName}),
 	}
 }
