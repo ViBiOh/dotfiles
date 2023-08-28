@@ -1,10 +1,10 @@
 [
   {
     "keys": ["super+;"],
-    "command": "reset_layout",
+    "command": "reset_layout"
   },
   {
-    "keys": ["super+:"],
+    "keys": ["super+\\"],
     "command": "split_vertically"
   }
 ]
