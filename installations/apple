@@ -4,6 +4,6 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    packages_install_desktop "appcleaner" "rectangle"
+    packages_install_desktop "appcleaner" "rectangle" "qwerty-fr"
   fi
 }
