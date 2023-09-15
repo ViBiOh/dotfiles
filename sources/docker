@@ -31,7 +31,7 @@ if command -v docker >/dev/null 2>&1; then
   }
 
   postgres() {
-    docker run --name "postgres" --rm --env "POSTGRES_PASSWORD=postgres" --publish "127.0.0.1:5432:5432" "postgres"
+    docker run --name "postgres" --rm --env "POSTGRES_PASSWORD=postgres" --env "POSTGRES_DB=${1:-postgres}" --publish "127.0.0.1:5432:5432" "postgres"
   }
 
   rabbit() {
