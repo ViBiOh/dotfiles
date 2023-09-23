@@ -23,7 +23,9 @@ gpg_eject_card() {
   gpg-connect-agent "scd serialno" "learn --force" /bye
 }
 
-gpg_agent_start
+if [[ -d ${HOME}/.gnupg ]]; then
+  gpg_agent_start
+fi
 
 cipher() {
   gpg --symmetric --cipher-algo AES256 "${@}" | base64
