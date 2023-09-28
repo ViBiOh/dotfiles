@@ -50,7 +50,7 @@
 	ui = true
 
 [alias]
-	last-tag = ! git describe --tag 2> /dev/null | awk -F "-" '{printf(\"%s\", $1)}'
+	last-tag = ! git describe --tag --abbrev=0 2> /dev/null
 	remote-repository = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@.*:(.*).git$ ]] && printf '%s' \"${BASH_REMATCH[1]}\"
 	web-url = ! [[ "$(git remote get-url --push $(git remote show | head -1))" =~ ^.*@(.*)[:/](.*)/(.*)$ ]] && printf 'https://%s/%s/%s' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]%.git}"
 	web = ! open "$(git web-url)"
