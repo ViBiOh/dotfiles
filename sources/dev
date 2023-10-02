@@ -160,7 +160,7 @@ if command -v vegeta >/dev/null 2>&1; then
     local URL=${1}
     shift
 
-    var_info "Attacking '${URL}' at ${RATE} request(s) per second during 30 seconds..."
+    var_info "Attacking '${URL}' during 30 seconds..."
     printf "GET %s" "${URL}" | vegeta attack -duration=30s "${@}" | vegeta plot >vegeta.html && open vegeta.html
     sleep 5
     rm vegeta.html
