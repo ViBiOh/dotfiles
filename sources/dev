@@ -17,10 +17,6 @@ if command -v mc >/dev/null 2>&1; then
   complete -C mc mc
 fi
 
-random() {
-  openssl rand -hex "${1:-31}"
-}
-
 qrcode() {
   qrencode -t UTF8
 }
@@ -110,8 +106,13 @@ emergency() {
 
   sudo --reset-timestamp networksetup -setdnsservers "Wi-Fi" Empty
   sudo networksetup -setsearchdomains "Wi-Fi" Empty
-  sudo networksetup -setdnsservers "USB 10/100/1000 LAN" Empty
-  sudo networksetup -setsearchdomains "USB 10/100/1000 LAN" Empty
+
+  for interface in "USB 10/100/1000 LAN" "Thunderbolt Ethernet Slot 0" "Thunderbolt Ethernet Slot 1"; do
+    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i "${interface}") -gt 0 ]]; then
+      sudo networksetup -setdnsservers "${interface}" Empty
+      sudo networksetup -setsearchdomains "${interface}" Empty
+    fi
+  done
 
   _emergency_script_dir() {
     local FILE_SOURCE="${BASH_SOURCE[0]}"

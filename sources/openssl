@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+random() {
+  openssl rand -hex "${1:-31}"
+}
+
 openssl_cipher() {
   if [[ ${#} -lt 1 ]]; then
     printf "%bUsage: openssl_cipher PASSPHRASE%b\n" "${RED}" "${RESET}" 1>&2
