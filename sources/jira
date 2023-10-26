@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 jira() {
-  _jira "${JIRA_DOMAIN}" "Basic $(pass show "${JIRA_PASS}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)" "${@}"
+  GITHUB_TOKEN="$(github_token)" _jira "${JIRA_DOMAIN}" "Basic $(pass show "${JIRA_PASS}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)" "${@}"
 }
 
 _jira() {
@@ -186,6 +186,61 @@ _jira() {
 
     ;;
 
+  "pr")
+    if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
+      _jira_error "not in a git directory"
+      return 1
+    fi
+
+    if [[ -z ${GITHUB_TOKEN:-} ]]; then
+      _jira_error "no GITHUB_TOKEN environment varaible found"
+      return 1
+    fi
+
+    local GITHUB_REPOSITORY
+    if [[ "$(git remote get-url --push "$(git remote show | head -1)")" =~ ^.*@.*:(.*).git$ ]]; then
+      GITHUB_REPOSITORY="${BASH_REMATCH[1]}"
+    else
+      _jira_error "unable to identify git remote repository"
+      return 1
+    fi
+
+    local GIT_CURRENT_BRANCH
+    GIT_CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+
+    local JIRA_TICKET_ID
+    JIRA_TICKET_ID="$(_jira_issue "${scope}" "${GIT_CURRENT_BRANCH}")"
+
+    if [[ -z ${JIRA_TICKET_ID} ]]; then
+      return
+    fi
+
+    local PULL_REQUEST_BODY
+    PULL_REQUEST_BODY="[${JIRA_TICKET_ID}]($(_jira_url "${JIRA_TICKET_ID}"))"
+
+    local GITHUB_PR_TEMPLATE
+    GITHUB_PR_TEMPLATE="$(git rev-parse --show-toplevel)/.github/PULL_REQUEST_TEMPLATE.md"
+    if [[ -e ${GITHUB_PR_TEMPLATE} ]]; then
+      PULL_REQUEST_BODY+=$'\n\n'
+      PULL_REQUEST_BODY+="$(cat "${GITHUB_PR_TEMPLATE}")"
+    fi
+
+    local GITHUB_OUTPUT
+    GITHUB_OUTPUT="$(_github_request "/repos/${GITHUB_REPOSITORY}/pulls" \
+      --data "$(
+        jq --compact-output --null-input \
+          --arg title "$(_jira_summary "${JIRA_TICKET_ID}")" \
+          --arg base "$(git remote show origin | grep 'HEAD branch:' | awk '{printf("%s", $3)}')" \
+          --arg head "${GIT_CURRENT_BRANCH}" \
+          --arg body "${PULL_REQUEST_BODY}" \
+          '{title: $title, base: $base, head: $head, body: $body, draft: true}'
+      )")"
+
+    if [[ -n ${GITHUB_OUTPUT} ]]; then
+      open "$(printf "%s" "${GITHUB_OUTPUT}" | jq --raw-output '.html_url')"
+    fi
+    ;;
+
   "print")
     local JIRA_ISSUE
     JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
@@ -227,7 +282,7 @@ _jira() {
       return
     fi
 
-    printf "%s/browse/%s" "${JIRA_DOMAIN}" "${JIRA_ISSUE}"
+    _jira_url "${JIRA_ISSUE}"
     ;;
 
   *)
@@ -378,10 +433,51 @@ _jira_help() {
   _jira_info "\nPossibles actions are                                  | args\n"
   _jira_info " - branch      Switch git repository branch to ticket  | <search text>?"
   _jira_info " - create      Create a ticket interactively           |"
+  _jira_info " - pr          Open pull-request for current branch"
   _jira_info " - print       Print ticket ID                         | <search text>?"
   _jira_info " - summary     Print the summary of a ticket           | <search text>?"
   _jira_info " - transition  Transition ticket to another state      | <search text>?"
   _jira_info " - url         Print URL for ticket                    | <search text>?"
+}
+
+_github_request() {
+  if [[ ${#} -lt 1 ]]; then
+    _jira_error "Usage: _github_request PATH [EXTRA_CURL_ARGS]"
+    return 1
+  fi
+
+  local HEADER_OUPUT
+  HEADER_OUPUT=$(mktemp)
+
+  local URL
+  URL="https://api.github.com${1-}"
+  shift 1
+
+  local GITHUB_OUTPUT
+  GITHUB_OUTPUT="$(
+    curl \
+      --disable \
+      --silent \
+      --show-error \
+      --location \
+      --max-time 10 \
+      --dump-header "${HEADER_OUPUT}" \
+      --fail-with-body \
+      --header "Accept: application/vnd.github+json" \
+      --header "Authorization: Bearer ${GITHUB_TOKEN}" \
+      "${URL}" \
+      "${@}"
+  )"
+
+  if [[ ${?} -ne 0 ]]; then
+    cat "${HEADER_OUPUT}" >/dev/stderr
+    printf "%s\n" "${GITHUB_OUTPUT}" >/dev/stderr
+    rm -f "${HEADER_OUPUT}"
+    return 1
+  fi
+
+  rm -f "${HEADER_OUPUT}"
+  printf "%s" "${GITHUB_OUTPUT}"
 }
 
 _jira_request() {
@@ -486,7 +582,7 @@ _jira_project() {
 
 _jira_summary() {
   local JIRA_ISSUE_PAYLOAD
-  JIRA_ISSUE_PAYLOAD="$(_jira_request "/rest/api/latest/issue/${JIRA_ISSUE}" --get)"
+  JIRA_ISSUE_PAYLOAD="$(_jira_request "/rest/api/latest/issue/${1-}" --get)"
 
   if [[ -z ${JIRA_ISSUE_PAYLOAD} ]]; then
     return
@@ -635,4 +731,8 @@ _jira_self_user() {
   fi
 
   printf "%s" "${JIRA_USER}" | jq --raw-output '.accountId'
+}
+
+_jira_url() {
+  printf "%s/browse/%s" "${JIRA_DOMAIN}" "${1}"
 }

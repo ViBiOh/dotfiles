@@ -11,26 +11,3 @@ fi
 ...() {
   cd "$(git_root)" || return 1
 }
-
-jira_pull_request() {
-  git push
-
-  local GIT_CURRENT_BRANCH
-  GIT_CURRENT_BRANCH="$(git current-branch)"
-
-  local JIRA_TICKET_ID
-  JIRA_TICKET_ID="$(jira print "${GIT_CURRENT_BRANCH}")"
-
-  local GITHUB_PR_TEMPLATE
-  GITHUB_PR_TEMPLATE="$(git_root)/.github/PULL_REQUEST_TEMPLATE.md"
-
-  local PULL_REQUEST_BODY
-  if [[ -e ${GITHUB_PR_TEMPLATE} ]]; then
-    PULL_REQUEST_BODY="$(cat "${GITHUB_PR_TEMPLATE}")"
-  else
-    PULL_REQUEST_BODY="[${JIRA_TICKET_ID}]($(jira url "${JIRA_TICKET_ID}"))"
-  fi
-
-  github_pull_request "$(git remote-repository)" "$(jira summary "${JIRA_TICKET_ID}")" "$(git default-branch)" "${GIT_CURRENT_BRANCH}" "${PULL_REQUEST_BODY}"
-  jira transition "${JIRA_TICKET_ID}" "in review"
-}
