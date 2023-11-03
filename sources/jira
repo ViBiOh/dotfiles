@@ -215,30 +215,8 @@ _jira() {
       return
     fi
 
-    local PULL_REQUEST_BODY
-    PULL_REQUEST_BODY="[${JIRA_TICKET_ID}]($(_jira_url "${JIRA_TICKET_ID}"))"
-
-    local GITHUB_PR_TEMPLATE
-    GITHUB_PR_TEMPLATE="$(git rev-parse --show-toplevel)/.github/PULL_REQUEST_TEMPLATE.md"
-    if [[ -e ${GITHUB_PR_TEMPLATE} ]]; then
-      PULL_REQUEST_BODY+=$'\n\n'
-      PULL_REQUEST_BODY+="$(cat "${GITHUB_PR_TEMPLATE}")"
-    fi
-
-    local GITHUB_OUTPUT
-    GITHUB_OUTPUT="$(_github_request "/repos/${GITHUB_REPOSITORY}/pulls" \
-      --data "$(
-        jq --compact-output --null-input \
-          --arg title "$(_jira_summary "${JIRA_TICKET_ID}")" \
-          --arg base "$(git remote show origin | grep 'HEAD branch:' | awk '{printf("%s", $3)}')" \
-          --arg head "${GIT_CURRENT_BRANCH}" \
-          --arg body "${PULL_REQUEST_BODY}" \
-          '{title: $title, base: $base, head: $head, body: $body, draft: true}'
-      )")"
-
-    if [[ -n ${GITHUB_OUTPUT} ]]; then
-      open "$(printf "%s" "${GITHUB_OUTPUT}" | jq --raw-output '.html_url')"
-    fi
+    _jira_github_branch "${GITHUB_REPOSITORY}" "${GIT_CURRENT_BRANCH}"
+    _jira_github_pull_request "${GITHUB_REPOSITORY}" "${GIT_CURRENT_BRANCH}" "${JIRA_TICKET_ID}"
     ;;
 
   "print")
@@ -440,7 +418,51 @@ _jira_help() {
   _jira_info " - url         Print URL for ticket                    | <search text>?"
 }
 
-_github_request() {
+_jira_github_branch() {
+  local GITHUB_REPOSITORY="${1}"
+  local GIT_CURRENT_BRANCH="${2}"
+
+  if ! _jira_github_request "/repos/${GITHUB_REPOSITORY}/branches/${GIT_CURRENT_BRANCH}"; then
+    _jira_warning "Remote branch '${GIT_CURRENT_BRANCH}' doesn't exist."
+
+    if _jira_confirm "Run 'git push'?"; then
+      git push
+    fi
+  fi
+}
+
+_jira_github_pull_request() {
+  local GITHUB_REPOSITORY="${1}"
+  local GIT_CURRENT_BRANCH="${2}"
+  local JIRA_TICKET_ID="${3}"
+
+  local PULL_REQUEST_BODY
+  PULL_REQUEST_BODY="[${JIRA_TICKET_ID}]($(_jira_url "${JIRA_TICKET_ID}"))"
+
+  local GITHUB_PR_TEMPLATE
+  GITHUB_PR_TEMPLATE="$(git rev-parse --show-toplevel)/.github/PULL_REQUEST_TEMPLATE.md"
+  if [[ -e ${GITHUB_PR_TEMPLATE} ]]; then
+    PULL_REQUEST_BODY+=$'\n\n'
+    PULL_REQUEST_BODY+="$(cat "${GITHUB_PR_TEMPLATE}")"
+  fi
+
+  local GITHUB_OUTPUT
+  GITHUB_OUTPUT="$(_jira_github_request "/repos/${GITHUB_REPOSITORY}/pulls" \
+    --data "$(
+      jq --compact-output --null-input \
+        --arg title "$(_jira_summary "${JIRA_TICKET_ID}")" \
+        --arg base "$(git remote show origin | grep 'HEAD branch:' | awk '{printf("%s", $3)}')" \
+        --arg head "${GIT_CURRENT_BRANCH}" \
+        --arg body "${PULL_REQUEST_BODY}" \
+        '{title: $title, base: $base, head: $head, body: $body, draft: true}'
+    )")"
+
+  if [[ -n ${GITHUB_OUTPUT} ]]; then
+    open "$(printf "%s" "${GITHUB_OUTPUT}" | jq --raw-output '.html_url')"
+  fi
+}
+
+_jira_github_request() {
   if [[ ${#} -lt 1 ]]; then
     _jira_error "Usage: _github_request PATH [EXTRA_CURL_ARGS]"
     return 1
