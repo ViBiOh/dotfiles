@@ -425,7 +425,7 @@ _jira_github_branch() {
   if ! _jira_github_request "/repos/${GITHUB_REPOSITORY}/branches/${GIT_CURRENT_BRANCH}"; then
     _jira_warning "Remote branch '${GIT_CURRENT_BRANCH}' doesn't exist."
 
-    if _jira_confirm "Run 'git push'?"; then
+    if _jira_confirm "Run 'git push'"; then
       git push
     fi
   fi
