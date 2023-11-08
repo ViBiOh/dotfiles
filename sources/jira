@@ -175,7 +175,7 @@ _jira() {
         fi
 
         if _jira_confirm "Change status" "true"; then
-          _jira_transition
+          _jira_transition "${JIRA_ISSUE}"
         fi
 
         if _jira_confirm "Create branch" "true"; then
@@ -217,6 +217,10 @@ _jira() {
 
     _jira_github_branch "${GITHUB_REPOSITORY}" "${GIT_CURRENT_BRANCH}"
     _jira_github_pull_request "${GITHUB_REPOSITORY}" "${GIT_CURRENT_BRANCH}" "${JIRA_TICKET_ID}"
+
+    if _jira_confirm "Change status" "true"; then
+      _jira_transition "${JIRA_TICKET_ID}"
+    fi
     ;;
 
   "print")
@@ -302,6 +306,9 @@ _jira_branch() {
 }
 
 _jira_transition() {
+  local JIRA_ISSUE="${1}"
+  shift
+
   local JIRA_TRANSITIONS
   JIRA_TRANSITIONS="$(_jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --get --data-urlencode "expand=transitions.fields")"
 
