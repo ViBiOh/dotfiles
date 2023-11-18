@@ -80,7 +80,7 @@ kube() {
     fi
 
     local KUBE_RESOURCE
-    KUBE_RESOURCE="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --height=20 --ansi --reverse --select-1 --query="${QUERY}")"
+    KUBE_RESOURCE="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --select-1 --query="${QUERY}")"
 
     RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
     RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
@@ -130,7 +130,7 @@ kube() {
   case ${ACTION} in
   "context")
     local CONTEXT
-    CONTEXT="$(kubectl config get-contexts --output name | fzf --height=20 --ansi --reverse --select-1 --query="${1-}")"
+    CONTEXT="$(kubectl config get-contexts --output name | fzf --select-1 --query="${1-}")"
 
     if [[ -n ${CONTEXT-} ]]; then
       if [[ "$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")" == "${CONTEXT}" ]]; then
@@ -230,7 +230,7 @@ kube() {
       local KUBE_PORT="${3:-}"
 
       if [[ -z ${KUBE_PORT:-} ]]; then
-        KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --height=20 --ansi --reverse --select-1 --prompt="Port: ")"
+        KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --select-1 --prompt="Port: ")"
       fi
 
       if [[ -n ${KUBE_PORT-} ]]; then
@@ -352,7 +352,7 @@ kube() {
     ;;
 
   "ns")
-    "${KUBECTL_COMMAND[@]}" get namespaces --output=yaml | yq eval '.items[].metadata.name' | fzf --height=20 --ansi --reverse --select-1 --query="${1-}" | xargs "${KUBECTL_COMMAND[@]}" config set-context --current --namespace
+    "${KUBECTL_COMMAND[@]}" get namespaces --output=yaml | yq eval '.items[].metadata.name' | fzf --select-1 --query="${1-}" | xargs "${KUBECTL_COMMAND[@]}" config set-context --current --namespace
     ;;
 
   "restart")

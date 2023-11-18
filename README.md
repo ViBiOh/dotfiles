@@ -27,7 +27,7 @@ You can set following environment variables for customizing installation behavio
 ```bash
 #!/usr/bin/env bash
 
-# Server configuration example
+# Dotfiles configuration example for Server
 
 export DOTFILES_NO__MACOS="true"
 export DOTFILES_NO__PASS="true"

@@ -20,7 +20,7 @@ main() {
 
   (
     cd "${INSTALL_PATH}/${REPOSITORY_NAME}"
-    "./init" -a
+    "./init" -d -a
 
     git init
     git remote add origin "http://github.com/${GITHUB_USER}/${REPOSITORY_NAME}.git"

@@ -49,14 +49,32 @@ do_action() {
   done
 }
 
-do_mandatory_install() {
+browse_mandatory_actions() {
   while IFS= read -r -d '' file; do
     do_action "$(basename "${file}")" "${@}"
   done < <(find "${CURRENT_DIR}/installations" -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
 }
 
-do_install() {
-  do_mandatory_install "${@}"
+create_dotfilesrc() {
+  printf "Select files to ignore\n"
+
+  cat >"${HOME}/.dotfilesrc" <<END_OF_DOTFILES_RC
+#!/usr/bin/env bash
+
+END_OF_DOTFILES_RC
+
+  while IFS= read -r -d '' file; do
+    local BASENAME_FILE
+    BASENAME_FILE="$(basename "${file}")"
+
+    local UPPERCASE_FILENAME
+    UPPERCASE_FILENAME="$(printf "%s" "${BASENAME_FILE}" | tr "[:lower:]" "[:upper:]")"
+    echo "export DOTFILES_NO_${UPPERCASE_FILENAME}=\"true\"" >>"${HOME}/.dotfilesrc"
+  done < <(find "${CURRENT_DIR}/installations" -not -name "__*" -type f | LC_ALL=C sort | fzf --multi --print0)
+}
+
+browse_actions() {
+  browse_mandatory_actions "${@}"
 
   while IFS= read -r -d '' file; do
     if [[ ! -r ${file} ]]; then
@@ -100,13 +118,14 @@ source_bashrc() {
 main() {
   local FILE_LIMIT=""
   local FILE_RESTART=0
+  local DOTFILES_RC=0
   local RUN_SYMLINKS=0
   local RUN_CLEAN=0
   local RUN_INSTALL=0
   local RUN_PASSWORDS=0
 
   OPTIND=0
-  while getopts ":l:r:achips" option; do
+  while getopts ":l:r:acdhips" option; do
     case "${option}" in
     a)
       RUN_SYMLINKS=1
@@ -116,6 +135,9 @@ main() {
       ;;
     c)
       RUN_CLEAN=1
+      ;;
+    d)
+      DOTFILES_RC=1
       ;;
     h)
       usage
@@ -161,6 +183,16 @@ main() {
   mkdir -p "${HOME}/opt/bin"
   source_bashrc
 
+  if [[ ${DOTFILES_RC} -eq 1 ]]; then
+    if command -v fzf 2>/dev/null 2>&1; then
+      browse_mandatory_actions "install"
+    fi
+
+    create_dotfilesrc
+
+    source_bashrc
+  fi
+
   local ACTIONS=()
 
   if [[ ${RUN_CLEAN} -eq 1 ]]; then
@@ -172,14 +204,14 @@ main() {
   fi
 
   if [[ ${#ACTIONS[@]} -ne 0 ]]; then
-    do_install "${ACTIONS[@]}"
+    browse_actions "${ACTIONS[@]}"
     packages_clean
   fi
 
   source_bashrc
 
   if [[ ${RUN_PASSWORDS} -eq 1 ]]; then
-    do_install "credentials"
+    browse_actions "credentials"
   fi
 }
 

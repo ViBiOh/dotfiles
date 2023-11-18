@@ -127,7 +127,7 @@ dns_allow() {
   "
 
   local WEBSITE
-  WEBSITE="$(printf "%s\n" "${!websites[@]}" | fzf --height=20 --ansi --reverse --select-1 --query="${1-}" --exit-0)"
+  WEBSITE="$(printf "%s\n" "${!websites[@]}" | fzf --select-1 --query="${1-}" --exit-0)"
 
   if [[ -z ${WEBSITE} ]]; then
     return 1

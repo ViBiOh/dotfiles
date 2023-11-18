@@ -60,6 +60,10 @@ if [[ -e "${HOME}/.localrc" ]]; then
   source "${HOME}/.localrc"
 fi
 
+if [[ -e "${HOME}/.dotfilesrc" ]]; then
+  source "${HOME}/.dotfilesrc"
+fi
+
 unset -f set_locale
 unset -f script_dir
 unset -f source_all

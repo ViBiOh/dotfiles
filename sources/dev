@@ -73,7 +73,7 @@ meteo() {
 
 date_in() {
   local TZ
-  TZ="$(rg --files /usr/share/zoneinfo/ | sed 's|/usr/share/zoneinfo/||' | fzf --height=20 --ansi --reverse --select-1 --query="${*:-New_York}")"
+  TZ="$(rg --files /usr/share/zoneinfo/ | sed 's|/usr/share/zoneinfo/||' | fzf --select-1 --query="${*:-New_York}")"
 
   printf "%b%s%b %b%s%b\n" "${BLUE}" "${TZ}" "${RESET}" "${YELLOW}" "$(TZ=${TZ} date '+%Y-%m-%d %H:%M:%S')" "${RESET}"
 }

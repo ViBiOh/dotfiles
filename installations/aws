@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+clean() {
+  rm -rf "${HOME}/.aws" "${HOME}/.aws-cli"
+}
+
+install() {
+  local AWS_CONFIG_CHOICE="aws_choices.xml"
+  local AWS_INSTALLER_PKG="AWSCLIV2.pkg"
+
+  cat >"${AWS_CONFIG_CHOICE}" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <array>
+    <dict>
+      <key>choiceAttribute</key>
+      <string>customLocation</string>
+      <key>attributeSetting</key>
+      <string>/Users/$(whoami)</string>
+      <key>choiceIdentifier</key>
+      <string>default</string>
+    </dict>
+  </array>
+</plist>
+EOF
+  curl --disable --silent --show-error --location --max-time 120 --output "${AWS_INSTALLER_PKG}" "https://awscli.amazonaws.com/AWSCLIV2.pkg"
+  installer -pkg "${AWS_INSTALLER_PKG}" -target "CurrentUserHomeDirectory" -applyChoiceChangesXML "${AWS_CONFIG_CHOICE}" || true
+  ln -f -s "${HOME}/aws-cli/aws" "${HOME}/opt/bin/aws"
+  ln -f -s "${HOME}/aws-cli/aws_completer" "${HOME}/opt/bin/aws_completer"
+
+  rm -f "${AWS_CONFIG_CHOICE}" "${AWS_INSTALLER_PKG}"
+  mkdir -p "${HOME}/.aws"
+}
