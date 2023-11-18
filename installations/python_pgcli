@@ -16,6 +16,7 @@ script_dir() {
 
 clean() {
   rm -rf "${HOME}/.pgpass"
+  rm -rf "${HOME}/.psql_history"
   rm -rf "${HOME}/.config/pgcli"
 }
 
