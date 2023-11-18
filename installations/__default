@@ -49,9 +49,9 @@ END_OF_BASH_PROFILE
   elif command -v apt-get >/dev/null 2>&1; then
     packages_update
     packages_install "apt-transport-https"
-    packages_install "${PACKAGES[@]}" dnsutils jdupes
+    packages_install "${PACKAGES[@]}" "dnsutils" "jdupes"
   elif command -v pacman >/dev/null 2>&1; then
     packages_update
-    packages_install "${PACKAGES[@]}" inetutils tcpdump
+    packages_install "${PACKAGES[@]}" "inetutils" "tcpdump"
   fi
 }

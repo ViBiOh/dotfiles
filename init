@@ -27,16 +27,36 @@ create_symlinks() {
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
 
-    if [[ -n ${FILE_LIMIT} ]] && [[ ${BASENAME_FILE} != "${FILE_LIMIT}" ]]; then
-      continue
-    fi
-
     [[ -r ${file} ]] && [[ -e ${file} ]] && rm -f "${HOME}/.${BASENAME_FILE}" && ln -s "${file}" "${HOME}/.${BASENAME_FILE}"
   done < <(find "${CURRENT_DIR}/symlinks" -type f -print0)
 }
 
-browse_install() {
-  local BROWSED_FILES=()
+do_action() {
+  local ACTION_FILENAME="${1}"
+  shift
+
+  for action in "${@}"; do
+    unset -f "${action}"
+  done
+
+  source "${CURRENT_DIR}/installations/${ACTION_FILENAME}"
+
+  for action in "${@}"; do
+    if [[ $(type -t "${action}") == "function" ]]; then
+      print_title "${action} - ${ACTION_FILENAME}"
+      "${action}"
+    fi
+  done
+}
+
+do_mandatory_install() {
+  while IFS= read -r -d '' file; do
+    do_action "$(basename "${file}")" "${@}"
+  done < <(find "${CURRENT_DIR}/installations" -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
+}
+
+do_install() {
+  do_mandatory_install "${@}"
 
   while IFS= read -r -d '' file; do
     if [[ ! -r ${file} ]]; then
@@ -62,23 +82,8 @@ browse_install() {
       continue
     fi
 
-    BROWSED_FILES+=("${BASENAME_FILE}")
-  done < <(find "${CURRENT_DIR}/installations" -type f -print0 | LC_ALL=C sort --zero-terminated)
-
-  for BROWSED_FILE in "${BROWSED_FILES[@]}"; do
-    for action in "${@}"; do
-      unset -f "${action}"
-    done
-
-    source "${CURRENT_DIR}/installations/${BROWSED_FILE}"
-
-    for action in "${@}"; do
-      if [[ $(type -t "${action}") == "function" ]]; then
-        print_title "${action} - ${BROWSED_FILE}"
-        "${action}"
-      fi
-    done
-  done
+    do_action "${BASENAME_FILE}" "${@}"
+  done < <(find "${CURRENT_DIR}/installations" -not -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
 }
 
 source_bashrc() {
@@ -167,14 +172,14 @@ main() {
   fi
 
   if [[ ${#ACTIONS[@]} -ne 0 ]]; then
-    browse_install "${ACTIONS[@]}"
+    do_install "${ACTIONS[@]}"
     packages_clean
   fi
 
   source_bashrc
 
   if [[ ${RUN_PASSWORDS} -eq 1 ]]; then
-    browse_install credentials
+    do_install "credentials"
   fi
 }
 
