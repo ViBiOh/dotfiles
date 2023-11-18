@@ -15,7 +15,6 @@ script_dir() {
 }
 
 clean() {
-  rm -rf "${HOME}/.z"
   rm -rf "$(script_dir)/../scripts"
 }
 

@@ -3,5 +3,5 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  packages_install ripgrep
+  packages_install "ripgrep"
 }

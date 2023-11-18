@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  packages_install_desktop firefox
+  packages_install_desktop "firefox"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     local PROFILE_DIRECTORY="${HOME}/Library/Application Support/Firefox/Profiles/"

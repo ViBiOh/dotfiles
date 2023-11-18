@@ -170,10 +170,10 @@ install() {
   sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
 
   sudo nvram SystemAudioVolume=" "
-  sudo scutil --set ComputerName macbook
-  sudo scutil --set HostName macbook
-  sudo scutil --set LocalHostName macbook
-  sudo networksetup -setcomputername macbook
+  sudo scutil --set ComputerName "${DOTFILES_MACOS_USERNAME:-macbook}"
+  sudo scutil --set HostName "${DOTFILES_MACOS_USERNAME:-macbook}"
+  sudo scutil --set LocalHostName "${DOTFILES_MACOS_USERNAME:-macbook}"
+  sudo networksetup -setcomputername "${DOTFILES_MACOS_USERNAME:-macbook}"
 
   sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsigned off
   sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsignedapp off

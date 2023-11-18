@@ -3,5 +3,5 @@
 set -o nounset -o pipefail -o errexit
 
 install() {
-  packages_install shellcheck
+  packages_install "shellcheck"
 }

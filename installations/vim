@@ -8,5 +8,5 @@ clean() {
 }
 
 install() {
-  packages_install vim
+  packages_install "vim"
 }

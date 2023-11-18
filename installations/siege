@@ -7,5 +7,5 @@ clean() {
 }
 
 install() {
-  packages_install siege
+  packages_install "siege"
 }

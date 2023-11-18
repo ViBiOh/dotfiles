@@ -7,7 +7,7 @@ clean() {
 }
 
 install() {
-  packages_install unbound
+  packages_install "unbound"
 
   local UNBOUND_CONF_FOLDER="${BREW_PREFIX-}/etc/unbound"
   local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"

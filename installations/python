@@ -22,10 +22,10 @@ install() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(script_dir)"
 
-  packages_install python
+  packages_install "python"
 
-  if package_exists python-pip; then
-    packages_install python-pip
+  if package_exists "python-pip"; then
+    packages_install "python-pip"
   fi
 
   if command -v brew >/dev/null 2>&1; then
@@ -44,5 +44,5 @@ install() {
     return
   fi
 
-  pip install --user --upgrade pip
+  pip install --user --upgrade "pip"
 }

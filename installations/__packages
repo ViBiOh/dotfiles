@@ -14,6 +14,10 @@ script_dir() {
   fi
 }
 
+clean() {
+  sudo rm -rf "${HOME}/.config/htop"
+}
+
 install() {
   local PACKAGES=("bash" "bash-completion" "make" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv")
 
