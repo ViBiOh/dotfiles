@@ -6,7 +6,7 @@
 	email = bob@vibioh.fr
 	signingkey = DD539006C49CAB71
 
-[includeIf "gitdir:~/workspace/"]
+[includeIf "hasconfig:remote.*.url:git@github.com:FooBar/**"]
 	path = ~/.gitconfig_work
 
 [core]

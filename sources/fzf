@@ -119,3 +119,19 @@ if command -v pgcli >/dev/null 2>&1; then
 
   [[ -n ${BASH} ]] && complete -F _fzf_complete_pgcli -o default -o bashdefault pgcli
 fi
+
+if command -v mycli >/dev/null 2>&1; then
+  _fzf_complete_mycli() {
+    if [[ ! -f ${HOME}/.myclirc ]]; then
+      return
+    fi
+
+    FZF_COMPLETION_TRIGGER="" _fzf_complete --ansi --select-1 "${@}" < <(cat "${HOME}/.myclirc" | grep --extended-regexp '^[a-zA-Z0-9_-]+\s*=\s*mysql://' | awk '{print $1}')
+  }
+
+  _fzf_complete_mycli_post() {
+    awk '{printf("-d %s", $1)}'
+  }
+
+  [[ -n ${BASH} ]] && complete -F _fzf_complete_mycli -o default -o bashdefault mycli
+fi
