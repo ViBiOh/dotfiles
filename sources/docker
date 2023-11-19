@@ -2,7 +2,7 @@
 
 if command -v colima >/dev/null 2>&1; then
   docker_start() {
-    colima start --runtime=containerd --vm-type vz --mount-type virtiofs
+    colima start --runtime=containerd --vm-type=vz --mount-type=virtiofs
   }
 
   docker_stop() {

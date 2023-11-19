@@ -78,11 +78,9 @@ browse_actions() {
     browse_mandatory_actions "${@}"
   fi
 
-  while IFS= read -r -d '' file; do
-    if [[ ! -r ${file} ]]; then
-      continue
-    fi
+  local FILE_TO_INSTALL=()
 
+  while IFS= read -r -d '' file; do
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
 
@@ -102,8 +100,12 @@ browse_actions() {
       continue
     fi
 
-    do_action "${BASENAME_FILE}" "${@}"
+    FILE_TO_INSTALL+=("${BASENAME_FILE}")
   done < <(find "${CURRENT_DIR}/installations" -not -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
+
+  for install_file in "${FILE_TO_INSTALL[@]}"; do
+    do_action "${install_file}" "${@}"
+  done
 }
 
 source_bashrc() {
