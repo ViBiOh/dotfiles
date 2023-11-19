@@ -56,7 +56,7 @@ browse_mandatory_actions() {
 }
 
 create_dotfilesrc() {
-  printf "Select files to ignore\n"
+  printf "Select files to install\n"
 
   cat >"${HOME}/.dotfilesrc" <<END_OF_DOTFILES_RC
 #!/usr/bin/env bash
@@ -69,12 +69,14 @@ END_OF_DOTFILES_RC
 
     local UPPERCASE_FILENAME
     UPPERCASE_FILENAME="$(printf "%s" "${BASENAME_FILE}" | tr "[:lower:]" "[:upper:]")"
-    echo "export DOTFILES_NO_${UPPERCASE_FILENAME}=\"true\"" >>"${HOME}/.dotfilesrc"
+    echo "export DOTFILES_${UPPERCASE_FILENAME}=\"true\"" >>"${HOME}/.dotfilesrc"
   done < <(find "${CURRENT_DIR}/installations" -not -name "__*" -type f | LC_ALL=C sort | fzf --multi --print0)
 }
 
 browse_actions() {
-  browse_mandatory_actions "${@}"
+  if [[ ${DOTFILES_RC} -ne 1 ]]; then
+    browse_mandatory_actions "${@}"
+  fi
 
   while IFS= read -r -d '' file; do
     if [[ ! -r ${file} ]]; then
@@ -94,9 +96,9 @@ browse_actions() {
 
     local UPPERCASE_FILENAME
     UPPERCASE_FILENAME="$(printf "%s" "${BASENAME_FILE}" | tr "[:lower:]" "[:upper:]")"
-    local DISABLE_VARIABLE_NAME="DOTFILES_NO_${UPPERCASE_FILENAME}"
+    local ENABLE_VARIABLE_NAME="DOTFILES_${UPPERCASE_FILENAME}"
 
-    if [[ ${!DISABLE_VARIABLE_NAME-} == "true" ]]; then
+    if [[ ${!ENABLE_VARIABLE_NAME:-} != "true" ]]; then
       continue
     fi
 

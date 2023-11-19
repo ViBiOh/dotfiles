@@ -14,8 +14,8 @@ install() {
     local ARCHIVE_FILENAME="fzf.zip"
     mkdir -p "${FZF_INSTALL_DIR}"
 
-    curl --disable --silent --show-error --location --max-time 60 --output "${ARCHIVE_FILENAME}" "https://github.com/junegunn/fzf/archive/${DOTFILES_BRANCH}.zip"
-    unzip "${ARCHIVE_FILENAME}" -d "${INSTALL_PATH}"
+    curl --disable --silent --show-error --location --max-time 60 --output "${ARCHIVE_FILENAME}" "https://github.com/junegunn/fzf/archive/master.zip"
+    unzip "${ARCHIVE_FILENAME}" -d "${FZF_INSTALL_DIR}"
     rm -f "${ARCHIVE_FILENAME}"
   fi
 
