@@ -143,7 +143,6 @@ install() {
   sudo systemsetup -setrestartfreeze on
   sudo systemsetup -setwakeonnetworkaccess off
   sudo systemsetup -f -setremotelogin off
-  sudo systemsetup -setcomputername macbook
 
   sudo pmset -a autopoweroff 0
   sudo pmset -a destroyfvkeyonstandby 1
@@ -162,13 +161,6 @@ install() {
     fix_spotlight || true
   fi
 
-  sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
-  sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
-  sudo defaults write /Library/Preferences/com.apple.loginwindow RetriesUntilHint -int 0
-  sudo defaults write /Library/Preferences/com.apple.loginwindow showInputMenu -bool true
-  sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool true
-  sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
-
   sudo nvram SystemAudioVolume=" "
 
   if [[ -n ${DOTFILES_MACOS_USERNAME:-} ]]; then
@@ -176,15 +168,23 @@ install() {
     sudo scutil --set HostName "${DOTFILES_MACOS_USERNAME}"
     sudo scutil --set LocalHostName "${DOTFILES_MACOS_USERNAME}"
     sudo networksetup -setcomputername "${DOTFILES_MACOS_USERNAME}"
-  fi
+    sudo systemsetup -setcomputername "${DOTFILES_MACOS_USERNAME}"
 
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsigned off
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsignedapp off
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall on
-  sudo pkill -HUP socketfilterfw
+    sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
+    sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
+    sudo defaults write /Library/Preferences/com.apple.loginwindow RetriesUntilHint -int 0
+    sudo defaults write /Library/Preferences/com.apple.loginwindow showInputMenu -bool true
+    sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool true
+    sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
+
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsigned off
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsignedapp off
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall on
+    sudo pkill -HUP socketfilterfw
+  fi
 
   chflags nohidden "${HOME}/Library"
 
