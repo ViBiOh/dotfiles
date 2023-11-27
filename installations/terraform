@@ -21,11 +21,7 @@ install() {
 }
 
 credentials() {
-  if ! command -v pass >/dev/null 2>&1 || ! [[ -d ${PASSWORD_STORE_DIR:-${HOME}/.password-store} ]]; then
-    return
-  fi
-
-  if [[ $(pass find terraform | wc -l) -gt 1 ]]; then
+  if command -v pass >/dev/null 2>&1 && [[ -d ${PASSWORD_STORE_DIR:-${HOME}/.password-store} ]] && [[ $(pass find terraform | wc -l) -gt 1 ]]; then
     printf "credentials \"app.terraform.io\" {\n  token = \"%s\"\n}" "$(pass_get "dev/terraform" "token")" >>"${HOME}/.terraformrc"
     chmod 600 "${HOME}/.terraformrc"
   fi
