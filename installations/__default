@@ -36,7 +36,7 @@ END_OF_BASH_PROFILE
     fi
 
     packages_update
-    packages_install "${PACKAGES[@]}" "awk" "iftop"
+    packages_install "${PACKAGES[@]}" "awk"
 
     if [[ $(grep --count "${BREW_PREFIX}" "/etc/shells") -eq 0 ]]; then
       printf "+-------------------------+\n"
