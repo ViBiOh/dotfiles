@@ -3,8 +3,10 @@
 GPG_TTY="$(tty)"
 export GPG_TTY
 
-SSH_AUTH_SOCK="$(gpgconf --list-dirs "agent-ssh-socket")"
-export SSH_AUTH_SOCK
+if [[ -z ${SSH_AUTH_SOCK:-} ]]; then
+  SSH_AUTH_SOCK="$(gpgconf --list-dirs "agent-ssh-socket")"
+  export SSH_AUTH_SOCK
+fi
 
 gpg_agent_start() {
   if [[ $(pgrep gpg-agent | wc -l) -eq 1 ]]; then
