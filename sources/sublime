@@ -16,7 +16,7 @@ SUBLIME_SCRIPT_DIR="$(script_dir)"
 
 sublime_add_project() {
   local currentDir
-  currentDir="$(pwd)"
+  currentDir="$(readlink -f "$(pwd)")"
 
   if ! git_is_inside || [[ ${currentDir} != $(git_root) ]]; then
     return
