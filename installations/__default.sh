@@ -32,6 +32,8 @@ install() {
     cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
 #!/usr/bin/env bash
 
+export SSH_INIT_FROM_FILE="true"
+
 if [[ -f "${HOME}/.bashrc" ]]; then
   source "${HOME}/.bashrc"
 fi
