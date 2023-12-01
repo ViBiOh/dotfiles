@@ -74,7 +74,7 @@ END_OF_DOTFILES_RC
 }
 
 browse_actions() {
-  if [[ ${DOTFILES_RC} -ne 1 ]]; then
+  if [[ ${DOTFILES_RC} -ne 1 ]] && [[ -z ${FILE_LIMIT:-} ]]; then
     browse_mandatory_actions "${@}"
   fi
 
