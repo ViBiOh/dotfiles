@@ -72,7 +72,7 @@ if command -v pass >/dev/null 2>&1; then
     read -s -r -p "Press enter for password"
     printf "\n"
 
-    passfor "${PASS_NAME}" "password"
+    passfor "${PASS_NAME}"
   }
 
   [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passfull
