@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 jira() {
-  GITHUB_TOKEN="$(github_token)" _jira "${JIRA_DOMAIN}" "Basic $(pass show "${JIRA_PASS}" | awk -F': ' '{ if (NR == 1) a["pass"] = $0; if ($1 == "login") a["user"] = $2; } END { printf("%s:%s",a["user"], a["pass"])}' | base64)" "${@}"
+  GITHUB_TOKEN="$(github_token)" _jira "${JIRA_DOMAIN}" "Basic $(pass_get "${JIRA_PASS}" "basic")" "${@}"
 }
 
 _jira() {
