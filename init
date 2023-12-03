@@ -70,7 +70,7 @@ END_OF_DOTFILES_RC
     local UPPERCASE_FILENAME
     UPPERCASE_FILENAME="$(printf "%s" "${BASENAME_FILE}" | tr "[:lower:]" "[:upper:]")"
     echo "export DOTFILES_${UPPERCASE_FILENAME}=\"true\"" >>"${HOME}/.dotfilesrc"
-  done < <(find "${CURRENT_DIR}/installations" -not -name "__*" -type f | LC_ALL=C sort | fzf --multi --print0)
+  done < <(find "${CURRENT_DIR}/installations" -not -name "__*" -type f | LC_ALL=C sort | fzf --multi --print0 --preview 'cat {}')
 }
 
 browse_actions() {
