@@ -13,10 +13,6 @@ if command -v xdg-open >/dev/null 2>&1 && ! command -v open >/dev/null 2>&1; the
   alias open='xdg-open'
 fi
 
-if command -v mc >/dev/null 2>&1; then
-  complete -C mc mc
-fi
-
 qrcode() {
   qrencode -t UTF8
 }
