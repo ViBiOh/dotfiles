@@ -21,28 +21,17 @@ clean() {
   fi
 
   rm -rf "${HOME}/.dlv"
-  rm -rf "${HOME}/opt/go"
   rm -rf "${HOME}/pprof"
 }
 
 install() {
-  local GO_VERSION="1.21.4"
-
-  if [[ ! -d "${HOME}/opt/go" ]]; then
-    local GO_ARCHIVE
-    GO_ARCHIVE="go${GO_VERSION}.$(normalized_os)-$(normalized_arch "amd64" "armv6l" "arm64").tar.gz"
-
-    curl --disable --silent --show-error --location --max-time 300 --remote-name "https://dl.google.com/go/${GO_ARCHIVE}"
-    tar -C "${HOME}/opt" -xzf "${GO_ARCHIVE}"
-    rm -rf "${GO_ARCHIVE}"
-  fi
+  packages_install "go" "graphviz"
 
   local SCRIPT_DIR
   SCRIPT_DIR="$(script_dir)"
+
   source "${SCRIPT_DIR}/../sources/_golang"
   mkdir -p "${GOPATH}"
-
-  packages_install graphviz
 
   if command -v go >/dev/null 2>&1; then
     go install "github.com/go-delve/delve/cmd/dlv@latest"
@@ -57,8 +46,4 @@ install() {
 
     golangci-lint completion bash >"${SCRIPT_DIR}/../sources/golangci-lint-completion"
   fi
-
-  # renovate: datasource=github-releases depName=golang-migrate/migrate
-  local GOLANG_MIGRATE_VERSION="v4.16.2"
-  archive_to_binary "https://github.com/golang-migrate/migrate/releases/download/${GOLANG_MIGRATE_VERSION}/migrate.$(normalized_os)-$(normalized_arch "amd64" "armv7" "arm64").tar.gz" "migrate"
 }
