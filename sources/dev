@@ -13,6 +13,10 @@ if command -v xdg-open >/dev/null 2>&1 && ! command -v open >/dev/null 2>&1; the
   alias open='xdg-open'
 fi
 
+notes() {
+  subl "${NOTES_FOLDER:-${HOME}/notes}"
+}
+
 qrcode() {
   qrencode -t UTF8
 }
