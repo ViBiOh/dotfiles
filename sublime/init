@@ -77,21 +77,21 @@ main() {
   symlink_settings "${TEXT_PKG}" "text"
   symlink_settings "${MERGE_PKG}" "merge"
 
-  install_plugin "${TEXT_PKG}" SublimeGit
-  install_plugin "${TEXT_PKG}" SublimeGo
-  install_plugin "${TEXT_PKG}" SublimeLayout
-  install_plugin "${TEXT_PKG}" Formatter
+  install_plugin "${TEXT_PKG}" "SublimeGit"
+  install_plugin "${TEXT_PKG}" "SublimeGo"
+  install_plugin "${TEXT_PKG}" "SublimeLayout"
+  install_plugin "${TEXT_PKG}" "Formatter"
 
   if command -v go >/dev/null 2>&1; then
     go install "golang.org/x/tools/gopls@latest"
   fi
 
   if command -v npm >/dev/null 2>&1; then
-    npm install --ignore-scripts --global prettier eslint typescript-language-server typescript
+    npm install --ignore-scripts --global "prettier" "eslint" "typescript-language-server" "typescript"
   fi
 
   if command -v pip >/dev/null 2>&1; then
-    pip install --user python-lsp-server black pycodestyle
+    pip install --user "python-lsp-server" "black" "pycodestyle"
   fi
 
   install_shfmt
