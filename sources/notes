@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+notes() {
+  subl "${NOTES_FOLDER:-${HOME}/notes}"
+}
+
+notes_save() {
+  (
+    cd "${NOTES_FOLDER:-${HOME}/notes}" || return
+    git add -A
+    git ci -m "docs: $(date +"%Y-%m-%dT%H:%M:%S%z")"
+  )
+}
+
+notes_sync() {
+  (
+    if ! [[ -d ${NOTES_FOLDER:-${HOME}/notes} ]]; then
+      git clone "git@github.com:ViBiOh/notes.git" "${NOTES_FOLDER:-${HOME}/notes}"
+      cd "${NOTES_FOLDER:-${HOME}/notes}" || return
+      sublime_add_project
+    else
+      cd "${NOTES_FOLDER:-${HOME}/notes}" || return
+      git pp
+    fi
+  )
+}
+
+notes_erase() {
+  if [[ -d ${NOTES_FOLDER:-${HOME}/notes} ]]; then
+    rm -rf "${NOTES_FOLDER:-${HOME}/notes}"
+  fi
+}

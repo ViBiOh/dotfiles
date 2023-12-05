@@ -13,19 +13,6 @@ if command -v xdg-open >/dev/null 2>&1 && ! command -v open >/dev/null 2>&1; the
   alias open='xdg-open'
 fi
 
-notes() {
-  subl "${NOTES_FOLDER:-${HOME}/notes}"
-}
-
-notes_save() {
-  (
-    cd "${NOTES_FOLDER:-${HOME}/notes}" || return
-    git add -A
-    git ci -m "docs: $(date +"%Y-%m-%dT%H:%M:%S%z")"
-    git pp
-  )
-}
-
 qrcode() {
   qrencode -t UTF8
 }
@@ -139,6 +126,10 @@ emergency() {
       sudo networksetup -setsearchdomains "${interface}" Empty
     fi
   done
+
+  if [[ "$(type -t "notes_erase")" == "function" ]]; then
+    notes_erase
+  fi
 
   _emergency_script_dir() {
     local FILE_SOURCE="${BASH_SOURCE[0]}"

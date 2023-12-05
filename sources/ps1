@@ -26,15 +26,15 @@ _ps1_new_line_if_not() {
 }
 
 PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
-if [[ "$(type -t __git_ps1)" == "function" ]]; then
+if [[ "$(type -t "__git_ps1")" == "function" ]]; then
   PS1+="${YELLOW}\$(__git_ps1)${RESET}"
 fi
 
-if [[ "$(type -t __kube_ps1)" == "function" ]]; then
+if [[ "$(type -t "__kube_ps1")" == "function" ]]; then
   PS1+="${BLUE}\$(__kube_ps1)${RESET}"
 fi
 
-if [[ "$(type -t __terraform_ps1)" == "function" ]]; then
+if [[ "$(type -t "__terraform_ps1")" == "function" ]]; then
   PS1+="${PURPLE}\$(__terraform_ps1)${RESET}"
 fi
 
