@@ -2,5 +2,9 @@
   {
     "caption": "Copy git web url",
     "command": "sublime_git_web"
+  },
+  {
+    "caption": "Copy line path",
+    "command": "sublime_git_linepath"
   }
 ]
