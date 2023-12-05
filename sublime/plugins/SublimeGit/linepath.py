@@ -10,16 +10,16 @@ class SublimeGitLinepath(sublime_plugin.WindowCommand):
 
         variables = window.extract_variables()
         folder = variables.get("folder")
-        file_path = variables.get("file_path")
+        file = variables.get("file")
 
-        if not file_path or len(file_path) == 0:
+        if not file or len(file) == 0:
             return
 
         view = window.active_view()
         line_number = view.rowcol(view.sel()[0].begin())[0] + 1
 
-        relative_file_path = file_path.replace(folder, "").lstrip("/")
+        relative_file = file.replace(folder, "").lstrip("/")
 
-        url = "{}:{}".format(relative_file_path, line_number)
+        url = "{}:{}".format(relative_file, line_number)
 
         sublime.set_clipboard(url)
