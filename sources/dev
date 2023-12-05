@@ -17,6 +17,15 @@ notes() {
   subl "${NOTES_FOLDER:-${HOME}/notes}"
 }
 
+notes_save() {
+  (
+    cd "${NOTES_FOLDER:-${HOME}/notes}" || return
+    git add -A
+    git ci -m "docs: $(date +"%Y-%m-%dT%H:%M:%S%z")"
+    git pp
+  )
+}
+
 qrcode() {
   qrencode -t UTF8
 }
