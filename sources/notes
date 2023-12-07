@@ -1,32 +1,42 @@
 #!/usr/bin/env bash
 
-notes() {
-  subl "${NOTES_FOLDER:-${HOME}/notes}"
-}
-
-notes_save() {
-  (
-    cd "${NOTES_FOLDER:-${HOME}/notes}" || return
-    git add -A
-    git ci -m "docs: $(date +"%Y-%m-%dT%H:%M:%S%z")"
-  )
-}
-
-notes_sync() {
-  (
-    if ! [[ -d ${NOTES_FOLDER:-${HOME}/notes} ]]; then
-      git clone "git@github.com:ViBiOh/notes.git" "${NOTES_FOLDER:-${HOME}/notes}"
-      cd "${NOTES_FOLDER:-${HOME}/notes}" || return
-      sublime_add_project
-    else
-      cd "${NOTES_FOLDER:-${HOME}/notes}" || return
-      git pp
-    fi
-  )
-}
-
 notes_erase() {
   if [[ -d ${NOTES_FOLDER:-${HOME}/notes} ]]; then
     rm -rf "${NOTES_FOLDER:-${HOME}/notes}"
   fi
+}
+
+notes() {
+  local NOTE_ACTION="${1:-}"
+  shift || true
+
+  local REAL_NOTE_FOLDER="${NOTES_FOLDER:-${HOME}/notes}"
+
+  case "${NOTE_ACTION}" in
+  "open" | "")
+    "${NOTE_EDITOR:-${EDITOR}}" "${REAL_NOTE_FOLDER}"
+    ;;
+
+  "save")
+    (
+      cd "${REAL_NOTE_FOLDER}" || return
+      git add -A
+      git commit --signoff -m "docs: $(date +"%Y-%m-%dT%H:%M:%S%z")"
+    )
+    ;;
+
+  "sync")
+    (
+      if ! [[ -d ${REAL_NOTE_FOLDER} ]]; then
+        git clone "git@github.com:ViBiOh/notes.git" "${REAL_NOTE_FOLDER}"
+        cd "${REAL_NOTE_FOLDER}" || return
+        sublime_add_project
+      else
+        cd "${REAL_NOTE_FOLDER}" || return
+        git pp
+      fi
+    )
+    ;;
+
+  esac
 }
