@@ -37,6 +37,8 @@ install() {
 
     source "${SCRIPT_DIR}/../sources/docker"
 
+    docker_start
     docker completion bash | sed 's|nerdctl|docker|g' >"${SCRIPT_DIR}/../sources/docker-completion"
+    docker_stop
   fi
 }
