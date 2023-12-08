@@ -198,7 +198,7 @@ _jira() {
     fi
 
     local GITHUB_REPOSITORY
-    if [[ "$(git remote get-url --push "$(git remote show | head -1)")" =~ ^.*@.*:(.*).git$ ]]; then
+    if [[ "$(git remote get-url --push "$(git remote show | head -1)")" =~ ^.*@.*:([^\.]*)(.git)?$ ]]; then
       GITHUB_REPOSITORY="${BASH_REMATCH[1]}"
     else
       _jira_error "unable to identify git remote repository"
