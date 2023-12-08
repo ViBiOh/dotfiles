@@ -7,12 +7,10 @@
 		"EditorConfig",
 		"LSP",
 		"Package Control",
-		"Protobuf Syntax Hightlighting",
 		"SublimeLinter",
 		"SublimeLinter-eslint",
 		"SublimeLinter-golangcilint",
 		"SublimeLinter-shellcheck",
 		"Terraform",
-		"TOML",
 	],
 }
