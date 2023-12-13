@@ -38,7 +38,7 @@ if command -v docker >/dev/null 2>&1; then
     docker run --name "rabbit" --rm --publish "127.0.0.1:5672:5672" --publish "127.0.0.1:15672:15672" "rabbitmq:management"
   }
 
-  otel-collector() {
+  otel_collector() {
     local OTEL_CONFIG_FILE="${HOME}/Downloads/otel-collector.yaml"
 
     cat >"${OTEL_CONFIG_FILE}" <<EOF
