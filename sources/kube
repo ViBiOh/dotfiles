@@ -108,15 +108,16 @@ kube() {
     _kube_info " - diff     | Run diff against multiple contexts  | <object type or deployment name> [object name]"
     _kube_info " - edit     | Edit an object                      | <object type or deployment name> [object name]"
     _kube_info " - env      | Generate .env file from deployments | <deployment name> [container name]"
+    _kube_info " - exec     | Execute a command in a pod          | <object type or deployment name> [object name] <any commands... default to /bin/bash>"
     _kube_info " - forward  | Port-forward to a service           | <service name> [exposed port number] (default 4000) [service port number]"
     _kube_info " - help     | Print this help                     |"
     _kube_info " - image    | Print image name                    | <deployment name>"
     _kube_info " - info     | Print yaml output of an object      | <object type or deployment name> [object name]"
-    _kube_info " - top      | Run top command                     | pod|node <object type or deployment name for pod filtering> [object name]"
     _kube_info " - log      | Tail logs                           | <object type or deployment name> [object name] <any additionnals args...>"
     _kube_info " - ns       | Change default namespace            | <namespace name>"
-    _kube_info " - restart  | Perform a restart of pod            | <object type or deployment name> [object name]"
+    _kube_info " - restart  | Perform a restart of pods           | <object type or deployment name> [object name]"
     _kube_info " - rollback | Undo a rollout                      | <object type or deployment name> [object name]"
+    _kube_info " - top      | Run top command                     | pod|node <object type or deployment name for pod filtering> [object name]"
     _kube_info " - watch    | Watch pods                          | <object type or deployment name> <object name> <any additionnals args...>"
     _kube_info " - *        | Call kubectl directly               | <any additionnals 'kubectl' args...>"
   }
@@ -155,6 +156,14 @@ kube() {
     fi
     ;;
 
+  "desc" | "describe")
+    _kube_resources "${@}"
+
+    if [[ -n ${RESOURCE_NAME-} ]]; then
+      _kube_print_and_run "${KUBECTL_COMMAND[@]}" describe "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}"
+    fi
+    ;;
+
   "diff")
     if [[ ${#KUBECTL_CONTEXTS[@]} -lt 2 ]]; then
       _kube_warning "Diff only work with multiple contexts"
@@ -179,14 +188,6 @@ kube() {
       done
 
       eval "vimdiff -R ${DIFF_ARGS[*]}"
-    fi
-    ;;
-
-  "desc" | "describe")
-    _kube_resources "${@}"
-
-    if [[ -n ${RESOURCE_NAME-} ]]; then
-      _kube_print_and_run "${KUBECTL_COMMAND[@]}" describe "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}"
     fi
     ;;
 
@@ -221,6 +222,27 @@ kube() {
         return 1
       fi
     fi
+    ;;
+
+  "exec")
+    local FIRST=""
+    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      FIRST="${1}"
+      shift
+    fi
+
+    local SECOND=""
+    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^[-/] ]]; then
+      SECOND="${1}"
+      shift
+    fi
+
+    _kube_resources "${FIRST}" "${SECOND}"
+
+    if [[ -n ${RESOURCE_NAME-} ]]; then
+      _kube_print_and_run "${KUBECTL_COMMAND[@]}" exec --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --stdin --tty -- "${@-/bin/bash}"
+    fi
+
     ;;
 
   "forward")
@@ -272,53 +294,6 @@ kube() {
       fi
 
       _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval --prettyPrint "${QUERY}"
-    fi
-    ;;
-
-  "top")
-    local EXTRA_ARGS=()
-    local TOP_SUB_COMMAND="pod"
-
-    if [[ -n ${1-} ]] && [[ ${1-} =~ ^(pod|node)s?$ ]]; then
-      TOP_SUB_COMMAND="${1}"
-      shift
-    fi
-
-    if [[ ${TOP_SUB_COMMAND} =~ ^pods? ]]; then
-      local FIRST=""
-      if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
-        FIRST="${1}"
-        shift
-      fi
-
-      local SECOND=""
-      if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
-        SECOND="${1}"
-        shift
-      fi
-
-      if [[ -n ${FIRST:-} ]]; then
-        _kube_resources "${FIRST}" "${SECOND}"
-
-        local EXTRA_ARGS=()
-
-        if [[ -n ${RESOURCE_NAME-} ]]; then
-          local PODS_LABELS
-          PODS_LABELS="$(_kube_pod_labels)"
-
-          if [[ -n ${PODS_LABELS-} ]]; then
-            EXTRA_ARGS+=("--selector=${PODS_LABELS}" --namespace="${RESOURCE_NAMESPACE}")
-          fi
-        fi
-      fi
-    fi
-
-    if [[ ${#KUBECTL_CONTEXTS} -eq 0 ]]; then
-      _kube_print_and_run "kubectl" top "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
-    else
-      for context in "${KUBECTL_CONTEXTS[@]}"; do
-        _kube_print_and_run "kubectl" "${context}" top "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
-      done
     fi
     ;;
 
@@ -387,6 +362,53 @@ kube() {
 
     ;;
 
+  "top")
+    local EXTRA_ARGS=()
+    local TOP_SUB_COMMAND="pod"
+
+    if [[ -n ${1-} ]] && [[ ${1-} =~ ^(pod|node)s?$ ]]; then
+      TOP_SUB_COMMAND="${1}"
+      shift
+    fi
+
+    if [[ ${TOP_SUB_COMMAND} =~ ^pods? ]]; then
+      local FIRST=""
+      if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+        FIRST="${1}"
+        shift
+      fi
+
+      local SECOND=""
+      if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+        SECOND="${1}"
+        shift
+      fi
+
+      if [[ -n ${FIRST:-} ]]; then
+        _kube_resources "${FIRST}" "${SECOND}"
+
+        local EXTRA_ARGS=()
+
+        if [[ -n ${RESOURCE_NAME-} ]]; then
+          local PODS_LABELS
+          PODS_LABELS="$(_kube_pod_labels)"
+
+          if [[ -n ${PODS_LABELS-} ]]; then
+            EXTRA_ARGS+=("--selector=${PODS_LABELS}" --namespace="${RESOURCE_NAMESPACE}")
+          fi
+        fi
+      fi
+    fi
+
+    if [[ ${#KUBECTL_CONTEXTS} -eq 0 ]]; then
+      _kube_print_and_run "kubectl" top "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
+    else
+      for context in "${KUBECTL_CONTEXTS[@]}"; do
+        _kube_print_and_run "kubectl" "${context}" top "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
+      done
+    fi
+    ;;
+
   "watch")
     if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
       local FIRST=""
@@ -430,7 +452,7 @@ kube() {
 
 _fzf_complete_kube() {
   if [[ ${COMP_CWORD} -eq 1 ]]; then
-    mapfile -t COMPREPLY < <(compgen -W "context desc diff edit env forward image info log ns restart watch --context --namespace -n" -- "${COMP_WORDS[COMP_CWORD]}")
+    mapfile -t COMPREPLY < <(compgen -W "context desc diff edit env exec forward image info log ns restart rollback top watch --context --namespace -n" -- "${COMP_WORDS[COMP_CWORD]}")
     return
   fi
 
@@ -447,7 +469,7 @@ _fzf_complete_kube() {
     )
     ;;
 
-  "desc" | "describe" | "diff" | "edit" | "env" | "image" | "images" | "info" | "log" | "logs" | "restart")
+  "desc" | "describe" | "diff" | "edit" | "env" | "exec" | "image" | "images" | "info" | "log" | "logs" | "restart" | "rollback" | "top" | "watch")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
       kubectl get deployments.app --all-namespaces --output=yaml | yq eval '.items[].metadata.name'
     )
