@@ -39,10 +39,16 @@ class GoTest(sublime_plugin.WindowCommand):
         if self.task:
             self.task.kill()
 
-        self.queue_write("Running go test...\n")
-
         self.task = AsyncTask(
-            command=["go", "test", "-cover", "-race", "-count=1"],
+            command=[
+                "go",
+                "test",
+                "-cover",
+                "-race",
+                "-count=1",
+                "-timeout=30s",
+                ".",
+            ],
             output=self.queue_write,
             cwd=working_dir,
             env=load_git_root_env(working_dir),

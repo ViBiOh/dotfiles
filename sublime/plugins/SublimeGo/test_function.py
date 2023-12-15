@@ -40,8 +40,6 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
 
         function_name = self.get_function_name(window)
 
-        self.queue_write("Running go test for {}...\n".format(function_name))
-
         self.task = AsyncTask(
             command=[
                 "go",
@@ -50,7 +48,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
                 "-race",
                 "-count=1",
                 "-timeout=30s",
-                "-testify.m",
+                "-run",
                 function_name,
                 ".",
             ],
