@@ -15,6 +15,8 @@ class AsyncTask:
             self.proc.terminate()
             self.proc = None
 
+        self.write(" ".join(command) + "\n\n")
+
         self.proc = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
