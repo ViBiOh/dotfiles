@@ -40,3 +40,12 @@ notes() {
 
   esac
 }
+
+_complete_notes() {
+  if [[ ${COMP_CWORD} -eq 1 ]]; then
+    mapfile -t COMPREPLY < <(compgen -W "open save sync" -- "${COMP_WORDS[COMP_CWORD]}")
+    return
+  fi
+}
+
+[[ -n ${BASH} ]] && complete -F _complete_notes -o default -o bashdefault notes
