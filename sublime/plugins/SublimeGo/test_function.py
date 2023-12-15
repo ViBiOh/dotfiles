@@ -50,7 +50,6 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
                 "-timeout=30s",
                 "-run",
                 function_name,
-                ".",
             ],
             output=self.queue_write,
             cwd=working_dir,
