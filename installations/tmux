@@ -6,6 +6,6 @@ install() {
   packages_install "tmux"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    packages_install "reattach-to-user-namespace"
+    packages_install "reattach-to-user-namespace" "pam-reattach"
   fi
 }
