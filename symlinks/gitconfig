@@ -85,7 +85,7 @@
 	default = ! git switch "$(git default-branch)"
 	log-pretty = log --color --date=local --pretty=format:'%C(red)%h%C(reset)%C(yellow)%d%C(reset) %s %C(green)(%cr) %C(magenta)(%cd) %C(bold blue)<%an>%C(reset)'
 	lg = log-pretty --graph
-	changelog = ! git log --no-merges --pretty=format:'%C(red)%h%C(reset) %s' "${2:-HEAD}...${1:-$(git last-tag)}"
+	changelog = ! git log-pretty --no-merges "${2:-HEAD}...${1:-$(git last-tag)}"
 	find = log-pretty -S
 	filehistory = log-pretty --
 	linehistory = log-pretty -L
