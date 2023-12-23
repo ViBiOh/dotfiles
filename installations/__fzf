@@ -16,7 +16,9 @@ install() {
 
     curl --disable --silent --show-error --location --max-time 60 --output "${ARCHIVE_FILENAME}" "https://github.com/junegunn/fzf/archive/master.zip"
     unzip "${ARCHIVE_FILENAME}" -d "${FZF_INSTALL_DIR}"
-    rm -f "${ARCHIVE_FILENAME}"
+
+    mv "${FZF_INSTALL_DIR}/fzf-master/"* "${FZF_INSTALL_DIR}"
+    rm -f "${FZF_INSTALL_DIR}/fzf-master/" "${ARCHIVE_FILENAME}"
   fi
 
   (
