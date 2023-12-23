@@ -1,6 +1,7 @@
 import os
 import subprocess
 import threading
+import signal
 
 
 class AsyncTask:
@@ -12,8 +13,7 @@ class AsyncTask:
         self.output = output
 
         if self.proc is not None:
-            self.proc.terminate()
-            self.proc = None
+            self.kill()
 
         self.write(" ".join(command) + "\n\n")
 
@@ -37,7 +37,24 @@ class AsyncTask:
     def kill(self):
         if self.proc:
             self.killed = True
+
+            self.kill_child()
             self.proc.terminate()
+            self.proc = None
+
+    def kill_child(self):
+        try:
+            child_processes = subprocess.check_output(
+                ["pgrep", "-P", str(self.proc.pid)],
+                stderr=subprocess.STDOUT,
+            )
+        except subprocess.CalledProcessError as e:
+            print("unable to list child process: {}".format(e.output.decode("utf8")))
+            return
+
+        for line in child_processes.decode("utf8").rstrip().split("\n"):
+            if subprocess.call(["kill", "-s", "SIGTERM", line]) != 0:
+                print("unable to kill {}".format(line))
 
     def read(self, reader):
         for line in reader:
