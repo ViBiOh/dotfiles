@@ -15,6 +15,7 @@ usage() {
   printf "Usage: %s [flags]\n" "${0}"
   printf "  -a\tRun all stages: symlinks, clean, install and passwords\n"
   printf "  -c\tClean install and temporary files\n"
+  printf "  -d\tRecreate dotfilesrc\n"
   printf "  -i\tInstall and configure softwares\n"
   printf "  -l\tLimiting execution to given filename\n"
   printf "  -p\tRetrieve and write credentials\n"

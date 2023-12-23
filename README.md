@@ -29,8 +29,8 @@ You can set following environment variables for customizing installation behavio
 
 # Dotfiles configuration example for a server
 
+export DOTFILES__SCRIPTS="true"
 export DOTFILES_RIPGREP="true"
-export DOTFILES_SIEGE="true"
 export DOTFILES_VIM="true"
 export DOTFILES_YQ="true"
 ```
