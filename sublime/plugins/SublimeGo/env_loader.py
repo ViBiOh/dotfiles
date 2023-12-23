@@ -1,3 +1,4 @@
+import sublime
 import re
 import os
 import subprocess
@@ -18,13 +19,11 @@ def load_env_file(cwd, name):
     try:
         env_values = subprocess.check_output(
             [
-                "bash",
-                "-c",
-                "set -o pipefail -o errexit; comm -13 <(declare) <(source '{}' && declare)".format(
-                    env_file
-                ),
+                "make",
+                "TARGET_ENV_FILE={}".format(env_file),
             ],
             stderr=subprocess.STDOUT,
+            cwd=sublime.packages_path() + "/SublimeGo/",
         )
     except subprocess.CalledProcessError as e:
         print("unable to source .env: {}".format(e.output.decode("utf8")))

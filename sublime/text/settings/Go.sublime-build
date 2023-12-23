@@ -1,8 +1,7 @@
 {
-	"target": "go_test",
-	"variants": [{ "name": "Function", "target": "go_function_test" }],
+	"target": "go_run",
 	"selector": "source.go",
-	"file_patterns": ["*_test.go"],
+	"file_patterns": ["*.go"],
 	"cancel": {
 		"kill": true
 	}
