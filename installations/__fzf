@@ -18,7 +18,7 @@ install() {
     unzip "${ARCHIVE_FILENAME}" -d "${FZF_INSTALL_DIR}"
 
     mv "${FZF_INSTALL_DIR}/fzf-master/"* "${FZF_INSTALL_DIR}"
-    rm -f "${FZF_INSTALL_DIR}/fzf-master/" "${ARCHIVE_FILENAME}"
+    rm -rf "${FZF_INSTALL_DIR}/fzf-master/" "${ARCHIVE_FILENAME}"
   fi
 
   (
