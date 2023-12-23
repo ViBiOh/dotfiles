@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+DOTFILES_SCRIPT_DIR="$(script_dir)"
+
 alias dev='cd ${HOME}/code/'
 alias work='test -e ${HOME}/workspace/ && cd ${HOME}/workspace/ || dev'
 alias grep='grep --color=auto'
@@ -42,7 +44,10 @@ dot_env() {
   local DOTENV_FILE="${1:-.env}"
 
   if [[ -e ${DOTENV_FILE} ]]; then
-    comm -13 <(declare) <(source "${DOTENV_FILE}" && declare)
+    comm -13 \
+      <(make --directory "${DOTFILES_SCRIPT_DIR}/../sublime/plugins/SublimeGo/" | sort) \
+      <(make --directory "${DOTFILES_SCRIPT_DIR}/../sublime/plugins/SublimeGo/" TARGET_ENV_FILE="$(readlink -f "${DOTENV_FILE}")" | sort) |
+      grep -E -v "^(CURDIR|GNUMAKEFLAGS|MAKEFILE_LIST|MAKEFLAGS|TARGET_ENV_FILE)="
   fi
 }
 
