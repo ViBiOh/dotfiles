@@ -192,8 +192,8 @@ main() {
       browse_mandatory_actions "install"
     fi
 
+    source_bashrc
     create_dotfilesrc
-
     source_bashrc
   fi
 
