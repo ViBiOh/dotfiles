@@ -15,7 +15,11 @@ script_dir() {
 }
 
 install() {
-  packages_install "git" "git-lfs" "git-delta"
+  packages_install "git" "git-lfs"
+
+  if package_exists "git-delta"; then
+    packages_install "git-delta"
+  fi
 
   if ! command -v git >/dev/null 2>&1; then
     return
