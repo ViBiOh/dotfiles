@@ -506,7 +506,6 @@ _jira_github_request() {
   fi
 
   rm -f "${HEADER_OUPUT}"
-  printf "%s" "${GITHUB_OUTPUT}"
 }
 
 _jira_request() {
