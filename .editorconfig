@@ -1,5 +1,3 @@
-root = true
-
 [*]
 charset = utf-8
 end_of_line = lf
@@ -14,10 +12,7 @@ indent_size = 4
 [Makefile]
 indent_style = tab
 
-[*.sublime-snippet]
-indent_style = tab
-
-[*.sublime-settings]
+[{*.sublime-snippet,*.sublime-settings}]
 indent_style = tab
 
 [sublime/text/settings/*]
