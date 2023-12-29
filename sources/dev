@@ -262,5 +262,5 @@ aziz() {
 }
 
 json() {
-  jq -n -c "${@}"
+  jq --null-input --compact-output "${@}"
 }
