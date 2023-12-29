@@ -429,6 +429,8 @@ _jira_github_branch() {
   local GITHUB_REPOSITORY="${1}"
   local GIT_CURRENT_BRANCH="${2}"
 
+  local GITHUB_PRINT_OUTPUT="false"
+
   if ! _jira_github_request "/repos/${GITHUB_REPOSITORY}/branches/${GIT_CURRENT_BRANCH}"; then
     _jira_warning "Remote branch '${GIT_CURRENT_BRANCH}' doesn't exist."
 
@@ -452,6 +454,8 @@ _jira_github_pull_request() {
     PULL_REQUEST_BODY+=$'\n\n'
     PULL_REQUEST_BODY+="$(cat "${GITHUB_PR_TEMPLATE}")"
   fi
+
+  local GITHUB_PRINT_OUTPUT="true"
 
   local GITHUB_OUTPUT
   GITHUB_OUTPUT="$(_jira_github_request "/repos/${GITHUB_REPOSITORY}/pulls" \
@@ -506,6 +510,10 @@ _jira_github_request() {
   fi
 
   rm -f "${HEADER_OUPUT}"
+
+  if [[ ${GITHUB_PRINT_OUTPUT:-} == "true" ]]; then
+    printf "%s" "${GITHUB_OUTPUT}"
+  fi
 }
 
 _jira_request() {
