@@ -56,8 +56,28 @@ kube() {
     KUBECTL_COMMAND+=("${KUBECTL_CONTEXT[@]}")
   fi
 
-  local RESOURCE_TYPE
   local RESOURCE_NAMESPACE
+
+  OPTIND=0
+  while getopts ":n:" option; do
+    case "${option}" in
+    n)
+      RESOURCE_NAMESPACE="${OPTARG}"
+      ;;
+    :)
+      printf "option -%s requires a value\n" "${OPTARG}" 1>&2
+      return 1
+      ;;
+    \?)
+      printf "option -%s is invalid\n" "${OPTARG}" 1>&2
+      return 2
+      ;;
+    esac
+  done
+
+  shift $((OPTIND - 1))
+
+  local RESOURCE_TYPE
   local RESOURCE_NAME
 
   _kube_resources() {
@@ -67,6 +87,11 @@ kube() {
     if [[ -n ${RESOURCE} ]] && [[ -z ${QUERY} ]]; then
       QUERY="${RESOURCE}"
       RESOURCE=""
+    fi
+
+    local RESOURCE_NAMESPACE_QUERY="--all-namespaces"
+    if [[ -n ${RESOURCE_NAMESPACE} ]]; then
+      RESOURCE_NAMESPACE_QUERY="--namespace=${RESOURCE_NAMESPACE}"
     fi
 
     if [[ -z ${RESOURCE} ]]; then
@@ -80,7 +105,7 @@ kube() {
     fi
 
     local KUBE_RESOURCE
-    KUBE_RESOURCE="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE}" --all-namespaces --output=yaml | yq eval "${YAML_QUERY}" | fzf --select-1 --query="${QUERY}")"
+    KUBE_RESOURCE="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE}" "${RESOURCE_NAMESPACE_QUERY}" --output=yaml | yq eval "${YAML_QUERY}" | fzf --select-1 --query="${QUERY}")"
 
     RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
     RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
@@ -100,7 +125,10 @@ kube() {
   }
 
   _kube_help() {
-    _kube_info "Usage: kube ACTION"
+    _kube_info "Usage: kube [--context=<name>...?] [options?] ACTION"
+
+    _kube_info "\nPossibles options are\n"
+    _kube_info " - -n Narrow resource search to given namespace (default search in all namespaces)"
 
     _kube_info "\nPossibles actions are                            | args\n"
     _kube_info " - context  | Switch context                      | <context name>"

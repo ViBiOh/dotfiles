@@ -129,7 +129,7 @@ stock() {
 
   _stock_evolution
 
-  printf "%b%s%b %s %s %b%s%s%b\n" "${YELLOW}" "${STOCK_SYMBOL}" "${RESET}" "${CURRENT_PRICE}" "${STOCK_CURRENCY}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}" "${RESET}"
+  printf "%b%s%b %s %s %b%s%s%b\n" "${YELLOW}" "${STOCK_SYMBOL}" "${RESET}" "${CURRENT_PRICE}" "${STOCK_CURRENCY}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
 
   if command -v spark >/dev/null 2>&1; then
     YAHOO_OUTPUT="$(
@@ -156,7 +156,7 @@ stock() {
     PREVIOUS_PRICE="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .chartPreviousClose')"
     _stock_evolution
 
-    printf -- "\n---\n1mo %b%s%s%b\n" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}" "${RESET}"
+    printf -- "\n---\n1mo %b%s%s%b\n" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
     printf "%s" "${YAHOO_OUTPUT}" | jq -r '.chart.result[0].indicators.quote[0].open | join(",")' | spark
   fi
 }
