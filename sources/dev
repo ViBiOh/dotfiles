@@ -104,25 +104,61 @@ stock() {
   local STOCK_CURRENCY
   STOCK_CURRENCY="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .currency')"
 
-  local CURRENT_PRICE
-  CURRENT_PRICE="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
-
-  local PREVIOUS_CLOSE
-  PREVIOUS_CLOSE="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .previousClose')"
-
   local EVOLUTION_PERCENT
-  EVOLUTION_PERCENT="$(printf "scale = 3; scale = 4; 100 * ((%s / %s) - 1)" "${CURRENT_PRICE}" "${PREVIOUS_CLOSE}" | bc)"
-
   local OUTPUT_COLOR="${GREEN}"
   local EVOLUTION_SIGN="↗"
 
-  if [[ ${EVOLUTION_PERCENT} =~ ^- ]]; then
-    OUTPUT_COLOR="${RED}"
-    EVOLUTION_SIGN="↘"
-    EVOLUTION_PERCENT="${EVOLUTION_PERCENT#-}"
-  fi
+  _stock_evolution() {
+    EVOLUTION_PERCENT="$(printf "scale = 4; scale = 4; 100 * ((%s / %s) - 1)" "${CURRENT_PRICE}" "${PREVIOUS_PRICE}" | bc)"
+
+    OUTPUT_COLOR="${GREEN}"
+    EVOLUTION_SIGN="↗"
+
+    if [[ ${EVOLUTION_PERCENT} =~ ^- ]]; then
+      OUTPUT_COLOR="${RED}"
+      EVOLUTION_SIGN="↘"
+      EVOLUTION_PERCENT="${EVOLUTION_PERCENT#-}"
+    fi
+  }
+
+  local CURRENT_PRICE
+  CURRENT_PRICE="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
+
+  local PREVIOUS_PRICE
+  PREVIOUS_PRICE="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .previousClose')"
+
+  _stock_evolution
 
   printf "%b%s%b %s %s %b%s%s%b\n" "${YELLOW}" "${STOCK_SYMBOL}" "${RESET}" "${CURRENT_PRICE}" "${STOCK_CURRENCY}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}" "${RESET}"
+
+  if command -v spark >/dev/null 2>&1; then
+    YAHOO_OUTPUT="$(
+      curl \
+        --disable \
+        --silent \
+        --show-error \
+        --location \
+        --max-time 10 \
+        --dump-header "${HEADER_OUPUT}" \
+        --fail-with-body \
+        "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=false&interval=1d&range=1mo"
+    )"
+
+    if [[ ${?} -ne 0 ]]; then
+      cat "${HEADER_OUPUT}" >/dev/stderr
+      printf "%s\n" "${YAHOO_OUTPUT}" >/dev/stderr
+      rm -f "${HEADER_OUPUT}"
+      return 1
+    fi
+
+    rm -f "${HEADER_OUPUT}"
+
+    PREVIOUS_PRICE="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .chartPreviousClose')"
+    _stock_evolution
+
+    printf -- "\n---\n1mo %b%s%s%b\n" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}" "${RESET}"
+    printf "%s" "${YAHOO_OUTPUT}" | jq -r '.chart.result[0].indicators.quote[0].open | join(",")' | spark
+  fi
 }
 
 date_in() {
