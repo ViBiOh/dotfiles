@@ -46,7 +46,7 @@ main() {
   browse_folder "${HOME}/code"
 
   if [[ -d "${HOME}/workspace" ]]; then
-    browse_folder "${HOME}/workspace" "work"
+    browse_folder "$(readlink -f "${HOME}/workspace")" "work"
   fi
 }
 
