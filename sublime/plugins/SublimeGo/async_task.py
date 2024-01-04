@@ -17,16 +17,20 @@ class AsyncTask:
 
         self.write(" ".join(command) + "\n\n")
 
-        self.proc = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            cwd=cwd,
-            env=env,
-        )
-        self.killed = False
+        try:
+            self.proc = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                cwd=cwd,
+                env=env,
+            )
+            self.killed = False
 
-        threading.Thread(target=self.read, args=(self.proc.stdout,)).start()
+            threading.Thread(target=self.read, args=(self.proc.stdout,)).start()
+
+        except Exception as e:
+            self.write("[exception]\n" + getattr(e, 'message', repr(e)))
 
     def enabled(self, kill=False):
         if kill:
