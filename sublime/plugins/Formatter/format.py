@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 import subprocess
+import threading
 
 PLUGIN_NAME = "Formatter"
 PLUGIN_SETTINGS = "{}.sublime-settings".format(PLUGIN_NAME)
@@ -24,12 +25,18 @@ def format(view, region, working_dir, commands):
             cwd=working_dir,
         )
 
-        process_out, process_err = process.communicate(value.encode("utf8"))
-        if process.returncode != 0:
-            print(process_err.decode("utf8"), end="")
-            return value
+        timeout = threading.Timer(interval=5, function=process.terminate)
 
-        value = process_out.decode("utf8")
+        try:
+            process_out, process_err = process.communicate(value.encode("utf8"))
+            if process.returncode != 0:
+                print(process_err.decode("utf8"), end="")
+                return value
+
+            value = process_out.decode("utf8")
+
+        finally:
+            timeout.cancel()
 
     return value
 
