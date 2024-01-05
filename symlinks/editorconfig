@@ -10,6 +10,9 @@ trim_trailing_whitespace = true
 [Makefile]
 indent_style = tab
 
+[*.proto]
+indent_style = tab
+
 [{*.go,go.mod}]
 indent_style = tab
 
