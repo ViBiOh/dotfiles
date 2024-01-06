@@ -26,6 +26,7 @@ def format(view, region, working_dir, commands):
         )
 
         timeout = threading.Timer(interval=5, function=process.terminate)
+        timeout.start()
 
         try:
             process_out, process_err = process.communicate(value.encode("utf8"))
@@ -36,7 +37,8 @@ def format(view, region, working_dir, commands):
             value = process_out.decode("utf8")
 
         finally:
-            timeout.cancel()
+            if timeout.is_alive():
+                timeout.cancel()
 
     return value
 
