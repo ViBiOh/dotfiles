@@ -52,6 +52,10 @@ source_all() {
   for file in "${SCRIPT_DIR}/../sources/"*; do
     [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
   done
+
+  if [[ -e "${SCRIPT_DIR}/../../work/bash_source" ]]; then
+    source "${SCRIPT_DIR}/../../work/bash_source"
+  fi
 }
 
 set_locale
