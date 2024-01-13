@@ -211,18 +211,22 @@ rainbow() {
 emergency() {
   var_confirm "Erase all data"
 
-  sudo --reset-timestamp networksetup -setdnsservers "Wi-Fi" Empty
-  sudo networksetup -setsearchdomains "Wi-Fi" Empty
+  sudo --reset-timestamp echo "Erasing..."
 
-  for interface in "USB 10/100/1000 LAN" "Thunderbolt Ethernet Slot 0" "Thunderbolt Ethernet Slot 1"; do
-    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i "${interface}") -gt 0 ]]; then
-      sudo networksetup -setdnsservers "${interface}" Empty
-      sudo networksetup -setsearchdomains "${interface}" Empty
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    sudo networksetup -setdnsservers "Wi-Fi" Empty
+    sudo networksetup -setsearchdomains "Wi-Fi" Empty
+
+    for interface in "USB 10/100/1000 LAN" "Thunderbolt Ethernet Slot 0" "Thunderbolt Ethernet Slot 1"; do
+      if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i "${interface}") -gt 0 ]]; then
+        sudo networksetup -setdnsservers "${interface}" Empty
+        sudo networksetup -setsearchdomains "${interface}" Empty
+      fi
+    done
+
+    if [[ "$(type -t "notes_erase")" == "function" ]]; then
+      notes_erase
     fi
-  done
-
-  if [[ "$(type -t "notes_erase")" == "function" ]]; then
-    notes_erase
   fi
 
   _emergency_script_dir() {
@@ -260,6 +264,10 @@ emergency() {
 
   # Clean broken symlinks in home directory
   find "${HOME}" -maxdepth 1 -type l ! -exec test -e {} \; -exec rm {} \;
+
+  if [[ -e "/opt/k3s/k3s-clean" ]]; then
+    /opt/k3s/k3s-clean
+  fi
 }
 
 if command -v vegeta >/dev/null 2>&1; then
