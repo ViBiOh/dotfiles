@@ -4,7 +4,7 @@
 		{ "name": "format", "cmd": ["make", "format"] },
 		{ "name": "style", "cmd": ["make", "style"] },
 		{ "name": "test", "cmd": ["make", "test"] },
-		{ "name": "run", "cmd": ["make", "run"] }
+		{ "name": "run", "cmd": ["make", "run"] },
 		{ "name": "build", "cmd": ["make", "build"] }
 	],
 	"cmd": ["make", "format", "style", "test", "build"],
