@@ -50,10 +50,9 @@ do_action() {
   done
 }
 
-browse_mandatory_actions() {
-  while IFS= read -r -d '' file; do
-    do_action "$(basename "${file}")" "${@}"
-  done < <(find "${CURRENT_DIR}/installations" -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
+do_mandatory_actions() {
+  do_action "$(basename "${CURRENT_DIR}/installations/__default")" "${@}"
+  do_action "$(basename "${CURRENT_DIR}/installations/__fzf")" "${@}"
 }
 
 create_dotfilesrc() {
@@ -76,7 +75,7 @@ END_OF_DOTFILES_RC
 
 browse_actions() {
   if [[ ${DOTFILES_RC} -ne 1 ]] && [[ -z ${FILE_LIMIT:-} ]]; then
-    browse_mandatory_actions "${@}"
+    do_mandatory_actions "${@}"
   fi
 
   local FILE_TO_INSTALL=()
@@ -190,7 +189,7 @@ main() {
 
   if [[ ${DOTFILES_RC} -eq 1 ]]; then
     if ! command -v fzf 2>/dev/null 2>&1; then
-      browse_mandatory_actions "install"
+      do_mandatory_actions "install"
     fi
 
     source_bashrc
