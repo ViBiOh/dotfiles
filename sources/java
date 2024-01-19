@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+if [[ -d "${BREW_PREFIX}/opt/openjdk/bin" ]]; then
+  export PATH="${BREW_PREFIX}/opt/openjdk/bin:${PATH}"
+fi
