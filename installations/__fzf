@@ -4,37 +4,10 @@ set -o nounset -o pipefail -o errexit
 
 clean() {
   rm -rf "${HOME}/.fzf.bash"
-  rm -rf "${HOME}/opt/fzf"
 }
 
 install() {
-  local FZF_INSTALL_DIR="${HOME}/opt/fzf"
+  packages_install "fzf"
 
-  if [[ ! -d ${FZF_INSTALL_DIR} ]]; then
-    local ARCHIVE_FILENAME="fzf.zip"
-    mkdir -p "${FZF_INSTALL_DIR}"
-
-    curl --disable --silent --show-error --location --max-time 60 --output "${ARCHIVE_FILENAME}" "https://github.com/junegunn/fzf/archive/master.zip"
-    unzip "${ARCHIVE_FILENAME}" -d "${FZF_INSTALL_DIR}"
-
-    mv "${FZF_INSTALL_DIR}/fzf-master/"* "${FZF_INSTALL_DIR}"
-    rm -rf "${FZF_INSTALL_DIR}/fzf-master/" "${ARCHIVE_FILENAME}"
-  fi
-
-  (
-    cd "${FZF_INSTALL_DIR}"
-
-    if command -v git >/dev/null 2>&1; then
-      if [[ $(git rev-parse --is-inside-work-tree 2>&1) == "true" ]]; then
-        git pull
-      else
-        git init
-        git remote add origin "http://github.com/junegunn/fzf.git"
-        git fetch origin
-        git checkout --force "master"
-      fi
-    fi
-  )
-
-  "${FZF_INSTALL_DIR}/install" --key-bindings --completion --no-zsh --no-fish --no-update-rc
+  "${BREW_PREFIX}/opt/fzf/install" --key-bindings --completion --no-zsh --no-fish --no-update-rc
 }
