@@ -1,10 +1,10 @@
 <snippet>
 	<content><![CDATA[
-type ${1:Object}Option func(${1:Object}) ${1:Object}
+type ${1:Object}Option func(${2:Struct}) ${2:Struct}
 
-func With${4:Name}(${2:Field} ${3:Type}) ${1:Object}Option {
-	return func(instance ${1:Object}) ${1:Object} {
-		instance.${2:Field} = ${2:Field}
+func With${3:Name}(${4:Field} ${5:Type}) ${1:Object}Option {
+	return func(instance ${2:Struct}) ${2:Struct} {
+		instance.${4:Field} = ${4:Field}
 
 		return instance
 	}
