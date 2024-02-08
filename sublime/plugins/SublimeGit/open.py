@@ -1,8 +1,9 @@
 import re
-import sublime
-import sublime_plugin
 import subprocess
 
+import sublime_plugin
+
+import sublime
 
 origin_regex = re.compile("^.*@(.*):(.*?)(.git)?\\n?$")
 

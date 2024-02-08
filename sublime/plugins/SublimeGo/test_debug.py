@@ -1,6 +1,8 @@
-import sublime
-import sublime_plugin
 import threading
+
+import sublime_plugin
+
+import sublime
 
 
 class GoTestDebug(sublime_plugin.WindowCommand):

@@ -1,9 +1,10 @@
 import re
-import sublime
-import sublime_plugin
 import subprocess
-
 from datetime import datetime, timedelta
+
+import sublime_plugin
+
+import sublime
 
 new_file_regex = re.compile("fatal: no such path '.*' in HEAD")
 not_git_regex = re.compile(

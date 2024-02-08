@@ -1,11 +1,10 @@
-import sublime
-import re
 import os
+import re
 import subprocess
 import threading
-
 from os.path import exists, join
 
+import sublime
 
 env_regex = re.compile("^(export )?([a-zA-Z_][a-zA-Z0-9_]*)=(.*)")
 
