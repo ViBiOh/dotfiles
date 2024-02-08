@@ -7,8 +7,8 @@
     ],
     "source.jsx": [["prettier", "--no-color", "--stdin-filepath", "file.jsx"]],
     "source.python": [
-      ["black", "--quiet", "-"],
-      ["isort", "-"]
+      ["isort", "-"],
+      ["black", "--quiet", "-"]
     ],
     "source.shell.bash": [["shfmt", "-s", "-"]],
     "source.terraform": [["terraform", "fmt", "-no-color", "-"]],
