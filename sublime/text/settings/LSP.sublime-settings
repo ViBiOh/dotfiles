@@ -8,6 +8,11 @@
 				"experimentalWorkspaceModule": false
 			}
 		},
+		"templ": {
+			"enabled": true,
+			"command": ["templ", "lsp"],
+			"selector": "source.templ"
+		},
 		"python": {
 			"enabled": true,
 			"command": ["pylsp"],
