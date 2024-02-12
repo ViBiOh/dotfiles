@@ -18,5 +18,8 @@ indent_style = tab
 [sublime/text/settings/*]
 indent_style = tab
 
+[*.sublime-syntax]
+indent_style = space
+
 [gitconfig*]
 indent_style = tab
