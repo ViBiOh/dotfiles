@@ -10,6 +10,5 @@ install() {
 
     echo "auth       optional       /opt/homebrew/lib/pam/pam_reattach.so
 auth       sufficient     pam_tid.so" | sudo tee "/etc/pam.d/sudo_local" >/dev/null
-    EOF
   fi
 }
