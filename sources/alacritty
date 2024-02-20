@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+term_sharing() {
+  alacritty msg config font.size=20
+}
+
+term_reset() {
+  alacritty msg config font.size=12
+}
