@@ -136,7 +136,7 @@ kube() {
     _kube_info " - diff     | Run diff against multiple contexts  | <object type or deployment name> [object name]"
     _kube_info " - edit     | Edit an object                      | <object type or deployment name> [object name]"
     _kube_info " - env      | Generate .env file from deployments | <deployment name> [container name]"
-    _kube_info " - exec     | Execute a command in a pod          | <object type or deployment name> [object name] <any commands... default to /bin/bash>"
+    _kube_info " - exec     | Execute a command in a pod          | <object type or deployment name> [object name] [-c <container name>] [-t for tty] <any commands... default to /bin/bash>"
     _kube_info " - forward  | Port-forward to a service           | <service name> [exposed port number] (default 4000) [service port number]"
     _kube_info " - help     | Print this help                     |"
     _kube_info " - image    | Print image name                    | <deployment name>"
@@ -268,7 +268,31 @@ kube() {
     _kube_resources "${FIRST}" "${SECOND}"
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
-      _kube_print_and_run "${KUBECTL_COMMAND[@]}" exec --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --stdin --tty -- "${@-/bin/bash}"
+      local EXTRA_OPTIONS
+
+      OPTIND=0
+      while getopts ":c:t" option; do
+        case "${option}" in
+        c)
+          EXTRA_OPTIONS+=" --container ${OPTARG}"
+          ;;
+        t)
+          EXTRA_OPTIONS+=" --tty"
+          ;;
+        :)
+          printf "option -%s requires a value\n" "${OPTARG}" 1>&2
+          return 1
+          ;;
+        \?)
+          printf "option -%s is invalid\n" "${OPTARG}" 1>&2
+          return 2
+          ;;
+        esac
+      done
+
+      shift $((OPTIND - 1))
+
+      _kube_print_and_run "${KUBECTL_COMMAND[@]}" exec --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" ${EXTRA_OPTIONS} --stdin -- "${@-/bin/bash}"
     fi
 
     ;;
