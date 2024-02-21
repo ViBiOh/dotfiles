@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
-term_sharing() {
-  alacritty msg config font.size=20
+if ! command -v alacritty >/dev/null 2>&1; then
+  return
+fi
+
+alacritty_share() {
+  alacritty msg config "font.size=20"
 }
 
-term_reset() {
-  alacritty msg config font.size=12
+alacritty_reset() {
+  alacritty msg config "font.size=12"
 }
