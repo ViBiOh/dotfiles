@@ -16,15 +16,6 @@ _ps1_previous_status() {
   fi
 }
 
-_ps1_new_line_if_not() {
-  # preserve exit status
-  local exit="${?}"
-
-  printf "%$(($(tput cols) - 1))s\r"
-
-  return "${exit}"
-}
-
 PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
 if [[ "$(type -t "__git_ps1")" == "function" ]]; then
   PS1+="${YELLOW}\$(__git_ps1)${RESET}"
