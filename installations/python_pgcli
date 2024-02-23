@@ -32,7 +32,7 @@ install() {
     packages_install "pgcli"
   elif command -v apt-get >/dev/null 2>&1; then
     packages_install "libpq-dev"
-    pip install --user "pgcli"
+    pip install "pgcli"
   fi
 
   if ! command -v pgcli >/dev/null 2>&1; then

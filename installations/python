@@ -37,6 +37,9 @@ install() {
   fi
 
   mkdir -p "${HOME}/opt/python"
+
+  python3 -m venv "${HOME}/opt/python/venv"
+
   source "${SCRIPT_DIR}/../sources/_first"
   source "${SCRIPT_DIR}/../sources/_python"
 
@@ -44,5 +47,5 @@ install() {
     return
   fi
 
-  pip install --user --upgrade "pip"
+  pip install --upgrade "pip"
 }

@@ -29,6 +29,6 @@ install() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install "iredis"
   elif command -v apt-get >/dev/null 2>&1; then
-    pip install --user "iredis"
+    pip install "iredis"
   fi
 }

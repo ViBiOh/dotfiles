@@ -6,5 +6,5 @@ fi
 
 if [[ -d "${HOME}/opt/python" ]]; then
   export PYTHONUSERBASE="${HOME}/opt/python"
-  export PATH="${PYTHONUSERBASE}/bin:${PATH}"
+  export PATH="${PYTHONUSERBASE}/bin:${HOME}/opt/python/venv/bin:${PATH}"
 fi

@@ -27,7 +27,7 @@ install() {
     exit
   fi
 
-  pip install --user "ansible" "passlib" "ansible-lint" "jmespath" "yamllint"
+  pip install "ansible" "passlib" "ansible-lint" "jmespath" "yamllint"
 }
 
 credentials() {
