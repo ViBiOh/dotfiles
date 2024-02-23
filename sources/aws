@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+aws_regions() {
+  curl "https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/endpoints.json" | jq -r '.partitions[].regions | keys[]'
+}
+
 aws_service_no_region() {
   if [[ ${#} -ne 1 ]]; then
     var_error "Usage: aws_service_region <service>"
@@ -9,6 +13,6 @@ aws_service_no_region() {
   local SERVICE=$1
   shift
 
-  curl https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/endpoints.json | jq -r --arg service "${SERVICE}" \
-    "[.partitions[].regions|keys[]] - [.partitions[].services.$SERVICE | select(.endpoints != null) | .endpoints | keys[]]"
+  curl "https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/endpoints.json" | jq -r --arg service "${SERVICE}" \
+    '[.partitions[].regions | keys[]] - [.partitions[].services.[$service] | select(.endpoints != null) | .endpoints | keys[]]'
 }
