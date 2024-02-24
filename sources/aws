@@ -4,7 +4,7 @@ aws_regions() {
   curl "https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/endpoints.json" | jq -r '.partitions[].regions | keys[]'
 }
 
-aws_service_no_region() {
+aws_regions_no_service() {
   local ENDPOINTS
   ENDPOINTS="$(curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/endpoints.json")"
 
