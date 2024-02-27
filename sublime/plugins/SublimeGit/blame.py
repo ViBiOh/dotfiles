@@ -127,6 +127,6 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         time = int(time_regex.findall(blame_content)[0])
         moment = datetime.fromtimestamp(time)
         description = summary_regex.findall(blame_content)[0]
-        blame = "{}|{}: {}".format(author, relative_time(moment), description)
+        blame = "{}|{}({}): {}".format(author, relative_time(moment), moment.strftime("%Y-%m-%dT%H:%M:%S%z"), description)
 
         self.print_blame(view, blame)
