@@ -6,6 +6,7 @@
 		"Debugger",
 		"EditorConfig",
 		"LSP",
+		"LSP-gopls",
 		"Package Control",
 		"SublimeLinter",
 		"SublimeLinter-eslint",

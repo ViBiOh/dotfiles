@@ -1,13 +1,5 @@
 {
 	"clients": {
-		"gopls": {
-			"enabled": true,
-			"command": ["gopls"],
-			"selector": "source.go",
-			"initializationOptions": {
-				"experimentalWorkspaceModule": false
-			}
-		},
 		"templ": {
 			"enabled": true,
 			"command": ["templ", "lsp"],
