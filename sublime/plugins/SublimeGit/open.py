@@ -24,46 +24,41 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
         view = window.active_view()
         line_number = view.rowcol(view.sel()[0].begin())[0] + 1
 
-        is_git = subprocess.call(
-            ["git", "rev-parse", "--is-inside-work-tree"], cwd=working_dir
-        )
+        is_git = subprocess.call(["git", "rev-parse", "--is-inside-work-tree"], cwd=working_dir)
         if is_git != 0:
             return
 
         try:
-            git_remote_url = subprocess.check_output(
+            remote = subprocess.check_output(
                 ["git", "remote", "get-url", "--push", "origin"],
                 stderr=subprocess.STDOUT,
                 cwd=working_dir,
-            )
+            ).decode("utf8").rstrip()
         except subprocess.CalledProcessError as e:
             print("unable to get remote push url: {}".format(e.output.decode("utf8")))
             return
 
         try:
-            git_root = subprocess.check_output(
+            root = subprocess.check_output(
                 ["git", "rev-parse", "--show-toplevel"],
                 stderr=subprocess.STDOUT,
                 cwd=working_dir,
-            )
+            ).decode("utf8").rstrip()
         except subprocess.CalledProcessError as e:
             print("unable to get root path: {}".format(e.output.decode("utf8")))
             return
 
+        git_path = working_dir.replace(root, "")
+
         try:
-            git_branch = subprocess.check_output(
-                ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            branch = subprocess.check_output(
+                ["git", "log", "-n", "1", "--pretty=format:%h", "--", file_name],
                 stderr=subprocess.STDOUT,
                 cwd=working_dir,
-            )
+            ).decode("utf8").rstrip()
         except subprocess.CalledProcessError as e:
-            print("unable to get branch: {}".format(e.output.decode("utf8")))
+            print("unable to get last commit of file: {}".format(e.output.decode("utf8")))
             return
-
-        remote = git_remote_url.decode("utf8").rstrip()
-        root = git_root.decode("utf8").rstrip()
-        git_path = working_dir.replace(root, "")
-        branch = git_branch.decode("utf8").rstrip()
 
         paths = origin_regex.findall(remote)
         url = "https://{}/{}/blob/{}{}/{}#L{}".format(
