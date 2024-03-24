@@ -121,6 +121,17 @@ dns_allow() {
     doubleclick.net
   "
 
+  websites["twitter"]="
+    api.twitter.com
+    www.twitter.com
+    twitter.com
+    x.com
+    t.co
+    abs.twimg.com
+    pbs.twimg.com
+    twimg.com
+  "
+
   websites["gtm"]="
     www.googletagmanager.com
     googletagmanager.com
