@@ -109,6 +109,8 @@ dns_allow() {
   websites["aws"]="analytics.console.aws.a2z.com"
 
   websites["datadog"]="
+    www.datadoghq-browser-agent.com
+    browser-intake-datadoghq.eu
     live.logs.datadoghq.com
     logs.datadoghq.com
   "
