@@ -1,7 +1,5 @@
 # dotfiles
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ViBiOh_dotfiles&metric=alert_status)](https://sonarcloud.io/dashboard?id=ViBiOh_dotfiles)
-
 ## How it works?
 
 Please have a look at my article [here](https://dev.to/vibioh/dotfiles-5695)
