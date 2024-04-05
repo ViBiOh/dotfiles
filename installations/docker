@@ -31,7 +31,9 @@ install() {
     colima completion bash >"${SCRIPT_DIR}/../sources/colima-completion"
 
     # safe guard on Apple Silicon to avoid silent error
-    sudo mkdir -p "/usr/local/bin"
+    if ! [[ -d "/usr/local/bin" ]]; then
+      sudo mkdir -p "/usr/local/bin"
+    fi
 
     colima nerdctl install --path "${HOME}/opt/bin/docker" --force
 
