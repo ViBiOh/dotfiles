@@ -8,6 +8,10 @@
     "command": "compact_json"
   },
   {
+    "caption": "Formatter: Compact YAML",
+    "command": "compact_yaml"
+  },
+  {
     "caption": "Formatter: Disable format on save",
     "command": "formatter_disable_on_save"
   },

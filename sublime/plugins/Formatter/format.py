@@ -1,7 +1,9 @@
-import sublime
-import sublime_plugin
 import subprocess
 import threading
+
+import sublime_plugin
+
+import sublime
 
 PLUGIN_NAME = "Formatter"
 PLUGIN_SETTINGS = "{}.sublime-settings".format(PLUGIN_NAME)
@@ -83,7 +85,7 @@ class FormatterEnableOnSave(sublime_plugin.WindowCommand):
         _settings_obj.set("format_on_save", "all")
 
 
-class Formatter(sublime_plugin.TextCommand):
+class command(sublime_plugin.TextCommand):
     def run(self, edit, file=False):
         view = self.view
 
@@ -94,42 +96,49 @@ class Formatter(sublime_plugin.TextCommand):
         variables = window.extract_variables()
         working_dir = variables.get("file_path")
 
+        for region in get_regions(view, file):
+            view.replace(edit, region, self.format(view, file, region, working_dir))
+
+
+class Formatter(command):
+    def __init__(self, view):
+        self.view = view
+        self.available_selectors = _settings_obj.get("selectors", {}).items()
+
+    def format(self, view, file, region, working_dir):
         allowed_selectors = get_allowed_selectors(file)
 
         selectors = {}
-        for selector, commands in _settings_obj.get("selectors", {}).items():
+        for selector, commands in self.available_selectors:
             if allowed_selectors is None or selector in allowed_selectors:
                 selectors[selector] = commands
 
-        for region in get_regions(view, file):
-            commands = get_commands(view, region.a, selectors)
-            formatted = format(view, region, working_dir, commands)
-            view.replace(edit, region, formatted)
+        commands = get_commands(view, region.a, selectors)
+        return format(view, region, working_dir, commands)
 
 
-class CompactJson(sublime_plugin.TextCommand):
-    def run(self, edit, file=False):
-        view = self.view
+class CompactJson(command):
+    def format(self, view, file, region, working_dir):
+        return format(
+            view,
+            region,
+            working_dir,
+            [
+                ["jq", "--compact-output"],
+            ],
+        )
 
-        window = view.window()
-        if not window:
-            return
 
-        variables = window.extract_variables()
-        working_dir = variables.get("file_path")
-
-        allowed_selectors = get_allowed_selectors(file)
-
-        selectors = {}
-        for selector, commands in _settings_obj.get("selectors", {}).items():
-            if allowed_selectors is None or selector in allowed_selectors:
-                selectors[selector] = commands
-
-        for region in get_regions(view, file):
-            formatted = format(view, region, working_dir, [
-                ['jq', '--compact-output'],
-            ])
-            view.replace(edit, region, formatted)
+class CompactYaml(command):
+    def format(self, view, file, region, working_dir):
+        return format(
+            view,
+            region,
+            working_dir,
+            [
+                ["yq", "--prettyPrint", "--no-colors"],
+            ],
+        )
 
 
 class SublimeFormatOnSave(sublime_plugin.EventListener):
