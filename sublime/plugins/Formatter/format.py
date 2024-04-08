@@ -107,6 +107,31 @@ class Formatter(sublime_plugin.TextCommand):
             view.replace(edit, region, formatted)
 
 
+class CompactJson(sublime_plugin.TextCommand):
+    def run(self, edit, file=False):
+        view = self.view
+
+        window = view.window()
+        if not window:
+            return
+
+        variables = window.extract_variables()
+        working_dir = variables.get("file_path")
+
+        allowed_selectors = get_allowed_selectors(file)
+
+        selectors = {}
+        for selector, commands in _settings_obj.get("selectors", {}).items():
+            if allowed_selectors is None or selector in allowed_selectors:
+                selectors[selector] = commands
+
+        for region in get_regions(view, file):
+            formatted = format(view, region, working_dir, [
+                ['jq', '--compact-output'],
+            ])
+            view.replace(edit, region, formatted)
+
+
 class SublimeFormatOnSave(sublime_plugin.EventListener):
     def on_pre_save(self, view):
         view.run_command("formatter", {"file": True})

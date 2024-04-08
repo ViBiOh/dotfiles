@@ -4,6 +4,10 @@
     "command": "formatter"
   },
   {
+    "caption": "Formatter: Compact JSON",
+    "command": "compact_json"
+  },
+  {
     "caption": "Formatter: Disable format on save",
     "command": "formatter_disable_on_save"
   },
