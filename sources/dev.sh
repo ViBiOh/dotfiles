@@ -241,7 +241,7 @@ emergency() {
     fi
   }
 
-  "$(_emergency_script_dir)/../init" -c
+  "$(_emergency_script_dir)/../init.sh" -c
 
   ssh_agent_stop
   gpg_agent_stop

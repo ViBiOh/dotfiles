@@ -20,6 +20,6 @@ install() {
   fi
 
   if command -v op >/dev/null 2>&1; then
-    op completion bash >"$(script_dir)/../sources/op-completion"
+    op completion bash >"$(script_dir)/../sources/op-completion.sh"
   fi
 }

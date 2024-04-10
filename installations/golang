@@ -44,6 +44,6 @@ install() {
     go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
     go install "mvdan.cc/gofumpt@latest"
 
-    golangci-lint completion bash >"${SCRIPT_DIR}/../sources/golangci-lint-completion"
+    golangci-lint completion bash >"${SCRIPT_DIR}/../sources/golangci-lint-completion.sh"
   fi
 }

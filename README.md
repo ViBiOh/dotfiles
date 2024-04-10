@@ -13,7 +13,7 @@ curl "https://dotfiles.vibioh.fr/bootstrap" | bash
 ## Update
 
 ```bash
-"${HOME}/code/dotfiles/init" -a
+"${HOME}/code/dotfiles/init.sh" -a
 ```
 
 ## Configuration

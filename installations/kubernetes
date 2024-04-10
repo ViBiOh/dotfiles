@@ -30,14 +30,14 @@ install() {
   KUBERNETES_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://storage.googleapis.com/kubernetes-release/release/stable.txt")"
 
   curl_to_binary "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/$(normalized_os)/$(normalized_arch "amd64" "arm" "arm64")/kubectl" "kubectl"
-  kubectl completion bash >"${SCRIPT_DIR}/../sources/kubectl-completion"
+  kubectl completion bash >"${SCRIPT_DIR}/../sources/kubectl-completion.sh"
 
   # renovate: datasource=github-releases depName=helm/helm
   local HELM_VERSION="v3.14.3"
 
   archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64").tar.gz" "$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64")/helm"
   if command -v helm >/dev/null 2>&1; then
-    helm completion bash >"${SCRIPT_DIR}/../sources/helm-completion"
+    helm completion bash >"${SCRIPT_DIR}/../sources/helm-completion.sh"
   else
     var_error "helm was not found in path. Please run 'helm completion bash >'${SCRIPT_DIR}/../sources/helm-completion'"
   fi
@@ -45,7 +45,7 @@ install() {
   # renovate: datasource=github-releases depName=fluxcd/flux2
   local FLUX_VERSION="v2.2.3"
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION#v}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").tar.gz" "flux"
-  flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion"
+  flux completion bash >"${SCRIPT_DIR}/../sources/flux-completion.sh"
 
   # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
   local KUBESEAL_VERSION="v0.26.2"
@@ -54,7 +54,7 @@ install() {
   # renovate: datasource=github-releases depName=ViBiOh/kmux
   local KMUX_VERSION="v0.9.4"
   archive_to_binary "https://github.com/ViBiOh/kmux/releases/download/${KMUX_VERSION}/kmux_$(normalized_os)_$(normalized_arch "" "arm" "arm64").tar.gz" "kmux"
-  kmux completion bash >"${SCRIPT_DIR}/../sources/kmux-completion"
+  kmux completion bash >"${SCRIPT_DIR}/../sources/kmux-completion.sh"
 }
 
 credentials() {

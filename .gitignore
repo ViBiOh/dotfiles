@@ -1,4 +1,4 @@
 scripts/
 sources/git-prompt
-sources/*-completion
+sources/*-completion*
 sources/z

@@ -20,7 +20,7 @@ main() {
 
   (
     cd "${INSTALL_PATH}/${REPOSITORY_NAME}"
-    "./init" -d -a
+    "./init.sh" -d -a
 
     if command -v git >/dev/null 2>&1; then
       git init
