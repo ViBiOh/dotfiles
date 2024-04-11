@@ -51,8 +51,8 @@ do_action() {
 }
 
 do_mandatory_actions() {
-  do_action "$(basename "${CURRENT_DIR}/installations/__default")" "${@}"
-  do_action "$(basename "${CURRENT_DIR}/installations/__fzf")" "${@}"
+  do_action "__default.sh" "${@}"
+  do_action "__fzf.sh" "${@}"
 }
 
 create_dotfilesrc() {
@@ -67,9 +67,10 @@ END_OF_DOTFILES_RC
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
 
-    local UPPERCASE_FILENAME
-    UPPERCASE_FILENAME="$(printf "%s" "${BASENAME_FILE}" | tr "[:lower:]" "[:upper:]")"
-    echo "export DOTFILES_${UPPERCASE_FILENAME}=\"true\"" >>"${HOME}/.dotfilesrc"
+    local INSTALL_NAME
+    INSTALL_NAME="$(printf "%s" "${BASENAME_FILE%.sh}" | tr "[:lower:]" "[:upper:]")"
+
+    echo "export DOTFILES_${INSTALL_NAME}=\"true\"" >>"${HOME}/.dotfilesrc"
   done < <(find "${CURRENT_DIR}/installations" -not -name "__*" -type f | LC_ALL=C sort | fzf --multi --print0 --preview 'cat {}')
 }
 
@@ -84,7 +85,10 @@ browse_actions() {
     local BASENAME_FILE
     BASENAME_FILE="$(basename "${file}")"
 
-    if [[ -n ${FILE_LIMIT} ]] && [[ ${BASENAME_FILE} != "${FILE_LIMIT}" ]]; then
+    local INSTALL_NAME
+    INSTALL_NAME="$(printf "%s" "${BASENAME_FILE%.sh}" | tr "[:lower:]" "[:upper:]")"
+
+    if [[ -n ${FILE_LIMIT} ]] && [[ ${INSTALL_NAME} != "${FILE_LIMIT}" ]]; then
       continue
     fi
 
@@ -92,9 +96,7 @@ browse_actions() {
       FILE_LIMIT=""
     fi
 
-    local UPPERCASE_FILENAME
-    UPPERCASE_FILENAME="$(printf "%s" "${BASENAME_FILE}" | tr "[:lower:]" "[:upper:]")"
-    local ENABLE_VARIABLE_NAME="DOTFILES_${UPPERCASE_FILENAME}"
+    local ENABLE_VARIABLE_NAME="DOTFILES_${INSTALL_NAME}"
 
     if [[ ${!ENABLE_VARIABLE_NAME:-} != "true" ]]; then
       continue
@@ -157,11 +159,11 @@ main() {
       RUN_SYMLINKS=1
       ;;
     l)
-      FILE_LIMIT="${OPTARG}"
+      FILE_LIMIT="$(printf "%s" "${OPTARG}" | tr "[:lower:]" "[:upper:]")"
       printf "Limiting to %s\n" "${FILE_LIMIT}"
       ;;
     r)
-      FILE_LIMIT="${OPTARG}"
+      FILE_LIMIT="$(printf "%s" "${OPTARG}" | tr "[:lower:]" "[:upper:]")"
       FILE_RESTART=1
       printf "Restarting at %s\n" "${FILE_LIMIT}"
       ;;
