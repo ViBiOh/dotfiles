@@ -103,13 +103,12 @@ class command(sublime_plugin.TextCommand):
 class Formatter(command):
     def __init__(self, view):
         self.view = view
-        self.available_selectors = _settings_obj.get("selectors", {}).items()
 
     def format(self, view, file, region, working_dir):
         allowed_selectors = get_allowed_selectors(file)
 
         selectors = {}
-        for selector, commands in self.available_selectors:
+        for selector, commands in _settings_obj.get("selectors", {}).items():
             if allowed_selectors is None or selector in allowed_selectors:
                 selectors[selector] = commands
 

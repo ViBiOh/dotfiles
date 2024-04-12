@@ -78,7 +78,7 @@
 	s = status --short --branch
 	unstage = reset HEAD --
 	fresh-clean = ! git reset HEAD -- . && git checkout -- . && git clean -ffxd
-	default-branch = rev-parse --abbrev-ref origin/HEAD
+	default-branch = ! git rev-parse --abbrev-ref origin/HEAD | sed 's|^origin/||'
 	current-branch = rev-parse --abbrev-ref HEAD
 	set-head = remote set-head origin -a
 	default = ! git switch "$(git default-branch)"
