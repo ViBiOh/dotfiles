@@ -47,6 +47,12 @@ install() {
   (cd "${HOME}/n-install" && PREFIX="${HOME}/opt" make install)
   rm -rf "${HOME}/n-install"
 
+  # Fix n with curl --compressed
+  sed "s|curl --silent --compressed|curl --silent|" "${HOME}/opt/bin/n" >"${HOME}/opt/bin/n-fixed"
+  rm "${HOME}/opt/bin/n"
+  mv "${HOME}/opt/bin/n-fixed" "${HOME}/opt/bin/n"
+  chmod +x "${HOME}/opt/bin/n"
+
   mkdir -p "${HOME}/opt/node"
   source "${SCRIPT_DIR}/../sources/_first.sh"
   source "${SCRIPT_DIR}/../sources/node.sh"
