@@ -30,7 +30,7 @@ install() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(script_dir)"
 
-  source "${SCRIPT_DIR}/../sources/_golang"
+  source "${SCRIPT_DIR}/../sources/_golang.sh"
   mkdir -p "${GOPATH}"
 
   if command -v go >/dev/null 2>&1; then

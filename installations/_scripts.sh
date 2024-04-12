@@ -24,27 +24,27 @@ install() {
 
   (
     cd "${SCRIPT_DIR}/../"
-    curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" \
+    curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" \
       "gcloud" \
       "git" \
-      "git_coco" \
+      "git_coco.sh" \
       "github" \
       "http" \
       "kubernetes" \
       "pass" \
-      "rotate" \
+      "rotate.sh" \
       "ssh" \
       "tmux" \
       "var" \
       "version"
 
     source "${SCRIPT_DIR}/../scripts/git"
-    ln -s -f "${SCRIPT_DIR}/../scripts/git_coco" "${HOME}/opt/bin/git-coco"
+    ln -s -f "${SCRIPT_DIR}/../scripts/git_coco.sh" "${HOME}/opt/bin/git-coco"
 
     if command -v git >/dev/null 2>&1 && git_is_inside; then
-      curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "git_hooks"
+      curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "git_hooks"
     fi
   )
 
-  source "${SCRIPT_DIR}/../scripts/meta" && meta_check "var"
+  source "${SCRIPT_DIR}/../scripts/meta" && meta_check "var.sh"
 }

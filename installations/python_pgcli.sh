@@ -21,7 +21,7 @@ clean() {
 }
 
 install() {
-  source "$(script_dir)/../sources/_python"
+  source "$(script_dir)/../sources/_python.sh"
 
   if ! command -v pip >/dev/null 2>&1; then
     var_error "pip is required"

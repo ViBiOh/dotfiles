@@ -37,7 +37,7 @@ install() {
 
     colima nerdctl install --path "${HOME}/opt/bin/docker" --force
 
-    source "${SCRIPT_DIR}/../sources/docker"
+    source "${SCRIPT_DIR}/../sources/docker.sh"
 
     docker_start
     docker completion bash | sed 's|nerdctl|docker|g' >"${SCRIPT_DIR}/../sources/docker-completion.sh"

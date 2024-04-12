@@ -48,8 +48,8 @@ install() {
   rm -rf "${HOME}/n-install"
 
   mkdir -p "${HOME}/opt/node"
-  source "${SCRIPT_DIR}/../sources/_first"
-  source "${SCRIPT_DIR}/../sources/node"
+  source "${SCRIPT_DIR}/../sources/_first.sh"
+  source "${SCRIPT_DIR}/../sources/node.sh"
   n "${NODE_VERSION}"
 
   if ! command -v npm >/dev/null 2>&1; then

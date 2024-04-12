@@ -30,7 +30,7 @@ install() {
   tar -C "${HOME}/opt" -xzf "${GCLOUD_ARCHIVE}"
   rm -rf "${GCLOUD_ARCHIVE}"
 
-  source "$(script_dir)/../sources/gcloud"
+  source "$(script_dir)/../sources/gcloud.sh"
 
   if command -v gcloud >/dev/null 2>&1; then
     gcloud components update --quiet
