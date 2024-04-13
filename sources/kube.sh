@@ -56,7 +56,7 @@ kube() {
     KUBECTL_COMMAND+=("${KUBECTL_CONTEXT[@]}")
   fi
 
-  local RESOURCE_NAMESPACE
+  local RESOURCE_NAMESPACE="${KUBE_NS:-}"
 
   OPTIND=0
   while getopts ":n:" option; do
