@@ -285,16 +285,16 @@ _jira_branch() {
 
   local JIRA_BRANCH_NAME="${JIRA_ISSUE}"
 
-  local BRANCH_PREFIX
-  _jira_read_input "BRANCH_PREFIX=" BRANCH_PREFIX
-  if [[ -n ${BRANCH_PREFIX} ]]; then
-    JIRA_BRANCH_NAME="${BRANCH_PREFIX}${JIRA_BRANCH_NAME}"
+  local JIRA_BRANCH_PREFIX
+  _jira_read "JIRA_BRANCH_PREFIX" "${JIRA_BRANCH_PREFIX:-}"
+  if [[ -n ${JIRA_BRANCH_PREFIX} ]]; then
+    JIRA_BRANCH_NAME="${JIRA_BRANCH_PREFIX}${JIRA_BRANCH_NAME}"
   fi
 
-  local BRANCH_SUFFIX
-  _jira_read_input "BRANCH_SUFFIX=" BRANCH_SUFFIX
-  if [[ -n ${BRANCH_SUFFIX} ]]; then
-    JIRA_BRANCH_NAME="${JIRA_BRANCH_NAME}${BRANCH_SUFFIX}"
+  local JIRA_BRANCH_SUFFIX
+  _jira_read "JIRA_BRANCH_SUFFIX" "${JIRA_BRANCH_SUFFIX:-}"
+  if [[ -n ${JIRA_BRANCH_SUFFIX} ]]; then
+    JIRA_BRANCH_NAME="${JIRA_BRANCH_NAME}${JIRA_BRANCH_SUFFIX}"
   fi
 
   local CHECKOUT_OPTION=""
@@ -365,11 +365,35 @@ _jira_error() {
   printf -- "%b%b %b\n" "${RED}" "${*}" "${RESET}" 1>&2
 }
 
+_jira_read() {
+  local VAR_NAME="${1}"
+  shift
+  local VAR_DEFAULT="${1-}"
+  shift || true
+
+  local VAR_DEFAULT_DISPLAY=""
+  if [[ -n ${VAR_DEFAULT} ]]; then
+    VAR_DEFAULT_DISPLAY=" [${VAR_DEFAULT}]"
+  fi
+
+  _jira_read_input "${VAR_NAME}${VAR_DEFAULT_DISPLAY}=" "READ_VALUE"
+
+  local VAR_SAFE_VALUE
+  VAR_SAFE_VALUE="$(printf "%s" "${READ_VALUE:-${VAR_DEFAULT}}" | sed "s|'|\\\'|g")"
+  eval "${VAR_NAME}=$'${VAR_SAFE_VALUE}'"
+}
+
 _jira_read_input() {
+  local VAR_PROMPT="${1}"
+  shift
+
+  local VAR_NAME="${1}"
+  shift
+
   if [[ -n ${BASH_VERSION} ]]; then
-    read -r -p "${1}" "${2}" </dev/tty
+    read -r -p "${VAR_PROMPT}" "${VAR_NAME}" </dev/tty
   elif [[ -n ${ZSH_VERSION} ]]; then
-    read -r "${2}?${1}" </dev/tty
+    read -r "${VAR_NAME}?${VAR_PROMPT}" </dev/tty
   else
     return 1
   fi
