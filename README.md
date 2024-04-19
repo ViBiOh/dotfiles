@@ -7,7 +7,7 @@ Please have a look at my article [here](https://dev.to/vibioh/dotfiles-5695)
 ## Installation
 
 ```bash
-curl "https://dotfiles.vibioh.fr/bootstrap" | bash
+curl "https://dotfiles.vibioh.fr/bootstrap.sh" | bash
 ```
 
 ## Update
