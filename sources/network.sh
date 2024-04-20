@@ -98,6 +98,7 @@ dns_allow() {
     linkedin.com
     media.licdn.com
     static.licdn.com
+    dms.licdn.com
   "
 
   websites["linkedin_blog"]="
