@@ -10,6 +10,10 @@ open_ports() {
   fi
 }
 
+default_route() {
+  route -n get default
+}
+
 dns_flush() {
   if command -v unbound-control >/dev/null 2>&1; then
     if [[ ${UNBOUND_CONTROL-} == "no" ]]; then
