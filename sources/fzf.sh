@@ -76,6 +76,30 @@ if command -v pass >/dev/null 2>&1; then
   }
 
   [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passfull
+
+  passweb() {
+    if [[ ${#} -ne 1 ]]; then
+      var_red "Usage: passweb PASS_NAME"
+      return 1
+    fi
+
+    local PASS_NAME="${1}"
+    shift
+
+    local PASS_URL
+    PASS_URL="$(pass_get "${PASS_NAME}" "url")"
+
+    if [[ -z ${PASS_URL} ]]; then
+      var_red "no url in the store"
+      return 1
+    fi
+
+    open "${PASS_URL}"
+
+    passfull "${PASS_NAME}"
+  }
+
+  [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passweb
 fi
 
 if command -v make >/dev/null 2>&1; then
