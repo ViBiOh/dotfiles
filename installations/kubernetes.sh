@@ -52,7 +52,7 @@ install() {
   archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64").tar.gz" "kubeseal"
 
   # renovate: datasource=github-releases depName=ViBiOh/kmux
-  local KMUX_VERSION="v0.9.4"
+  local KMUX_VERSION="v0.9.5"
   archive_to_binary "https://github.com/ViBiOh/kmux/releases/download/${KMUX_VERSION}/kmux_$(normalized_os)_$(normalized_arch "" "arm" "arm64").tar.gz" "kmux"
   kmux completion bash >"${SCRIPT_DIR}/../sources/kmux-completion.sh"
 }
