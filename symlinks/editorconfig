@@ -10,11 +10,14 @@ trim_trailing_whitespace = true
 [Makefile]
 indent_style = tab
 
+# https://protobuf.dev/programming-guides/style/#standard-file-formatting
 [*.proto]
-indent_style = tab
+indent_size = 2
+indent_style = space
 
 [{*.go,go.mod}]
 indent_style = tab
 
 [*.py]
 indent_size = 4
+indent_style = space
