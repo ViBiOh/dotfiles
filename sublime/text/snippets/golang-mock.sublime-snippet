@@ -4,7 +4,7 @@ type mocks${1:Instance} struct {
 	${2:Field} *mocks.${3:FieldType}
 }
 
-func initMocks${1:Instance}(t *testing.T) (${1:Instance}, mocks${1:Instance}, func()) {
+func initMocks${1:Instance}(t *testing.T) (${1:Instance}, mocks${1:Instance}) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
@@ -13,7 +13,7 @@ func initMocks${1:Instance}(t *testing.T) (${1:Instance}, mocks${1:Instance}, fu
 
 	return New${1:Instance}(${2:Field}), mocks${1:Instance}{
 		${2:Field}:   ${2:Field},
-	}, ctrl.Finish
+	}
 }
 
 ]]></content>
