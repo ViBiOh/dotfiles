@@ -8,6 +8,7 @@
 		"EditorConfig",
 		"LSP",
 		"LSP-gopls",
+		"LSP-typescript",
 		"Package Control",
 		"Protobuf Syntax Hightlighting",
 		"SublimeLinter",
