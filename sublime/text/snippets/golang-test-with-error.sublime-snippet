@@ -27,10 +27,10 @@ func Test${1:FuncName}(t *testing.T) {
 		t.Run(intention, func(t *testing.T) {
 			t.Parallel()
 
-			got, gotErr := ${1:FuncName}(testCase.args.content)
+			actual, actualErr := ${1:FuncName}(testCase.args.content)
 
-			assert.Equal(t, testCase.want, got)
-			assert.Equal(t, testCase.wantErr, gotErr)
+			assert.Equal(t, testCase.want, actual)
+			assert.Equal(t, testCase.wantErr, actualErr)
 		})
 	}
 }

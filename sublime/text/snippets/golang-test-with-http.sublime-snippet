@@ -26,11 +26,11 @@ func Test${1:FuncName}(t *testing.T) {
 			writer := httptest.NewRecorder()
 			${1:FuncName}(writer, testCase.request)
 
-			gotStatus := writer.Code
-			gotBody, _ := request.ReadBodyResponse(writer.Result())
+			actualStatus := writer.Code
+			actualBody, _ := request.ReadBodyResponse(writer.Result())
 
-			assert.Equal(t, testCase.wantStatus, gotStatus)
-			assert.Equal(t, testCase.want, string(gotBody))
+			assert.Equal(t, testCase.wantStatus, actualStatus)
+			assert.Equal(t, testCase.want, string(actualBody))
 
 			for key := range testCase.wantHeader {
 				assert.Equal(t, testCase.wantHeader.Get(key), writer.Header().Get(key))

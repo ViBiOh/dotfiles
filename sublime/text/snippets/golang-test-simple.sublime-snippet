@@ -10,9 +10,9 @@ func Test${2:FuncName}(t *testing.T) {
 
 		expected := true
 
-		got := ${2:FuncName}()
+		actual := ${2:FuncName}()
 
-		assert.Equal(t, expected, got)
+		assert.Equal(t, expected, actual)
 	})
 }
 
