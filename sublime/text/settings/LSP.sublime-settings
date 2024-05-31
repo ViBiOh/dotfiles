@@ -15,6 +15,11 @@
 			"command": ["typescript-language-server", "--stdio"],
 			"selector": "source.js"
 		},
+		"typescript": {
+			"enabled": true,
+			"command": ["typescript-language-server", "--stdio"],
+			"selector": "source.tsx"
+		},
 		"terraform": {
 			"enabled": true,
 			"command": ["terraform-ls", "serve"],
