@@ -13,12 +13,7 @@
 		"javascript": {
 			"enabled": true,
 			"command": ["typescript-language-server", "--stdio"],
-			"selector": "source.js"
-		},
-		"typescript": {
-			"enabled": true,
-			"command": ["typescript-language-server", "--stdio"],
-			"selector": "source.tsx"
+			"selector": "source.js,source.jsx,source.tsx"
 		},
 		"terraform": {
 			"enabled": true,
