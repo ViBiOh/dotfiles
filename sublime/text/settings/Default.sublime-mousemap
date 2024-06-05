@@ -13,7 +13,7 @@
 			{
 				"key": "selector",
 				"operator": "equal",
-				"operand": "(source.go, source.js, source.python)"
+				"operand": "(source.templ, source.python, source.js, source.jsx, source.tsx, source.go, source.terraform)"
 			}
 		]
 	}
