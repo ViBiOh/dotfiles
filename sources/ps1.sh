@@ -29,6 +29,6 @@ if [[ "$(type -t "__terraform_ps1")" == "function" ]]; then
   PS1+="${PURPLE}\$(__terraform_ps1)${RESET}"
 fi
 
-PS1+=" \$(_ps1_previous_status)\n> "
+PS1+=" \$(_ps1_previous_status)\n> "
 
 export PS1
