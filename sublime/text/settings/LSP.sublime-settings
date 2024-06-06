@@ -10,11 +10,6 @@
 			"command": ["pylsp"],
 			"selector": "source.python"
 		},
-		"javascript": {
-			"enabled": true,
-			"command": ["typescript-language-server", "--stdio"],
-			"selector": "source.js,source.jsx,source.tsx"
-		},
 		"terraform": {
 			"enabled": true,
 			"command": ["terraform-ls", "serve"],
