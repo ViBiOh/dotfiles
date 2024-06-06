@@ -87,7 +87,7 @@ main() {
   fi
 
   if command -v npm >/dev/null 2>&1; then
-    npm install --ignore-scripts --global "prettier" "eslint" "typescript-language-server" "typescript"
+    npm install --ignore-scripts --global "prettier" "eslint" "typescript-language-server" "typescript" "yaml-language-server"
   fi
 
   if command -v pip >/dev/null 2>&1; then
