@@ -10,6 +10,26 @@
 			"command": ["pylsp"],
 			"selector": "source.python"
 		},
+		"javacript": {
+			"enabled": true,
+			"command": ["typescript-language-server", "--stdio"],
+			"selector": "source.js"
+		},
+		"jsx": {
+			"enabled": true,
+			"command": ["typescript-language-server", "--stdio"],
+			"selector": "source.jsx"
+		},
+		"ts": {
+			"enabled": true,
+			"command": ["typescript-language-server", "--stdio"],
+			"selector": "source.ts"
+		},
+		"tsx": {
+			"enabled": true,
+			"command": ["typescript-language-server", "--stdio"],
+			"selector": "source.tsx"
+		},
 		"terraform": {
 			"enabled": true,
 			"command": ["terraform-ls", "serve"],
