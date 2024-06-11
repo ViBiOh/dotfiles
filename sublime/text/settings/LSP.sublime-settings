@@ -13,21 +13,45 @@
 		"javacript": {
 			"enabled": true,
 			"command": ["typescript-language-server", "--stdio"],
+			"initializationOptions": {
+				"maxTsServerMemory": 16384,
+				"tsserver": {
+					"path": "~/opt/node/lib/node_modules/typescript/lib/"
+				}
+			},
 			"selector": "source.js"
 		},
 		"jsx": {
 			"enabled": true,
 			"command": ["typescript-language-server", "--stdio"],
+			"initializationOptions": {
+				"maxTsServerMemory": 16384,
+				"tsserver": {
+					"path": "~/opt/node/lib/node_modules/typescript/lib/"
+				}
+			},
 			"selector": "source.jsx"
 		},
 		"ts": {
 			"enabled": true,
 			"command": ["typescript-language-server", "--stdio"],
+			"initializationOptions": {
+				"maxTsServerMemory": 16384,
+				"tsserver": {
+					"path": "~/opt/node/lib/node_modules/typescript/lib/"
+				}
+			},
 			"selector": "source.ts"
 		},
 		"tsx": {
 			"enabled": true,
 			"command": ["typescript-language-server", "--stdio"],
+			"initializationOptions": {
+				"maxTsServerMemory": 16384,
+				"tsserver": {
+					"path": "~/opt/node/lib/node_modules/typescript/lib/"
+				}
+			},
 			"selector": "source.tsx"
 		},
 		"terraform": {
