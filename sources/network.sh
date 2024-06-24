@@ -126,6 +126,9 @@ dns_allow() {
     securepubads.g.doubleclick.net
     g.doubleclick.net
     doubleclick.net
+    sdk.iad-01.braze.com
+    iad-01.braze.com
+    braze.com
   "
 
   websites["twitter"]="
