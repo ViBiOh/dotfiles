@@ -38,7 +38,7 @@ main() {
     return 1
   fi
 
-  source "${SCRIPT_DIR}/../sources/sublime"
+  source "${SCRIPT_DIR}/../sources/sublime.sh"
 
   rm -rf "${PROJECT_FOLDER}"
   mkdir -p "${PROJECT_FOLDER}"
