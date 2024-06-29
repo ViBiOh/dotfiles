@@ -1,0 +1,9 @@
+[
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-left": "pane::GoBack",
+      "cmd-right": "editor::GoToDefinition"
+    }
+  }
+]
