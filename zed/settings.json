@@ -1,6 +1,6 @@
 {
   "base_keymap": "SublimeText",
-  "theme": "One Dark",
+  "theme": "Ayu Dark",
   "telemetry": {
     "diagnostics": false,
     "metrics": false
