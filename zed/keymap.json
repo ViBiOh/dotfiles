@@ -3,7 +3,12 @@
     "context": "Editor",
     "bindings": {
       "cmd-left": "pane::GoBack",
-      "cmd-right": "editor::GoToDefinition"
+      "cmd-right": "editor::GoToDefinition",
+      "ctrl-shift-k": "editor::DeleteLine",
+      "cmd-shift-d": "editor::DuplicateLineDown",
+      "ctrl-cmd-down": "editor::MoveLineDown",
+      "ctrl-cmd-up": "editor::MoveLineUp",
+      "ctrl-shift-z": "editor::RevertSelectedHunks"
     }
   }
 ]
