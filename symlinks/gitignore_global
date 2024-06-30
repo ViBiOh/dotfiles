@@ -91,6 +91,12 @@ GitHub.sublime-settings
 # VsCode #
 #--------#
 .vscode/*
+.fleet/
+
+#-----#
+# zed #
+#-----#
+.zed/*
 
 # Local History for Visual Studio Code
 .history/
