@@ -1,11 +1,21 @@
 {
   "base_keymap": "SublimeText",
   "theme": "Ayu Dark",
+  "show_whitespaces": "all",
+  "ui_font_size": 12,
+  "buffer_font_size": 12,
+  "tab_size": 2,
+  "restore_on_startup": "none",
+  "auto_install_extensions": {
+    "basher": true,
+    "dockerfile": true,
+    "html": true,
+    "make": true,
+    "snippets": true,
+    "terraform": true
+  },
   "telemetry": {
     "diagnostics": false,
     "metrics": false
-  },
-  "show_whitespaces": "all",
-  "ui_font_size": 12,
-  "buffer_font_size": 12
+  }
 }
