@@ -2,7 +2,7 @@
 	<content><![CDATA[
 import "github.com/stretchr/testify/assert"
 
-func Test${2:FuncName}(t *testing.T) {
+func Test${1:FuncName}(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -25,7 +25,7 @@ func Test${2:FuncName}(t *testing.T) {
 		t.Run(intention, func(t *testing.T) {
 			t.Parallel()
 
-			actual := ${2:FuncName}(testCase.args.content)
+			actual := ${1:FuncName}(testCase.args.content)
 
 			assert.Equal(t, testCase.want, actual)
 		})
