@@ -7,7 +7,6 @@
 		"Debugger",
 		"EditorConfig",
 		"LSP",
-		"LSP-copilot",
 		"LSP-gopls",
 		"LSP-json",
 		"LSP-yaml",

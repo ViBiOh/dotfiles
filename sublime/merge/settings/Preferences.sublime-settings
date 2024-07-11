@@ -1,3 +1,4 @@
 {
-	"theme": "Merge Dark.sublime-theme"
+	"theme": "Merge Dark.sublime-theme",
+	"trim_trailing_white_space_on_save": false,
 }
