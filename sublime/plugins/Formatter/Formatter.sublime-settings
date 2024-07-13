@@ -1,7 +1,6 @@
 {
   "selectors": {
     "source.go": [["goimports"], ["gofumpt"]],
-    "source.templ": [["templ", "fmt"]],
     "source.js": [["prettier", "--no-color", "--stdin-filepath", "file.js"]],
     "source.json": [["jq"]],
     "source.jsx": [["prettier", "--no-color", "--stdin-filepath", "file.jsx"]],
