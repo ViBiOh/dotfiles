@@ -94,9 +94,16 @@ if command -v pass >/dev/null 2>&1; then
       return 1
     fi
 
-    open "${PASS_URL}"
+    local PASS_URL_BASIC
+    PASS_URL_BASIC="$(pass_get "${PASS_NAME}" "url_basic")"
 
-    passfull "${PASS_NAME}"
+    if [[ ${PASS_URL_BASIC:-} == "on" ]]; then
+      PASS_URL="${PASS_URL/#https:\/\//https:\/\/"$(urlencode "$(pass_get "${PASS_NAME}" "login")")":"$(urlencode "$(pass_get "${PASS_NAME}" "password")")"@}"
+      open --url "${PASS_URL}" -a firefox
+    else
+      open --url "${PASS_URL}"
+      passfull "${PASS_NAME}"
+    fi
   }
 
   [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passweb
