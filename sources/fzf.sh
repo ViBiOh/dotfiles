@@ -107,6 +107,25 @@ if command -v pass >/dev/null 2>&1; then
   }
 
   [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passweb
+
+  pass_wifi_qrcode() {
+    if [[ ${#} -lt 1 ]]; then
+      var_red "Usage: pass_wifi_qrcode WIFI_NAME"
+      return 1
+    fi
+
+    local WIFI_NAME
+    WIFI_NAME="${1}"
+
+    local WIFI_PASSWORD
+    WIFI_PASSWORD="$(pass_get "wifi/${WIFI_NAME}" "password")"
+
+    if [[ -z ${WIFI_PASSWORD:-} ]]; then
+      return
+    fi
+
+    qrcode_wifi "${WIFI_NAME}" "${WIFI_PASSWORD}"
+  }
 fi
 
 if command -v make >/dev/null 2>&1; then
