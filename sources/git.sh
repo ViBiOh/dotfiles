@@ -12,6 +12,7 @@ fi
   cd "$(git_root)" || return 1
 }
 
+# https://blog.gitbutler.com/git-tips-3-really-large-repositories/
 git_large_repos() {
   git config feature.manyFiles true
   git update-index --index-version 4
