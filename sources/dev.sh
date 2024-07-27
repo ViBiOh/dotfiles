@@ -35,8 +35,9 @@ loop() {
   fi
 
   while true; do
-    var_info "Run at $(date)"
     eval "${1}"
+
+    var_info "Ended at $(date), next in ${2:-60} seconds"
     sleep "${2:-60}"
   done
 }
