@@ -35,6 +35,7 @@ loop() {
   fi
 
   while true; do
+    var_info "Run at $(date)"
     eval "${1}"
     sleep "${2:-60}"
   done
