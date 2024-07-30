@@ -20,7 +20,7 @@ clean() {
 
 install() {
   # renovate: datasource=docker depName=gcr.io/google.com/cloudsdktool/google-cloud-cli
-  local GCLOUD_VERSION="485.0.0"
+  local GCLOUD_VERSION="486.0.0"
 
   local GCLOUD_ARCHIVE
   GCLOUD_ARCHIVE="google-cloud-sdk-${GCLOUD_VERSION}-$(normalized_os)-$(normalized_arch "" "arm" "arm").tar.gz"
