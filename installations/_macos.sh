@@ -152,6 +152,7 @@ install() {
   sudo pmset -a sms 0
   sudo pmset -a standby 0
   sudo pmset -a standbydelay 0
+  sudo pmset -a tcpkeepalive 0
   sudo pmset -b displaysleep 5
   sudo pmset -b sleep 10
   sudo pmset -c displaysleep 10
