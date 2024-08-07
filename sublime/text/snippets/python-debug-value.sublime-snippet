@@ -1,0 +1,8 @@
+<snippet>
+  <content><![CDATA[
+print("type", type(${1:var}), "str", str(${1:var}), "raw", ${1:var})
+]]></content>
+  <tabTrigger>pdp</tabTrigger>
+  <scope>source.python</scope>
+  <description>Debug Print</description>
+</snippet>
