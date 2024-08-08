@@ -5,7 +5,7 @@
     "source.json": [["jq"]],
     "source.jsx": [["prettier", "--no-color", "--stdin-filepath", "file.jsx"]],
     "source.python": [
-      ["isort", "-"],
+      ["isort", "--quiet", "-"],
       ["black", "--quiet", "-"]
     ],
     "source.shell.bash": [["shfmt", "-s", "-"]],
