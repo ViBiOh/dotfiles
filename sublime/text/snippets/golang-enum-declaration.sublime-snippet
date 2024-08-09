@@ -23,7 +23,31 @@ func Parse${1:EnumName}(value string) (${1:EnumName}, error) {
 		previous = current
 	}
 
-	return Default, ErrUnknown${1:EnumName}
+	return Default, fmt.Errorf("parse `%s`: %w", value, ErrUnknown${1:EnumName})
+}
+
+func (e ${1:EnumName}) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString(`"`)
+	buffer.WriteString(e.String())
+	buffer.WriteString(`"`)
+	return buffer.Bytes(), nil
+}
+
+func (e *${1:EnumName}) UnmarshalJSON(b []byte) error {
+	var strValue string
+
+	if err := json.Unmarshal(b, &strValue); err != nil {
+		return fmt.Errorf("unmarshal ${1:EnumName}: %w", err)
+	}
+
+	value, err := ParseEventType(strValue)
+	if err != nil {
+		return err
+	}
+
+	*e = value
+
+	return nil
 }
 
 ]]></content>
