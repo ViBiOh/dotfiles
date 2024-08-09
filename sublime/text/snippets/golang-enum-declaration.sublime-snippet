@@ -1,0 +1,33 @@
+<snippet>
+	<content><![CDATA[
+//go:generate stringer -type=${1:EnumName}
+type ${1:EnumName} int
+
+const (
+	Default ${1:EnumName} = iota
+	Other
+)
+
+var ErrUnknown${1:EnumName} = errors.New("unknown ${1:EnumName}")
+
+func Parse${1:EnumName}(value string) (${1:EnumName}, error) {
+	var previous, current uint8
+
+	for i := 1; i < len(_${1:EnumName}_index); i++ {
+		current = _${1:EnumName}_index[i]
+
+		if strings.EqualFold(_${1:EnumName}_name[previous:current], value) {
+			return ${1:EnumName}(i - 1), nil
+		}
+
+		previous = current
+	}
+
+	return Default, ErrUnknown${1:EnumName}
+}
+
+]]></content>
+	<tabTrigger>ged</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang Enum Declaration</description>
+</snippet>

@@ -41,6 +41,7 @@ install() {
     go install "github.com/ViBiOh/registry-cleaner@latest"
     go install "go.uber.org/mock/mockgen@latest"
     go install "golang.org/x/tools/cmd/goimports@latest"
+    go install "golang.org/x/tools/cmd/stringer@latest"
     go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
     go install "mvdan.cc/gofumpt@latest"
 
