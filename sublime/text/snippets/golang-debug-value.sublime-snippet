@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-fmt.Printf("Type: %T, Value: %#v, String: `%s`\n", ${1:var}, ${1}, ${1})
+fmt.Printf("%[1]T(%#[1]v) ~= `%[1]s`\n", ${1:var})
 ]]></content>
 	<tabTrigger>gdp</tabTrigger>
 	<scope>source.go</scope>
