@@ -38,7 +38,6 @@ install() {
     go install "github.com/go-delve/delve/cmd/dlv@latest"
     go install "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
     go install "github.com/tsenart/vegeta@latest"
-    go install "github.com/ViBiOh/registry-cleaner@latest"
     go install "go.uber.org/mock/mockgen@latest"
     go install "golang.org/x/tools/cmd/goimports@latest"
     go install "golang.org/x/tools/cmd/stringer@latest"
