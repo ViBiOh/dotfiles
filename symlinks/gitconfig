@@ -89,6 +89,7 @@
 	linehistory = log-pretty -L
 	sweep = ! git prune && git remote prune origin && git branch --list --format '%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' | grep --extended-regexp --invert-match '^$' | xargs git branch --delete --force && git gc
 	unshallow = ! git remote set-branches origin '*' && git pull --unshallow
+	unlock-ref = git update-ref -d
 
 [merge]
 	tool = smerge
