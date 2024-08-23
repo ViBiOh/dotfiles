@@ -9,7 +9,7 @@
   "hardware_acceleration": "opengl",
   "highlight_line": true,
   "highlight_modified_tabs": true,
-  "index_skip_unknown_extensions": false,
+  "index_skip_unknown_extensions": true,
   "show_encoding": true,
   "show_full_path": true,
   "show_line_endings": true,
