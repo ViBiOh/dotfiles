@@ -25,11 +25,11 @@ main() {
   local ZED_CONFIG_FOLDER="${HOME}/.config/zed"
   local ZED_SNIPPETS_FOLDER="${ZED_CONFIG_FOLDER}/snippets"
 
+  rm -rf "${ZED_CONFIG_FOLDER}"
   mkdir -p "${ZED_SNIPPETS_FOLDER}"
 
   ln -s "${SCRIPT_DIR}/settings.json" "${ZED_CONFIG_FOLDER}/"
   ln -s "${SCRIPT_DIR}/keymap.json" "${ZED_CONFIG_FOLDER}/"
-
   ln -s "${SCRIPT_DIR}/snippets.json" "${ZED_SNIPPETS_FOLDER}"
 }
 
