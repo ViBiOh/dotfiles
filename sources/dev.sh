@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
 DOTFILES_SCRIPT_DIR="$(script_dir)"
 
 alias dev='cd ${HOME}/code/'
@@ -47,8 +59,8 @@ dot_env() {
 
   if [[ -e ${DOTENV_FILE} ]]; then
     comm -13 \
-      <(make --directory "${DOTFILES_SCRIPT_DIR}/../sublime/plugins/SublimeGo/" | sort) \
-      <(make --directory "${DOTFILES_SCRIPT_DIR}/../sublime/plugins/SublimeGo/" TARGET_ENV_FILE="$(readlink -f "${DOTENV_FILE}")" | sort) |
+      <(make --directory "${DOTFILES_SCRIPT_DIR}/DotEnv/" | sort) \
+      <(make --directory "${DOTFILES_SCRIPT_DIR}/DotEnv/" TARGET_ENV_FILE="$(readlink -f "${DOTENV_FILE}")" | sort) |
       grep -E -v "^(CURDIR|GNUMAKEFLAGS|MAKEFILE_LIST|MAKEFLAGS|TARGET_ENV_FILE)="
   fi
 }
