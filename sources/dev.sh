@@ -53,6 +53,17 @@ dot_env() {
   fi
 }
 
+dot_env_json() {
+  dot_env "${@}" | jq -nR '
+
+def parse: capture("(?<key>[^=]*)=(?<value>.*)");
+
+reduce inputs as $line ({};
+   ($line | parse) as $p
+   | .[$p.key] = ($p.value) )
+'
+}
+
 urlencode() {
   local old_lc_collate="${LC_COLLATE-}"
   LC_COLLATE="C"
