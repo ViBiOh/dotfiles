@@ -66,13 +66,12 @@ dot_env() {
 }
 
 dot_env_json() {
-  dot_env "${@}" | jq -nR '
-
+  dot_env "${@}" | jq --null-input --raw-input '
 def parse: capture("(?<key>[^=]*)=(?<value>.*)");
 
 reduce inputs as $line ({};
-   ($line | parse) as $p
-   | .[$p.key] = ($p.value) )
+  ($line | parse) as $p | .[$p.key] = ($p.value)
+)
 '
 }
 
