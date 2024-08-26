@@ -37,7 +37,16 @@ qrcode_wifi() {
     return 1
   fi
 
-  printf "WIFI:S:%s;T:WPA;P:%s;;" "${1}" "${2}" | qrcode
+  local WIFI_NAME
+  WIFI_NAME="${1}"
+
+  local WIFI_PASSWORD
+  WIFI_PASSWORD="${2}"
+
+  WIFI_PASSWORD="${WIFI_PASSWORD//;/\\;}"
+  WIFI_PASSWORD="${WIFI_PASSWORD//:/\\:}"
+
+  printf "WIFI:S:%s;T:WPA;P:%s;;" "${WIFI_NAME}" "${WIFI_PASSWORD}" | qrcode
 }
 
 loop() {

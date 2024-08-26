@@ -124,9 +124,6 @@ if command -v pass >/dev/null 2>&1; then
       return
     fi
 
-    WIFI_PASSWORD="${WIFI_PASSWORD//;/\\;}"
-    WIFI_PASSWORD="${WIFI_PASSWORD//:/\\:}"
-
     qrcode_wifi "${WIFI_NAME}" "${WIFI_PASSWORD}"
   }
 fi
