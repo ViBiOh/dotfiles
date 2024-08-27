@@ -508,6 +508,11 @@ _fzf_complete_kube() {
     return
   fi
 
+  local NAMESPACE_SCOPE="--all-namespaces"
+  if [[ -n ${KUBE_NS:-} ]]; then
+    NAMESPACE_SCOPE="--namespace=${KUBE_NS}"
+  fi
+
   case ${COMP_WORDS[COMP_CWORD - 1]} in
   "context" | "--context")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
@@ -517,13 +522,13 @@ _fzf_complete_kube() {
 
   "forward")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl get services --all-namespaces --output=yaml | yq eval '.items[].metadata.name'
+      kubectl get services "${NAMESPACE_SCOPE}" --output=yaml | yq eval '.items[].metadata.name'
     )
     ;;
 
   "desc" | "describe" | "diff" | "edit" | "env" | "exec" | "image" | "images" | "info" | "log" | "logs" | "restart" | "rollback" | "top" | "watch")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl get deployments.app --all-namespaces --output=yaml | yq eval '.items[].metadata.name'
+      kubectl get deployments.app "${NAMESPACE_SCOPE}" --output=yaml | yq eval '.items[].metadata.name'
     )
     ;;
 
@@ -536,3 +541,4 @@ _fzf_complete_kube() {
 }
 
 [[ -n ${BASH} ]] && complete -F _fzf_complete_kube -o default -o bashdefault kube
+[[ -n ${BASH} ]] && complete -F _fzf_complete_kube -o default -o bashdefault kikou
