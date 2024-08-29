@@ -20,20 +20,21 @@ notes() {
   "save")
     (
       cd "${REAL_NOTES_FOLDER}" || return
-      git add -A
-      git commit --signoff -m "docs: $(date +"%Y-%m-%dT%H:%M:%S%z")"
+      git add --all
+      git commit --signoff --message "docs: $(date +"%Y-%m-%dT%H:%M:%S%z")"
     )
     ;;
 
   "sync")
     (
       if ! [[ -d ${REAL_NOTES_FOLDER} ]]; then
-        git clone "git@github.com:ViBiOh/notes.git" "${REAL_NOTES_FOLDER}"
+        git clone "${NOTES_REPOSITORY:-git@github.com:ViBiOh/notes.git}" "${REAL_NOTES_FOLDER}"
         cd "${REAL_NOTES_FOLDER}" || return
         sublime_add_project
       else
         cd "${REAL_NOTES_FOLDER}" || return
-        git pp
+        git pull
+        git push
       fi
     )
     ;;
