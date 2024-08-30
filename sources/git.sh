@@ -13,10 +13,17 @@ fi
 }
 
 # https://blog.gitbutler.com/git-tips-3-really-large-repositories/
+# https://www.git-tower.com/blog/git-performance/
 git_large_repos() {
   git config feature.manyFiles true
   git update-index --index-version 4
   git config core.fsmonitor true
   git config core.untrackedcache true
   git config core.commitgraph true
+  git config fetch.writeCommitGraph true
+  git commit-graph write --reachable
+}
+
+git_large_repos_status() {
+  git fsmonitor--daemon status
 }
