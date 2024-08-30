@@ -19,7 +19,7 @@ if command -v kubectl >/dev/null 2>&1; then
       K8S_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
 
       if [[ -n ${K8S_CONTEXT} ]]; then
-        printf " ☸ %s" "${K8S_CONTEXT}"
+        printf " ☸ %s" "${K8S_CONTEXT}"
       fi
 
       return "${exit}"

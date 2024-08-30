@@ -23,7 +23,7 @@ if command -v terraform >/dev/null 2>&1; then
     local exit="${?}"
 
     if [[ $(find . -maxdepth 1 -type f -name "*.tf" | wc -l) -gt 0 ]]; then
-      printf " 🔧 %s" "$(terraform workspace show)"
+      printf " 🔧 %s" "$(terraform workspace show)"
     fi
 
     return "${exit}"
