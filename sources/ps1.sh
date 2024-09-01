@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-export GIT_PS1_SHOWDIRTYSTATE="true"
-export GIT_PS1_STATESEPARATOR="|"
-export GIT_PS1_SHOWSTASHSTATE="true"
-export GIT_PS1_SHOWUNTRACKEDFILES="true"
-export GIT_PS1_COMPRESSSPARSESTATE="true"
-
 export PROMPT_DIRTRIM="3"
 
 __ps1_previous_status() {
@@ -16,9 +10,41 @@ __ps1_previous_status() {
   fi
 }
 
+_git_ps1() {
+  # preserve exit status
+  local exit="${?}"
+
+  if [[ $(git rev-parse --is-inside-work-tree 2>&1) == "true" ]]; then
+    local _GIT_STATUS_PORCELAIN
+    _GIT_STATUS_PORCELAIN="$(git status --porcelain --branch --untracked-files=normal)"
+
+    local _GIT_STATUS_BRANCH
+    if [[ $(printf "%s" "${_GIT_STATUS_PORCELAIN}") =~ ^##\ ([^.]+).*$ ]]; then
+      _GIT_STATUS_BRANCH="${BASH_REMATCH[1]}"
+    fi
+
+    local _GIT_LOCAL_CHANGE
+    if [[ $(printf "%s" "${_GIT_STATUS_PORCELAIN}" | grep -c "^.M") -gt 0 ]]; then
+      _GIT_LOCAL_CHANGE+="*"
+    fi
+
+    if [[ $(printf "%s" "${_GIT_STATUS_PORCELAIN}" | grep -c "^??") -gt 0 ]]; then
+      _GIT_LOCAL_CHANGE+="$"
+    fi
+
+    if [[ -n ${_GIT_LOCAL_CHANGE} ]]; then
+      _GIT_LOCAL_CHANGE="|${_GIT_LOCAL_CHANGE}"
+    fi
+
+    printf " (%s%s)" "${_GIT_STATUS_BRANCH}" "${_GIT_LOCAL_CHANGE}"
+  fi
+
+  return "${exit}"
+}
+
 PS1="${BLUE}\u${RESET}@${RED}\h${RESET} ${GREEN}\w${RESET}"
-if [[ "$(type -t "__git_ps1")" == "function" ]]; then
-  PS1+="${YELLOW}\$(__git_ps1)${RESET}"
+if [[ "$(type -t "_git_ps1")" == "function" ]]; then
+  PS1+="${YELLOW}\$(_git_ps1)${RESET}"
 fi
 
 if [[ "$(type -t "__kube_ps1")" == "function" ]]; then
