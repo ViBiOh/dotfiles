@@ -10,30 +10,63 @@ __git_ps1() {
 
   if [[ $(git rev-parse --is-inside-work-tree 2>&1) == "true" ]]; then
     local _GIT_STATUS_PORCELAIN
-    _GIT_STATUS_PORCELAIN="$(git status --porcelain --untracked-files=normal)"
 
-    local _GIT_LOCAL_CHANGE
-    if [[ ${_GIT_STATUS_PORCELAIN} =~ ^.[MTADRC] ]]; then
-      _GIT_LOCAL_CHANGE+="*"
+    local _GIT_STATUS_BRANCH
+    local _GIT_LOCAL_CHANGE=0
+
+    while read -r line; do
+      if [[ ${line} =~ ^#\ branch\.head\ (.*) ]]; then
+        _GIT_STATUS_BRANCH="${BASH_REMATCH[1]}"
+      fi
+
+      if [[ ${line} =~ ^1\ \.[MTADRC] ]]; then
+        _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 1))
+      fi
+
+      if [[ ${line} =~ ^1\ [MTADRC] ]]; then
+        _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 2))
+      fi
+
+      if [[ ${line} =~ ^u ]]; then
+        _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 4))
+      fi
+
+      if [[ ${line} =~ ^\? ]]; then
+        _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 8))
+      fi
+
+      if [[ ${line} =~ ^#\ stash ]]; then
+        _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 16))
+      fi
+    done <<<"$(git status --porcelain=v2 --branch --show-stash --untracked-files=normal)"
+
+    local _GIT_STATUS_FILES=""
+
+    if [[ $((_GIT_LOCAL_CHANGE & 1)) -ne 0 ]]; then
+      _GIT_STATUS_FILES+="*"
     fi
 
-    if [[ ${_GIT_STATUS_PORCELAIN} =~ ^[MTADRC] ]]; then
-      _GIT_LOCAL_CHANGE+="+"
+    if [[ $((_GIT_LOCAL_CHANGE & 2)) -ne 0 ]]; then
+      _GIT_STATUS_FILES+="+"
     fi
 
-    if [[ ${_GIT_STATUS_PORCELAIN} =~ ^[DAU][DAU] ]]; then
-      _GIT_LOCAL_CHANGE+="💥"
+    if [[ $((_GIT_LOCAL_CHANGE & 4)) -ne 0 ]]; then
+      _GIT_STATUS_FILES+="💥"
     fi
 
-    if [[ ${_GIT_STATUS_PORCELAIN} =~ ^\? ]]; then
-      _GIT_LOCAL_CHANGE+="$"
+    if [[ $((_GIT_LOCAL_CHANGE & 8)) -ne 0 ]]; then
+      _GIT_STATUS_FILES+="$"
     fi
 
-    if [[ -n ${_GIT_LOCAL_CHANGE} ]]; then
-      _GIT_LOCAL_CHANGE="|${_GIT_LOCAL_CHANGE}"
+    if [[ $((_GIT_LOCAL_CHANGE & 16)) -ne 0 ]]; then
+      _GIT_STATUS_FILES+="%"
     fi
 
-    printf " (%s%s)" "$(git rev-parse --abbrev-ref HEAD)" "${_GIT_LOCAL_CHANGE}"
+    if [[ -n ${_GIT_STATUS_FILES} ]]; then
+      _GIT_STATUS_FILES="|${_GIT_STATUS_FILES}"
+    fi
+
+    printf " (%s%s)" "${_GIT_STATUS_BRANCH}" "${_GIT_STATUS_FILES}"
   fi
 
   return "${exit}"
