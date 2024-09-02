@@ -134,6 +134,7 @@ install() {
 
   defaults write com.apple.screencapture disable-shadow -bool true
   defaults write com.apple.screencapture location -string "${HOME}/Downloads"
+  defaults write com.apple.screencapture show-thumbnail -bool false
   defaults write com.apple.screencapture type -string "png"
 
   defaults write com.apple.touchbar.agent PresentationModeGlobal "functionKeys"
