@@ -12,35 +12,28 @@ __git_ps1() {
     local _GIT_STATUS_PORCELAIN
     _GIT_STATUS_PORCELAIN="$(git status --porcelain --untracked-files=normal)"
 
-    local _GIT_STATUS_BRANCH
-    _GIT_STATUS_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-
     local _GIT_LOCAL_CHANGE
-    if [[ $(printf "%s" "${_GIT_STATUS_PORCELAIN}" | grep --count --extended-regexp "^.[MTADRC]") -gt 0 ]]; then
+    if [[ ${_GIT_STATUS_PORCELAIN} =~ ^.[MTADRC] ]]; then
       _GIT_LOCAL_CHANGE+="*"
     fi
 
-    if [[ $(printf "%s" "${_GIT_STATUS_PORCELAIN}" | grep --count --extended-regexp "^[MTADRC]") -gt 0 ]]; then
+    if [[ ${_GIT_STATUS_PORCELAIN} =~ ^[MTADRC] ]]; then
       _GIT_LOCAL_CHANGE+="+"
     fi
 
-    if [[ $(printf "%s" "${_GIT_STATUS_PORCELAIN}" | grep --count --extended-regexp "^[DAU][DAU]") -gt 0 ]]; then
+    if [[ ${_GIT_STATUS_PORCELAIN} =~ ^[DAU][DAU] ]]; then
       _GIT_LOCAL_CHANGE+="💥"
     fi
 
-    if [[ $(printf "%s" "${_GIT_STATUS_PORCELAIN}" | grep --count "^?") -gt 0 ]]; then
+    if [[ ${_GIT_STATUS_PORCELAIN} =~ ^\? ]]; then
       _GIT_LOCAL_CHANGE+="$"
-    fi
-
-    if [[ $(git stash list | wc -l) -gt 0 ]]; then
-      _GIT_LOCAL_CHANGE+="%"
     fi
 
     if [[ -n ${_GIT_LOCAL_CHANGE} ]]; then
       _GIT_LOCAL_CHANGE="|${_GIT_LOCAL_CHANGE}"
     fi
 
-    printf " (%s%s)" "${_GIT_STATUS_BRANCH}" "${_GIT_LOCAL_CHANGE}"
+    printf " (%s%s)" "$(git rev-parse --abbrev-ref HEAD)" "${_GIT_LOCAL_CHANGE}"
   fi
 
   return "${exit}"
