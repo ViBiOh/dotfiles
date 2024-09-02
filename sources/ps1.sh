@@ -10,12 +10,10 @@ __git_ps1() {
 
   if [[ $(git rev-parse --is-inside-work-tree 2>&1) == "true" ]]; then
     local _GIT_STATUS_PORCELAIN
-    _GIT_STATUS_PORCELAIN="$(git status --porcelain --branch --untracked-files=normal)"
+    _GIT_STATUS_PORCELAIN="$(git status --porcelain --untracked-files=normal)"
 
     local _GIT_STATUS_BRANCH
-    if [[ $(printf "%s" "${_GIT_STATUS_PORCELAIN}") =~ ^##\ ([^. ]+).*$ ]]; then
-      _GIT_STATUS_BRANCH="${BASH_REMATCH[1]}"
-    fi
+    _GIT_STATUS_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
     local _GIT_LOCAL_CHANGE
     if [[ $(printf "%s" "${_GIT_STATUS_PORCELAIN}" | grep --count --extended-regexp "^.[MTADRC]") -gt 0 ]]; then
