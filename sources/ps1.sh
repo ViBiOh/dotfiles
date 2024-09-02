@@ -19,11 +19,11 @@ __git_ps1() {
         _GIT_STATUS_BRANCH="${BASH_REMATCH[1]}"
       fi
 
-      if [[ ${line} =~ ^1\ \.[MTADRC] ]]; then
+      if [[ ${line} =~ ^[1|2]\ \.[MTADRC] ]]; then
         _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 1))
       fi
 
-      if [[ ${line} =~ ^1\ [MTADRC] ]]; then
+      if [[ ${line} =~ ^[1|2]\ [MTADRC] ]]; then
         _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 2))
       fi
 
