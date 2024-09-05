@@ -2,19 +2,21 @@
 
 export PROMPT_DIRTRIM="3"
 
-PS1=""
+PS1="${BLUE}\u${RESET}"
 
-# Show username and hostname if SSH
+# Show hostname if SSH
 if [[ -n ${SSH_CONNECTION:-} ]]; then
-  PS1+="${BLUE}\u${RESET}@${RED}\h${RESET} "
+  PS1+="@${RED}\h${RESET}"
 fi
+
+PS1+=" "
 
 # Show red star if root
 if [[ $UID -eq 0 ]]; then
   PS1+="${RED}👻${RESET} "
 fi
 
-PS1="${GREEN}\w${RESET}"
+PS1+="${GREEN}\w${RESET}"
 
 __git_ps1() {
   # preserve exit status
