@@ -51,8 +51,8 @@
 
 [alias]
 	last-tag = ! git describe --tag --abbrev=0 2> /dev/null
-	remote-repository = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@.*:([^\\.]*)(.git)?$ ]] && printf '%s' \"${BASH_REMATCH[1]}\"
-	web-url = ! [[ "$(git remote get-url --push $(git remote show | head -1))" =~ ^.*@(.*)[:/](.*)/(.*)$ ]] && printf 'https://%s/%s/%s' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]%.git}"
+	remote-repository = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@.*:([^\\.]*)(.git)?$ ]] && printf -- '%s' \"${BASH_REMATCH[1]}\"
+	web-url = ! [[ "$(git remote get-url --push $(git remote show | head -1))" =~ ^.*@(.*)[:/](.*)/(.*)$ ]] && printf -- 'https://%s/%s/%s' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]%.git}"
 	web = ! open "$(git web-url)"
 	pr = ! open "$(git web-url)/compare/$(git default-branch)...$(git current-branch)?expand=1"
 	fco = "! git switch \"$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query=\"remotes/${1:-}\" | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||')\" #"

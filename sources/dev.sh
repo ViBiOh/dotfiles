@@ -233,11 +233,11 @@ rainbow() {
       g = (colnum*510/76);
       b = (colnum*255/76);
       if (g>255) g = 510-g;
-      printf -- "\033[48;2;%d;%d;%dm", r,g,b;
-      printf -- "\033[38;2;%d;%d;%dm", 255-r,255-g,255-b;
-      printf -- "%s\033[0m", substr(s,colnum+1,1);
+      printf "\033[48;2;%d;%d;%dm", r,g,b;
+      printf "\033[38;2;%d;%d;%dm", 255-r,255-g,255-b;
+      printf "%s\033[0m", substr(s,colnum+1,1);
     }
-    printf -- "\n";
+    printf "\n";
   }'
 }
 
