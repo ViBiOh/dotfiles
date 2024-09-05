@@ -2,7 +2,12 @@
 
 export PROMPT_DIRTRIM="3"
 
-PS1="${BLUE}\u${RESET}"
+PS1=""
+
+# Show username if different than logname
+if [[ $(logname) != "$(id -un)" ]]; then
+  PS1+="${BLUE}\u${RESET}"
+fi
 
 # Show hostname if SSH
 if [[ -n ${SSH_CONNECTION:-} ]]; then
@@ -11,9 +16,9 @@ fi
 
 PS1+=" "
 
-# Show red star if root
+# Show red star if root (most likely root has a different PS1)
 if [[ $UID -eq 0 ]]; then
-  PS1+="${RED}👻${RESET} "
+  PS1+="${PURPLE}👻${RESET} "
 fi
 
 PS1+="${GREEN}\w${RESET}"
