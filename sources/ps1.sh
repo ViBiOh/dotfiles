@@ -5,7 +5,7 @@ export PROMPT_DIRTRIM="3"
 PS1=""
 
 # Show username if different than logname
-if [[ $(logname) != "$(id -un)" ]]; then
+if [[ $(logname 2>/dev/null) != "$(id -un)" ]]; then
   PS1+="${BLUE}\u${RESET}"
 fi
 
