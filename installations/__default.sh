@@ -46,11 +46,11 @@ END_OF_BASH_PROFILE
     packages_install "${PACKAGES[@]}" "awk"
 
     if [[ $(grep --count "${BREW_PREFIX}" "/etc/shells") -eq 0 ]]; then
-      printf "+-------------------------+\n"
-      printf "| changing shell for user |\n"
-      printf "+-------------------------+\n"
+      printf -- "+-------------------------+\n"
+      printf -- "| changing shell for user |\n"
+      printf -- "+-------------------------+\n"
 
-      printf "%s/bin/bash\n" "${BREW_PREFIX}" | sudo tee -a "/etc/shells" >/dev/null
+      printf -- "%s/bin/bash\n" "${BREW_PREFIX}" | sudo tee -a "/etc/shells" >/dev/null
       chsh -s "${BREW_PREFIX}/bin/bash" -u "$(whoami)"
     fi
   elif command -v apt-get >/dev/null 2>&1; then

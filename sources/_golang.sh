@@ -24,7 +24,7 @@ if command -v fzf >/dev/null 2>&1; then
       return
     fi
 
-    printf "MODULE=%s\n" "${MODULE_TO_BUMP}"
+    printf -- "MODULE=%s\n" "${MODULE_TO_BUMP}"
     local MODULE_VERSION=""
 
     local GITHUB_TOKEN
@@ -35,7 +35,7 @@ if command -v fzf >/dev/null 2>&1; then
 
       MODULE_VERSION="$(
         cat \
-          <(printf "latest\n") \
+          <(printf -- "latest\n") \
           <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/branches?per_page=100" | jq --raw-output '.[].name') \
           <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/tags?per_page=100" | jq --raw-output '.[].name') |
           fzf --height=20 --ansi --reverse
@@ -45,7 +45,7 @@ if command -v fzf >/dev/null 2>&1; then
     fi
 
     if [[ -n ${MODULE_VERSION} ]]; then
-      printf "MODULE_VERSION=%s\n" "${MODULE_VERSION}"
+      printf -- "MODULE_VERSION=%s\n" "${MODULE_VERSION}"
       MODULE_VERSION="@${MODULE_VERSION}"
 
       var_print_and_run go get -d "${MODULE_TO_BUMP}${MODULE_VERSION}"
@@ -87,7 +87,7 @@ go_mod_local() {
   fi
 
   if [[ $(go list -m -json "${MODULE_TO_LOCAL}" | jq --raw-output 'select(.Replace != null) | .Path' | wc -l) -gt 0 ]]; then
-    printf "Module %s was already replaced, removing it..." "${MODULE_TO_LOCAL}"
+    printf -- "Module %s was already replaced, removing it..." "${MODULE_TO_LOCAL}"
     go mod edit -dropreplace="${MODULE_TO_LOCAL}"
     return
   fi

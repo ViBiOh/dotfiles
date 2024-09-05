@@ -46,7 +46,7 @@ qrcode_wifi() {
   WIFI_PASSWORD="${WIFI_PASSWORD//;/\\;}"
   WIFI_PASSWORD="${WIFI_PASSWORD//:/\\:}"
 
-  printf "WIFI:S:%s;T:WPA;P:%s;;" "${WIFI_NAME}" "${WIFI_PASSWORD}" | qrcode
+  printf -- "WIFI:S:%s;T:WPA;P:%s;;" "${WIFI_NAME}" "${WIFI_PASSWORD}" | qrcode
 }
 
 loop() {
@@ -92,8 +92,8 @@ urlencode() {
   for ((i = 0; i < length; i++)); do
     local c="${1:i:1}"
     case "${c}" in
-    [a-zA-Z0-9.~_-]) printf "%s" "${c}" ;;
-    ' ') printf "%%20" ;;
+    [a-zA-Z0-9.~_-]) printf -- "%s" "${c}" ;;
+    ' ') printf -- "%%20" ;;
     *) printf '%%%02X' "'$c" ;;
     esac
   done
@@ -124,7 +124,7 @@ stock() {
 
   if [[ ${?} -ne 0 ]]; then
     cat "${HEADER_OUPUT}" >/dev/stderr
-    printf "%s\n" "${YAHOO_OUTPUT}" >/dev/stderr
+    printf -- "%s\n" "${YAHOO_OUTPUT}" >/dev/stderr
     rm -f "${HEADER_OUPUT}"
     return 1
   fi
@@ -132,17 +132,17 @@ stock() {
   rm -f "${HEADER_OUPUT}"
 
   local STOCK_SYMBOL
-  STOCK_SYMBOL="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .symbol')"
+  STOCK_SYMBOL="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .symbol')"
 
   local STOCK_CURRENCY
-  STOCK_CURRENCY="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .currency')"
+  STOCK_CURRENCY="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .currency')"
 
   local EVOLUTION_PERCENT
   local OUTPUT_COLOR="${GREEN}"
   local EVOLUTION_SIGN="↗"
 
   _stock_evolution() {
-    EVOLUTION_PERCENT="$(printf "scale = 4; scale = 4; 100 * ((%s / %s) - 1)" "${CURRENT_PRICE}" "${PREVIOUS_PRICE}" | bc)"
+    EVOLUTION_PERCENT="$(printf -- "scale = 4; scale = 4; 100 * ((%s / %s) - 1)" "${CURRENT_PRICE}" "${PREVIOUS_PRICE}" | bc)"
 
     OUTPUT_COLOR="${GREEN}"
     EVOLUTION_SIGN="↗"
@@ -155,14 +155,14 @@ stock() {
   }
 
   local CURRENT_PRICE
-  CURRENT_PRICE="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
+  CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
 
   local PREVIOUS_PRICE
-  PREVIOUS_PRICE="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .previousClose')"
+  PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .previousClose')"
 
   _stock_evolution
 
-  printf "%b%s%b %s %s %b%s%s%b\n" "${YELLOW}" "${STOCK_SYMBOL}" "${RESET}" "${CURRENT_PRICE}" "${STOCK_CURRENCY}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
+  printf -- "%b%s%b %s %s %b%s%s%b\n" "${YELLOW}" "${STOCK_SYMBOL}" "${RESET}" "${CURRENT_PRICE}" "${STOCK_CURRENCY}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
 
   if command -v spark >/dev/null 2>&1; then
     YAHOO_OUTPUT="$(
@@ -179,18 +179,18 @@ stock() {
 
     if [[ ${?} -ne 0 ]]; then
       cat "${HEADER_OUPUT}" >/dev/stderr
-      printf "%s\n" "${YAHOO_OUTPUT}" >/dev/stderr
+      printf -- "%s\n" "${YAHOO_OUTPUT}" >/dev/stderr
       rm -f "${HEADER_OUPUT}"
       return 1
     fi
 
     rm -f "${HEADER_OUPUT}"
 
-    PREVIOUS_PRICE="$(printf "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .chartPreviousClose')"
+    PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .chartPreviousClose')"
     _stock_evolution
 
     printf -- "\n---\n1mo %b%s%s%b\n" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
-    printf "%s" "${YAHOO_OUTPUT}" | jq -r '.chart.result[0].indicators.quote[0].open | join(",")' | spark
+    printf -- "%s" "${YAHOO_OUTPUT}" | jq -r '.chart.result[0].indicators.quote[0].open | join(",")' | spark
   fi
 }
 
@@ -198,7 +198,7 @@ date_in() {
   local TZ
   TZ="$(rg --files /usr/share/zoneinfo/ | sed 's|/usr/share/zoneinfo/||' | fzf --select-1 --query="${*:-New_York}")"
 
-  printf "%b%s%b %b%s%b\n" "${BLUE}" "${TZ}" "${RESET}" "${YELLOW}" "$(TZ=${TZ} date '+%Y-%m-%d %H:%M:%S')" "${RESET}"
+  printf -- "%b%s%b %b%s%b\n" "${BLUE}" "${TZ}" "${RESET}" "${YELLOW}" "$(TZ=${TZ} date '+%Y-%m-%d %H:%M:%S')" "${RESET}"
 }
 
 _fzf_complete_date_in() {
@@ -215,11 +215,11 @@ if [[ ${OSTYPE} =~ ^darwin ]]; then
   }
 
   system_state() {
-    printf "%bThermal%b\n" "${BLUE}" "${RESET}"
+    printf -- "%bThermal%b\n" "${BLUE}" "${RESET}"
     pmset -g therm
-    printf "%bAC Power adapter%b\n" "${BLUE}" "${RESET}"
+    printf -- "%bAC Power adapter%b\n" "${BLUE}" "${RESET}"
     pmset -g ac
-    printf "%bBattery%b\n" "${BLUE}" "${RESET}"
+    printf -- "%bBattery%b\n" "${BLUE}" "${RESET}"
     pmset -g batt
   }
 fi
@@ -233,11 +233,11 @@ rainbow() {
       g = (colnum*510/76);
       b = (colnum*255/76);
       if (g>255) g = 510-g;
-      printf "\033[48;2;%d;%d;%dm", r,g,b;
-      printf "\033[38;2;%d;%d;%dm", 255-r,255-g,255-b;
-      printf "%s\033[0m", substr(s,colnum+1,1);
+      printf -- "\033[48;2;%d;%d;%dm", r,g,b;
+      printf -- "\033[38;2;%d;%d;%dm", 255-r,255-g,255-b;
+      printf -- "%s\033[0m", substr(s,colnum+1,1);
     }
-    printf "\n";
+    printf -- "\n";
   }'
 }
 
@@ -314,7 +314,7 @@ if command -v vegeta >/dev/null 2>&1; then
     shift
 
     var_info "Attacking '${URL}' during 30 seconds..."
-    printf "GET %s" "${URL}" | vegeta attack -duration=30s "${@}" | vegeta plot >vegeta.html && open vegeta.html
+    printf -- "GET %s" "${URL}" | vegeta attack -duration=30s "${@}" | vegeta plot >vegeta.html && open vegeta.html
     sleep 5
     rm vegeta.html
   }

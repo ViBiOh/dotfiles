@@ -65,11 +65,11 @@ kube() {
       RESOURCE_NAMESPACE="${OPTARG}"
       ;;
     :)
-      printf "option -%s requires a value\n" "${OPTARG}" 1>&2
+      printf -- "option -%s requires a value\n" "${OPTARG}" 1>&2
       return 1
       ;;
     \?)
-      printf "option -%s is invalid\n" "${OPTARG}" 1>&2
+      printf -- "option -%s is invalid\n" "${OPTARG}" 1>&2
       return 2
       ;;
     esac
@@ -114,9 +114,9 @@ kube() {
 
   _kube_pod_labels() {
     if [[ ${RESOURCE_TYPE} =~ ^cronjobs? ]]; then
-      printf "job-name in (%s)" "$("${KUBECTL_COMMAND[@]}" get jobs --namespace "${RESOURCE_NAMESPACE}" --output yaml | OWNER_NAME="${RESOURCE_NAME}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -)"
+      printf -- "job-name in (%s)" "$("${KUBECTL_COMMAND[@]}" get jobs --namespace "${RESOURCE_NAMESPACE}" --output yaml | OWNER_NAME="${RESOURCE_NAME}" yq eval '.items[] | select(.metadata.ownerReferences[].name == strenv(OWNER_NAME)) | .metadata.name' | paste -sd, -)"
     elif [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
-      printf "job-name=%s" "${RESOURCE_NAME}"
+      printf -- "job-name=%s" "${RESOURCE_NAME}"
     elif [[ ${RESOURCE_TYPE} =~ ^(daemonset|deployment|statefulset)s? ]]; then
       "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -
     else
@@ -280,11 +280,11 @@ kube() {
           EXTRA_OPTIONS+=" --tty"
           ;;
         :)
-          printf "option -%s requires a value\n" "${OPTARG}" 1>&2
+          printf -- "option -%s requires a value\n" "${OPTARG}" 1>&2
           return 1
           ;;
         \?)
-          printf "option -%s is invalid\n" "${OPTARG}" 1>&2
+          printf -- "option -%s is invalid\n" "${OPTARG}" 1>&2
           return 2
           ;;
         esac
@@ -313,7 +313,7 @@ kube() {
         if command -v kmux >/dev/null 2>&1; then
           _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace "${RESOURCE_NAMESPACE}" port-forward "${RESOURCE_TYPE}" "${RESOURCE_NAME}" "${LOCAL_PORT}:${KUBE_PORT}"
         else
-          printf "%bForwarding %s from %s to %s%b\n" "${BLUE}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${LOCAL_PORT}" "${KUBE_PORT}" "${RESET}"
+          printf -- "%bForwarding %s from %s to %s%b\n" "${BLUE}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${LOCAL_PORT}" "${KUBE_PORT}" "${RESET}"
           _kube_print_and_run "${KUBECTL_COMMAND[@]}" port-forward --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --address "127.0.0.1" "${LOCAL_PORT}:${KUBE_PORT}"
         fi
       fi
@@ -371,7 +371,7 @@ kube() {
         local PODS_LABELS
         PODS_LABELS="$(_kube_pod_labels)"
 
-        printf "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
+        printf -- "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
         _kube_print_and_run "${KUBECTL_COMMAND[@]}" logs --namespace "${RESOURCE_NAMESPACE}" --ignore-errors --prefix --selector="${PODS_LABELS}" --follow --since=24h "${@}"
       fi

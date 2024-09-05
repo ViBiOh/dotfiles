@@ -81,7 +81,7 @@ normalized_os() {
     OS_NAME="${MACOS_VALUE}"
   fi
 
-  printf "%s" "${OS_NAME}"
+  printf -- "%s" "${OS_NAME}"
 }
 
 normalized_arch() {
@@ -109,5 +109,5 @@ normalized_arch() {
     ARCH="${ARM64_VALUE}"
   fi
 
-  printf "%s" "${ARCH}"
+  printf -- "%s" "${ARCH}"
 }

@@ -14,7 +14,9 @@ if [[ -n ${SSH_CONNECTION:-} ]]; then
   PS1+="@${RED}\h${RESET}"
 fi
 
-PS1+=" "
+if [[ -n ${PS1} ]]; then
+  PS1+=" "
+fi
 
 # Show special char if root (most likely root has a different PS1)
 if [[ $UID -eq 0 ]]; then
@@ -85,7 +87,7 @@ __git_ps1() {
       _GIT_STATUS_FILES="|${_GIT_STATUS_FILES}"
     fi
 
-    printf " (%s%s)" "${_GIT_STATUS_BRANCH}" "${_GIT_STATUS_FILES}"
+    printf -- " (%s%s)" "${_GIT_STATUS_BRANCH}" "${_GIT_STATUS_FILES}"
   fi
 
   return "${exit}"
@@ -118,7 +120,7 @@ __elapsed_ps1() {
     local _ELAPSED=$((EPOCHSECONDS - _START))
 
     if [[ ${_ELAPSED} -gt 0 ]]; then
-      printf "⏳%ss" "${_ELAPSED}"
+      printf -- "⏳%ss" "${_ELAPSED}"
     fi
   fi
 }

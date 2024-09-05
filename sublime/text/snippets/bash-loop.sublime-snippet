@@ -1,7 +1,7 @@
 <snippet>
 	<content><![CDATA[
 while IFS= read -r -d '' file; do
-  printf "%s" "\${file}"
+  printf -- "%s" "\${file}"
 done < <(find . -type f -name '*' -print0)
 
 ]]></content>

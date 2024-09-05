@@ -50,7 +50,7 @@ if command -v pass >/dev/null 2>&1; then
 
     if command -v pass >/dev/null 2>&1 && [[ -e "${PASSWORD_STORE_DIR:-${HOME}/.password-store}/${PASS_NAME}.gpg" ]] && [[ "$(pass show "${PASS_NAME}" | grep --count "^otpauth:")" -eq 1 ]]; then
       read -s -r -p "  Press enter for otp"
-      printf "\n"
+      printf -- "\n"
 
       pass otp -c "${PASS_NAME}"
     fi
@@ -68,9 +68,9 @@ if command -v pass >/dev/null 2>&1; then
     shift
 
     pass_get "${PASS_NAME}" "login" | pbcopy
-    printf "Copied login of %s to clipboard\n" "${PASS_NAME}"
+    printf -- "Copied login of %s to clipboard\n" "${PASS_NAME}"
     read -s -r -p "Press enter for password"
-    printf "\n"
+    printf -- "\n"
 
     passfor "${PASS_NAME}"
   }
@@ -155,7 +155,7 @@ if command -v pgcli >/dev/null 2>&1; then
 
       while IFS=":" read -r host port db user pass; do
         if [[ ! ${host} =~ ^\s*# ]] && [[ ! ${host} =~ ^\s*$ ]]; then
-          printf "host: %b%s%b port: %b%s%b db: %b%s%b user: %b%s%b %b%s%b\n" "${BLUE}" "${host}" "${RESET}" "${YELLOW}" "${port}" "${RESET}" "${RED}" "${db}" "${RESET}" "${GREEN}" "${user}" "${RESET}" "${BLUE}" "${comment}" "${RESET}"
+          printf -- "host: %b%s%b port: %b%s%b db: %b%s%b user: %b%s%b %b%s%b\n" "${BLUE}" "${host}" "${RESET}" "${YELLOW}" "${port}" "${RESET}" "${RED}" "${db}" "${RESET}" "${GREEN}" "${user}" "${RESET}" "${BLUE}" "${comment}" "${RESET}"
           comment=""
         elif [[ ${host} =~ ^\s*# ]]; then
           comment="${host}"

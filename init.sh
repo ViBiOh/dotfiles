@@ -6,21 +6,21 @@ readonly CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 print_title() {
   local line="--------------------------------------------------------------------------------"
 
-  printf "%s%s%s\n" "+-" "${line:0:${#1}}" "-+"
-  printf "%s%s%s\n" "| " "${1}" " |"
-  printf "%s%s%s\n" "+-" "${line:0:${#1}}" "-+"
+  printf -- "%s%s%s\n" "+-" "${line:0:${#1}}" "-+"
+  printf -- "%s%s%s\n" "| " "${1}" " |"
+  printf -- "%s%s%s\n" "+-" "${line:0:${#1}}" "-+"
 }
 
 usage() {
-  printf "Usage: %s [flags]\n" "${0}"
-  printf "  -a\tRun all stages: symlinks, clean, install and passwords\n"
-  printf "  -c\tClean install and temporary files\n"
-  printf "  -d\tRecreate dotfilesrc\n"
-  printf "  -i\tInstall and configure softwares\n"
-  printf "  -l\tLimiting execution to given filename\n"
-  printf "  -p\tRetrieve and write credentials\n"
-  printf "  -s\tCreate symlinks into \${HOME}\n"
-  printf "  -h\tPrint this help\n"
+  printf -- "Usage: %s [flags]\n" "${0}"
+  printf -- "  -a\tRun all stages: symlinks, clean, install and passwords\n"
+  printf -- "  -c\tClean install and temporary files\n"
+  printf -- "  -d\tRecreate dotfilesrc\n"
+  printf -- "  -i\tInstall and configure softwares\n"
+  printf -- "  -l\tLimiting execution to given filename\n"
+  printf -- "  -p\tRetrieve and write credentials\n"
+  printf -- "  -s\tCreate symlinks into \${HOME}\n"
+  printf -- "  -h\tPrint this help\n"
 }
 
 create_symlinks() {
@@ -56,7 +56,7 @@ do_mandatory_actions() {
 }
 
 create_dotfilesrc() {
-  printf "Select files to install\n"
+  printf -- "Select files to install\n"
 
   cat >"${HOME}/.dotfilesrc" <<END_OF_DOTFILES_RC
 #!/usr/bin/env bash
@@ -68,7 +68,7 @@ END_OF_DOTFILES_RC
     BASENAME_FILE="$(basename "${file}")"
 
     local INSTALL_NAME
-    INSTALL_NAME="$(printf "%s" "${BASENAME_FILE%.sh}" | tr "[:lower:]" "[:upper:]")"
+    INSTALL_NAME="$(printf -- "%s" "${BASENAME_FILE%.sh}" | tr "[:lower:]" "[:upper:]")"
 
     echo "export DOTFILES_${INSTALL_NAME}=\"true\"" >>"${HOME}/.dotfilesrc"
   done < <(find "${CURRENT_DIR}/installations" -not -name "__*" -type f | LC_ALL=C sort | fzf --multi --print0 --preview 'cat {}')
@@ -86,7 +86,7 @@ browse_actions() {
     BASENAME_FILE="$(basename "${file}")"
 
     local INSTALL_NAME
-    INSTALL_NAME="$(printf "%s" "${BASENAME_FILE%.sh}" | tr "[:lower:]" "[:upper:]")"
+    INSTALL_NAME="$(printf -- "%s" "${BASENAME_FILE%.sh}" | tr "[:lower:]" "[:upper:]")"
 
     if [[ -n ${FILE_LIMIT} ]] && [[ ${INSTALL_NAME} != "${FILE_LIMIT}" ]]; then
       continue
@@ -159,20 +159,20 @@ main() {
       RUN_SYMLINKS=1
       ;;
     l)
-      FILE_LIMIT="$(printf "%s" "${OPTARG}" | tr "[:lower:]" "[:upper:]")"
-      printf "Limiting to %s\n" "${FILE_LIMIT}"
+      FILE_LIMIT="$(printf -- "%s" "${OPTARG}" | tr "[:lower:]" "[:upper:]")"
+      printf -- "Limiting to %s\n" "${FILE_LIMIT}"
       ;;
     r)
-      FILE_LIMIT="$(printf "%s" "${OPTARG}" | tr "[:lower:]" "[:upper:]")"
+      FILE_LIMIT="$(printf -- "%s" "${OPTARG}" | tr "[:lower:]" "[:upper:]")"
       FILE_RESTART=1
-      printf "Restarting at %s\n" "${FILE_LIMIT}"
+      printf -- "Restarting at %s\n" "${FILE_LIMIT}"
       ;;
     :)
-      printf "option -%s requires a value\n" "${OPTARG}" >&2
+      printf -- "option -%s requires a value\n" "${OPTARG}" >&2
       exit 1
       ;;
     \?)
-      printf "option -%s is invalid\n" "${OPTARG}" >&2
+      printf -- "option -%s is invalid\n" "${OPTARG}" >&2
       usage
       exit 2
       ;;

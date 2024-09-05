@@ -13,7 +13,7 @@ install() {
   terraform_install "${TERRAFORM_VERSION}"
 
   mkdir -p "${HOME}/.terraform.d/plugin-cache"
-  printf "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\ndisable_checkpoint = true\n" "${HOME}" >"${HOME}/.terraformrc"
+  printf -- "plugin_cache_dir = \"%s/.terraform.d/plugin-cache\"\ndisable_checkpoint = true\n" "${HOME}" >"${HOME}/.terraformrc"
 
   # renovate: datasource=github-releases depName=hashicorp/terraform-ls
   local TERRAFORM_LS_VERSION="v0.34.3"
@@ -22,7 +22,7 @@ install() {
 
 credentials() {
   if command -v pass >/dev/null 2>&1 && [[ -d ${PASSWORD_STORE_DIR:-${HOME}/.password-store} ]] && [[ $(pass find terraform | wc -l) -gt 1 ]]; then
-    printf "credentials \"app.terraform.io\" {\n  token = \"%s\"\n}" "$(pass_get "dev/terraform" "token")" >>"${HOME}/.terraformrc"
+    printf -- "credentials \"app.terraform.io\" {\n  token = \"%s\"\n}" "$(pass_get "dev/terraform" "token")" >>"${HOME}/.terraformrc"
     chmod 600 "${HOME}/.terraformrc"
   fi
 }

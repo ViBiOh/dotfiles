@@ -7,7 +7,7 @@ memory_clean() {
     sudo sysctl vm.drop_caches=3
   else
     sudo sync
-    printf "3\n" >"/proc/sys/vm/drop_caches"
+    printf -- "3\n" >"/proc/sys/vm/drop_caches"
   fi
 }
 

@@ -28,7 +28,7 @@ dns_flush() {
       sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload 2>/dev/null || true
       sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop 2>/dev/null || true
 
-      printf "Waiting 1 second before starting again...\n"
+      printf -- "Waiting 1 second before starting again...\n"
       sleep 1
 
       sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
@@ -148,7 +148,7 @@ dns_allow() {
   "
 
   local WEBSITE
-  WEBSITE="$(printf "%s\n" "${!websites[@]}" | fzf --select-1 --query="${1-}" --exit-0)"
+  WEBSITE="$(printf -- "%s\n" "${!websites[@]}" | fzf --select-1 --query="${1-}" --exit-0)"
 
   if [[ -z ${WEBSITE} ]]; then
     return 1

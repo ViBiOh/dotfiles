@@ -88,7 +88,7 @@ forward-zone:
     sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload || true
     sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop || true
 
-    printf "Waiting 1 second before starting unbound...\n"
+    printf -- "Waiting 1 second before starting unbound...\n"
     sleep 1
 
     sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
@@ -114,7 +114,7 @@ forward-zone:
 
   if command -v resolvconf >/dev/null 2>&1; then
     if [[ -d /etc/NetworkManager/ ]]; then
-      printf "dns=none\n" | sudo tee "/etc/NetworkManager/NetworkManager.conf" >/dev/null
+      printf -- "dns=none\n" | sudo tee "/etc/NetworkManager/NetworkManager.conf" >/dev/null
     fi
 
     if [[ ${UNBOUND_PORT} -eq 53 ]]; then

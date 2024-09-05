@@ -34,7 +34,7 @@ main() {
   if [[ -e "${SCRIPT_DIR}/../scripts/meta" ]]; then
     source "${SCRIPT_DIR}/../scripts/meta" && meta_init "var" "git"
   else
-    printf "scripts' folder not found"
+    printf -- "scripts' folder not found"
     return 1
   fi
 

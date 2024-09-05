@@ -39,7 +39,7 @@ decipher() {
 
 cipher_for() {
   if [[ ${#} -lt 1 ]]; then
-    printf "%bUsage: cipher_for GITHUB_USERNAME%b\n" "${RED}" "${RESET}" 1>&2
+    printf -- "%bUsage: cipher_for GITHUB_USERNAME%b\n" "${RED}" "${RESET}" 1>&2
     return 1
   fi
 
@@ -61,7 +61,7 @@ cipher_for() {
   ENCRYPT_KEY_IDS="$(gpg --homedir "${TEMP_GNUPGHOME}" --list-keys --with-colons | grep pub | awk -F: '{print "{\"id\":\"" $5 "\",\"cap\":\"" $12 "\"}"}' | jq --raw-output 'select(.cap | test("e|E")) | .id')"
 
   if [[ -z ${ENCRYPT_KEY_IDS} ]]; then
-    printf "%bno encryption key found%b\n" "${RED}" "${RESET}" 1>&2
+    printf -- "%bno encryption key found%b\n" "${RED}" "${RESET}" 1>&2
   else
     local EMAILS
 
@@ -71,11 +71,11 @@ cipher_for() {
     done
 
     local RECIPIENT
-    RECIPIENT="$(printf "%s" "${EMAILS}" | uniq | fzf --prompt "Email: ")"
+    RECIPIENT="$(printf -- "%s" "${EMAILS}" | uniq | fzf --prompt "Email: ")"
 
     gpg --homedir "${TEMP_GNUPGHOME}" --encrypt --recipient "${RECIPIENT}" "${@}" | base64
 
-    printf "%bDecipher with: base64 -D | gpg --decrypt%b\n" "${YELLOW}" "${RESET}" 1>&2
+    printf -- "%bDecipher with: base64 -D | gpg --decrypt%b\n" "${YELLOW}" "${RESET}" 1>&2
   fi
 
   rm -rf "${TEMP_GNUPGHOME}" "${PUBLIC_KEY}"
@@ -98,7 +98,7 @@ _fzf_complete_cipher_for() {
 
     HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/user/followers")"
     if [[ ${HTTP_STATUS} != "200" ]]; then
-      printf "%bHTTP/%s: Unable to get followers%b\n" "${RED}" "${HTTP_STATUS}" "${RESET}" 1>&2
+      printf -- "%bHTTP/%s: Unable to get followers%b\n" "${RED}" "${HTTP_STATUS}" "${RESET}" 1>&2
       return
     fi
 
@@ -106,7 +106,7 @@ _fzf_complete_cipher_for() {
 
     HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/user/following")"
     if [[ ${HTTP_STATUS} != "200" ]]; then
-      printf "%bHTTP/%s: Unable to get following%b\n" "${RED}" "${HTTP_STATUS}" "${RESET}" 1>&2
+      printf -- "%bHTTP/%s: Unable to get following%b\n" "${RED}" "${HTTP_STATUS}" "${RESET}" 1>&2
       cat "${HTTP_OUTPUT}" 1>&2 && rm "${HTTP_OUTPUT}"
       return
     fi
@@ -115,7 +115,7 @@ _fzf_complete_cipher_for() {
 
     HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/user/memberships/orgs")"
     if [[ ${HTTP_STATUS} != "200" ]]; then
-      printf "%bHTTP/%s: Unable to list orgs%b\n" "${RED}" "${HTTP_STATUS}" "${RESET}" 1>&2
+      printf -- "%bHTTP/%s: Unable to list orgs%b\n" "${RED}" "${HTTP_STATUS}" "${RESET}" 1>&2
       cat "${HTTP_OUTPUT}" 1>&2 && rm "${HTTP_OUTPUT}"
       return
     fi
@@ -130,7 +130,7 @@ _fzf_complete_cipher_for() {
 
         HTTP_STATUS="$("${HTTP_CLIENT_ARGS[@]}" --header "Accept: application/vnd.github+json" "https://api.github.com/orgs/${org}/members?per_page=${page_size}&page=${page}")"
         if [[ ${HTTP_STATUS} != "200" ]]; then
-          printf "%bHTTP/%s: Unable to get members of org %s%b\n" "${RED}" "${HTTP_STATUS}" "${org}" "${RESET}" 1>&2
+          printf -- "%bHTTP/%s: Unable to get members of org %s%b\n" "${RED}" "${HTTP_STATUS}" "${org}" "${RESET}" 1>&2
           cat "${HTTP_OUTPUT}" 1>&2 && rm "${HTTP_OUTPUT}"
           return
         fi
@@ -142,7 +142,7 @@ _fzf_complete_cipher_for() {
 
     rm "${HTTP_OUTPUT}"
 
-    printf "%s\n%s\n%s" "${FOLLOWERS}" "${FOLLOWING}" "${MEMBERS}" | sort --unique
+    printf -- "%s\n%s\n%s" "${FOLLOWERS}" "${FOLLOWING}" "${MEMBERS}" | sort --unique
   )
 }
 

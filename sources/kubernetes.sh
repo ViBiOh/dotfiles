@@ -19,7 +19,7 @@ if command -v kubectl >/dev/null 2>&1; then
       K8S_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
 
       if [[ -n ${K8S_CONTEXT} ]]; then
-        printf " ☸ %s" "${K8S_CONTEXT}"
+        printf -- " ☸ %s" "${K8S_CONTEXT}"
       fi
 
       return "${exit}"
@@ -54,7 +54,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
 
     var_info "Version: ${CHART_VERSION}"
 
-    printf "%s@%s" "${CHART_NAME}" "${CHART_VERSION}"
+    printf -- "%s@%s" "${CHART_NAME}" "${CHART_VERSION}"
   }
 
   helm_delta() {
@@ -128,7 +128,7 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
       helm pull "${CHART}" --version "${VERSION}" --untar
 
       if [[ -d "${CHART_BASENAME}/crds/" ]]; then
-        printf "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(find "${CHART_BASENAME}/crds" -type f -print0 | xargs -0 printf "%s, " | sed 's|, $||')" "${BLUE}" "${RESET}" 1>&2
+        printf -- "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(find "${CHART_BASENAME}/crds" -type f -print0 | xargs -0 printf -- "%s, " | sed 's|, $||')" "${BLUE}" "${RESET}" 1>&2
         cp "${CHART_BASENAME}/crds/"* "${CURRENT_DIR}/"
       else
         var_warning "no crds/ folder in this chart, searching for definition..."
@@ -158,7 +158,7 @@ if command -v kubeseal >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
     CERT="$(rg --files --glob '*.{pem,crt}' | fzf --height=20 --ansi --reverse)"
 
     local SCOPE=""
-    SCOPE="$(printf "strict\nnamespace-wide\ncluster-wide" | fzf --height=20 --ansi --reverse)"
+    SCOPE="$(printf -- "strict\nnamespace-wide\ncluster-wide" | fzf --height=20 --ansi --reverse)"
 
     var_print_and_run "printf '%s' '${CONTENT}' | kubeseal --raw --from-file=/dev/stdin --namespace '${NAMESPACE}' --name '${NAME}' --scope '${SCOPE}' --cert '${CERT}' | pbcopy"
   }

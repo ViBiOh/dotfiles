@@ -27,12 +27,12 @@ _jira() {
       ;;
 
     :)
-      printf "option -%s requires a value\n" "${OPTARG}" 1>&2
+      printf -- "option -%s requires a value\n" "${OPTARG}" 1>&2
       return 1
       ;;
 
     \?)
-      printf "option -%s is invalid\n" "${OPTARG}" 1>&2
+      printf -- "option -%s is invalid\n" "${OPTARG}" 1>&2
       return 2
       ;;
     esac
@@ -70,10 +70,10 @@ _jira() {
       return
     fi
 
-    JIRA_PROJECT_KEY="$(printf "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $2)}')"
+    JIRA_PROJECT_KEY="$(printf -- "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $2)}')"
 
     _jira_info "Project: ${JIRA_PROJECT_KEY}"
-    JIRA_PROJECT="$(printf "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $1)}')"
+    JIRA_PROJECT="$(printf -- "%s" "${JIRA_PROJECT}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_TYPE
     JIRA_ISSUE_TYPE="$(_jira_issue_type "${JIRA_PROJECT}")"
@@ -82,8 +82,8 @@ _jira() {
       return
     fi
 
-    _jira_info "Issue Type: $(printf "%s" "${JIRA_ISSUE_TYPE}" | cut -f 2- -d ' ')"
-    JIRA_ISSUE_TYPE="$(printf "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
+    _jira_info "Issue Type: $(printf -- "%s" "${JIRA_ISSUE_TYPE}" | cut -f 2- -d ' ')"
+    JIRA_ISSUE_TYPE="$(printf -- "%s" "${JIRA_ISSUE_TYPE}" | awk '{printf("%s", $1)}')"
 
     local JIRA_ISSUE_SUMMARY
     _jira_read_input "Summary: " JIRA_ISSUE_SUMMARY
@@ -97,8 +97,8 @@ _jira() {
     local JIRA_PRIORITY
     JIRA_PRIORITY="$(_jira_priority)"
 
-    _jira_info "Piority: $(printf "%s" "${JIRA_PRIORITY}" | cut -f 2- -d ' ')"
-    JIRA_PRIORITY="$(printf "%s" "${JIRA_PRIORITY}" | awk '{printf("%s", $1)}')"
+    _jira_info "Piority: $(printf -- "%s" "${JIRA_PRIORITY}" | cut -f 2- -d ' ')"
+    JIRA_PRIORITY="$(printf -- "%s" "${JIRA_PRIORITY}" | awk '{printf("%s", $1)}')"
 
     local JIRA_CREATE_ISSUE_PAYLOAD
     JIRA_CREATE_ISSUE_PAYLOAD="$(jq --compact-output --null-input \
@@ -130,18 +130,18 @@ _jira() {
     JIRA_EPIC="$(_jira_epic "${JIRA_PROJECT_KEY}")"
 
     if [[ ${JIRA_EPIC:-None} != "None" ]]; then
-      _jira_info "Epic:$(printf "%s" "${JIRA_EPIC}" | awk '{$1=""; print}')"
+      _jira_info "Epic:$(printf -- "%s" "${JIRA_EPIC}" | awk '{$1=""; print}')"
 
-      JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --arg epic "$(printf "%s" "${JIRA_EPIC}" | awk '{printf("%s", $1)}')" '{fields: { parent: {id: $epic} } }')")"
+      JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --arg epic "$(printf -- "%s" "${JIRA_EPIC}" | awk '{printf("%s", $1)}')" '{fields: { parent: {id: $epic} } }')")"
     fi
 
     local JIRA_LABELS
     JIRA_LABELS="$(_jira_issue_labels)"
 
     if [[ -n ${JIRA_LABELS:-} ]] && ! [[ ${JIRA_LABELS:-} =~ "None" ]]; then
-      _jira_info "Labels: $(printf "%s" "${JIRA_LABELS}" | tr "\n" "," | sed 's|.$||')"
+      _jira_info "Labels: $(printf -- "%s" "${JIRA_LABELS}" | tr "\n" "," | sed 's|.$||')"
 
-      JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --argjson labels "$(printf "%s" "${JIRA_LABELS}" | jq --raw-input . | jq --slurp .)" '{fields: { labels: $labels } }')")"
+      JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --argjson labels "$(printf -- "%s" "${JIRA_LABELS}" | jq --raw-input . | jq --slurp .)" '{fields: { labels: $labels } }')")"
     fi
 
     local EXTRA_FIELDS_NAMES
@@ -158,7 +158,7 @@ _jira() {
       JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "${EXTRA_FIELD_OUTPUT}")"
     done
 
-    printf "%s" "${JIRA_CREATE_ISSUE_PAYLOAD}" | jq
+    printf -- "%s" "${JIRA_CREATE_ISSUE_PAYLOAD}" | jq
 
     if _jira_confirm "Submit"; then
       local JIRA_ISSUE_CREATION
@@ -166,7 +166,7 @@ _jira() {
 
       if [[ -n ${JIRA_ISSUE_CREATION} ]]; then
         local JIRA_ISSUE
-        JIRA_ISSUE="$(printf "%s" "${JIRA_ISSUE_CREATION}" | jq --raw-output '.key')"
+        JIRA_ISSUE="$(printf -- "%s" "${JIRA_ISSUE_CREATION}" | jq --raw-output '.key')"
 
         _jira_info "Issue ${JIRA_ISSUE} created"
 
@@ -231,7 +231,7 @@ _jira() {
       return
     fi
 
-    printf "%s" "${JIRA_ISSUE}"
+    printf -- "%s" "${JIRA_ISSUE}"
     ;;
 
   "summary")
@@ -275,7 +275,7 @@ _jira() {
 }
 
 _jira_append_create() {
-  printf "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${1}" | jq --compact-output --slurp '.[0] * .[1]'
+  printf -- "%s %s" "${JIRA_CREATE_ISSUE_PAYLOAD}" "${1}" | jq --compact-output --slurp '.[0] * .[1]'
 }
 
 _jira_branch() {
@@ -318,7 +318,7 @@ _jira_transition() {
 
   local JIRA_TRANSITION
   JIRA_TRANSITION="$(
-    printf "%s" "${JIRA_TRANSITIONS}" | jq --raw-output '.transitions[] | .id + " " + .name' |
+    printf -- "%s" "${JIRA_TRANSITIONS}" | jq --raw-output '.transitions[] | .id + " " + .name' |
       fzf --exit-0 --prompt="Status: " --select-1 --query "${2-}"
   )"
 
@@ -327,16 +327,16 @@ _jira_transition() {
   fi
 
   local JIRA_TRANSITION_ID
-  JIRA_TRANSITION_ID="$(printf "%s" "${JIRA_TRANSITION}" | awk '{printf("%s", $1)}')"
+  JIRA_TRANSITION_ID="$(printf -- "%s" "${JIRA_TRANSITION}" | awk '{printf("%s", $1)}')"
 
   local JIRA_TRANSITION_NAME
-  JIRA_TRANSITION_NAME="$(printf "%s" "${JIRA_TRANSITION}" | awk '{$1=""; print}')"
+  JIRA_TRANSITION_NAME="$(printf -- "%s" "${JIRA_TRANSITION}" | awk '{$1=""; print}')"
 
   local JIRA_TRANSITION_PAYLOAD
   JIRA_TRANSITION_PAYLOAD="$(jq --null-input --compact-output --arg transition_id "${JIRA_TRANSITION_ID}" '{transition: $transition_id}')"
 
   local JIRA_TRANSITION_FIELDS
-  JIRA_TRANSITION_FIELDS="$(printf "%s" "${JIRA_TRANSITIONS}" | jq --arg transitionID "${JIRA_TRANSITION_ID}" '.transitions[] | select(.id == $transitionID) | .fields[]')"
+  JIRA_TRANSITION_FIELDS="$(printf -- "%s" "${JIRA_TRANSITIONS}" | jq --arg transitionID "${JIRA_TRANSITION_ID}" '.transitions[] | select(.id == $transitionID) | .fields[]')"
 
   while true; do
     local EXTRA_FIELD_OUTPUT
@@ -346,7 +346,7 @@ _jira_transition() {
       break
     fi
 
-    JIRA_TRANSITION_PAYLOAD="$(printf "%s %s" "${JIRA_TRANSITION_PAYLOAD}" "${EXTRA_FIELD_OUTPUT}" | jq --compact-output --slurp '.[0] * .[1]')"
+    JIRA_TRANSITION_PAYLOAD="$(printf -- "%s %s" "${JIRA_TRANSITION_PAYLOAD}" "${EXTRA_FIELD_OUTPUT}" | jq --compact-output --slurp '.[0] * .[1]')"
   done
 
   _jira_request "/rest/api/3/issue/${JIRA_ISSUE}/transitions" --request "POST" --header "Content-Type: application/json" --data "${JIRA_TRANSITION_PAYLOAD}"
@@ -379,7 +379,7 @@ _jira_read() {
   _jira_read_input "${VAR_NAME}${VAR_DEFAULT_DISPLAY}=" "READ_VALUE"
 
   local VAR_SAFE_VALUE
-  VAR_SAFE_VALUE="$(printf "%s" "${READ_VALUE:-${VAR_DEFAULT}}" | sed "s|'|\\\'|g")"
+  VAR_SAFE_VALUE="$(printf -- "%s" "${READ_VALUE:-${VAR_DEFAULT}}" | sed "s|'|\\\'|g")"
   eval "${VAR_NAME}=$'${VAR_SAFE_VALUE}'"
 }
 
@@ -495,7 +495,7 @@ _jira_github_pull_request() {
     )")"
 
   if [[ -n ${GITHUB_OUTPUT} ]]; then
-    open "$(printf "%s" "${GITHUB_OUTPUT}" | jq --raw-output '.html_url')"
+    open "$(printf -- "%s" "${GITHUB_OUTPUT}" | jq --raw-output '.html_url')"
   fi
 }
 
@@ -531,7 +531,7 @@ _jira_github_request() {
   if [[ ${?} -ne 0 ]]; then
     if [[ ${GITHUB_PRINT_ERROR:-} == "true" ]]; then
       cat "${HEADER_OUPUT}" >/dev/stderr
-      printf "%s\n" "${GITHUB_OUTPUT}" >/dev/stderr
+      printf -- "%s\n" "${GITHUB_OUTPUT}" >/dev/stderr
     fi
 
     rm -f "${HEADER_OUPUT}"
@@ -541,7 +541,7 @@ _jira_github_request() {
   rm -f "${HEADER_OUPUT}"
 
   if [[ ${GITHUB_PRINT_OUTPUT:-} == "true" ]]; then
-    printf "%s" "${GITHUB_OUTPUT}"
+    printf -- "%s" "${GITHUB_OUTPUT}"
   fi
 }
 
@@ -576,13 +576,13 @@ _jira_request() {
 
   if [[ ${?} -ne 0 ]]; then
     cat "${HEADER_OUPUT}" >/dev/stderr
-    printf "%s\n" "${JIRA_OUTPUT}" >/dev/stderr
+    printf -- "%s\n" "${JIRA_OUTPUT}" >/dev/stderr
     rm -f "${HEADER_OUPUT}"
     return 1
   fi
 
   rm -f "${HEADER_OUPUT}"
-  printf "%s" "${JIRA_OUTPUT}"
+  printf -- "%s" "${JIRA_OUTPUT}"
 }
 
 _jira_issue() {
@@ -611,7 +611,7 @@ _jira_issue() {
     return
   fi
 
-  printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .key + " " + .fields.summary' |
+  printf -- "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .key + " " + .fields.summary' |
     fzf --exit-0 --prompt="Issue: " --select-1 |
     awk '{printf("%s", $1)}'
 }
@@ -629,7 +629,7 @@ _jira_epic() {
     return
   fi
 
-  printf "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .id + " " + .fields.summary' | awk 'BEGIN{print "None"}1' |
+  printf -- "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .id + " " + .fields.summary' | awk 'BEGIN{print "None"}1' |
     fzf --exit-0 --prompt="Epic: "
 }
 
@@ -641,7 +641,7 @@ _jira_project() {
     return
   fi
 
-  printf "%s" "${JIRA_PROJECTS}" | jq --raw-output '.[] | .id + " " + .key + " " + .name' |
+  printf -- "%s" "${JIRA_PROJECTS}" | jq --raw-output '.[] | .id + " " + .key + " " + .name' |
     fzf --exit-0 --prompt="Project: "
 }
 
@@ -653,7 +653,7 @@ _jira_summary() {
     return
   fi
 
-  printf "%s" "${JIRA_ISSUE_PAYLOAD}" | jq --raw-output '.key + " " + .fields.summary'
+  printf -- "%s" "${JIRA_ISSUE_PAYLOAD}" | jq --raw-output '.key + " " + .fields.summary'
 }
 
 _jira_issue_type() {
@@ -667,7 +667,7 @@ _jira_issue_type() {
     return
   fi
 
-  printf "%s" "${JIRA_ISSUE_TYPES}" | jq --raw-output '.[] | .id + " " + .name' |
+  printf -- "%s" "${JIRA_ISSUE_TYPES}" | jq --raw-output '.[] | .id + " " + .name' |
     fzf --exit-0 --prompt="Issue Type: "
 }
 
@@ -679,7 +679,7 @@ _jira_priority() {
     return
   fi
 
-  printf "%s" "${JIRA_PRIORITY}" | jq --raw-output '.[] | .id + " " + .name' |
+  printf -- "%s" "${JIRA_PRIORITY}" | jq --raw-output '.[] | .id + " " + .name' |
     fzf --exit-0 --prompt="Priority: "
 }
 
@@ -687,7 +687,7 @@ _jira_issue_labels() {
   local READ_LABELS=0
 
   while
-    printf "None\n"
+    printf -- "None\n"
 
     local JIRA_LABEL_PAYLOAD
     JIRA_LABEL_PAYLOAD="$(_jira_request "/rest/api/3/label" --get --data-urlencode "startAt=${READ_LABELS}")"
@@ -696,15 +696,15 @@ _jira_issue_labels() {
       break
     fi
 
-    for label in $(printf "%s" "${JIRA_LABEL_PAYLOAD}" | jq --raw-output '.values[]'); do
+    for label in $(printf -- "%s" "${JIRA_LABEL_PAYLOAD}" | jq --raw-output '.values[]'); do
       if [[ ${label} =~ [a-zA-Z0-9_-]{2,} ]]; then
-        printf "%s\n" "${label}"
+        printf -- "%s\n" "${label}"
       fi
 
       READ_LABELS=$((READ_LABELS + 1))
     done
 
-    if [[ $(printf "%s" "${JIRA_LABEL_PAYLOAD}" | jq --raw-output '.isLast') == "true" ]]; then
+    if [[ $(printf -- "%s" "${JIRA_LABEL_PAYLOAD}" | jq --raw-output '.isLast') == "true" ]]; then
       break
     fi
   do true; done | fzf --exit-0 --multi --prompt="Labels (multi-select with Tab): "
@@ -724,7 +724,7 @@ _jira_extra_fields() {
     return
   fi
 
-  printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.projects[].issuetypes[].fields[] | select(.key | startswith("customfield")) | select(.schema.type == "number" or .schema.type == "string" or .schema.type == "date" or .schema.type == "option")'
+  printf -- "%s" "${JIRA_EXTRA_FIELDS}" | jq --raw-output '.projects[].issuetypes[].fields[] | select(.key | startswith("customfield")) | select(.schema.type == "number" or .schema.type == "string" or .schema.type == "date" or .schema.type == "option")'
 }
 
 _jira_fill_extra_fields() {
@@ -743,17 +743,17 @@ _jira_fill_extra_fields() {
   fi
 
   local EXTRA_FIELD_TYPE
-  EXTRA_FIELD_TYPE="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .schema.type')"
+  EXTRA_FIELD_TYPE="$(printf -- "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .schema.type')"
 
   local EXTRA_FIELD_VALUE
 
   case "${EXTRA_FIELD_TYPE}" in
   "option")
-    EXTRA_FIELD_VALUE="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .allowedValues[] | .value' | fzf --exit-0 --prompt="${EXTRA_FIELD}: ")"
+    EXTRA_FIELD_VALUE="$(printf -- "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .allowedValues[] | .value' | fzf --exit-0 --prompt="${EXTRA_FIELD}: ")"
     ;;
 
   "resolution" | "array")
-    EXTRA_FIELD_VALUE="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .allowedValues[] | .name' | fzf --exit-0 --prompt="${EXTRA_FIELD}: ")"
+    EXTRA_FIELD_VALUE="$(printf -- "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .allowedValues[] | .name' | fzf --exit-0 --prompt="${EXTRA_FIELD}: ")"
     ;;
 
   "date")
@@ -766,7 +766,7 @@ _jira_fill_extra_fields() {
   esac
 
   local EXTRA_FIELD_KEY
-  EXTRA_FIELD_KEY="$(printf "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .key')"
+  EXTRA_FIELD_KEY="$(printf -- "%s" "${JIRA_EXTRA_FIELDS}" | jq --arg name "${EXTRA_FIELD}" --raw-output 'select(.name == $name) | .key')"
 
   case "${EXTRA_FIELD_TYPE}" in
   "string" | "date")
@@ -795,9 +795,9 @@ _jira_self_user() {
     return
   fi
 
-  printf "%s" "${JIRA_USER}" | jq --raw-output '.accountId'
+  printf -- "%s" "${JIRA_USER}" | jq --raw-output '.accountId'
 }
 
 _jira_url() {
-  printf "%s/browse/%s" "${JIRA_DOMAIN}" "${1}"
+  printf -- "%s/browse/%s" "${JIRA_DOMAIN}" "${1}"
 }

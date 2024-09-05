@@ -6,7 +6,7 @@ random() {
 
 openssl_cipher() {
   if [[ ${#} -lt 1 ]]; then
-    printf "%bUsage: openssl_cipher PASSPHRASE%b\n" "${RED}" "${RESET}" 1>&2
+    printf -- "%bUsage: openssl_cipher PASSPHRASE%b\n" "${RED}" "${RESET}" 1>&2
     return 1
   fi
 
@@ -18,7 +18,7 @@ openssl_cipher() {
 
 openssl_decipher() {
   if [[ ${#} -lt 1 ]]; then
-    printf "%bUsage: openssl_decipher PASSPHRASE%b\n" "${RED}" "${RESET}" 1>&2
+    printf -- "%bUsage: openssl_decipher PASSPHRASE%b\n" "${RED}" "${RESET}" 1>&2
     return 1
   fi
 
