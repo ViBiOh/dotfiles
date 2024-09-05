@@ -16,9 +16,9 @@ fi
 
 PS1+=" "
 
-# Show red star if root (most likely root has a different PS1)
+# Show special char if root (most likely root has a different PS1)
 if [[ $UID -eq 0 ]]; then
-  PS1+="${PURPLE}👻${RESET} "
+  PS1+="👻 "
 fi
 
 PS1+="${GREEN}\w${RESET}"
