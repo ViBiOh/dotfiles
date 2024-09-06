@@ -28,7 +28,7 @@ install() {
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install "colima"
-    colima completion bash >"${SCRIPT_DIR}/../sources/colima-completion.sh"
+    colima completion bash >"${HOME}/opt/completions/colima-completion.sh"
 
     # safe guard on Apple Silicon to avoid silent error
     if ! [[ -d "/usr/local/bin" ]]; then
@@ -40,7 +40,7 @@ install() {
     source "${SCRIPT_DIR}/../sources/docker.sh"
 
     docker_start
-    docker completion bash | sed 's|nerdctl|docker|g' >"${SCRIPT_DIR}/../sources/docker-completion.sh"
+    docker completion bash | sed 's|nerdctl|docker|g' >"${HOME}/opt/completions/docker-completion.sh"
     docker_stop
   fi
 }

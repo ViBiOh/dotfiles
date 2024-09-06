@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
+export BASH_COMPLETION_USER_DIR="${HOME}/opt"
+
 if command -v brew >/dev/null 2>&1; then
-  if [[ -f "${BREW_PREFIX:-}/etc/bash_completion" ]]; then
-    source "${BREW_PREFIX:-}/etc/bash_completion"
+  if [[ -f "${BREW_PREFIX:-}/etc/profile.d/bash_completion.sh" ]]; then
+    source "${BREW_PREFIX:-}/etc/profile.d/bash_completion.sh"
   fi
 elif [[ -f /etc/bash_completion ]]; then
   source "/etc/bash_completion"

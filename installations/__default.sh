@@ -17,7 +17,6 @@ script_dir() {
 clean() {
   sudo rm -rf "${HOME}/.config/htop" "${HOME}/opt"
   rm -rf "${HOME}/.cache"
-  rm -rf "$(script_dir)/../sources/"*-completion*
 
   # Clean broken symlinks in home directory
   find "${HOME}" -maxdepth 1 -type l ! -exec test -e {} \; -exec rm {} \;
@@ -36,6 +35,7 @@ fi
 END_OF_BASH_PROFILE
 
     mkdir -p "${HOME}/opt/bin"
+    mkdir -p "${HOME}/opt/completions"
 
     if ! command -v brew >/dev/null 2>&1; then
       /bin/bash -c "$(curl --disable --silent --show-error --location "https://raw.githubusercontent.com/Homebrew/install/master/install.sh")"

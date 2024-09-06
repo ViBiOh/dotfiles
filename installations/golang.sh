@@ -27,10 +27,7 @@ clean() {
 install() {
   packages_install "go" "graphviz"
 
-  local SCRIPT_DIR
-  SCRIPT_DIR="$(script_dir)"
-
-  source "${SCRIPT_DIR}/../sources/_golang.sh"
+  source "$(script_dir)/../sources/_golang.sh"
   mkdir -p "${GOPATH}"
 
   if command -v go >/dev/null 2>&1; then
@@ -44,6 +41,6 @@ install() {
     go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
     go install "mvdan.cc/gofumpt@latest"
 
-    golangci-lint completion bash >"${SCRIPT_DIR}/../sources/golangci-lint-completion.sh"
+    golangci-lint completion bash >"${HOME}/opt/completions/golangci-lint-completion.sh"
   fi
 }
