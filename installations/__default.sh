@@ -24,7 +24,7 @@ clean() {
 }
 
 install() {
-  local PACKAGES=("bash" "bash-completion@2" "make" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv")
+  local PACKAGES=("bash" "bash-completion" "make" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv")
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
