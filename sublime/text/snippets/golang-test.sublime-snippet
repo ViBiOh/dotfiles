@@ -1,6 +1,10 @@
 <snippet>
 	<content><![CDATA[
-import "github.com/stretchr/testify/assert"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func Test${1:FuncName}(t *testing.T) {
 	t.Parallel()

@@ -1,6 +1,10 @@
 <snippet>
 	<content><![CDATA[
-import "github.com/stretchr/testify/assert"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func Test${1:FuncName}(t *testing.T) {
 	t.Parallel()
@@ -8,11 +12,9 @@ func Test${1:FuncName}(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Parallel()
 
-		expected := true
-
 		actual := ${1:FuncName}()
 
-		assert.Equal(t, expected, actual)
+		assert.Equal(t, true, actual)
 	})
 }
 
