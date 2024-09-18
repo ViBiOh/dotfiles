@@ -6,6 +6,10 @@ import sublime_plugin
 
 import sublime
 
+
+PLUGIN_NAME = "SublimeGit"
+PLUGIN_SETTINGS = "{}.sublime-settings".format(PLUGIN_NAME)
+
 new_file_regex = re.compile("fatal: no such path '.*' in HEAD")
 not_git_regex = re.compile(
     "fatal: not a git repository \\(or any of the parent directories\\): .git"
@@ -13,6 +17,12 @@ not_git_regex = re.compile(
 author_regex = re.compile("author\\s(.*)")
 time_regex = re.compile("author-time\\s(.*)")
 summary_regex = re.compile("summary\\s(.*)")
+
+
+def plugin_loaded() -> None:
+    global _settings_obj
+    loaded_settings_obj = sublime.load_settings(PLUGIN_SETTINGS)
+    _settings_obj = loaded_settings_obj
 
 
 # From https://gist.github.com/jonlabelle/7d306575cbbd34b154f87b1853d532cc
@@ -47,6 +57,17 @@ def relative_time(date):
     return FormatDelta(date).format()
 
 
+class SublimeGitDisableBlame(sublime_plugin.WindowCommand):
+    def run(self):
+        _settings_obj.set("show_blame", "")
+        self.window.active_view().erase_status("git_blame")
+
+
+class SublimeGitEnableBlame(sublime_plugin.WindowCommand):
+    def run(self):
+        _settings_obj.set("show_blame", "true")
+
+
 class SublimeGitBlame(sublime_plugin.EventListener):
     _blame_key = "git_blame"
 
@@ -60,6 +81,9 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         view.set_status(self._blame_key, value)
 
     def on_selection_modified_async(self, view):
+        if not _settings_obj.get("show_blame", ""):
+            return
+
         file_name = view.file_name()
         if not file_name or len(file_name) == 0:
             return
@@ -91,6 +115,8 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             self.clear_blame(view)
             return
 
+        variables = window.extract_variables()
+
         try:
             git_blame = subprocess.check_output(
                 [
@@ -104,7 +130,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
                     file_name,
                 ],
                 stderr=subprocess.STDOUT,
-                cwd=window.extract_variables()["file_path"],
+                cwd=variables["file_path"],
             )
         except subprocess.CalledProcessError as e:
             err_content = e.output.decode("utf8")
@@ -128,5 +154,24 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         moment = datetime.fromtimestamp(time)
         description = summary_regex.findall(blame_content)[0]
         blame = "{}|{}({}): {}".format(author, relative_time(moment), moment.strftime("%Y-%m-%dT%H:%M:%S%z"), description)
+
+        try:
+            folder = variables.get("folder")
+            file = variables.get("file")
+
+            filename_from_root = file.replace(folder, "").lstrip("/")
+            owners = subprocess.check_output(
+                [
+                    "codeowners",
+                    "--",
+                    filename_from_root,
+                ],
+                stderr=subprocess.STDOUT,
+                cwd=folder,
+            )
+
+            blame += ", {}".format(owners.decode("utf8").replace(filename_from_root, "").strip())
+        except subprocess.CalledProcessError as e:
+            print(e.output.decode("utf8"), end="")
 
         self.print_blame(view, blame)

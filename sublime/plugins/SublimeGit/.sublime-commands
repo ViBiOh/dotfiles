@@ -1,10 +1,18 @@
 [
   {
-    "caption": "Copy git web url",
+    "caption": "SublimeGit: Copy git web url",
     "command": "sublime_git_web"
   },
   {
-    "caption": "Copy line path",
+    "caption": "SublimeGit: Copy line path",
     "command": "sublime_git_linepath"
-  }
+  },
+  {
+    "caption": "SublimeGit: Disable show git blame",
+    "command": "sublime_git_disable_blame"
+  },
+  {
+    "caption": "SublimeGit: Enable show git blame",
+    "command": "sublime_git_enable_blame"
+  },
 ]
