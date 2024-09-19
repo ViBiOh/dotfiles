@@ -15,4 +15,12 @@
     "caption": "SublimeGit: Enable show git blame",
     "command": "sublime_git_enable_blame"
   },
+  {
+    "caption": "SublimeGit: Disable show codeowners",
+    "command": "sublime_git_disable_codeowners"
+  },
+  {
+    "caption": "SublimeGit: Enable show codeowners",
+    "command": "sublime_git_enable_codeowners"
+  },
 ]

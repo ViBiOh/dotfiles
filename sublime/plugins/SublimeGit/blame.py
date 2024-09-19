@@ -69,16 +69,16 @@ class SublimeGitEnableBlame(sublime_plugin.WindowCommand):
 
 
 class SublimeGitBlame(sublime_plugin.EventListener):
-    _blame_key = "git_blame"
+    _status_key = "git_blame"
 
     _filename = ""
     _liner_number = 0
 
-    def clear_blame(self, view):
-        view.erase_status(self._blame_key)
+    def clear_status(self, view):
+        view.erase_status(self._status_key)
 
-    def print_blame(self, view, value):
-        view.set_status(self._blame_key, value)
+    def print_status(self, view, value):
+        view.set_status(self._status_key, value)
 
     def on_selection_modified_async(self, view):
         if not _settings_obj.get("show_blame", ""):
@@ -90,7 +90,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
 
         selections = view.sel()
         if len(selections) != 1:
-            self.clear_blame(view)
+            self.clear_status(view)
             return
 
         window = view.window()
@@ -102,7 +102,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         line_number = view.rowcol(current_point)[0] + 1  # index start at 0
 
         if line_number != view.rowcol(selection.end())[0] + 1:
-            self.clear_blame(view)
+            self.clear_status(view)
             return
 
         if file_name == self._filename and line_number == self._liner_number:
@@ -112,7 +112,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         self._liner_number = line_number
 
         if current_point == view.size():
-            self.clear_blame(view)
+            self.clear_status(view)
             return
 
         variables = window.extract_variables()
@@ -136,9 +136,9 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             err_content = e.output.decode("utf8")
 
             if new_file_regex.match(err_content):
-                self.print_blame(view, "New file")
+                self.print_status(view, "New file")
             elif not_git_regex.match(err_content):
-                self.print_blame(view, "Not in git")
+                self.print_status(view, "Not in git")
             else:
                 print(err_content, end="")
 
@@ -147,7 +147,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         blame_content = git_blame.decode("utf8")
         author = author_regex.findall(blame_content)[0]
         if author == "Not Committed Yet":
-            self.clear_blame(view)
+            self.clear_status(view)
             return
 
         time = int(time_regex.findall(blame_content)[0])
@@ -155,23 +155,60 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         description = summary_regex.findall(blame_content)[0]
         blame = "{}|{}({}): {}".format(author, relative_time(moment), moment.strftime("%Y-%m-%dT%H:%M:%S%z"), description)
 
-        try:
-            folder = variables.get("folder")
-            file = variables.get("file")
+        self.print_status(view, blame)
 
-            filename_from_root = file.replace(folder, "").lstrip("/")
+
+class SublimeGitDisableCodeowners(sublime_plugin.WindowCommand):
+    def run(self):
+        _settings_obj.set("show_codeowners", "")
+        self.window.active_view().erase_status("git_codeowners")
+
+
+class SublimeGitEnableCodeowners(sublime_plugin.WindowCommand):
+    def run(self):
+        _settings_obj.set("show_codeowners", "true")
+
+
+class SublimeGitCodeowners(sublime_plugin.EventListener):
+    _status_key = "git_codeowners"
+
+    _filename = ""
+
+    def clear_status(self, view):
+        view.erase_status(self._status_key)
+
+    def print_status(self, view, value):
+        view.set_status(self._status_key, value)
+
+    def on_selection_modified_async(self, view):
+        if not _settings_obj.get("show_codeowners", ""):
+            return
+
+        window = view.window()
+        if not window:
+            return
+
+        variables = window.extract_variables()
+        folder = variables.get("folder")
+        file = variables.get("file")
+        filename = file.replace(folder, "").lstrip("/")
+
+        if filename == self._filename:
+            return
+
+        self._filename = filename
+
+        try:
             owners = subprocess.check_output(
                 [
                     "codeowners",
                     "--",
-                    filename_from_root,
+                    filename,
                 ],
                 stderr=subprocess.STDOUT,
                 cwd=folder,
             )
 
-            blame += ", {}".format(owners.decode("utf8").replace(filename_from_root, "").strip())
+            self.print_status(view, owners.decode("utf8").replace(filename, "").strip())
         except subprocess.CalledProcessError as e:
             print(e.output.decode("utf8"), end="")
-
-        self.print_blame(view, blame)
