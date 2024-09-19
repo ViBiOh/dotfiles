@@ -6,7 +6,6 @@ import sublime_plugin
 
 import sublime
 
-
 PLUGIN_NAME = "SublimeGit"
 PLUGIN_SETTINGS = "{}.sublime-settings".format(PLUGIN_NAME)
 
@@ -153,7 +152,12 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         time = int(time_regex.findall(blame_content)[0])
         moment = datetime.fromtimestamp(time)
         description = summary_regex.findall(blame_content)[0]
-        blame = "{}|{}({}): {}".format(author, relative_time(moment), moment.strftime("%Y-%m-%dT%H:%M:%S%z"), description)
+        blame = "{}|{}({}): {}".format(
+            author,
+            relative_time(moment),
+            moment.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            description,
+        )
 
         self.print_status(view, blame)
 

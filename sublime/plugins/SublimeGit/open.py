@@ -24,26 +24,36 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
         view = window.active_view()
         line_number = view.rowcol(view.sel()[0].begin())[0] + 1
 
-        is_git = subprocess.call(["git", "rev-parse", "--is-inside-work-tree"], cwd=working_dir)
+        is_git = subprocess.call(
+            ["git", "rev-parse", "--is-inside-work-tree"], cwd=working_dir
+        )
         if is_git != 0:
             return
 
         try:
-            remote = subprocess.check_output(
-                ["git", "remote", "get-url", "--push", "origin"],
-                stderr=subprocess.STDOUT,
-                cwd=working_dir,
-            ).decode("utf8").rstrip()
+            remote = (
+                subprocess.check_output(
+                    ["git", "remote", "get-url", "--push", "origin"],
+                    stderr=subprocess.STDOUT,
+                    cwd=working_dir,
+                )
+                .decode("utf8")
+                .rstrip()
+            )
         except subprocess.CalledProcessError as e:
             print("unable to get remote push url: {}".format(e.output.decode("utf8")))
             return
 
         try:
-            root = subprocess.check_output(
-                ["git", "rev-parse", "--show-toplevel"],
-                stderr=subprocess.STDOUT,
-                cwd=working_dir,
-            ).decode("utf8").rstrip()
+            root = (
+                subprocess.check_output(
+                    ["git", "rev-parse", "--show-toplevel"],
+                    stderr=subprocess.STDOUT,
+                    cwd=working_dir,
+                )
+                .decode("utf8")
+                .rstrip()
+            )
         except subprocess.CalledProcessError as e:
             print("unable to get root path: {}".format(e.output.decode("utf8")))
             return
@@ -51,13 +61,19 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
         git_path = working_dir.replace(root, "")
 
         try:
-            branch = subprocess.check_output(
-                ["git", "log", "-n", "1", "--pretty=format:%h", "--", file_name],
-                stderr=subprocess.STDOUT,
-                cwd=working_dir,
-            ).decode("utf8").rstrip()
+            branch = (
+                subprocess.check_output(
+                    ["git", "log", "-n", "1", "--pretty=format:%h", "--", file_name],
+                    stderr=subprocess.STDOUT,
+                    cwd=working_dir,
+                )
+                .decode("utf8")
+                .rstrip()
+            )
         except subprocess.CalledProcessError as e:
-            print("unable to get last commit of file: {}".format(e.output.decode("utf8")))
+            print(
+                "unable to get last commit of file: {}".format(e.output.decode("utf8"))
+            )
             return
 
         paths = origin_regex.findall(remote)
