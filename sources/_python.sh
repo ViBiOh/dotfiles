@@ -5,6 +5,5 @@ if command -v brew >/dev/null 2>&1; then
 fi
 
 if [[ -d "${HOME}/opt/python" ]]; then
-  export PYTHONUSERBASE="${HOME}/opt/python"
-  export PATH="${PYTHONUSERBASE}/bin:${HOME}/opt/python/venv/bin:${PATH}"
+  export PATH="${HOME}/opt/python/venv/bin:${PATH}"
 fi
