@@ -194,7 +194,7 @@ class SublimeGitCodeowners(sublime_plugin.EventListener):
 
         variables = window.extract_variables()
         folder = variables.get("folder")
-        file = variables.get("file")
+        file = variables.get("file", "")
         filename = file.replace(folder, "").lstrip("/")
 
         if filename == self._filename:
