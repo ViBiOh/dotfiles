@@ -32,8 +32,10 @@ def format(view, region, working_dir, commands):
 
         try:
             process_out, process_err = process.communicate(value.encode("utf8"))
-            if process.returncode != 0:
-                print(process_err.decode("utf8"), end="")
+
+            error = process_err.decode("utf8")
+            if process.returncode != 0 or len(error) > 0:
+                print(error, end="")
                 return value
 
             value = process_out.decode("utf8")

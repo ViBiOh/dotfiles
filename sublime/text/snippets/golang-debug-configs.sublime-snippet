@@ -14,7 +14,8 @@
 	"type": "go",
 	"request": "launch",
 	"mode": "test",
-	"program": "\${file_path}",
+	"cwd": "\${file_path}",
+	"program": "./",
 	"args": ["-test.run", "Test*"]
 }
 ]]></content>
