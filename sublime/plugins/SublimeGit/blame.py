@@ -193,9 +193,32 @@ class SublimeGitCodeowners(sublime_plugin.EventListener):
             return
 
         variables = window.extract_variables()
-        folder = variables.get("folder")
-        file = variables.get("file", "")
-        filename = file.replace(folder, "").lstrip("/")
+        working_dir = variables.get("file_path")
+
+        is_git = subprocess.call(
+            ["git", "rev-parse", "--is-inside-work-tree"], cwd=working_dir
+        )
+        if is_git != 0:
+            return
+
+        try:
+            root = (
+                subprocess.check_output(
+                    ["git", "rev-parse", "--show-toplevel"],
+                    stderr=subprocess.STDOUT,
+                    cwd=working_dir,
+                )
+                .decode("utf8")
+                .rstrip()
+            )
+        except subprocess.CalledProcessError as e:
+            print("unable to get root path: {}".format(e.output.decode("utf8")))
+            return
+
+        filename = "{}/{}".format(
+            working_dir.replace(root, ""),
+            variables.get("file_name"),
+        ).lstrip("/")
 
         if filename == self._filename:
             return
@@ -210,7 +233,7 @@ class SublimeGitCodeowners(sublime_plugin.EventListener):
                     filename,
                 ],
                 stderr=subprocess.STDOUT,
-                cwd=folder,
+                cwd=root,
             )
 
             self.print_status(view, owners.decode("utf8").replace(filename, "").strip())
