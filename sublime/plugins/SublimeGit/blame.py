@@ -1,10 +1,13 @@
 import re
 import subprocess
 from datetime import datetime, timedelta
+from os.path import dirname
 
 import sublime_plugin
 
 import sublime
+
+from .utils import git_path
 
 PLUGIN_NAME = "SublimeGit"
 PLUGIN_SETTINGS = "{}.sublime-settings".format(PLUGIN_NAME)
@@ -70,8 +73,9 @@ class SublimeGitEnableBlame(sublime_plugin.WindowCommand):
 class SublimeGitBlame(sublime_plugin.EventListener):
     _status_key = "git_blame"
 
-    _filename = ""
-    _liner_number = 0
+    _file_name = ""
+    _git_info = {}
+    _line_number = 0
 
     def clear_status(self, view):
         view.erase_status(self._status_key)
@@ -92,10 +96,6 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             self.clear_status(view)
             return
 
-        window = view.window()
-        if not window:
-            return
-
         selection = selections[0]
         current_point = selection.begin()
         line_number = view.rowcol(current_point)[0] + 1  # index start at 0
@@ -104,17 +104,23 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             self.clear_status(view)
             return
 
-        if file_name == self._filename and line_number == self._liner_number:
+        if line_number == self._line_number or self._file_name == file_name:
             return
 
-        self._filename = file_name
-        self._liner_number = line_number
+        self._line_number = line_number
+
+        if self._file_name != file_name:
+            git_info = git_path(file_name)
+
+            if not git_info and line_number == self._line_number:
+                return
+
+            self._file_name = file_name
+            self._git_info = git_info
 
         if current_point == view.size():
             self.clear_status(view)
             return
-
-        variables = window.extract_variables()
 
         try:
             git_blame = subprocess.check_output(
@@ -126,10 +132,10 @@ class SublimeGitBlame(sublime_plugin.EventListener):
                     "-L",
                     "{},{}".format(line_number, line_number),
                     "--",
-                    file_name,
+                    self._git_info["path"],
                 ],
                 stderr=subprocess.STDOUT,
-                cwd=variables["file_path"],
+                cwd=self._git_info["root"],
             )
         except subprocess.CalledProcessError as e:
             err_content = e.output.decode("utf8")
@@ -176,7 +182,8 @@ class SublimeGitEnableCodeowners(sublime_plugin.WindowCommand):
 class SublimeGitCodeowners(sublime_plugin.EventListener):
     _status_key = "git_codeowners"
 
-    _filename = ""
+    _file_name = ""
+    _git_info = {}
 
     def clear_status(self, view):
         view.erase_status(self._status_key)
@@ -188,54 +195,33 @@ class SublimeGitCodeowners(sublime_plugin.EventListener):
         if not _settings_obj.get("show_codeowners", ""):
             return
 
-        window = view.window()
-        if not window:
+        file_name = view.file_name()
+        if not file_name or len(file_name) == 0:
             return
 
-        variables = window.extract_variables()
-        working_dir = variables.get("file_path")
-
-        is_git = subprocess.call(
-            ["git", "rev-parse", "--is-inside-work-tree"], cwd=working_dir
-        )
-        if is_git != 0:
+        if file_name == self._file_name:
             return
 
-        try:
-            root = (
-                subprocess.check_output(
-                    ["git", "rev-parse", "--show-toplevel"],
-                    stderr=subprocess.STDOUT,
-                    cwd=working_dir,
-                )
-                .decode("utf8")
-                .rstrip()
-            )
-        except subprocess.CalledProcessError as e:
-            print("unable to get root path: {}".format(e.output.decode("utf8")))
+        _git_info = git_path(file_name)
+        if not _git_info:
             return
 
-        filename = "{}/{}".format(
-            working_dir.replace(root, ""),
-            variables.get("file_name"),
-        ).lstrip("/")
-
-        if filename == self._filename:
-            return
-
-        self._filename = filename
+        self._file_name = file_name
+        self._git_info = _git_info
 
         try:
             owners = subprocess.check_output(
                 [
                     "codeowners",
                     "--",
-                    filename,
+                    self._git_info["path"],
                 ],
                 stderr=subprocess.STDOUT,
-                cwd=root,
+                cwd=self._git_info["root"],
             )
 
-            self.print_status(view, owners.decode("utf8").replace(filename, "").strip())
+            self.print_status(
+                view, owners.decode("utf8").replace(self._git_info["path"], "").strip()
+            )
         except subprocess.CalledProcessError as e:
             print(e.output.decode("utf8"), end="")
