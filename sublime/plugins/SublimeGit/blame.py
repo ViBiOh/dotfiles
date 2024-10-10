@@ -104,7 +104,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             self.clear_status(view)
             return
 
-        if line_number == self._line_number or self._file_name == file_name:
+        if line_number == self._line_number and self._file_name == file_name:
             return
 
         self._line_number = line_number
