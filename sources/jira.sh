@@ -619,11 +619,11 @@ _jira_issue() {
 _jira_epic() {
   local JIRA_PROJECT_NAME="${1-}"
 
-  local JIRA_JQL="issuetype = Epic and project = ${JIRA_PROJECT_NAME}"
+  local JIRA_JQL="issuetype = Epic and status NOT IN (Done, Closed, Resolved) and project = ${JIRA_PROJECT_NAME}"
   JIRA_JQL+=" ORDER BY updated DESC"
 
   local JIRA_OUTPUT
-  JIRA_OUTPUT="$(_jira_request "/rest/api/3/search" --get --data-urlencode "maxResults=200" --data-urlencode "jql=${JIRA_JQL}")"
+  JIRA_OUTPUT="$(_jira_request "/rest/api/3/search" --get --data-urlencode "maxResults=50" --data-urlencode "jql=${JIRA_JQL}")"
 
   if [[ -z ${JIRA_OUTPUT} ]]; then
     return
