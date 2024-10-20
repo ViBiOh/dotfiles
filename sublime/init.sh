@@ -55,7 +55,7 @@ symlink_settings() {
 
 install_shfmt() {
   # renovate: datasource=github-releases depName=mvdan/sh
-  local SHFMT_VERSION="v3.9.0"
+  local SHFMT_VERSION="v3.10.0"
 
   curl_to_binary "https://github.com/mvdan/sh/releases/download/${SHFMT_VERSION}/shfmt_${SHFMT_VERSION}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64")" "shfmt"
 }
