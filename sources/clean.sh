@@ -24,7 +24,7 @@ os_clean() {
 }
 
 macos_clean() {
-  sudo find / \( -name ".DS_Store" -or -name ".localized" \) -exec rm -f {} \; 2>/dev/null
+  sudo find . \( -name ".DS_Store" -or -name ".localized" \) -exec rm -f {} \; 2>/dev/null
 
   sudo rm -rfv /var/spool/cups/c0*
   sudo rm -rfv /var/spool/cups/tmp/*
