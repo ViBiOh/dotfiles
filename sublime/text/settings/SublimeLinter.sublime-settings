@@ -1,7 +1,8 @@
 {
-	"linters": {
-		"golangcilint": {
-			"args": [],
-		}
-	}
+  "linters": {
+    "golangcilint": {
+      "args": [],
+      "working_dir": "$file_path"
+    }
+  }
 }
