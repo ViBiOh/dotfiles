@@ -20,6 +20,11 @@ clean() {
   fi
 
   sudo rm -rf "${HOME}/.docker" "${HOME}/.lima" "${HOME}/.colima"
+
+  if ! [[ ${OSTYPE} =~ ^darwin ]]; then
+    rm-rf "${HOME}/Library/Caches/colima"
+    rm-rf "${HOME}/Library/Caches/lima"
+  fi
 }
 
 install() {

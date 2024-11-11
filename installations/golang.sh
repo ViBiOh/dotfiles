@@ -22,6 +22,12 @@ clean() {
 
   rm -rf "${HOME}/.dlv"
   rm -rf "${HOME}/pprof"
+
+  if ! [[ ${OSTYPE} =~ ^darwin ]]; then
+    rm-rf "${HOME}/Library/Caches/go-build"
+    rm-rf "${HOME}/Library/Caches/golangci-lint"
+    rm-rf "${HOME}/Library/Caches/gopls"
+  fi
 }
 
 install() {

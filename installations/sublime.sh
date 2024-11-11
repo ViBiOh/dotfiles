@@ -14,6 +14,13 @@ script_dir() {
   fi
 }
 
+clean() {
+  if ! [[ ${OSTYPE} =~ ^darwin ]]; then
+    rm-rf "${HOME}/Library/Caches/Sublime Text"
+    rm-rf "${HOME}/Library/Caches/Sublime Merge"
+  fi
+}
+
 install() {
   local ARCH
   ARCH="$(normalized_arch)"

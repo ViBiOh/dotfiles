@@ -16,6 +16,11 @@ script_dir() {
 
 clean() {
   rm -rf "${HOME}/.python_history"
+
+  if ! [[ ${OSTYPE} =~ ^darwin ]]; then
+    rm-rf "${HOME}/Library/Caches/pip"
+    rm-rf "${HOME}/Library/Caches/pip-tools"
+  fi
 }
 
 install() {
