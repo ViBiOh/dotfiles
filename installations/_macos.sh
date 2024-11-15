@@ -184,7 +184,7 @@ install() {
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
-    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall on
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall off
     sudo pkill -HUP socketfilterfw
   fi
 
