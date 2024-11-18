@@ -179,7 +179,7 @@ install() {
     sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool true
     sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
 
-    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsigned off
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsigned on
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsignedapp off
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
