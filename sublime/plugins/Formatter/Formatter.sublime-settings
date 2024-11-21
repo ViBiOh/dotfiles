@@ -1,6 +1,5 @@
 {
 	"selectors": {
-		"text.html.go": [["prettier", "--no-color", "--plugin", "prettier-plugin-go-template", "--stdin-filepath", "file.tmpl"]],
 		"source.go": [["goimports"], ["gofumpt"]],
 		"source.js": [["prettier", "--no-color", "--stdin-filepath", "file.js"]],
 		"source.json": [["jq"]],

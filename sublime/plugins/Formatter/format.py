@@ -24,7 +24,6 @@ def format(view, region, working_dir, commands):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=working_dir,
         )
 
         timeout = threading.Timer(interval=5, function=process.terminate)
