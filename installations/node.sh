@@ -25,8 +25,8 @@ clean() {
   rm -rf "${HOME}/.npm"
   rm -rf "${HOME}/.v8flags."*
 
-  if ! [[ ${OSTYPE} =~ ^darwin ]]; then
-    rm-rf "${HOME}/Library/Caches/Yarn"
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    rm -rf "${HOME}/Library/Caches/Yarn"
   fi
 }
 
