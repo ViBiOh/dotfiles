@@ -292,7 +292,7 @@ kube() {
 
       shift $((OPTIND - 1))
 
-      _kube_print_and_run "${KUBECTL_COMMAND[@]}" exec --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" ${EXTRA_OPTIONS} --tty --stdin -- "${@-/bin/bash}"
+      _kube_print_and_run "${KUBECTL_COMMAND[@]}" exec --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" ${EXTRA_OPTIONS} --stdin -- "${@-/bin/bash}"
     fi
 
     ;;
