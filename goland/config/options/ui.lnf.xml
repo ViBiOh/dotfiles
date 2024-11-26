@@ -1,0 +1,5 @@
+<application>
+  <component name="UISettings">
+    <option name="UI_DENSITY" value="COMPACT" />
+  </component>
+</application>

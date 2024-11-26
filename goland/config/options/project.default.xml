@@ -1,0 +1,37 @@
+<application>
+  <component name="ProjectManager">
+    <defaultProject>
+      <component name="FormatOnSaveOptions">
+        <option name="myRunOnSave" value="false" />
+      </component>
+      <component name="InspectionProjectProfileManager">
+        <profile version="1.0">
+          <option name="myName" value="Project Default" />
+        </profile>
+        <version value="1.0" />
+      </component>
+      <component name="ProjectTasksOptions">
+        <enabled-global>
+          <option value="gofumpt" />
+          <option value="goimports" />
+          <option value="golangci-lint" />
+          <option value="shfmt" />
+        </enabled-global>
+      </component>
+      <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;actions.on.save&quot;
+  }
+}</component>
+      <component name="VcsDirectoryMappings" defaultProject="true" />
+      <component name="WindowStateProjectService">
+        <state x="399" y="238" key="SettingsEditor" timestamp="1732646170621">
+          <screen x="0" y="44" width="1800" height="1125" />
+        </state>
+        <state x="399" y="238" key="SettingsEditor/0.44.1800.1125" timestamp="1732646170621" />
+      </component>
+    </defaultProject>
+  </component>
+</application>

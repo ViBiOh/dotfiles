@@ -1,0 +1,19 @@
+<keymap version="1" name="Sublime Text (macOS) copy" parent="Sublime Text (Mac OS X)">
+  <action id="Back">
+    <keyboard-shortcut first-keystroke="meta left" />
+  </action>
+  <action id="EditorAddOrRemoveCaret" />
+  <action id="EditorLineEnd" />
+  <action id="EditorLineStart" />
+  <action id="GotoImplementation">
+    <keyboard-shortcut first-keystroke="meta right" />
+    <mouse-shortcut keystroke="meta button1" />
+  </action>
+  <action id="ManageRecentProjects">
+    <keyboard-shortcut first-keystroke="ctrl meta p" />
+  </action>
+  <action id="NavBar-selectHome">
+    <keyboard-shortcut first-keystroke="ctrl a" />
+    <keyboard-shortcut first-keystroke="home" />
+  </action>
+</keymap>

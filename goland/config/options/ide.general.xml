@@ -1,0 +1,12 @@
+<application>
+  <component name="GeneralSettings">
+    <option name="showTipsOnStartup" value="false" />
+    <option name="confirmExit" value="false" />
+  </component>
+  <component name="Registry">
+    <entry key="moved.to.new.ui" value="true" />
+    <entry key="ide.experimental.ui" value="true" />
+    <entry key="suggest.all.run.configurations.from.context" value="true" />
+    <entry key="i18n.locale" value="" />
+  </component>
+</application>
