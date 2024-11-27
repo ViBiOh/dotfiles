@@ -2,6 +2,7 @@
   <component name="GeneralSettings">
     <option name="showTipsOnStartup" value="false" />
     <option name="confirmExit" value="false" />
+    <option name="confirmOpenNewProject2" value="-1" />
   </component>
   <component name="Registry">
     <entry key="moved.to.new.ui" value="true" />
