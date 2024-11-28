@@ -4,6 +4,7 @@
       <option value="Annotate" />
       <option value="ReopenClosedTab" />
       <option value="CreateLauncherScript" />
+      <option value="GitHub.Copy.Link" />
     </ids>
   </component>
   <component name="DatadogUsageSettings">
@@ -14,8 +15,6 @@
     <option name="languageName" value="go" />
   </component>
   <component name="NotRoamableUiSettings">
-    <option name="ideAAType" value="No antialiasing" />
-    <option name="editorAAType" value="No antialiasing" />
     <option name="fontSize" value="13.0" />
     <option name="presentationModeIdeScale" value="1.75" />
   </component>
@@ -25,7 +24,6 @@
     "LayoutCode.codeCleanup": "true",
     "LayoutCode.optimizeImports": "true",
     "RunOnceActivity.VFSInitializationConditionsToFusReporter": "true",
-    "RunOnceActivity.datadog.showInfo-2024-05": "true",
     "RunOnceActivity.go.enabled.exportability.sorter": "true",
     "RunOnceActivity.go.init.cfg.2": "true",
     "RunOnceActivity.go.init.cfg.line.markers": "true",
@@ -33,7 +31,7 @@
     "RunOnceActivity.go.suggest.all.rc.was.enabled.once": "true",
     "RunOnceActivity.llm.installer.activate.toolwindow": "true",
     "RunOnceActivity.terminal.shell.command.handling.was.disabled.once": "true",
-    "datadog.staticAnalyzer.path": "/Users/vincent.boutour/Library/Caches/JetBrains/GoLand2024.3/Datadog/static-analyzer/0.4.8/datadog-static-analyzer-server",
+    "evlsprt.243": "1934bcdd180",
     "evlsprt3.243": "3",
     "experimental.ui.on.first.startup": "true",
     "experimental.ui.used.version": "243.21565.208",
@@ -42,6 +40,7 @@
     "fontSizeToResetConsole": "13.0",
     "fontSizeToResetEditor": "13.0",
     "go.first.run.time": "1732705619910",
+    "got.it.tooltip.dd.codeInsight.editor.widget.got.it": "1",
     "llm.installer.last.toolwindow.state": "LLM_INSTALLER",
     "previousColorScheme": "_@user_Dark",
     "registry.to.advanced.settings.migration.build": "GO-243.21565.208",

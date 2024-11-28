@@ -2,9 +2,13 @@
   <action id="Back">
     <keyboard-shortcut first-keystroke="meta left" />
   </action>
+  <action id="CodeFloatingToolbar.GotoPrevMenu" />
   <action id="EditorAddOrRemoveCaret" />
   <action id="EditorLineEnd" />
   <action id="EditorLineStart" />
+  <action id="EditorUnindentSelection">
+    <keyboard-shortcut first-keystroke="shift tab" />
+  </action>
   <action id="GotoImplementation">
     <keyboard-shortcut first-keystroke="meta right" />
     <mouse-shortcut keystroke="meta button1" />
@@ -16,4 +20,8 @@
     <keyboard-shortcut first-keystroke="ctrl a" />
     <keyboard-shortcut first-keystroke="home" />
   </action>
+  <action id="PrevParameter" />
+  <action id="PreviousTemplateVariable" />
+  <action id="SearchEverywhere.PrevTab" />
+  <action id="SplitChooser.PreviousWindow" />
 </keymap>
