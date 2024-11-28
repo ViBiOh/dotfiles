@@ -1,0 +1,27 @@
+<keymap version="1" name="Sublime Text (macOS) copy" parent="Sublime Text (Mac OS X)">
+  <action id="Back">
+    <keyboard-shortcut first-keystroke="meta left" />
+  </action>
+  <action id="CodeFloatingToolbar.GotoPrevMenu" />
+  <action id="EditorAddOrRemoveCaret" />
+  <action id="EditorLineEnd" />
+  <action id="EditorLineStart" />
+  <action id="EditorUnindentSelection">
+    <keyboard-shortcut first-keystroke="shift tab" />
+  </action>
+  <action id="GotoImplementation">
+    <keyboard-shortcut first-keystroke="meta right" />
+    <mouse-shortcut keystroke="meta button1" />
+  </action>
+  <action id="ManageRecentProjects">
+    <keyboard-shortcut first-keystroke="ctrl meta p" />
+  </action>
+  <action id="NavBar-selectHome">
+    <keyboard-shortcut first-keystroke="ctrl a" />
+    <keyboard-shortcut first-keystroke="home" />
+  </action>
+  <action id="PrevParameter" />
+  <action id="PreviousTemplateVariable" />
+  <action id="SearchEverywhere.PrevTab" />
+  <action id="SplitChooser.PreviousWindow" />
+</keymap>
