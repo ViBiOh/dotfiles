@@ -17,6 +17,7 @@ kube() {
 
   _kube_print_and_run() {
     printf -- "%b%s%b\n" "${YELLOW}" "${*}" "${RESET}" 1>&2
+    history -s "${@}"
     "${@}"
   }
 
@@ -303,19 +304,17 @@ kube() {
     if [[ -n ${RESOURCE_NAME-} ]]; then
       shift 1
 
-      local LOCAL_PORT
-      if [[ ${1:-} =~ ^- ]]; then
+      local LOCAL_PORT="${1:-}"
+      if [[ -z ${LOCAL_PORT-} ]] || [[ ${LOCAL_PORT:-} =~ ^- ]]; then
         LOCAL_PORT="4000"
       else
-        LOCAL_PORT="${1}"
         shift 1
       fi
 
-      local KUBE_PORT
-      if [[ ${1:-} =~ ^- ]]; then
+      local KUBE_PORT="${1:-}"
+      if [[ -z ${KUBE_PORT-} ]] || [[ ${KUBE_PORT:-} =~ ^- ]]; then
         KUBE_PORT=""
       else
-        KUBE_PORT="${1}"
         shift 1
       fi
 
