@@ -16,8 +16,8 @@ script_dir() {
 
 clean() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    rm -rf "${HOME}/Library/Caches/Sublime Text"
-    rm -rf "${HOME}/Library/Caches/Sublime Merge"
+    sudo rm -rf "${HOME}/Library/Caches/Sublime Text"
+    sudo rm -rf "${HOME}/Library/Caches/Sublime Merge"
   fi
 }
 
