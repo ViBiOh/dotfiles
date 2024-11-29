@@ -124,6 +124,17 @@ kube() {
     fi
   }
 
+  _get_arg_if_not_a_flag() {
+    local VALUE="${2-}"
+
+    if [[ ${VALUE:-} =~ ^- ]]; then
+      printf "%s" "${2-}"
+    fi
+
+    shift 1
+    printf "%s" "${VALUE}"
+  }
+
   _kube_help() {
     _kube_info "Usage: kube [--context=<name>...?] [options?] ACTION"
 
@@ -301,17 +312,21 @@ kube() {
     _kube_resources "services" "${1:- }"
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
-      local KUBE_PORT="${3:-}"
+      shift 1
+
+      local KUBE_PORT
+      KUBE_PORT="$(_get_arg_if_not_a_flag "${3:-}")"
 
       if [[ -z ${KUBE_PORT:-} ]]; then
         KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --select-1 --prompt="Port: ")"
       fi
 
       if [[ -n ${KUBE_PORT-} ]]; then
-        local LOCAL_PORT="${2:-4000}"
+        local LOCAL_PORT
+        LOCAL_PORT="$(_get_arg_if_not_a_flag "${3:-}" "4000")"
 
         if command -v kmux >/dev/null 2>&1; then
-          _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace "${RESOURCE_NAMESPACE}" port-forward "${RESOURCE_TYPE}" "${RESOURCE_NAME}" "${LOCAL_PORT}:${KUBE_PORT}"
+          _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" --namespace "${RESOURCE_NAMESPACE}" port-forward "${RESOURCE_TYPE}" "${RESOURCE_NAME}" "${LOCAL_PORT}:${KUBE_PORT}" "${@}"
         else
           printf -- "%bForwarding %s from %s to %s%b\n" "${BLUE}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${LOCAL_PORT}" "${KUBE_PORT}" "${RESET}"
           _kube_print_and_run "${KUBECTL_COMMAND[@]}" port-forward --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --address "127.0.0.1" "${LOCAL_PORT}:${KUBE_PORT}"
