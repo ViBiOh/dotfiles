@@ -15,6 +15,8 @@ kube() {
   local BLUE='\033[0;34m'
   local RESET='\033[0m'
 
+  history -s "${FUNCNAME[0]} ${*}"
+
   _kube_print_and_run() {
     printf -- "%b%s%b\n" "${YELLOW}" "${*}" "${RESET}" 1>&2
     history -s "${@}"
