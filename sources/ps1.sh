@@ -30,8 +30,6 @@ __git_ps1() {
   local exit="${?}"
 
   if [[ $(git rev-parse --is-inside-work-tree 2>&1) == "true" ]]; then
-    local _GIT_STATUS_PORCELAIN
-
     local _GIT_STATUS_BRANCH
     local _GIT_LOCAL_CHANGE=0
 
