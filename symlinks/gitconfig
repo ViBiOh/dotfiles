@@ -55,7 +55,7 @@
 	web-url = ! [[ "$(git remote get-url --push $(git remote show | head -1))" =~ ^.*@(.*)[:/](.*)/(.*)$ ]] && printf -- 'https://%s/%s/%s' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]%.git}"
 	web = ! open "$(git web-url)"
 	pr = ! open "$(git web-url)/compare/$(git default-branch)...$(git current-branch)?expand=1"
-	fco = "! git switch \"$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query=\"remotes/${1:-}\" | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||')\" #"
+	fco = "! git switch \"$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query=\"remotes/${1:-}\" | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||')\""
 	fixup = ! git ci --fixup "$(git log-pretty "$(git default-branch).." --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{printf(\"%s\", $1)}')"
 	file-list = ! git ls-files | grep --invert-match package-lock.json | grep --extended-regexp --invert-match '.jpg$|.jpeg$|.png$|.gif$|.ico$|.lock$|.sum$|.jar$|.bat$|.otf$|.woff$|.svg$|.xml$'
 	files-commits = ! git log --format=format: --name-only | grep --extended-regexp --invert-match '^$' | sort | uniq -c | sort -rg | head -10
