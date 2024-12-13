@@ -8,6 +8,10 @@
     "command": "sublime_git_linepath"
   },
   {
+    "caption": "SublimeGit: Show line history",
+    "command": "sublime_git_line_history"
+  },
+  {
     "caption": "SublimeGit: Disable show git blame",
     "command": "sublime_git_disable_blame"
   },
