@@ -1,0 +1,10 @@
+{
+  "command": [
+    "gopls",
+    "-remote=:37374"
+  ],
+  "settings": {
+    "manageGoplsBinary": false,
+    "gopls.expandWorkspaceToModule": false
+  }
+}
