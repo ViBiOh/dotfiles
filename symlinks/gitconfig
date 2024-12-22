@@ -63,8 +63,8 @@
 	authors-commits = ! git log --format=%an | grep --extended-regexp --invert-match '^$' | sort | uniq -c | sort -rg | head -10
 	authors-lines = ! git file-list | xargs -n 1 git blame --porcelain 2>/dev/null | grep '^author ' | sed 's|author ||g' | sort | uniq -c | sort -rg | head -10
 	copr = !sh -c 'git fetch origin "pull/${1}/head:pr/${1}" && git switch "pr/${1}"' -
-	up = ! git pull --rebase origin "$(git default-branch)"
-	tidy = ! git rebase --signoff --interactive "origin/$(git default-branch)"
+	up = ! git pull --rebase origin "${1:-$(git default-branch)}"
+	tidy = ! git rebase --signoff --interactive "origin/${1:-$(git default-branch)}"
 	adiws = ! git diff --no-color --ignore-all-space | git apply --cached
 	adibl = ! git diff --no-color --ignore-blank-lines | git apply --cached
 	commend = ci --amend --no-edit
