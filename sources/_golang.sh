@@ -101,7 +101,3 @@ go_mod_local() {
 
   go mod edit -replace="${MODULE_TO_LOCAL}=../${LOCAL_NAME}"
 }
-
-gopls_start() {
-  gopls -listen=:37374
-}

@@ -1,7 +1,6 @@
 {
   "command": [
-    "gopls",
-    "-remote=:37374"
+    "gopls"
   ],
   "settings": {
     "manageGoplsBinary": false,
