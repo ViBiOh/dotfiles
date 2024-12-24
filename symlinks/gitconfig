@@ -62,7 +62,7 @@
 	lines-count = ! git file-list | xargs wc -l 2>/dev/null | tail -1
 	authors-commits = ! git log --format=%an | grep --extended-regexp --invert-match '^$' | sort | uniq -c | sort -rg | head -10
 	authors-lines = ! git file-list | xargs -n 1 git blame --porcelain 2>/dev/null | grep '^author ' | sed 's|author ||g' | sort | uniq -c | sort -rg | head -10
-	copr = !sh -c 'git fetch origin "pull/${1}/head:pr/${1}" && git switch "pr/${1}"'
+	copr = "!f() { git fetch origin "pull/${1}/head:pr/${1}" && git switch "pr/${1}"; }; f"
 	up = "!f() { git pull --rebase origin "${1:-$(git default-branch)}"; }; f"
 	tidy = "!f() { git rebase --signoff --interactive "origin/${1:-$(git default-branch)}"; }; f"
 	adiws = ! git diff --no-color --ignore-all-space | git apply --cached
