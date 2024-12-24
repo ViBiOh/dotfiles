@@ -156,7 +156,13 @@ dns_allow() {
 
   local GREP_PIPELINE=()
 
-  for entry in ${websites[${WEBSITE}]}; do
+  dns_unblock ${websites[${WEBSITE}]}
+}
+
+dns_unblock() {
+  local GREP_PIPELINE=()
+
+  for entry in "${@}"; do
     GREP_PIPELINE+=("--regexp" "\"${entry}\"")
   done
 
