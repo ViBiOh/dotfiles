@@ -38,6 +38,7 @@ install() {
       "var" \
       "version"
 
+    # https://git-scm.com/docs/git#Documentation/git.txt---list-cmdsltgroupgtltgroupgt82308203
     source "${SCRIPT_DIR}/../scripts/git"
     ln -s -f "${SCRIPT_DIR}/../scripts/git_coco.sh" "${HOME}/opt/bin/git-coco"
 
