@@ -10,8 +10,8 @@ install() {
   defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
   defaults write NSGlobalDomain AppleFontSmoothing -int 1
   defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
-  defaults write NSGlobalDomain AppleLanguages -array "en"
-  defaults write NSGlobalDomain AppleLocale -string "en_US@currency=EUR"
+  defaults write NSGlobalDomain AppleLanguages -array "en-US"
+  defaults write NSGlobalDomain AppleLocale -string "en_US@currency=eur;rg=frzzzz"
   defaults write NSGlobalDomain AppleMeasurementUnits -string "Centimeters"
   defaults write NSGlobalDomain AppleMetricUnits -bool true
   defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
@@ -37,6 +37,8 @@ install() {
   defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
   defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
   defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
+
+  defaults write com.apple.HIToolbox AppleFnUsageType -int 0
 
   defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
   defaults write com.apple.systempreferences DisableAutoLoginButtonIsHidden -bool true
@@ -110,6 +112,7 @@ install() {
   defaults write com.apple.dock wvous-bl-corner -int 1
   defaults write com.apple.dock wvous-br-corner -int 1
   defaults write com.apple.dock "show-recents" -int 0
+  defaults write com.apple.dock region -string "FR"
   killall Dock
 
   defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
