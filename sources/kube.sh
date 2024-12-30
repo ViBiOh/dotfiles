@@ -272,12 +272,14 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
       local EXTRA_OPTIONS
+      local CONTAINER_SELECTED=0
 
       OPTIND=0
       while getopts ":c:t" option; do
         case "${option}" in
         c)
           EXTRA_OPTIONS+=" --container ${OPTARG}"
+          CONTAINER_SELECTED=1
           ;;
         t)
           EXTRA_OPTIONS+=" --tty"
@@ -294,6 +296,21 @@ kube() {
       done
 
       shift $((OPTIND - 1))
+
+      if [[ ${CONTAINER_SELECTED} -eq 0 ]]; then
+        local POD_GETTER_ARG="${RESOURCE_NAME}"
+
+        if ! [[ ${RESOURCE_TYPE} =~ "pods?" ]]; then
+          POD_GETTER_ARG=" --selector $("${KUBECTL_COMMAND[@]}" get --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --output yaml | yq '.spec.selector.matchLabels | to_entries | map(.key + "=" + .value) | join(",")')"
+        fi
+
+        local CONTAINER_SELECTION
+        CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get --namespace "${RESOURCE_NAMESPACE}" pods ${POD_GETTER_ARG} --output yaml | yq '.items[0].spec.containers[].name' | fzf --select-1 --prompt="Container: ")"
+
+        if [[ -n ${CONTAINER_SELECTION:-} ]]; then
+          EXTRA_OPTIONS+=" --container ${CONTAINER_SELECTION}"
+        fi
+      fi
 
       _kube_print_and_run "${KUBECTL_COMMAND[@]}" exec --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" ${EXTRA_OPTIONS} --stdin -- "${@-/bin/bash}"
     fi
