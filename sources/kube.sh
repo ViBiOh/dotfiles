@@ -299,13 +299,15 @@ kube() {
 
       if [[ ${CONTAINER_SELECTED} -eq 0 ]]; then
         local POD_GETTER_ARG="${RESOURCE_NAME}"
+        local POD_CONTAINER_QUERY="."
 
-        if ! [[ ${RESOURCE_TYPE} =~ "pods?" ]]; then
+        if ! [[ ${RESOURCE_TYPE} =~ pods? ]]; then
           POD_GETTER_ARG=" --selector $("${KUBECTL_COMMAND[@]}" get --namespace "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --output yaml | yq '.spec.selector.matchLabels | to_entries | map(.key + "=" + .value) | join(",")')"
+          POD_CONTAINER_QUERY=".items[0]"
         fi
 
         local CONTAINER_SELECTION
-        CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get --namespace "${RESOURCE_NAMESPACE}" pods ${POD_GETTER_ARG} --output yaml | yq '.items[0].spec.containers[].name' | fzf --select-1 --prompt="Container: ")"
+        CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get --namespace "${RESOURCE_NAMESPACE}" pods ${POD_GETTER_ARG} --output yaml | yq "${POD_CONTAINER_QUERY}.spec.containers.[].name" | fzf --select-1 --prompt="Container: ")"
 
         if [[ -n ${CONTAINER_SELECTION:-} ]]; then
           EXTRA_OPTIONS+=" --container ${CONTAINER_SELECTION}"
