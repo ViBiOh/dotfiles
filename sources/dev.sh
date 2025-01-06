@@ -303,6 +303,8 @@ emergency() {
   fi
 }
 
+alias execute_order_66="emergency"
+
 if command -v vegeta >/dev/null 2>&1; then
   loadtest() {
     if [[ ${#} -lt 1 ]]; then
