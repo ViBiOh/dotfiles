@@ -241,7 +241,7 @@ rainbow() {
   }'
 }
 
-emergency() {
+order_66() {
   var_confirm "Erase all data"
 
   sudo --reset-timestamp echo "Erasing..."
@@ -262,7 +262,7 @@ emergency() {
     fi
   fi
 
-  _emergency_script_dir() {
+  _order_66_script_dir() {
     local FILE_SOURCE="${BASH_SOURCE[0]}"
 
     if [[ -L ${FILE_SOURCE} ]]; then
@@ -274,7 +274,7 @@ emergency() {
     fi
   }
 
-  "$(_emergency_script_dir)/../init.sh" -c
+  "$(_order_66_script_dir)/../init.sh" -c
 
   ssh_agent_stop
   gpg_agent_stop
@@ -302,8 +302,6 @@ emergency() {
     /opt/k3s/k3s-clean
   fi
 }
-
-alias execute_order_66="emergency"
 
 if command -v vegeta >/dev/null 2>&1; then
   loadtest() {
@@ -337,7 +335,7 @@ if command -v systemctl >/dev/null 2>&1; then
 fi
 
 aziz() {
-  curl --disable --silent --show-error --location --max-time 30 --request POST "http://${HUE_API}/api/groups/a66c32cb-c5ac-4060-9a39-e9a0742c2bea" --data state=on --data method=PATCH >/dev/null
+  curl --disable --silent --show-error --location --max-time 30 --request POST "http://${HUE_API}/api/groups/8ae318c4-e170-4ca0-ba7d-1cc85e343a1a" --data state=on --data method=PATCH >/dev/null
 }
 
 json() {
