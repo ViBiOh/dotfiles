@@ -101,3 +101,9 @@ go_mod_local() {
 
   go mod edit -replace="${MODULE_TO_LOCAL}=../${LOCAL_NAME}"
 }
+
+go_work_init() {
+  rm go.work
+  go work init .
+  go work use -r .
+}
