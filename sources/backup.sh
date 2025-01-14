@@ -32,5 +32,12 @@ backup_clean() {
 }
 
 backup_rclone() {
-  rclone sync --progress --track-renames "." "scw-crypt:"
+  rclone sync \
+    --progress \
+    --track-renames \
+    --multi-thread-streams "10" \
+    --delete-excluded \
+    --exlude ".stfolder/**" \
+    --exclude ".fibr/*/**" \
+    "." "scw-crypt:"
 }
