@@ -35,7 +35,7 @@ backup_rclone() {
   rclone sync \
     --progress \
     --track-renames \
-    --multi-thread-streams "10" \
+    --multi-thread-streams "8" \
     --delete-excluded \
     --exlude ".stfolder/**" \
     --exclude ".fibr/*/**" \
