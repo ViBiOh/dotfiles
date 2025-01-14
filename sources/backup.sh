@@ -37,7 +37,7 @@ backup_rclone() {
     --track-renames \
     --multi-thread-streams "8" \
     --delete-excluded \
-    --exlude ".stfolder/**" \
+    --exclude ".stfolder/**" \
     --exclude ".fibr/*/**" \
     "." "scw-crypt:"
 }
