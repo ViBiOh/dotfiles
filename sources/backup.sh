@@ -30,3 +30,7 @@ backup_restore() {
 backup_clean() {
   mc rm "scw/fibr/" --incomplete --recursive --force
 }
+
+backup_rclone() {
+  rclone sync --progress --track-renames "." "scw-crypt:"
+}
