@@ -33,6 +33,7 @@ backup_clean() {
 
 backup_rclone() {
   rclone sync \
+    --password-command 'pass infra/rclone' \
     --progress \
     --track-renames \
     --multi-thread-streams "8" \
