@@ -1,0 +1,8 @@
+<snippet>
+	<content><![CDATA[
+//go:generate mockgen -source=$GOFILE -destination=mocks/$GOFILE -package=mocks -mock_names ${1:InterfaceName}=${1:InterfaceName}
+]]></content>
+	<tabTrigger>gmg</tabTrigger>
+	<scope>source.go</scope>
+	<description>Golang Mockgen</description>
+</snippet>
