@@ -12,7 +12,6 @@ backup_dir() {
   (
     cd "${1-}" || return
     backup ""
-    backup_upload ""
   )
 }
 
