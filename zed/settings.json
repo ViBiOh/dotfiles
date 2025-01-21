@@ -1,0 +1,87 @@
+{
+  "base_keymap": "SublimeText",
+  "theme": "One Dark",
+  "show_whitespaces": "all",
+  "ui_font_size": 12,
+  "buffer_font_size": 12,
+  "tab_size": 2,
+  "restore_on_startup": "none",
+  "auto_install_extensions": {
+    "basher": true,
+    "dockerfile": true,
+    "html": true,
+    "make": true,
+    "snippets": true,
+    "terraform": true
+  },
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  "languages": {
+    "Go": {
+      "format_on_save": "on",
+      "formatter": [
+        { "external": { "command": "goimports" } },
+        { "external": { "command": "gofumpt" } }
+      ]
+    },
+    "JavaScript": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--no-color", "--stdin-filepath", "{buffer_path}"]
+        }
+      }
+    },
+    "JSON": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": { "command": "jq" }
+      }
+    },
+    "YAML": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--no-color", "--stdin-filepath", "{buffer_path}"]
+        }
+      }
+    },
+    "Markdown": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--no-color", "--stdin-filepath", "{buffer_path}"]
+        }
+      }
+    },
+    "Shell Script": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": { "command": "shfmt", "arguments": ["-s", "-"] }
+      }
+    },
+    "Terraform": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "terraform",
+          "arguments": ["fmt", "-no-color", "-"]
+        }
+      }
+    },
+    "Terraform Vars": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "terraform",
+          "arguments": ["fmt", "-no-color", "-"]
+        }
+      }
+    }
+  }
+}
