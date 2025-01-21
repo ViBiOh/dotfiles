@@ -40,7 +40,7 @@ func (e *${1:EnumName}) UnmarshalJSON(b []byte) error {
 		return fmt.Errorf("unmarshal ${1:EnumName}: %w", err)
 	}
 
-	value, err := ParseEventType(strValue)
+	value, err := Parse${1:EnumName}(strValue)
 	if err != nil {
 		return err
 	}

@@ -19,7 +19,7 @@ func Test${1:FuncName}(t *testing.T) {
 }
 
 ]]></content>
-	<tabTrigger>gst</tabTrigger>
+	<tabTrigger>gts</tabTrigger>
 	<scope>source.go</scope>
 	<description>Golang Simple Test</description>
 </snippet>

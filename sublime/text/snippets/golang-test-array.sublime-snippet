@@ -37,8 +37,8 @@ func Test${1:FuncName}(t *testing.T) {
 }
 
 ]]></content>
-	<tabTrigger>gt</tabTrigger>
+	<tabTrigger>gta</tabTrigger>
 	<scope>source.go</scope>
-	<description>Golang Test</description>
+	<description>Golang Array Test</description>
 </snippet>
 
