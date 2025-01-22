@@ -11,7 +11,7 @@ install() {
     packages_install_desktop "ghostty"
   fi
 
-  mkdir -p "${HOME}/.config/pgcli"
+  mkdir -p "${HOME}/.config/ghostty"
 
   echo 'scrollback-limit = 10000000
 
