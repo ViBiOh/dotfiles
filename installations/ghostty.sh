@@ -15,6 +15,8 @@ install() {
 
   echo 'scrollback-limit = 10000000
 
+background = "#000000"
+
 macos-titlebar-style = "hidden"
 macos-auto-secure-input = true
 
