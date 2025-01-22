@@ -1,6 +1,0 @@
-{
-	"shell_cmd": "npm test -- $file",
-	"selector": "source.js,source.jsx",
-	"file_patterns": ["*.test.js"],
-	"quiet": true
-}

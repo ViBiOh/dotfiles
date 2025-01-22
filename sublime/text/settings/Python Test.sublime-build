@@ -1,0 +1,10 @@
+{
+  "shell_cmd": "python -m pytest $file",
+  "working_dir": "$file_path/../",
+  "selector": "source.python",
+  "file_patterns": [
+    "test_*.py"
+  ],
+  "file_regex": "(\\S[^:]*):(\\d+)(?::\\d)?: ([^\\n]+)",
+  "quiet": true
+}

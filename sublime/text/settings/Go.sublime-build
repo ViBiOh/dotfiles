@@ -1,8 +1,10 @@
 {
-	"target": "go_run",
-	"selector": "source.go",
-	"file_patterns": ["*.go"],
-	"cancel": {
-		"kill": true
-	}
+  "target": "go_run",
+  "selector": "source.go",
+  "file_patterns": [
+    "*.go"
+  ],
+  "cancel": {
+    "kill": true
+  }
 }

@@ -1,32 +1,40 @@
 [
-	{
-		"keys": ["super+left"],
-		"command": "jump_back"
-	},
-	{
-		"keys": ["super+right"],
-		"command": "goto_definition"
-	},
-	{
-		"keys": ["super+right"],
-		"command": "lsp_symbol_definition",
-		"context": [
-			{
-				"key": "lsp.session_with_capability",
-				"operator": "equal",
-				"operand": "definitionProvider"
-			}
-		]
-	},
-	{
-		"keys": ["super+control+right"],
-		"command": "lsp_symbol_implementation",
-		"context": [
-			{
-				"key": "lsp.session_with_capability",
-				"operator": "equal",
-				"operand": "implementationProvider"
-			}
-		]
-	}
+  {
+    "keys": [
+      "super+left"
+    ],
+    "command": "jump_back"
+  },
+  {
+    "keys": [
+      "super+right"
+    ],
+    "command": "goto_definition"
+  },
+  {
+    "keys": [
+      "super+right"
+    ],
+    "command": "lsp_symbol_definition",
+    "context": [
+      {
+        "key": "lsp.session_with_capability",
+        "operator": "equal",
+        "operand": "definitionProvider"
+      }
+    ]
+  },
+  {
+    "keys": [
+      "super+control+right"
+    ],
+    "command": "lsp_symbol_implementation",
+    "context": [
+      {
+        "key": "lsp.session_with_capability",
+        "operator": "equal",
+        "operand": "implementationProvider"
+      }
+    ]
+  }
 ]

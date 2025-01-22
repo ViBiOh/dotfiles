@@ -1,25 +1,33 @@
 {
-	"clients": {
-		"python": {
-			"enabled": true,
-			"command": ["pylsp"],
-			"selector": "source.python"
-		},
-		"javacript": {
-			"enabled": true,
-			"command": ["typescript-language-server", "--stdio"],
-			"initializationOptions": {
-				"maxTsServerMemory": 16384,
-				"tsserver": {
-					"path": "~/opt/node/lib/node_modules/typescript/lib/"
-				}
-			},
-			"selector": "source.js, source.jsx, source.ts, source.tsx"
-		},
-		"terraform": {
-			"enabled": true,
-			"command": ["terraform-ls", "serve"],
-			"selector": "source.terraform"
-		}
-	}
+  "clients": {
+    "python": {
+      "enabled": true,
+      "command": [
+        "pylsp"
+      ],
+      "selector": "source.python"
+    },
+    "javacript": {
+      "enabled": true,
+      "command": [
+        "typescript-language-server",
+        "--stdio"
+      ],
+      "initializationOptions": {
+        "maxTsServerMemory": 16384,
+        "tsserver": {
+          "path": "~/opt/node/lib/node_modules/typescript/lib/"
+        }
+      },
+      "selector": "source.js, source.jsx, source.ts, source.tsx"
+    },
+    "terraform": {
+      "enabled": true,
+      "command": [
+        "terraform-ls",
+        "serve"
+      ],
+      "selector": "source.terraform"
+    }
+  }
 }

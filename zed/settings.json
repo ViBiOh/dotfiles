@@ -22,8 +22,16 @@
     "Go": {
       "format_on_save": "on",
       "formatter": [
-        { "external": { "command": "goimports" } },
-        { "external": { "command": "gofumpt" } }
+        {
+          "external": {
+            "command": "goimports"
+          }
+        },
+        {
+          "external": {
+            "command": "gofumpt"
+          }
+        }
       ]
     },
     "JavaScript": {
@@ -31,14 +39,43 @@
       "formatter": {
         "external": {
           "command": "prettier",
-          "arguments": ["--no-color", "--stdin-filepath", "{buffer_path}"]
+          "arguments": [
+            "--no-color",
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
         }
       }
+    },
+    "Python": {
+      "format_on_save": "on",
+      "formatter": [
+        {
+          "external": {
+            "command": "isort",
+            "arguments": [
+              "--quiet",
+              "-"
+            ]
+          }
+        },
+        {
+          "external": {
+            "command": "black",
+            "arguments": [
+              "--quiet",
+              "-"
+            ]
+          }
+        }
+      ]
     },
     "JSON": {
       "format_on_save": "on",
       "formatter": {
-        "external": { "command": "jq" }
+        "external": {
+          "command": "jq"
+        }
       }
     },
     "YAML": {
@@ -46,7 +83,11 @@
       "formatter": {
         "external": {
           "command": "prettier",
-          "arguments": ["--no-color", "--stdin-filepath", "{buffer_path}"]
+          "arguments": [
+            "--no-color",
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
         }
       }
     },
@@ -55,14 +96,24 @@
       "formatter": {
         "external": {
           "command": "prettier",
-          "arguments": ["--no-color", "--stdin-filepath", "{buffer_path}"]
+          "arguments": [
+            "--no-color",
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
         }
       }
     },
     "Shell Script": {
       "format_on_save": "on",
       "formatter": {
-        "external": { "command": "shfmt", "arguments": ["-s", "-"] }
+        "external": {
+          "command": "shfmt",
+          "arguments": [
+            "-s",
+            "-"
+          ]
+        }
       }
     },
     "Terraform": {
@@ -70,7 +121,11 @@
       "formatter": {
         "external": {
           "command": "terraform",
-          "arguments": ["fmt", "-no-color", "-"]
+          "arguments": [
+            "fmt",
+            "-no-color",
+            "-"
+          ]
         }
       }
     },
@@ -79,7 +134,11 @@
       "formatter": {
         "external": {
           "command": "terraform",
-          "arguments": ["fmt", "-no-color", "-"]
+          "arguments": [
+            "fmt",
+            "-no-color",
+            "-"
+          ]
         }
       }
     }

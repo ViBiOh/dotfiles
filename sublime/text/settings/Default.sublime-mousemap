@@ -1,20 +1,24 @@
 [
-	{
-		"modifiers": ["super"],
-		"button": "button1",
-		"press_command": "drag_select",
-		"command": "goto_definition"
-	},
-	{
-		"modifiers": ["super"],
-		"button": "button1",
-		"command": "lsp_symbol_definition",
-		"context": [
-			{
-				"key": "selector",
-				"operator": "equal",
-				"operand": "(source.python, source.js, source.jsx, source.ts, source.tsx, source.go, source.terraform)"
-			}
-		]
-	}
+  {
+    "modifiers": [
+      "super"
+    ],
+    "button": "button1",
+    "press_command": "drag_select",
+    "command": "goto_definition"
+  },
+  {
+    "modifiers": [
+      "super"
+    ],
+    "button": "button1",
+    "command": "lsp_symbol_definition",
+    "context": [
+      {
+        "key": "selector",
+        "operator": "equal",
+        "operand": "(source.python, source.js, source.jsx, source.ts, source.tsx, source.go, source.terraform)"
+      }
+    ]
+  }
 ]
