@@ -19,6 +19,7 @@ install() {
 
   echo 'keybinds clear-defaults=true {
     normal {
+        bind "Super Shift n" { NewTab; }
         bind "Super Shift d" { NewPane "Down"; }
         bind "Super d" { NewPane "Right"; }
 
