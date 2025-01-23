@@ -8,7 +8,11 @@ clean() {
 
 install() {
   if package_exists "zellij"; then
-    packages_install_desktop "zellij"
+    packages_install "zellij"
+  fi
+
+  if ! command -v zellij 2>/dev/null 2>&1; then
+    return
   fi
 
   mkdir -p "${HOME}/.config/zellij"
@@ -19,6 +23,8 @@ install() {
         bind "Super d" { NewPane "Right"; }
 
         bind "Ctrl f" { SwitchToMode "entersearch"; }
+
+        bind "Super Shift b" { Detach; }
     }
 
     entersearch {
@@ -29,6 +35,7 @@ install() {
         bind "Esc" { SwitchToMode "normal"; }
 
         bind "n" { Search "up"; }
+        bind "p" { Search "down"; }
     }
 }
 
@@ -43,6 +50,5 @@ ui {
         hide_session_name true
     }
 }
-
 ' >"${HOME}/.config/zellij/config.kdl"
 }
