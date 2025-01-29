@@ -9,5 +9,7 @@ clean() {
 install() {
   packages_install "fzf"
 
-  "${BREW_PREFIX}/opt/fzf/install" --key-bindings --completion --no-zsh --no-fish --no-update-rc
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    "${BREW_PREFIX}/opt/fzf/install" --key-bindings --completion --no-zsh --no-fish --no-update-rc
+  fi
 }
