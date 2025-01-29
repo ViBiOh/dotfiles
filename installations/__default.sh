@@ -25,6 +25,9 @@ clean() {
 install() {
   local PACKAGES=("bash" "make" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv")
 
+  mkdir -p "${HOME}/opt/bin"
+  mkdir -p "${HOME}/opt/completions"
+
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
 #!/usr/bin/env bash
@@ -35,9 +38,6 @@ fi
 END_OF_BASH_PROFILE
 
     PACKAGES+=("bash-completion@2")
-
-    mkdir -p "${HOME}/opt/bin"
-    mkdir -p "${HOME}/opt/completions"
 
     if ! command -v brew >/dev/null 2>&1; then
       /bin/bash -c "$(curl --disable --silent --show-error --location "https://raw.githubusercontent.com/Homebrew/install/master/install.sh")"
