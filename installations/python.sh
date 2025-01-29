@@ -27,7 +27,13 @@ install() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(script_dir)"
 
-  packages_install "python"
+  if package_exists "python"; then
+    packages_install "python"
+  fi
+
+  if package_exists "python-debian"; then
+    packages_install "python-debian"
+  fi
 
   if package_exists "python-pip"; then
     packages_install "python-pip"
