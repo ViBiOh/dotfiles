@@ -23,7 +23,7 @@ clean() {
 }
 
 install() {
-  local PACKAGES=("bash" "bash-completion@2" "make" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv")
+  local PACKAGES=("bash" "make" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv")
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
@@ -33,6 +33,8 @@ if [[ -f "${HOME}/.bashrc" ]]; then
   source "${HOME}/.bashrc"
 fi
 END_OF_BASH_PROFILE
+
+    PACKAGES+=("bash-completion@2")
 
     mkdir -p "${HOME}/opt/bin"
     mkdir -p "${HOME}/opt/completions"
@@ -54,10 +56,14 @@ END_OF_BASH_PROFILE
       chsh -s "${BREW_PREFIX}/bin/bash" -u "$(whoami)"
     fi
   elif command -v apt-get >/dev/null 2>&1; then
+    PACKAGES+=("bash-completion")
+
     packages_update
     packages_install "apt-transport-https"
     packages_install "${PACKAGES[@]}" "dnsutils" "jdupes"
   elif command -v pacman >/dev/null 2>&1; then
+    PACKAGES+=("bash-completion")
+
     packages_update
     packages_install "${PACKAGES[@]}" "inetutils" "tcpdump"
   fi
