@@ -17,5 +17,5 @@ credentials() {
     return
   fi
 
-  extract_secret "infra/rclone-config" ".config/rclone/rclone"
+  extract_secret "infra/rclone-config" ".config/rclone/rclone.conf"
 }
