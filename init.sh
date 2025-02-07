@@ -103,7 +103,7 @@ browse_actions() {
     fi
 
     FILE_TO_INSTALL+=("${BASENAME_FILE}")
-  done < <(find "${CURRENT_DIR}/installations" -not -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
+  done < <(find "${CURRENT_DIR}/installations/"*.sh -not -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
 
   for install_file in "${FILE_TO_INSTALL[@]}"; do
     do_action "${install_file}" "${@}"
