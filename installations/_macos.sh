@@ -179,7 +179,7 @@ install() {
     sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
     sudo defaults write /Library/Preferences/com.apple.loginwindow RetriesUntilHint -int 0
     sudo defaults write /Library/Preferences/com.apple.loginwindow showInputMenu -bool true
-    sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool true
+    sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool false # required for AirDrop
     sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
 
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsigned on
