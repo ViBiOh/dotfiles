@@ -1,5 +1,6 @@
-import sublime
 import sublime_plugin
+
+import sublime
 
 from .async_task import AsyncTask
 
