@@ -55,26 +55,6 @@ kube() {
     fi
   done
 
-  if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
-    local CURRENT_CONTEXT
-    CURRENT_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
-
-    local CONTEXTS
-    CONTEXTS="$(yq eval '.contexts[].name' "${KUBECONFIG:-${HOME}/.kube/config}" | fzf --prompt="Contexts: " --multi --query "^${CURRENT_CONTEXT}$" --bind 'load:select-all+clear-query')"
-
-    for context in ${CONTEXTS}; do
-      KUBECTL_CONTEXTS+=("--context=${context}")
-
-      if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
-        KUBECTL_CONTEXT+=("--context=${context}")
-      fi
-    done
-  fi
-
-  if [[ ${#KUBECTL_CONTEXT} -ne 0 ]]; then
-    KUBECTL_COMMAND+=("${KUBECTL_CONTEXT[@]}")
-  fi
-
   local RESOURCE_NAMESPACE="${KUBE_NS:-}"
 
   OPTIND=0
@@ -177,6 +157,26 @@ kube() {
   if [[ ${#} -gt 0 ]]; then
     ACTION="${1}"
     shift
+  fi
+
+  if [[ ${ACTION} != "context" ]] && [[ ${#KUBECTL_CONTEXT} -eq 0 ]] && [[ $(yq eval '.contexts | length' "${KUBECONFIG:-${HOME}/.kube/config}") -gt 1 ]]; then
+    local CURRENT_CONTEXT
+    CURRENT_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
+
+    local CONTEXTS
+    CONTEXTS="$(yq eval '.contexts[].name' "${KUBECONFIG:-${HOME}/.kube/config}" | fzf --prompt="Contexts: " --multi --query "^${CURRENT_CONTEXT}$" --bind 'load:select-all+clear-query')"
+
+    for context in ${CONTEXTS}; do
+      KUBECTL_CONTEXTS+=("--context=${context}")
+
+      if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
+        KUBECTL_CONTEXT+=("--context=${context}")
+      fi
+    done
+  fi
+
+  if [[ ${#KUBECTL_CONTEXT} -ne 0 ]]; then
+    KUBECTL_COMMAND+=("${KUBECTL_CONTEXT[@]}")
   fi
 
   case ${ACTION} in
