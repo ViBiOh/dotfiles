@@ -42,6 +42,7 @@
 
 [rebase]
 	autosquash = true
+	updateRefs = true
 
 [log]
 	abbrevCommit = true
