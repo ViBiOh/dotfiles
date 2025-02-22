@@ -1,6 +1,6 @@
 [
   {
-    "caption": "SublimeGit: Copy git web url",
+    "caption": "SublimeGit: Copy permalink",
     "command": "sublime_git_web"
   },
   {
