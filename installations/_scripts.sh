@@ -33,6 +33,7 @@ install() {
       "kubernetes" \
       "pass" \
       "rotate.sh" \
+      "scw" \
       "ssh" \
       "tmux" \
       "var" \
