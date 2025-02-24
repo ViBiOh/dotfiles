@@ -46,7 +46,7 @@ qrcode_wifi() {
   WIFI_PASSWORD="${WIFI_PASSWORD//;/\\;}"
   WIFI_PASSWORD="${WIFI_PASSWORD//:/\\:}"
 
-  printf -- "WIFI:S:%s;T:WPA;P:%s;;" "${WIFI_NAME}" "${WIFI_PASSWORD}" | qrcode
+  printf -- "WIFI:T:WPA;R:1;S:%s;P:%s;;" "${WIFI_NAME}" "${WIFI_PASSWORD}" | qrcode
 }
 
 loop() {
