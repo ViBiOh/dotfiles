@@ -1,6 +1,9 @@
 [init]
 	defaultBranch = main
 
+[branch]
+	sort = -committerdate
+
 [user]
 	name = Vincent Boutour
 	email = bob@vibioh.fr
@@ -33,12 +36,14 @@
 
 [fetch]
 	prune = true
+	pruneTags = true
 
 [commit]
 	gpgsign = true
 
 [tag]
 	gpgsign = true
+	sort = version:refname
 
 [rebase]
 	autosquash = true
@@ -49,6 +54,9 @@
 
 [color]
 	ui = true
+
+[help]
+	autocorrect = prompt
 
 [alias]
 	last-tag = ! git describe --tag --abbrev=0 2> /dev/null
