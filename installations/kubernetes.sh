@@ -28,7 +28,7 @@ install() {
   fi
 
   # renovate: datasource=github-releases depName=fluxcd/flux2
-  local FLUX_VERSION="v2.5.0"
+  local FLUX_VERSION="v2.5.1"
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION#v}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").tar.gz" "flux"
   flux completion bash >"${HOME}/opt/completions/flux-completion.sh"
 
