@@ -43,6 +43,7 @@ source_all() {
       "github" \
       "kubernetes" \
       "pass" \
+      "scw" \
       "ssh" \
       "tmux" \
       "var" \
