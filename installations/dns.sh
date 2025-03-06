@@ -77,8 +77,7 @@ remote-control:
 ${UNBOUND_EXTRA_DNS_CONF-}
 forward-zone:
   name: \".\"
-  forward-ssl-upstream: yes
-${UNBOUND_FORWARD}
+  forward-ssl-upstream: yes${UNBOUND_FORWARD}
 " | sudo tee "${UNBOUND_CONF_FILE}" >/dev/null
 
   dns_block "${UNBOUND_BLOCKLIST}"
