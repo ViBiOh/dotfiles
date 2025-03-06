@@ -17,6 +17,14 @@ install() {
   local UNBOUND_PORT="${UNBOUND_PORT:-53}"
   local UNBOUND_CONTROL="${UNBOUND_CONTROL:-yes}"
 
+  # Default to CloudFlare
+  local UNBOUND_FORWARD="${UNBOUND_FORWARD:-
+  forward-addr: 2606:4700:4700::1111@853#cloudflare-dns.com
+  forward-addr: 1.1.1.1@853#cloudflare-dns.com
+  forward-addr: 2606:4700:4700::1001@853#cloudflare-dns.com
+  forward-addr: 1.0.0.1@853#cloudflare-dns.com
+}"
+
   sudo curl --disable --silent --show-error --location --max-time 30 "https://curl.se/ca/cacert.pem" --output "${UNBOUND_CA_CERT}"
   sudo chmod 600 "${UNBOUND_CA_CERT}"
   sudo chown "root" "${UNBOUND_CA_CERT}"
@@ -69,11 +77,8 @@ remote-control:
 ${UNBOUND_EXTRA_DNS_CONF-}
 forward-zone:
   name: \".\"
-  forward-addr: 2606:4700:4700::1111@853#cloudflare-dns.com
-  forward-addr: 1.1.1.1@853#cloudflare-dns.com
-  forward-addr: 2606:4700:4700::1001@853#cloudflare-dns.com
-  forward-addr: 1.0.0.1@853#cloudflare-dns.com
   forward-ssl-upstream: yes
+${UNBOUND_FORWARD}
 " | sudo tee "${UNBOUND_CONF_FILE}" >/dev/null
 
   dns_block "${UNBOUND_BLOCKLIST}"
