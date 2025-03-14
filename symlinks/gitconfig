@@ -45,6 +45,9 @@
 	gpgsign = true
 	sort = version:refname
 
+[remote "origin"]
+	fetch = +refs/tags/*:refs/tags/*
+
 [rebase]
 	autosquash = true
 	updateRefs = true
