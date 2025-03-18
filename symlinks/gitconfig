@@ -89,6 +89,7 @@
 	s = status --short --branch
 	unstage = reset HEAD --
 	fresh-clean = ! git reset HEAD -- . && git checkout -- . && git clean -ffxd
+	list-merged-stash = ! git fsck --unreachable --no-progress | grep commit | cut -d' ' -f3 | xargs git log --merges --no-walk --grep=WIP
 	default-branch = ! git rev-parse --abbrev-ref origin/HEAD | sed 's|^origin/||'
 	current-branch = rev-parse --abbrev-ref HEAD
 	set-head = remote set-head origin -a
