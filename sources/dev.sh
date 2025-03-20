@@ -117,6 +117,7 @@ stock() {
       --show-error \
       --location \
       --max-time 10 \
+      --header "User-Agent: Mozilla/5.0" \
       --dump-header "${HEADER_OUPUT}" \
       --fail-with-body \
       "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=false&interval=2m&range=1d"
@@ -172,6 +173,7 @@ stock() {
         --show-error \
         --location \
         --max-time 10 \
+        --header "User-Agent: Mozilla/5.0" \
         --dump-header "${HEADER_OUPUT}" \
         --fail-with-body \
         "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=false&interval=1d&range=1mo"
