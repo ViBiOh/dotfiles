@@ -23,7 +23,7 @@ script_dir() {
 main() {
 }
 
-main "\${@}"
+main "\${@:-}"
 
 ]]></content>
 	<tabTrigger>bms</tabTrigger>
