@@ -120,7 +120,7 @@ stock() {
       --header "User-Agent: Mozilla/5.0" \
       --dump-header "${HEADER_OUPUT}" \
       --fail-with-body \
-      "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=false&interval=2m&range=1d"
+      "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=true&interval=2m&range=1d"
   )"
 
   if [[ ${?} -ne 0 ]]; then
@@ -155,11 +155,25 @@ stock() {
     fi
   }
 
-  local CURRENT_PRICE
-  CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
+  local REGULAR_START
+  REGULAR_START=$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta.currentTradingPeriod.regular.start')
+  local REGULAR_END
+  REGULAR_END=$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta.currentTradingPeriod.regular.end')
 
+  local CURRENT_TIMESTAMP
+  CURRENT_TIMESTAMP="$(date +%s)"
+
+  local CURRENT_PRICE
   local PREVIOUS_PRICE
-  PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .previousClose')"
+
+  if [[ ${CURRENT_TIMESTAMP} -gt ${REGULAR_START} ]] && [[ ${CURRENT_TIMESTAMP} -lt ${REGULAR_END} ]]; then
+    CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
+    PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .previousClose')"
+  else
+    var_info "Pre-market"
+    CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].indicators.quote[0].open[-1]')"
+    PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
+  fi
 
   _stock_evolution
 
