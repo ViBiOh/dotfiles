@@ -152,8 +152,20 @@ stock() {
       OUTPUT_COLOR="${RED}"
       EVOLUTION_SIGN="↘"
       EVOLUTION_PERCENT="${EVOLUTION_PERCENT#-}"
+    elif [[ ${EVOLUTION_PERCENT} -eq 0 ]]; then
+      OUTPUT_COLOR=""
+      EVOLUTION_SIGN="→"
     fi
   }
+
+  local CURRENT_PRICE
+  local PREVIOUS_PRICE
+
+  CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
+  PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .previousClose')"
+
+  _stock_evolution
+  printf -- "%b%s%b %s %s %b%s%s%b" "${YELLOW}" "${STOCK_SYMBOL}" "${RESET}" "${CURRENT_PRICE}" "${STOCK_CURRENCY}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
 
   local REGULAR_START
   REGULAR_START=$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta.currentTradingPeriod.regular.start')
@@ -163,21 +175,15 @@ stock() {
   local CURRENT_TIMESTAMP
   CURRENT_TIMESTAMP="$(date +%s)"
 
-  local CURRENT_PRICE
-  local PREVIOUS_PRICE
-
-  if [[ ${CURRENT_TIMESTAMP} -gt ${REGULAR_START} ]] && [[ ${CURRENT_TIMESTAMP} -lt ${REGULAR_END} ]]; then
-    CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
-    PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .previousClose')"
-  else
-    var_info "Pre-market"
+  if [[ ${CURRENT_TIMESTAMP} -lt ${REGULAR_START} ]] || [[ ${CURRENT_TIMESTAMP} -gt ${REGULAR_END} ]]; then
     CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].indicators.quote[0].open[-1]')"
     PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
+
+    _stock_evolution
+    printf -- " | Pre %s %b%s%s%b\n" "${CURRENT_PRICE}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
   fi
 
-  _stock_evolution
-
-  printf -- "%b%s%b %s %s %b%s%s%b\n" "${YELLOW}" "${STOCK_SYMBOL}" "${RESET}" "${CURRENT_PRICE}" "${STOCK_CURRENCY}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
+  printf -- "\n"
 
   if command -v spark >/dev/null 2>&1; then
     YAHOO_OUTPUT="$(
