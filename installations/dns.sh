@@ -35,6 +35,7 @@ install() {
   chroot: \"\"
 
   interface: 127.0.0.1
+  interface: ::1
   port: ${UNBOUND_PORT}
   num-threads: 4
 
@@ -108,7 +109,7 @@ forward-zone:
   fi
 
   if [[ ${UNBOUND_PORT} -eq 53 ]]; then
-    dns_set "127.0.0.1"
+    dns_set "127.0.0.1" "::1"
   fi
 
   if command -v systemctl >/dev/null 2>&1; then
@@ -123,7 +124,8 @@ forward-zone:
 
     if [[ ${UNBOUND_PORT} -eq 53 ]]; then
       echo "resolv_conf=/etc/resolv.conf
-  nameserver 127.0.0.1" | sudo tee "/etc/resolvconf.conf" >/dev/null
+  nameserver 127.0.0.1
+  nameserver ::1" | sudo tee "/etc/resolvconf.conf" >/dev/null
       sudo resolvconf -u
     fi
   fi
