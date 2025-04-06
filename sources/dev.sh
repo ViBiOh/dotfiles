@@ -180,7 +180,7 @@ stock() {
     PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
 
     _stock_evolution
-    printf -- " | Pre %s %b%s%s%b\n" "${CURRENT_PRICE}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
+    printf -- " | Pre %s %b%s%s%b" "${CURRENT_PRICE}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
   fi
 
   printf -- "\n"
