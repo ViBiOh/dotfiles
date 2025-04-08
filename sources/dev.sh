@@ -152,7 +152,7 @@ stock() {
       OUTPUT_COLOR="${RED}"
       EVOLUTION_SIGN="↘"
       EVOLUTION_PERCENT="${EVOLUTION_PERCENT#-}"
-    elif [[ ${EVOLUTION_PERCENT} -eq 0 ]]; then
+    elif [[ ${EVOLUTION_PERCENT} == 0 ]]; then
       OUTPUT_COLOR=""
       EVOLUTION_SIGN="→"
     fi
