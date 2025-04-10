@@ -2,7 +2,7 @@
 	<content><![CDATA[
 func Benchmark${1:FuncName}(b *testing.B) {
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		${1:FuncName}()
 	}
 }
