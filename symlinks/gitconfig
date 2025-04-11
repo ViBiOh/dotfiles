@@ -101,7 +101,7 @@
 	filehistory = log-pretty --
 	linehistory = log-pretty -L
 	sweep = ! git prune && git remote prune origin && git branch --list --format '%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' | grep --extended-regexp --invert-match '^$' | xargs git branch --delete --force && git gc
-	undo = "!f() { cd "${GIT_PREFIX:-.}"; git reset "${2:-$(git default-branch)}" -- "${1:-}"; git checkout -- "${1:-}"; git reset HEAD -- "${1:-}"; }; f"
+	undo = "!f() { cd "${GIT_PREFIX:-.}"; git reset "${2:-origin/$(git default-branch)}" -- "${1:-}"; git checkout -- "${1:-}"; git reset HEAD -- "${1:-}"; }; f"
 	unlock-ref = update-ref -d
 	unshallow = ! git remote set-branches origin '*' && git pull --unshallow
 
