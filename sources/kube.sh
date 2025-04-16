@@ -148,6 +148,7 @@ kube() {
     _kube_info " - ns       | Change default namespace            | <namespace name>"
     _kube_info " - restart  | Perform a restart of pods           | <object type or deployment name> [object name]"
     _kube_info " - rollback | Undo a rollout                      | <object type or deployment name> [object name]"
+    _kube_info " - scale    | Scale a replicable                  | <object type or deployment name> [object name] <factor>"
     _kube_info " - top      | Run top command                     | pod|node <object type or deployment name for pod filtering> [object name]"
     _kube_info " - watch    | Watch pods                          | <object type or deployment name> <object name> <any additionnals args...>"
     _kube_info " - *        | Call kubectl directly               | <any additionnals 'kubectl' args...>"
@@ -462,6 +463,52 @@ kube() {
       else
         for context in "${KUBECTL_CONTEXTS[@]}"; do
           _kube_print_and_run kubectl "${context}" rollout undo "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
+        done
+      fi
+    fi
+
+    ;;
+
+  "scale")
+    local FIRST=""
+    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      FIRST="${1}"
+      shift
+    fi
+
+    local SECOND=""
+    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      SECOND="${1}"
+      shift
+    fi
+
+    local KUBE_SCALE_FACTOR="1"
+    if [[ ${SECOND:-} =~ [0-9]+(\.[0-9])? ]]; then
+      KUBE_SCALE_FACTOR="${SECOND}"
+      SECOND=""
+    elif [[ -n ${1-} ]]; then
+      KUBE_SCALE_FACTOR="${1:-1}"
+      shift
+    fi
+
+    _kube_resources "${FIRST}" "${SECOND}"
+
+    if [[ -n ${RESOURCE_NAME-} ]]; then
+      if command -v kmux >/dev/null 2>&1; then
+        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" scale "${RESOURCE_TYPE}" "${RESOURCE_NAME} --factor ${KUBE_SCALE_FACTOR}"
+      else
+        for context in "${KUBECTL_CONTEXTS[@]}"; do
+          local CURRENT_SCALE
+          CURRENT_SCALE="$(kubectl "${context}" get "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --output yaml | yq eval '.spec.replicas')"
+
+          local WANTED_SCALE
+          if [[ ${CURRENT_SCALE} -eq 0 ]]; then
+            WANTED_SCALE="${KUBE_SCALE_FACTOR}"
+          else
+            WANTED_SCALE="$(printf "%f * %f" "${CURRENT_SCALE}" "${KUBE_SCALE_FACTOR}" | bc | sed -e 's/\.0*$//;s/\.[0-9]*$/ + 1/' | bc)"
+          fi
+
+          _kube_print_and_run kubectl "${context}" scale --replicas "${WANTED_SCALE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
         done
       fi
     fi
