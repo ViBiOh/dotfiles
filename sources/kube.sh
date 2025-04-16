@@ -505,7 +505,7 @@ kube() {
           if [[ ${CURRENT_SCALE} -eq 0 ]]; then
             WANTED_SCALE="${KUBE_SCALE_FACTOR}"
           else
-            WANTED_SCALE="$(printf "%f * %f" "${CURRENT_SCALE}" "${KUBE_SCALE_FACTOR}" | bc | sed -e 's/\.0*$//;s/\.[0-9]*$/ + 1/' | bc)"
+            WANTED_SCALE="$(printf "%f * %f" "${CURRENT_SCALE}" "${KUBE_SCALE_FACTOR}" | bc | sed -e 's|\.0*$||;s|\.[0-9]*$| + 1|' | bc)"
           fi
 
           _kube_print_and_run kubectl "${context}" scale --replicas "${WANTED_SCALE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
