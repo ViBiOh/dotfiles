@@ -44,6 +44,7 @@ install() {
     go install "github.com/jpillora/chisel@latest"
     go install "github.com/tsenart/vegeta@latest"
     go install "go.uber.org/mock/mockgen@latest"
+    go install "golang.org/x/perf/cmd/benchstat@latest"
     go install "golang.org/x/tools/cmd/goimports@latest"
     go install "golang.org/x/tools/cmd/stringer@latest"
     go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"

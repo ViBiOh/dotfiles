@@ -15,6 +15,8 @@ alias pprof_cpu='go tool pprof -http localhost:12000 http://localhost:9999/debug
 alias pprof_memory='go tool pprof -http localhost:12001 http://localhost:9999/debug/pprof/heap'
 alias pprof_goroutine='go tool pprof -http localhost:12002 http://localhost:9999/debug/pprof/goroutine'
 
+alias go_bench='go test -bench=. -benchmem -run='^$' -count=10'
+
 if command -v fzf >/dev/null 2>&1; then
   go_bump() {
     local MODULE_TO_BUMP
