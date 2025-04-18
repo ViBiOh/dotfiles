@@ -1,0 +1,14 @@
+<snippet>
+  <content><![CDATA[
+index := sort.Search(len(${1:arr}), func(i int) bool {
+  return ${1:arr}[i] >= ${2:item}
+})
+
+${1:arr} = append(${1:arr}, ${2:item})
+copy(${1:arr}[index+1:], ${1:arr}[index:])
+${1:arr}[index] = ${2:item}
+]]></content>
+  <tabTrigger>gdi</tabTrigger>
+  <scope>source.go</scope>
+  <description>Golang Dichotomic Insert</description>
+</snippet>
