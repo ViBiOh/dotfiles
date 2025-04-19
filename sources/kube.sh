@@ -495,18 +495,18 @@ kube() {
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
-        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" scale "${RESOURCE_TYPE}" "${RESOURCE_NAME} --factor ${KUBE_SCALE_FACTOR}"
+        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" scale "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --factor "${KUBE_SCALE_FACTOR}" "${@}"
       else
         for context in "${KUBECTL_CONTEXTS[@]}"; do
           local CURRENT_SCALE
           CURRENT_SCALE="$(kubectl "${context}" get "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --output yaml | yq eval '.spec.replicas')"
 
-          local WANTED_SCALE
-          if [[ ${CURRENT_SCALE} -eq 0 ]]; then
-            WANTED_SCALE="${KUBE_SCALE_FACTOR}"
-          else
-            WANTED_SCALE="$(printf "%f * %f" "${CURRENT_SCALE}" "${KUBE_SCALE_FACTOR}" | bc | sed -e 's|\.0*$||;s|\.[0-9]*$| + 1|' | bc)"
+          if [[ ${CURRENT_SCALE:-} -eq 0 ]]; then
+            CURRENT_SCALE=1
           fi
+
+          local WANTED_SCALE
+          WANTED_SCALE="$(printf "%f * %f" "${CURRENT_SCALE}" "${KUBE_SCALE_FACTOR}" | bc | sed -e 's|\.0*$||;s|\.[0-9]*$| + 1|' | bc)"
 
           _kube_print_and_run kubectl "${context}" scale --replicas "${WANTED_SCALE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
         done
