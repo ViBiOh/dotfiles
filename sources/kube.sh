@@ -642,4 +642,3 @@ _fzf_complete_kube() {
 }
 
 [[ -n ${BASH} ]] && complete -F _fzf_complete_kube -o default -o bashdefault kube
-[[ -n ${BASH} ]] && complete -F _fzf_complete_kube -o default -o bashdefault kikou
