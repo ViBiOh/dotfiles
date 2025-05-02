@@ -16,7 +16,7 @@ if command -v kubectl >/dev/null 2>&1; then
       fi
 
       local K8S_CONTEXT
-      K8S_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
+      K8S_CONTEXT="$(yq eval '.current-context as $context | .contexts[] | select(.name == $context) | .context.cluster + "/" + .context.namespace' "${KUBECONFIG:-${HOME}/.kube/config}")"
 
       if [[ -n ${K8S_CONTEXT} ]]; then
         printf -- " ☸ %s" "${K8S_CONTEXT}"
