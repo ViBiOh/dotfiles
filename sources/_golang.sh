@@ -11,11 +11,11 @@ fi
 export GOPATH="${HOME}/opt/gopath"
 export PATH="${GOPATH}/bin:${PATH}"
 
-alias pprof_cpu='go tool pprof -http localhost:12000 http://localhost:9999/debug/pprof/profile'
-alias pprof_memory='go tool pprof -http localhost:12001 http://localhost:9999/debug/pprof/heap'
-alias pprof_goroutine='go tool pprof -http localhost:12002 http://localhost:9999/debug/pprof/goroutine'
+alias pprof_http_cpu='go tool pprof -http localhost:12000 http://localhost:9999/debug/pprof/profile'
+alias pprof_http_memory='go tool pprof -http localhost:12001 http://localhost:9999/debug/pprof/heap'
+alias pprof_http_goroutine='go tool pprof -http localhost:12002 http://localhost:9999/debug/pprof/goroutine'
 
-alias go_bench="go test -bench=. -benchmem -run='^$' -count=10"
+alias go_bench="go test -bench=. -benchmem -run='^$'"
 
 if command -v fzf >/dev/null 2>&1; then
   go_bump() {
