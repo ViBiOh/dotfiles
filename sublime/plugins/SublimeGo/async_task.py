@@ -1,3 +1,4 @@
+import binascii
 import os
 import signal
 import subprocess
@@ -62,7 +63,10 @@ class AsyncTask:
 
     def read(self, reader):
         for line in reader:
-            self.write(line.decode(self.encoding))
+            try:
+                self.write(line.decode(self.encoding))
+            except UnicodeDecodeError:
+                self.write(line.hex() + "\n")
 
         if self.killed:
             msg = "Cancelled"
