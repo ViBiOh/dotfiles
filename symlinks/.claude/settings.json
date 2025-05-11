@@ -92,5 +92,16 @@
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   },
+  "enabledPlugins": {
+    "trajectory@trajectory": true
+  },
+  "extraKnownMarketplaces": {
+    "trajectory": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/vincent.boutour/.trajectory/claude-marketplace"
+      }
+    }
+  },
   "teammateMode": "tmux"
 }
