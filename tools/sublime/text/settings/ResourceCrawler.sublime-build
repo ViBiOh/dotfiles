@@ -1,0 +1,15 @@
+{
+  "cmd": [
+    "make",
+    "aws-debug-gen-resource-crawler",
+    "crawler=${file_name/.yaml//}"
+  ],
+  "working_dir": "$folder",
+  "selector": "source.yaml",
+  "file_patterns": [
+    "resource-crawler/internal/crawler/jobs/specs/*.yaml"
+  ],
+  "cancel": {
+    "kill": true
+  }
+}
