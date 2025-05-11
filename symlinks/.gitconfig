@@ -9,7 +9,7 @@
 	email = bob@vibioh.fr
 	signingkey = DD539006C49CAB71
 
-[includeIf "hasconfig:remote.*.url:git@github.com:FooBar/**"]
+[includeIf "hasconfig:remote.*.url:git@github.com:DataDog/**"]
 	path = ~/.gitconfig_work
 
 [core]
@@ -129,5 +129,5 @@
 	cmd = smerge mergetool \"$BASE\" \"$LOCAL\" \"$REMOTE\" -o \"$MERGED\"
 	trustExitCode = true
 
-[url "ssh://git@github.com/FooBar/"]
-	insteadOf = https://github.com/FooBar/
+[url "ssh://git@github.com/DataDog/"]
+	insteadOf = https://github.com/DataDog/
