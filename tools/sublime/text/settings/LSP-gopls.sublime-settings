@@ -2,6 +2,9 @@
   "command": [
     "gopls"
   ],
+  "env": {
+    "GOPACKAGESDRIVER": "/Users/vincent.boutour/go/src/github.com/DataDog/dd-source/tools/go-packagedriver/gopackagesdriver.sh"
+  },
   "settings": {
     "manageGoplsBinary": false,
     "gopls.expandWorkspaceToModule": false,
