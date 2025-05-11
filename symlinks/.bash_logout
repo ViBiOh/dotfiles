@@ -14,6 +14,10 @@ if [[ $(pgrep -a bash | wc -l) -eq 2 ]]; then
     op_broker_stop
   fi
 
+  if [[ $(type -t "workspaces_daemon_stop") == "function" ]]; then
+    workspaces_daemon_stop
+  fi
+
   if [[ $(type -t "kube_clean_contexts") == "function" ]]; then
     kube_clean_contexts
   fi
