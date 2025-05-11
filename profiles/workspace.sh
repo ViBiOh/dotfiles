@@ -3,6 +3,7 @@
 export DOTFILES_CLAUDE="true"
 export DOTFILES_GIT="true"
 export DOTFILES_GOLANG="true"
+export DOTFILES_NODE="true"
 export DOTFILES_RIPGREP="true"
 export DOTFILES_RUBY="true"
 export DOTFILES_SHELLCHECK="true"

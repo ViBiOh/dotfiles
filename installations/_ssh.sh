@@ -7,6 +7,7 @@ symlink() {
 
   if command -v op >/dev/null 2>&1; then
     symlink_home ".ssh/config.d/op"
+    symlink_home ".ssh/config.d/common-workspace"
   fi
 }
 

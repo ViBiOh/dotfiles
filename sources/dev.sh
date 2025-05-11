@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 alias dev='cd ${HOME}/code/'
-alias work='test -e ${HOME}/workspace/ && cd ${HOME}/workspace/ || dev'
+alias work='test -e ${HOME}/dd/ && cd ${HOME}/dd/ || dev'
 alias grep='grep --color=auto'
 alias vi='vim'
 alias fuck='sudo $(history -p \!\!)'
