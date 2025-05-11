@@ -1,2 +1,5 @@
 [user]
-  email = vibioh@foobar.com
+  email = vincent.boutour@datadoghq.com
+
+[core]
+  sshCommand = ssh -o "IdentityFile=~/.ssh/DataDog.pub" -o "IdentitiesOnly=yes"
