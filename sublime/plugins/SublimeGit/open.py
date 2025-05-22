@@ -52,8 +52,6 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
                         "-n",
                         "1",
                         "--pretty=format:%h",
-                        "--",
-                        git_info["path"],
                     ],
                     stderr=subprocess.STDOUT,
                     cwd=git_info["root"],
