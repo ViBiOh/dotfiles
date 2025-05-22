@@ -505,8 +505,8 @@ _jira_github_request() {
     return 1
   fi
 
-  local HEADER_OUPUT
-  HEADER_OUPUT=$(mktemp)
+  local HEADER_OUTPUT
+  HEADER_OUTPUT=$(mktemp)
 
   local URL
   URL="https://api.github.com${1-}"
@@ -520,7 +520,7 @@ _jira_github_request() {
       --show-error \
       --location \
       --max-time 10 \
-      --dump-header "${HEADER_OUPUT}" \
+      --dump-header "${HEADER_OUTPUT}" \
       --fail-with-body \
       --header "Accept: application/vnd.github+json" \
       --header "Authorization: Bearer ${GITHUB_TOKEN}" \
@@ -530,15 +530,15 @@ _jira_github_request() {
 
   if [[ ${?} -ne 0 ]]; then
     if [[ ${GITHUB_PRINT_ERROR:-} == "true" ]]; then
-      cat "${HEADER_OUPUT}" >/dev/stderr
+      cat "${HEADER_OUTPUT}" >/dev/stderr
       printf -- "%s\n" "${GITHUB_OUTPUT}" >/dev/stderr
     fi
 
-    rm -f "${HEADER_OUPUT}"
+    rm -f "${HEADER_OUTPUT}"
     return 1
   fi
 
-  rm -f "${HEADER_OUPUT}"
+  rm -f "${HEADER_OUTPUT}"
 
   if [[ ${GITHUB_PRINT_OUTPUT:-} == "true" ]]; then
     printf -- "%s" "${GITHUB_OUTPUT}"
@@ -551,8 +551,8 @@ _jira_request() {
     return 1
   fi
 
-  local HEADER_OUPUT
-  HEADER_OUPUT=$(mktemp)
+  local HEADER_OUTPUT
+  HEADER_OUTPUT=$(mktemp)
 
   local URL
   URL="${JIRA_DOMAIN}${1-}"
@@ -566,7 +566,7 @@ _jira_request() {
       --show-error \
       --location \
       --max-time 10 \
-      --dump-header "${HEADER_OUPUT}" \
+      --dump-header "${HEADER_OUTPUT}" \
       --fail-with-body \
       --header "Accept: application/json" \
       --header "Authorization: ${JIRA_AUTHORIZATION}" \
@@ -575,13 +575,13 @@ _jira_request() {
   )"
 
   if [[ ${?} -ne 0 ]]; then
-    cat "${HEADER_OUPUT}" >/dev/stderr
+    cat "${HEADER_OUTPUT}" >/dev/stderr
     printf -- "%s\n" "${JIRA_OUTPUT}" >/dev/stderr
-    rm -f "${HEADER_OUPUT}"
+    rm -f "${HEADER_OUTPUT}"
     return 1
   fi
 
-  rm -f "${HEADER_OUPUT}"
+  rm -f "${HEADER_OUTPUT}"
   printf -- "%s" "${JIRA_OUTPUT}"
 }
 

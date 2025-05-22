@@ -106,8 +106,8 @@ meteo() {
 }
 
 stock() {
-  local HEADER_OUPUT
-  HEADER_OUPUT=$(mktemp)
+  local HEADER_OUTPUT
+  HEADER_OUTPUT=$(mktemp)
 
   local YAHOO_OUTPUT
   YAHOO_OUTPUT="$(
@@ -118,19 +118,19 @@ stock() {
       --location \
       --max-time 10 \
       --header "User-Agent: Mozilla/5.0" \
-      --dump-header "${HEADER_OUPUT}" \
+      --dump-header "${HEADER_OUTPUT}" \
       --fail-with-body \
       "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=true&interval=2m&range=1d"
   )"
 
   if [[ ${?} -ne 0 ]]; then
-    cat "${HEADER_OUPUT}" >/dev/stderr
+    cat "${HEADER_OUTPUT}" >/dev/stderr
     printf -- "%s\n" "${YAHOO_OUTPUT}" >/dev/stderr
-    rm -f "${HEADER_OUPUT}"
+    rm -f "${HEADER_OUTPUT}"
     return 1
   fi
 
-  rm -f "${HEADER_OUPUT}"
+  rm -f "${HEADER_OUTPUT}"
 
   local STOCK_SYMBOL
   STOCK_SYMBOL="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .symbol')"
@@ -194,19 +194,19 @@ stock() {
         --location \
         --max-time 10 \
         --header "User-Agent: Mozilla/5.0" \
-        --dump-header "${HEADER_OUPUT}" \
+        --dump-header "${HEADER_OUTPUT}" \
         --fail-with-body \
         "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=false&interval=1d&range=1mo"
     )"
 
     if [[ ${?} -ne 0 ]]; then
-      cat "${HEADER_OUPUT}" >/dev/stderr
+      cat "${HEADER_OUTPUT}" >/dev/stderr
       printf -- "%s\n" "${YAHOO_OUTPUT}" >/dev/stderr
-      rm -f "${HEADER_OUPUT}"
+      rm -f "${HEADER_OUTPUT}"
       return 1
     fi
 
-    rm -f "${HEADER_OUPUT}"
+    rm -f "${HEADER_OUTPUT}"
 
     PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .chartPreviousClose')"
     _stock_evolution
