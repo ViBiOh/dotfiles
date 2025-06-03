@@ -19,8 +19,8 @@ kube() {
 
   _kube_print_and_run() {
     printf -- "%b%s%b\n" "${YELLOW}" "${*}" "${RESET}" 1>&2
-    history -s "${@}"
-    "${@}"
+    history -s "${*}"
+    eval "${*}"
   }
 
   _kube_info() {
@@ -386,7 +386,7 @@ kube() {
       if command -v kmux >/dev/null 2>&1; then
         _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" image "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
       else
-        _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.template.spec.containers[].image'
+        _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml \| yq eval '.spec.template.spec.containers[].image'
       fi
     fi
     ;;
@@ -400,7 +400,7 @@ kube() {
         QUERY=".data[] |= @base64d"
       fi
 
-      _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval --prettyPrint "${QUERY}"
+      _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml \| yq eval --prettyPrint "${QUERY}"
     fi
     ;;
 
@@ -445,7 +445,7 @@ kube() {
         _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" restart "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
       else
         if [[ ${RESOURCE_TYPE} =~ ^jobs? ]]; then
-          _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --output yaml | yq eval 'del(.spec.selector)' | yq eval 'del(.spec.template.metadata.labels)' | "${KUBECTL_COMMAND[@]}" replace --force --filename -
+          _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --output yaml \| yq eval 'del(.spec.selector)' \| yq eval 'del(.spec.template.metadata.labels)' \| "${KUBECTL_COMMAND[@]}" replace --force --filename -
         else
           _kube_print_and_run "${KUBECTL_COMMAND[@]}" rollout restart "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
         fi
