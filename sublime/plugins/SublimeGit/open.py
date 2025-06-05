@@ -11,6 +11,13 @@ from .utils import git_path
 origin_regex = re.compile("^.*@(.*):(.*?)(.git)?\\n?$")
 
 
+# Use removeprefix when migrating to 3.9+
+def remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix) :]
+    return text
+
+
 class SublimeGitType(sublime_plugin.ListInputHandler):
     def name(self):
         return "git_type"
@@ -104,7 +111,7 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
                 )
 
                 if git_type == "Default branch":
-                    ref = ref.removeprefix("origin/")
+                    ref = remove_prefix(ref, "origin/")
             except subprocess.CalledProcessError as e:
                 print("unable to get branch: {}".format(e.output.decode("utf8")))
                 return
