@@ -90,7 +90,9 @@
 	unstage = reset HEAD --
 	fresh-clean = ! git reset HEAD -- . && git checkout -- . && git clean -ffxd
 	list-merged-stash = ! git fsck --unreachable --no-progress | grep commit | cut -d' ' -f3 | xargs git log --merges --no-walk --grep=WIP
-	default-branch = ! git rev-parse --abbrev-ref origin/HEAD | sed 's|^origin/||'
+	default-branch = ! git config get --default $(git rev-parse --abbrev-ref origin/HEAD | sed 's|^origin/||') branch.overridden-default
+	force-default-branch = "!f() { git config set "branch.overridden-default" "${1}"; }; f"
+	unforce-default-branch = config unset "branch.overridden-default"
 	current-branch = rev-parse --abbrev-ref HEAD
 	set-head = remote set-head origin -a
 	default = ! git switch "$(git default-branch)"
