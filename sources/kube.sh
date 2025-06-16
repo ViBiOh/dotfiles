@@ -420,15 +420,22 @@ kube() {
     _kube_resources "${FIRST}" "${SECOND}"
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
+      local PODS_LABELS
+      PODS_LABELS="$(_kube_pod_labels)"
+
+      local KUBE_CONTAINER
+      KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get pods "${RESOURCE_NAMESPACE}" --selector="${PODS_LABELS}" --output=yaml | yq eval '.items[].spec.containers[].name' | sort -u | fzf --select-1 --prompt="Container: ")"
+      if [[ -n ${KUBE_CONTAINER:-} ]]; then
+        KUBE_CONTAINER="--container=${KUBE_CONTAINER}"
+      fi
+
       if [[ ${RESOURCE_TYPE} =~ ^(cronjob|daemonset|deployment|job|pod|namespace|service|node|statefulset)s? ]] && command -v kmux >/dev/null 2>&1; then
-        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" ${RESOURCE_NAMESPACE} log "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --since=24h "${@}"
+        _kube_print_and_run "kmux ${KUBECTL_CONTEXTS[*]} ${RESOURCE_NAMESPACE} log ${RESOURCE_TYPE} ${RESOURCE_NAME} --since=24h ${KUBE_CONTAINER} ${*}"
       else
-        local PODS_LABELS
-        PODS_LABELS="$(_kube_pod_labels)"
 
         printf -- "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE#--namespace=}/${RESOURCE_NAME}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
-        _kube_print_and_run "${KUBECTL_COMMAND[@]}" logs ${RESOURCE_NAMESPACE} --ignore-errors --prefix --selector="${PODS_LABELS}" --follow --since=24h "${@}"
+        _kube_print_and_run "${KUBECTL_COMMAND[*]} logs ${RESOURCE_NAMESPACE} --ignore-errors --prefix --selector=${PODS_LABELS} --follow --since=24h ${KUBE_CONTAINER} ${*}"
       fi
     fi
     ;;
