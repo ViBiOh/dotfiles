@@ -46,7 +46,7 @@
 	sort = version:refname
 
 [remote "origin"]
-	fetch = +refs/tags/*:refs/tags/*
+	fetch = +refs/tags/*:refs/origin/tags/*
 
 [rebase]
 	autosquash = true
