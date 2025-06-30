@@ -16,24 +16,28 @@ notes() {
     cd "${REAL_NOTES_FOLDER}" || return
 
     while IFS= read -r file; do
-      gpg --yes --encrypt --recipient "${NOTES_AUTHOR:-}" "${file}"
+      gpg --yes --encrypt --recipient "${NOTES_AUTHOR:-}" --output "encrypted/${file}" "${file}"
     done < <(rg --files --glob '*.md')
   }
 
   _notes_unlock() {
     cd "${REAL_NOTES_FOLDER}" || return
 
+    mkdir -p "decrypted"
+
     while IFS= read -r file; do
-      local TEMP_FILE
-      TEMP_FILE="$(mktemp)"
+      local FILENAME="${file#encrypted\/}"
+      FILENAME="${FILENAME%.gpg}"
 
-      gpg --yes --quiet --output "${TEMP_FILE}" --decrypt "${file}"
-      if [[ $(delta "${file%.gpg}" "${TEMP_FILE}" | wc -l) -gt 0 ]]; then
-        smerge mergetool -o "${file%.gpg}" "${file%.gpg}" "${TEMP_FILE}"
+      gpg --yes --quiet --output "decrypted/${FILENAME}" --decrypt "${file}"
+      if [[ $(delta "${FILENAME}" "decrypted/${FILENAME}" | wc -l) -gt 0 ]]; then
+        smerge mergetool -o "${FILENAME}" "${FILENAME}" "decrypted/${FILENAME}"
+      else
+        mv "decrypted/${FILENAME}" "${FILENAME}"
       fi
+    done < <(rg --files --glob 'encrypted/*')
 
-      rm "${TEMP_FILE}"
-    done < <(rg --files --glob '*.md.gpg')
+    rm -rf "decrypted"
   }
 
   case "${NOTES_ACTION}" in
@@ -49,7 +53,7 @@ notes() {
     (
       cd "${REAL_NOTES_FOLDER}" || return
       _note_lock
-      git add '*.md.gpg'
+      git add 'encrypted/'
       git commit --signoff --message "docs: $(date +"%Y-%m-%dT%H:%M:%S%z")"
     )
     ;;
