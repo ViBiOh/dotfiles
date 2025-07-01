@@ -19,6 +19,16 @@ if command -v git >/dev/null 2>&1; then
   grip() {
     fzf --ansi --reverse --tiebreak=index --no-sort --no-hscroll --preview 'f() { set -- $(echo -- "$@" | grep -o "[a-f0-9]\{7\}"); [ $# -eq 0 ] || git show --color=always $1; }; f {}'
   }
+
+  gripweb() {
+    local OUTPUT
+    OUTPUT="$(grip | awk '{print $1}')"
+
+    if [[ -n ${OUTPUT} ]]; then
+      git webcommit "${OUTPUT}"
+    fi
+
+  }
 fi
 
 if command -v jq >/dev/null 2>&1; then

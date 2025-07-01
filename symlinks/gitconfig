@@ -66,6 +66,7 @@
 	remote-repository = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@.*:([^\\.]*)(.git)?$ ]] && printf -- '%s' \"${BASH_REMATCH[1]}\"
 	web-url = ! [[ "$(git remote get-url --push $(git remote show | head -1))" =~ ^.*@(.*)[:/](.*)/(.*)$ ]] && printf -- 'https://%s/%s/%s' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]%.git}"
 	web = ! open "$(git web-url)"
+	webcommit = "!f() { open "$(git web-url)/commit/${1:-}"; }; f"
 	pr = ! open "$(git web-url)/compare/$(git default-branch)...$(git current-branch)?expand=1"
 	fco = "!f() { local GIT_BRANCH="$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query="remotes/${1:-}" | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||')"; [[ -n "${GIT_BRANCH}" ]] && git switch "${GIT_BRANCH}"; }; f"
 	fixup = ! git ci --fixup "$(git log-pretty "origin/$(git default-branch).." --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{printf(\"%s\", $1)}')"
