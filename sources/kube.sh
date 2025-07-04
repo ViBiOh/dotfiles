@@ -122,7 +122,7 @@ kube() {
       printf -- "job-name=%s" "${RESOURCE_NAME}"
     elif [[ ${RESOURCE_TYPE} =~ ^(daemonset|deployment|statefulset)s? ]]; then
       "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector.matchLabels | to_entries | .[] | .key + "=" + .value' | paste -sd, -
-    else
+    elif ! [[ ${RESOURCE_TYPE} =~ (ns|namespaces?) ]]; then
       "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.metadata.labels | to_entries | .[] | .key + "=" + .value' | paste -sd, -
     fi
   }
@@ -423,10 +423,12 @@ kube() {
       local PODS_LABELS
       PODS_LABELS="$(_kube_pod_labels)"
 
-      local KUBE_CONTAINER
-      KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get pods "${RESOURCE_NAMESPACE}" --selector="${PODS_LABELS}" --output=yaml | yq eval '.items[].spec.containers[].name' | sort -u | fzf --select-1 --prompt="Container: ")"
-      if [[ -n ${KUBE_CONTAINER:-} ]]; then
-        KUBE_CONTAINER="--container=${KUBE_CONTAINER}"
+      if [[ -n ${PODS_LABELS} ]]; then
+        local KUBE_CONTAINER
+        KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get pods "${RESOURCE_NAMESPACE}" --selector="${PODS_LABELS}" --output=yaml | yq eval '.items[].spec.containers[].name' | sort -u | fzf --select-1 --prompt="Container: ")"
+        if [[ -n ${KUBE_CONTAINER:-} ]]; then
+          KUBE_CONTAINER="--container=${KUBE_CONTAINER}"
+        fi
       fi
 
       if [[ ${RESOURCE_TYPE} =~ ^(cronjob|daemonset|deployment|job|pod|namespace|service|node|statefulset)s? ]] && command -v kmux >/dev/null 2>&1; then
