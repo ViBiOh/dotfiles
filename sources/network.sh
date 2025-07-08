@@ -147,6 +147,10 @@ dns_allow() {
     googletagmanager.com
   "
 
+  websites["laposte"]="
+    t.notif-colissimo-laposte.info
+  "
+
   local WEBSITE
   WEBSITE="$(printf -- "%s\n" "${!websites[@]}" | fzf --select-1 --query="${1-}" --exit-0)"
 
