@@ -18,7 +18,7 @@ install() {
   kubectl completion bash >"${HOME}/opt/completions/kubectl-completion.sh"
 
   # renovate: datasource=github-releases depName=helm/helm
-  local HELM_VERSION="v3.18.3"
+  local HELM_VERSION="v3.18.4"
 
   archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64").tar.gz" "$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64")/helm"
   if command -v helm >/dev/null 2>&1; then
