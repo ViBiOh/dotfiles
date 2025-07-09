@@ -28,7 +28,7 @@ if command -v xdg-open >/dev/null 2>&1 && ! command -v open >/dev/null 2>&1; the
 fi
 
 figmoji() {
-  figlet -f banner "${1:-Hello}" | tail -n +2 | head -n -1 | sed -e"s|#|:${2:-wave}:|g" | sed -e's| |:empty:|g' | pbcopy
+  figlet -f banner "${1:-Hello}" | tail -n +1 | head -n -1 | sed -e"s|#|:${2:-wave}:|g" | sed -e's| |:empty:|g' | pbcopy
 }
 
 qrcode() {
