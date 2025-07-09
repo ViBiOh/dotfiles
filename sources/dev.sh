@@ -27,6 +27,10 @@ if command -v xdg-open >/dev/null 2>&1 && ! command -v open >/dev/null 2>&1; the
   alias open='xdg-open'
 fi
 
+figmoji() {
+  figlet -f banner "${1:-Hello}" | sed -e"s|#|:${2:-wave}:|g" | sed -e's| |:empty:|g' | pbcopy
+}
+
 qrcode() {
   qrencode -t UTF8
 }
