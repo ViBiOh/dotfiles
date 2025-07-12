@@ -77,10 +77,11 @@ main() {
   symlink_settings "${TEXT_PKG}" "text"
   symlink_settings "${MERGE_PKG}" "merge"
 
+  install_plugin "${TEXT_PKG}" "Formatter"
   install_plugin "${TEXT_PKG}" "SublimeGit"
   install_plugin "${TEXT_PKG}" "SublimeGo"
   install_plugin "${TEXT_PKG}" "SublimeLayout"
-  install_plugin "${TEXT_PKG}" "Formatter"
+  install_plugin "${TEXT_PKG}" "SublimeMakefile"
 
   if command -v go >/dev/null 2>&1; then
     go install "golang.org/x/tools/gopls@latest"

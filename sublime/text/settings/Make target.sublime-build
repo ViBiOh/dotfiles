@@ -1,0 +1,10 @@
+{
+  "target": "makefile_run",
+  "selector": "source.makefile",
+  "file_patterns": [
+    "Makefile"
+  ],
+  "cancel": {
+    "kill": true
+  }
+}

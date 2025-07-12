@@ -53,7 +53,11 @@ class AsyncTask:
                 stderr=subprocess.STDOUT,
             )
         except subprocess.CalledProcessError as e:
-            print("unable to list child process: {}".format(e.output.decode("utf8")))
+            output = e.output.decode("utf8")
+            if len(e.output.decode("utf8")) == 0:
+                return
+
+            print("unable to list child process: {}".format(output))
             return
 
         for line in child_processes.decode("utf8").rstrip().split("\n"):
