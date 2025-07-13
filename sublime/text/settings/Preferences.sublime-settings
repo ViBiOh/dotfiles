@@ -24,4 +24,5 @@
   "ignored_packages": [
     "Vintage",
   ],
+  "color_scheme": "Monokai.sublime-color-scheme",
 }
