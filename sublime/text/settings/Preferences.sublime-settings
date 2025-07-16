@@ -23,6 +23,5 @@
   "word_wrap": true,
   "ignored_packages": [
     "Vintage",
-  ],
-  "color_scheme": "Monokai.sublime-color-scheme",
+  ]
 }
