@@ -41,6 +41,7 @@ class MakefileRun(sublime_plugin.WindowCommand):
             self.task.kill()
 
         function_name = self.get_target_name(window)
+        function_name = function_name.split(" ")[0]
 
         self.task = AsyncTask(
             command=[
