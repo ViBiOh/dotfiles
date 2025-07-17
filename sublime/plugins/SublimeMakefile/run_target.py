@@ -1,3 +1,5 @@
+import re
+import subprocess
 import threading
 
 import sublime_plugin
@@ -6,10 +8,49 @@ import sublime
 
 from .async_task import AsyncTask
 
+target_regex = re.compile("^[a-z].*:$")
+
+
+class MakefileTarget(sublime_plugin.ListInputHandler):
+    def __init__(self, window):
+        self.window = window
+
+    def name(self):
+        return "makefile_target"
+
+    def list_items(self):
+        variables = self.window.extract_variables()
+        working_dir = variables.get("file_path")
+
+        targets = []
+
+        for line in subprocess.run(
+            [
+                "make",
+                "--question",
+                "--print-data-base",
+                "--no-builtin-variables",
+                "--no-builtin-rules",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=working_dir,
+        ).stdout.splitlines():
+            if target_regex.match(line):
+                targets.append(line[:-1])
+
+        return targets
+
 
 class MakefileRun(sublime_plugin.WindowCommand):
     task = None
     panel = None
+
+    def input(self, args):
+        if "kill" in args:
+            return None
+
+        return MakefileTarget(self.window)
 
     def is_enabled(self, kill=False):
         if kill:
@@ -17,7 +58,7 @@ class MakefileRun(sublime_plugin.WindowCommand):
 
         return True
 
-    def run(self, kill=False):
+    def run(self, makefile_target, kill=False):
         if kill:
             if self.task:
                 self.task.kill()
@@ -40,13 +81,10 @@ class MakefileRun(sublime_plugin.WindowCommand):
         if self.task:
             self.task.kill()
 
-        function_name = self.get_target_name(window)
-        function_name = function_name.split(" ")[0]
-
         self.task = AsyncTask(
             command=[
                 "make",
-                function_name,
+                makefile_target,
             ],
             output=self.queue_write,
             cwd=working_dir,
@@ -57,19 +95,3 @@ class MakefileRun(sublime_plugin.WindowCommand):
 
     def do_write(self, text):
         self.panel.run_command("append", {"characters": text})
-
-    def get_target_name(self, window):
-        view = window.active_view()
-
-        current_point = view.sel()[0].begin()
-        current_function = ""
-
-        for function_symbol in [
-            x for x in view.symbol_regions() if x.kind[0] == sublime.KIND_ID_FUNCTION
-        ]:
-            if function_symbol.region.begin() < current_point:
-                current_function = function_symbol.name
-            else:
-                return current_function
-
-        return current_function

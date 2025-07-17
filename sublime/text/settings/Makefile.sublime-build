@@ -5,6 +5,7 @@
     "Makefile"
   ],
   "cancel": {
-    "kill": true
+    "kill": true,
+    "makefile_target": ""
   }
 }
