@@ -78,10 +78,25 @@ class SublimeGitBlame(sublime_plugin.EventListener):
     _line_number = 0
 
     def clear_status(self, view):
-        view.erase_status(self._status_key)
+        view.erase_regions(self._status_key)
 
-    def print_status(self, view, value):
-        view.set_status(self._status_key, value)
+    def print_status(self, view, selection, author, moment, description):
+        content = '{} <span style="color: var(--{})">({})</span> <span style="color: var(--{})">({})</span> <span style="color: var(--{})">&lt;{}&gt;</span>'.format(
+            description,
+            "greenish",
+            relative_time(moment),
+            "purplish",
+            moment.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "bluish",
+            author,
+        )
+
+        view.add_regions(
+            self._status_key,
+            [selection],
+            annotations=[content],
+            annotation_color="coral",
+        )
 
     def on_selection_modified_async(self, view):
         if not _settings_obj.get("show_blame", ""):
@@ -158,14 +173,8 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         time = int(time_regex.findall(blame_content)[0])
         moment = datetime.fromtimestamp(time)
         description = summary_regex.findall(blame_content)[0]
-        blame = "{}|{}({}): {}".format(
-            author,
-            relative_time(moment),
-            moment.strftime("%Y-%m-%dT%H:%M:%S%z"),
-            description,
-        )
 
-        self.print_status(view, blame)
+        self.print_status(view, selection, author, moment, description)
 
 
 class SublimeGitDisableCodeowners(sublime_plugin.WindowCommand):
