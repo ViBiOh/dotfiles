@@ -62,7 +62,7 @@ def relative_time(date):
 class SublimeGitDisableBlame(sublime_plugin.WindowCommand):
     def run(self):
         _settings_obj.set("show_blame", "")
-        self.window.active_view().erase_status("git_blame")
+        self.window.active_view().erase_regions("git_blame")
 
 
 class SublimeGitEnableBlame(sublime_plugin.WindowCommand):
