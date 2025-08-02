@@ -7,6 +7,7 @@ import sublime_plugin
 
 import sublime
 
+from .open import build_line_url, get_remote
 from .utils import git_path
 
 PLUGIN_NAME = "SublimeGit"
@@ -16,7 +17,9 @@ new_file_regex = re.compile("fatal: no such path '.*' in HEAD")
 not_git_regex = re.compile(
     "fatal: not a git repository \\(or any of the parent directories\\): .git"
 )
-line_regex = re.compile("^(?P<sha>[a-f0-9]{40})\\s[0-9]+\\s(?P<final_line>[0-9]+)")
+line_regex = re.compile(
+    "^(?P<sha>[a-f0-9]{40})\\s(?P<origin_line>[0-9]+)\\s(?P<final_line>[0-9]+)"
+)
 author_regex = re.compile("^author\\s(?P<author>.*)")
 time_regex = re.compile("^author-time\\s(?P<time>.*)")
 summary_regex = re.compile("^summary\\s(?P<summary>.*)")
@@ -121,15 +124,19 @@ class SublimeGitEnableBlame(sublime_plugin.WindowCommand):
 class SublimeGitBlame(sublime_plugin.EventListener):
     _status_key = "git_blame"
 
-    _file_name = ""
     _git_info = {}
+    _git_blame = None
+    _git_remote = ""
+
+    _file_name = ""
     _line_number = 0
 
     def clear_status(self, view):
         view.erase_regions(self._status_key)
 
-    def print_status(self, view, selection, author, moment, description):
-        content = '{} <span style="color: var(--{})">({})</span> <span style="color: var(--{})">({})</span> <span style="color: var(--{})">&lt;{}&gt;</span>'.format(
+    def print_status(self, view, selection, author, moment, description, url):
+        content = '<a href="{}">{}</a> <span style="color: var(--{})">({})</span> <span style="color: var(--{})">({})</span> <span style="color: var(--{})">&lt;{}&gt;</span>'.format(
+            url,
             description,
             "greenish",
             relative_time(moment),
@@ -184,7 +191,9 @@ class SublimeGitBlame(sublime_plugin.EventListener):
                 return
 
             self._file_name = file_name
+            self._git_info = git_info
             self._git_blame = parse_blame(git_blame.decode("utf8"))
+            self._git_remote = get_remote(git_info["root"])
 
     def on_post_save_async(self, view):
         if not _settings_obj.get("show_blame", False):
@@ -233,7 +242,16 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         moment = commit.get("time")
         description = commit.get("summary")
 
-        self.print_status(view, selection, author, moment, description)
+        self.print_status(
+            view,
+            selection,
+            author,
+            moment,
+            description,
+            build_line_url(
+                self._git_remote, sha, self._git_info["path"], self._line_number
+            ),
+        )
 
 
 class SublimeGitDisableCodeowners(sublime_plugin.WindowCommand):
