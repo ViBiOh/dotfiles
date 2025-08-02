@@ -1,4 +1,4 @@
 {
-  "show_blame": "false",
-  "show_codeowners": "true"
+  "show_blame": true,
+  "show_codeowners": true
 }

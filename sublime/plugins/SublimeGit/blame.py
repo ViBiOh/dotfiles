@@ -16,9 +16,10 @@ new_file_regex = re.compile("fatal: no such path '.*' in HEAD")
 not_git_regex = re.compile(
     "fatal: not a git repository \\(or any of the parent directories\\): .git"
 )
-author_regex = re.compile("author\\s(.*)")
-time_regex = re.compile("author-time\\s(.*)")
-summary_regex = re.compile("summary\\s(.*)")
+line_regex = re.compile("^(?P<sha>[a-f0-9]{40})\\s[0-9]+\\s(?P<final_line>[0-9]+)")
+author_regex = re.compile("^author\\s(?P<author>.*)")
+time_regex = re.compile("^author-time\\s(?P<time>.*)")
+summary_regex = re.compile("^summary\\s(?P<summary>.*)")
 
 
 def plugin_loaded() -> None:
@@ -59,15 +60,62 @@ def relative_time(date):
     return FormatDelta(date).format()
 
 
+def parse_blame(blame):
+    lines = {}
+    commits = {}
+
+    current_sha = ""
+    current_commit = None
+
+    for line in blame.splitlines():
+        line_match = line_regex.match(line)
+        if line_match:
+            if current_commit:
+                commits[current_commit.get("sha")] = current_commit
+
+            current_sha = line_match.group("sha")
+            lines[int(line_match.group("final_line"))] = current_sha
+
+            if not commits.get(current_sha, None):
+                current_commit = {"sha": current_sha}
+
+            continue
+
+        author_match = author_regex.match(line)
+        if author_match:
+            current_commit["author"] = author_match.group("author")
+            continue
+
+        time_match = time_regex.match(line)
+        if time_match:
+            current_commit["time"] = datetime.fromtimestamp(
+                int(time_match.group("time"))
+            )
+            continue
+
+        summary_match = summary_regex.match(line)
+        if summary_match:
+            current_commit["summary"] = summary_match.group("summary")
+            continue
+
+    if current_commit:
+        commits[current_commit.get("sha")] = current_commit
+
+    return {
+        "lines": lines,
+        "commits": commits,
+    }
+
+
 class SublimeGitDisableBlame(sublime_plugin.WindowCommand):
     def run(self):
-        _settings_obj.set("show_blame", "")
+        _settings_obj.set("show_blame", False)
         self.window.active_view().erase_regions("git_blame")
 
 
 class SublimeGitEnableBlame(sublime_plugin.WindowCommand):
     def run(self):
-        _settings_obj.set("show_blame", "true")
+        _settings_obj.set("show_blame", True)
 
 
 class SublimeGitBlame(sublime_plugin.EventListener):
@@ -94,17 +142,61 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         view.add_regions(
             self._status_key,
             [selection],
+            self._status_key,
+            flags=sublime.HIDDEN | sublime.PERSISTENT,
             annotations=[content],
             annotation_color="coral",
         )
 
-    def on_selection_modified_async(self, view):
-        if not _settings_obj.get("show_blame", ""):
-            return
-
+    def refresh_file(self, view):
         file_name = view.file_name()
         if not file_name or len(file_name) == 0:
             return
+
+        if self._file_name != file_name:
+            git_info = git_path(file_name)
+
+            if not git_info:
+                return
+
+            try:
+                git_blame = subprocess.check_output(
+                    [
+                        "git",
+                        "blame",
+                        "--porcelain",
+                        "--",
+                        git_info["path"],
+                    ],
+                    stderr=subprocess.STDOUT,
+                    cwd=git_info["root"],
+                )
+            except subprocess.CalledProcessError as e:
+                err_content = e.output.decode("utf8")
+
+                if new_file_regex.match(err_content):
+                    self.print_status(view, "New file")
+                elif not_git_regex.match(err_content):
+                    self.print_status(view, "Not in git")
+                else:
+                    print(err_content, end="")
+
+                return
+
+            self._file_name = file_name
+            self._git_blame = parse_blame(git_blame.decode("utf8"))
+
+    def on_post_save_async(self, view):
+        if not _settings_obj.get("show_blame", False):
+            return
+
+        self.refresh_file(view)
+
+    def on_selection_modified_async(self, view):
+        if not _settings_obj.get("show_blame", False):
+            return
+
+        self.refresh_file(view)
 
         selections = view.sel()
         if len(selections) != 1:
@@ -115,77 +207,44 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         current_point = selection.begin()
         line_number = view.rowcol(current_point)[0] + 1  # index start at 0
 
+        if line_number == self._line_number:
+            return
+
         if line_number != view.rowcol(selection.end())[0] + 1:
             self.clear_status(view)
             return
 
-        if line_number == self._line_number and self._file_name == file_name:
-            return
-
         self._line_number = line_number
-
-        if self._file_name != file_name:
-            git_info = git_path(file_name)
-
-            if not git_info and line_number == self._line_number:
-                return
-
-            self._file_name = file_name
-            self._git_info = git_info
 
         if current_point == view.size():
             self.clear_status(view)
             return
 
-        try:
-            git_blame = subprocess.check_output(
-                [
-                    "git",
-                    "blame",
-                    "-w",
-                    "--porcelain",
-                    "-L",
-                    "{},{}".format(line_number, line_number),
-                    "--",
-                    self._git_info["path"],
-                ],
-                stderr=subprocess.STDOUT,
-                cwd=self._git_info["root"],
-            )
-        except subprocess.CalledProcessError as e:
-            err_content = e.output.decode("utf8")
-
-            if new_file_regex.match(err_content):
-                self.print_status(view, "New file")
-            elif not_git_regex.match(err_content):
-                self.print_status(view, "Not in git")
-            else:
-                print(err_content, end="")
-
-            return
-
-        blame_content = git_blame.decode("utf8")
-        author = author_regex.findall(blame_content)[0]
-        if author == "Not Committed Yet":
+        sha = self._git_blame.get("lines")[self._line_number]
+        if sha == "0000000000000000000000000000000000000000":
             self.clear_status(view)
             return
 
-        time = int(time_regex.findall(blame_content)[0])
-        moment = datetime.fromtimestamp(time)
-        description = summary_regex.findall(blame_content)[0]
+        commit = self._git_blame.get("commits").get(sha)
+        if not commit:
+            return
+
+        author = commit.get("author")
+        moment = commit.get("time")
+        description = commit.get("summary")
 
         self.print_status(view, selection, author, moment, description)
 
 
 class SublimeGitDisableCodeowners(sublime_plugin.WindowCommand):
     def run(self):
-        _settings_obj.set("show_codeowners", "")
+        _settings_obj.set("show_codeowners", False)
         self.window.active_view().erase_status("git_codeowners")
 
 
 class SublimeGitEnableCodeowners(sublime_plugin.WindowCommand):
     def run(self):
-        _settings_obj.set("show_codeowners", "true")
+        _settings_obj.set("show_codeowners", True)
 
 
 class SublimeGitCodeowners(sublime_plugin.EventListener):
@@ -201,7 +260,7 @@ class SublimeGitCodeowners(sublime_plugin.EventListener):
         view.set_status(self._status_key, value)
 
     def on_selection_modified_async(self, view):
-        if not _settings_obj.get("show_codeowners", ""):
+        if not _settings_obj.get("show_codeowners", True):
             return
 
         file_name = view.file_name()
