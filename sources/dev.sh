@@ -235,11 +235,18 @@ _fzf_complete_date_in() {
 
 [[ -n ${BASH} ]] && complete -F _fzf_complete_date_in -o default -o bashdefault date_in
 
-if [[ ${OSTYPE} =~ ^darwin ]]; then
-  temperature() {
+temperature() {
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo powermetrics --samplers smc --sample-count 1 -i 1 | grep -i -E "temperature|fan"
-  }
+  fi
 
+  if command -v vcgencmd >/dev/null 2>&1; then
+    echo "CPU $(($(</sys/class/thermal/thermal_zone0/temp) / 1000))c"
+    vcgencmd measure_temp
+  fi
+}
+
+if [[ ${OSTYPE} =~ ^darwin ]]; then
   system_state() {
     printf -- "%bThermal%b\n" "${BLUE}" "${RESET}"
     pmset -g therm
