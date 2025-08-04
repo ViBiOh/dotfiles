@@ -140,7 +140,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             description,
             "greenish",
             relative_time(moment),
-            "bluish",
+            "purplish",
             author,
         )
 
@@ -230,7 +230,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             self.clear_status(view)
             return
 
-        sha = self._git_blame.get("lines")[self._line_number]
+        sha = self._git_blame.get("lines").get(self._line_number)
         if sha == "0000000000000000000000000000000000000000":
             self.clear_status(view)
             return
