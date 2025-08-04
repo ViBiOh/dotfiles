@@ -63,7 +63,7 @@ def relative_time(date):
     return FormatDelta(date).format()
 
 
-def parse_blame(blame):
+def parse_git_blame(blame):
     lines = {}
     commits = {}
 
@@ -153,64 +153,65 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             annotation_color="coral",
         )
 
-    def refresh_file(self, view):
+    def refresh_file(self, view, force):
         file_name = view.file_name()
         if not file_name or len(file_name) == 0:
             return
 
-        if self._file_name != file_name or self._git_blame is None:
-            git_info = git_path(file_name)
+        if not force and self._file_name == file_name:
+            return
 
-            if not git_info:
+        self._file_name = file_name
+
+        git_info = git_path(file_name)
+        if not git_info:
+            return
+
+        self._git_info = git_info
+        self._git_remote = git_remote(git_info["root"])
+
+        try:
+            git_blame = subprocess.check_output(
+                [
+                    "git",
+                    "blame",
+                    "--porcelain",
+                    "--",
+                    git_info["path"],
+                ],
+                stderr=subprocess.STDOUT,
+                cwd=git_info["root"],
+            )
+
+            self._git_blame = parse_git_blame(git_blame.decode("utf8"))
+        except subprocess.CalledProcessError as e:
+            self._git_blame = None
+
+            err = e.output.decode("utf8")
+            if not (new_file_regex.match(err) or not_git_regex.match(err)):
+                print(err, end="")
                 return
 
-            try:
-                git_blame = subprocess.check_output(
-                    [
-                        "git",
-                        "blame",
-                        "--porcelain",
-                        "--",
-                        git_info["path"],
-                    ],
-                    stderr=subprocess.STDOUT,
-                    cwd=git_info["root"],
-                )
-            except subprocess.CalledProcessError as e:
-                err_content = e.output.decode("utf8")
-
-                if new_file_regex.match(err_content):
-                    self.print_status(view, "New file")
-                elif not_git_regex.match(err_content):
-                    self.print_status(view, "Not in git")
-                else:
-                    print(err_content, end="")
-
-                return
-
-            self._file_name = file_name
-            self._git_info = git_info
-            self._git_blame = parse_blame(git_blame.decode("utf8"))
-            self._git_remote = git_remote(git_info["root"])
+    def _is_enabled(self):
+        return _settings_obj.get("show_blame", False)
 
     def on_post_save_async(self, view):
-        if not _settings_obj.get("show_blame", False):
+        if not self._is_enabled():
             return
 
-        self.refresh_file(view)
+        self.refresh_file(view, True)
 
     def on_selection_modified_async(self, view):
-        if not _settings_obj.get("show_blame", False):
-            return
-
-        self.refresh_file(view)
-
-        if self._git_blame is None:
+        if not self._is_enabled():
             return
 
         selections = view.sel()
         if len(selections) != 1:
             self.clear_status(view)
+            return
+
+        self.refresh_file(view, False)
+        if self._git_blame is None:
             return
 
         selection = selections[0]
@@ -239,16 +240,12 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         if not commit:
             return
 
-        author = commit.get("author")
-        moment = commit.get("time")
-        description = commit.get("summary")
-
         self.print_status(
             view,
             selection,
-            author,
-            moment,
-            description,
+            commit.get("author"),
+            commit.get("time"),
+            commit.get("summary"),
             build_line_url(
                 self._git_remote, sha, self._git_info["path"], self._line_number
             ),
@@ -276,10 +273,13 @@ class SublimeGitCodeowners(sublime_plugin.EventListener):
         view.erase_status(self._status_key)
 
     def print_status(self, view, value):
-        view.set_status(self._status_key, value)
+        view.set_status(self._status_key, "Owner {}".format(value))
+
+    def _is_enabled(self):
+        return _settings_obj.get("show_codeowners", True)
 
     def on_selection_modified_async(self, view):
-        if not _settings_obj.get("show_codeowners", True):
+        if not self._is_enabled():
             return
 
         file_name = view.file_name()
