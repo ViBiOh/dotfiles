@@ -1,4 +1,3 @@
-import re
 import subprocess
 from os.path import dirname
 
@@ -6,10 +5,7 @@ import sublime_plugin
 
 import sublime
 
-from .blame import get_origin_line_number
-from .utils import git_path
-
-origin_regex = re.compile("^.*@(?P<url>.*):(?P<repository>.*?)(.git)?\\n?$")
+from .utils import git_path, git_remote
 
 
 # Use removeprefix when migrating to 3.9+
@@ -20,36 +16,11 @@ def remove_prefix(text, prefix):
 
 
 def get_file_line_url(cwd, ref, file, line):
-    return build_line_url(get_remote(cwd), ref, file, line)
+    return build_line_url(git_remote(cwd), ref, file, line)
 
 
 def build_line_url(url, ref, file, line):
     return "{}/blob/{}/{}#L{}".format(url, ref, file, line)
-
-
-def get_remote(cwd):
-    try:
-        remote = (
-            subprocess.check_output(
-                ["git", "remote", "get-url", "--push", "origin"],
-                stderr=subprocess.STDOUT,
-                cwd=cwd,
-            )
-            .decode("utf8")
-            .rstrip()
-        )
-
-        origin_match = origin_regex.match(remote)
-        if origin_match:
-            return "https://{}/{}".format(
-                origin_match.group("url"),
-                origin_match.group("repository"),
-            )
-
-    except subprocess.CalledProcessError as e:
-        print("unable to get remote push url: {}".format(e.output.decode("utf8")))
-
-    return ""
 
 
 class SublimeGitType(sublime_plugin.ListInputHandler):

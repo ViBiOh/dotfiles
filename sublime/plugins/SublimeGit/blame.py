@@ -7,8 +7,8 @@ import sublime_plugin
 
 import sublime
 
-from .open import build_line_url, get_remote
-from .utils import git_path
+from .open import build_line_url
+from .utils import git_path, git_remote
 
 PLUGIN_NAME = "SublimeGit"
 PLUGIN_SETTINGS = "{}.sublime-settings".format(PLUGIN_NAME)
@@ -135,13 +135,11 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         view.erase_regions(self._status_key)
 
     def print_status(self, view, selection, author, moment, description, url):
-        content = '<a href="{}">{}</a> <span style="color: var(--{})">({})</span> <span style="color: var(--{})">({})</span> <span style="color: var(--{})">&lt;{}&gt;</span>'.format(
+        content = '<a href="{}">{}</a> <span style="color: var(--{})">({})</span> <span style="color: var(--{})">&lt;{}&gt;</span>'.format(
             url,
             description,
             "greenish",
             relative_time(moment),
-            "purplish",
-            moment.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "bluish",
             author,
         )
@@ -160,7 +158,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         if not file_name or len(file_name) == 0:
             return
 
-        if self._file_name != file_name:
+        if self._file_name != file_name or self._git_blame is None:
             git_info = git_path(file_name)
 
             if not git_info:
@@ -193,7 +191,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             self._file_name = file_name
             self._git_info = git_info
             self._git_blame = parse_blame(git_blame.decode("utf8"))
-            self._git_remote = get_remote(git_info["root"])
+            self._git_remote = git_remote(git_info["root"])
 
     def on_post_save_async(self, view):
         if not _settings_obj.get("show_blame", False):
@@ -206,6 +204,9 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             return
 
         self.refresh_file(view)
+
+        if self._git_blame is None:
+            return
 
         selections = view.sel()
         if len(selections) != 1:
