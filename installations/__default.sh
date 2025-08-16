@@ -40,6 +40,7 @@ fi
 END_OF_BASH_PROFILE
 
     PACKAGES+=("bash-completion@2")
+    PACKAGES+=("pstree")
 
     if ! command -v brew >/dev/null 2>&1; then
       /bin/bash -c "$(curl --disable --silent --show-error --location "https://raw.githubusercontent.com/Homebrew/install/master/install.sh")"
