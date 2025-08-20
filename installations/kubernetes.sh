@@ -33,7 +33,7 @@ install() {
   flux completion bash >"${HOME}/opt/completions/flux-completion.sh"
 
   # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
-  local KUBESEAL_VERSION="v0.30.0"
+  local KUBESEAL_VERSION="v0.31.0"
   archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64").tar.gz" "kubeseal"
 
   # renovate: datasource=github-releases depName=ViBiOh/kmux
