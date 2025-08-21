@@ -142,6 +142,13 @@ dns_allow() {
     twimg.com
   "
 
+  websites["instragram"]="
+    www.instragram.com
+    instragram.com
+    static.cdninstagram.com
+    scontent-.{3,4}(-.)?.cdninstagram.com
+  "
+
   websites["gtm"]="
     www.googletagmanager.com
     googletagmanager.com
