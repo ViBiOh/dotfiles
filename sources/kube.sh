@@ -595,7 +595,7 @@ kube() {
       if [[ -n ${PODS_LABELS-} ]]; then
         EXTRA_ARGS+=("--selector=${PODS_LABELS}" "${RESOURCE_NAMESPACE}")
       fi
-    else
+    elif [[ -n ${RESOURCE_NAMESPACE-} ]]; then
       EXTRA_ARGS+=("--namespace=${RESOURCE_NAMESPACE}")
     fi
 
