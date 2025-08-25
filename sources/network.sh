@@ -142,11 +142,12 @@ dns_allow() {
     twimg.com
   "
 
-  websites["instragram"]="
-    www.instragram.com
-    instragram.com
+  websites["instagram"]="
+    www.instagram.com
+    instagram.com
     static.cdninstagram.com
-    scontent-.{3,4}(-.)?.cdninstagram.com
+    scontent-.\{3,4\}\(.\)\?\.cdninstagram.com
+    cdninstagram.com
   "
 
   websites["gtm"]="
@@ -174,7 +175,7 @@ dns_unblock() {
   local GREP_PIPELINE=()
 
   for entry in "${@}"; do
-    GREP_PIPELINE+=("--regexp" "\"${entry}\"")
+    GREP_PIPELINE+=("--regexp" "${entry}")
   done
 
   local UNBOUND_BLOCKLIST
