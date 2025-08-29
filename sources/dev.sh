@@ -124,7 +124,7 @@ stock() {
       --header "User-Agent: Mozilla/5.0" \
       --dump-header "${HEADER_OUTPUT}" \
       --fail-with-body \
-      "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=true&interval=2m&range=1d"
+      "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=true&interval=1h&range=1d"
   )"
 
   if [[ ${?} -ne 0 ]]; then
@@ -190,6 +190,9 @@ stock() {
   printf -- "\n"
 
   if command -v spark >/dev/null 2>&1; then
+    printf -- "Volume 1d\n"
+    printf -- "%s" "${YAHOO_OUTPUT}" | jq -r '.chart.result[0].indicators.quote[0].volume | join(",")' | spark
+
     YAHOO_OUTPUT="$(
       curl \
         --disable \
@@ -215,7 +218,7 @@ stock() {
     PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .chartPreviousClose')"
     _stock_evolution
 
-    printf -- "\n---\n1mo %b%s%s%b\n" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
+    printf -- "\n1mo %b%s%s%b\n" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
     printf -- "%s" "${YAHOO_OUTPUT}" | jq -r '.chart.result[0].indicators.quote[0].open | join(",")' | spark
   fi
 }
