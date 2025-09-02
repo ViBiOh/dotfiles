@@ -105,6 +105,11 @@ urlencode() {
   LC_COLLATE="${old_lc_collate}"
 }
 
+my_ip() {
+  var_info "IPv4: $(curl --disable --silent --show-error --location --max-time 30 -4 "https://ifconfig.co/ip")"
+  var_info "IPv6: $(curl --disable --silent --show-error --location --max-time 30 -6 "https://ifconfig.co/ip")"
+}
+
 meteo() {
   curl --disable --silent --show-error --location --max-time 30 -4 "wttr.in/$(urlencode "${1:-Paris}")?m&format=v2"
 }
