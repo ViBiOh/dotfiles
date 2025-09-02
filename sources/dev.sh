@@ -190,9 +190,6 @@ stock() {
   printf -- "\n"
 
   if command -v spark >/dev/null 2>&1; then
-    printf -- "Volume 1d\n"
-    printf -- "%s" "${YAHOO_OUTPUT}" | jq -r '.chart.result[0].indicators.quote[0].volume | join(",")' | spark
-
     YAHOO_OUTPUT="$(
       curl \
         --disable \
@@ -221,6 +218,8 @@ stock() {
     printf -- "\n1mo %b%s%s%b\n" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
     printf -- "%s" "${YAHOO_OUTPUT}" | jq -r '.chart.result[0].indicators.quote[0].open | join(",")' | spark
   fi
+
+  printf "\nSource: https://finance.yahoo.com/quote/%s\n" "${1:-DDOG}"
 }
 
 date_in() {
