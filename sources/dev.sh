@@ -147,7 +147,7 @@ stock() {
   local EVOLUTION_SIGN="↗"
 
   _stock_evolution() {
-    EVOLUTION_PERCENT="$(printf -- "scale = 4; scale = 4; 100 * ((%s / %s) - 1)" "${CURRENT_PRICE}" "${PREVIOUS_PRICE}" | bc)"
+    EVOLUTION_PERCENT="$(printf -- "scale = 4; 100 * ((%s / %s) - 1)" "${CURRENT_PRICE}" "${PREVIOUS_PRICE}" | bc)"
 
     OUTPUT_COLOR="${GREEN}"
     EVOLUTION_SIGN="↗"
