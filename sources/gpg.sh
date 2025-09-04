@@ -86,10 +86,7 @@ _fzf_complete_cipher_for() {
     local HTTP_OUTPUT
     HTTP_OUTPUT="$(mktemp)"
 
-    local GITHUB_TOKEN
-    GITHUB_TOKEN="$(github_token)"
-
-    local HTTP_CLIENT_ARGS=("curl" "--disable" "--silent" "--show-error" "--location" "--max-time" "10" "--output" "${HTTP_OUTPUT}" "--write-out" "%{http_code}" "--header" "Authorization: token ${GITHUB_TOKEN}")
+    local HTTP_CLIENT_ARGS=("curl" "--disable" "--silent" "--show-error" "--location" "--max-time" "10" "--output" "${HTTP_OUTPUT}" "--write-out" "%{http_code}" "--header" "Authorization: token $(github_token)")
     local HTTP_STATUS
 
     local FOLLOWERS

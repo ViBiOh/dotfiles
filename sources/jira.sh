@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 jira() {
-  GITHUB_TOKEN="$(github_token)" _jira "${JIRA_DOMAIN}" "Basic $(pass_get "${JIRA_PASS}" "basic")" "${@}"
+  _jira "${JIRA_DOMAIN}" "Basic $(pass_get "${JIRA_PASS}" "basic")" "${@}"
 }
 
 _jira() {
@@ -189,11 +189,6 @@ _jira() {
   "pr")
     if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
       _jira_error "not in a git directory"
-      return 1
-    fi
-
-    if [[ -z ${GITHUB_TOKEN:-} ]]; then
-      _jira_error "no GITHUB_TOKEN environment varaible found"
       return 1
     fi
 
@@ -523,7 +518,7 @@ _jira_github_request() {
       --dump-header "${HEADER_OUTPUT}" \
       --fail-with-body \
       --header "Accept: application/vnd.github+json" \
-      --header "Authorization: Bearer ${GITHUB_TOKEN}" \
+      --header "Authorization: Bearer $(github_token)" \
       "${URL}" \
       "${@}"
   )"

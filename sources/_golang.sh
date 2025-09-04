@@ -29,17 +29,14 @@ if command -v fzf >/dev/null 2>&1; then
     printf -- "MODULE=%s\n" "${MODULE_TO_BUMP}"
     local MODULE_VERSION=""
 
-    local GITHUB_TOKEN
-    GITHUB_TOKEN="$(github_token)"
-
-    if [[ -z ${2-} ]] && [[ ${MODULE_TO_BUMP} =~ ^github.com\/([^\/]+)\/([^\/]+)(\/.+)?$ ]] && [[ -n ${GITHUB_TOKEN} ]]; then
+    if [[ -z ${2-} ]] && [[ ${MODULE_TO_BUMP} =~ ^github.com\/([^\/]+)\/([^\/]+)(\/.+)?$ ]]; then
       local REPOSITORY_NAME="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
 
       MODULE_VERSION="$(
         cat \
           <(printf -- "latest\n") \
-          <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/branches?per_page=100" | jq --raw-output '.[].name') \
-          <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/repos/${REPOSITORY_NAME}/tags?per_page=100" | jq --raw-output '.[].name') |
+          <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token $(github_token)" "https://api.github.com/repos/${REPOSITORY_NAME}/branches?per_page=100" | jq --raw-output '.[].name') \
+          <(curl --disable --silent --show-error --location --max-time 10 --header "Authorization: token $(github_token)" "https://api.github.com/repos/${REPOSITORY_NAME}/tags?per_page=100" | jq --raw-output '.[].name') |
           fzf --height=20 --ansi --reverse
       )"
     else
