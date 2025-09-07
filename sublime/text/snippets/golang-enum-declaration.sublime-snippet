@@ -10,16 +10,16 @@ const (
 
 var ErrUnknown${1:EnumName} = errors.New("unknown ${1:EnumName}")
 
-func ${1:EnumName}s() []${1:EnumName} {
+var ${1:EnumName}s = sync.OnceValue(func() []${1:EnumName} {
 	count := len(_${1:EnumName}_index) - 1
-	output := make([]${1:EnumName}, count)
+	values := make([]${1:EnumName}, count)
 
 	for i := range count {
-		output[i] = ${1:EnumName}(i)
+		values[i] = ${1:EnumName}(i)
 	}
 
-	return output
-}
+	return values
+})
 
 func Parse${1:EnumName}(value string) (${1:EnumName}, error) {
 	var previous uint8
