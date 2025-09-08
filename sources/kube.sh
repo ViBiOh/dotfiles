@@ -360,6 +360,11 @@ kube() {
         shift 1
       fi
 
+      if [[ "$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.selector')" == "null" ]]; then
+        _kube_warning "Cannot forward to service without selector"
+        return 1
+      fi
+
       if [[ -z ${KUBE_PORT:-} ]]; then
         KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --select-1 --prompt="Port: ")"
       fi
