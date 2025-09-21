@@ -23,7 +23,7 @@ clean() {
 }
 
 install() {
-  local PACKAGES=("bash" "make" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv" "parallel")
+  local PACKAGES=("bash" "make" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv")
 
   mkdir -p "${HOME}/opt/bin"
   mkdir -p "${HOME}/opt/completions"
