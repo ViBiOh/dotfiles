@@ -600,7 +600,7 @@ _jira_issue() {
   JIRA_JQL+=" ORDER BY updated DESC"
 
   local JIRA_OUTPUT
-  JIRA_OUTPUT="$(_jira_request "/rest/api/3/search" --get --data-urlencode "maxResults=200" --data-urlencode "jql=${JIRA_JQL}")"
+  JIRA_OUTPUT="$(_jira_request "/rest/api/3/search/jql" --get --data-urlencode "maxResults=200" --data-urlencode "fields=id,key,summary" --data-urlencode "jql=${JIRA_JQL}")"
 
   if [[ -z ${JIRA_OUTPUT} ]]; then
     return
