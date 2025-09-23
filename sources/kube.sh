@@ -134,24 +134,25 @@ kube() {
     _kube_info " - -n Narrow resource search to given namespace (default search in all namespaces)"
 
     _kube_info "\nPossibles actions are                            | args\n"
-    _kube_info " - context  | Switch context                      | <context name>"
-    _kube_info " - desc     | Describe an object                  | <object type or deployment name> [object name]"
-    _kube_info " - diff     | Run diff against multiple contexts  | <object type or deployment name> [object name]"
-    _kube_info " - edit     | Edit an object                      | <object type or deployment name> [object name]"
-    _kube_info " - env      | Generate .env file from deployments | <deployment name> [container name]"
-    _kube_info " - exec     | Execute a command in a pod          | <object type or deployment name> [object name] [-c <container name>] [-t for tty] <any commands... default to /bin/bash>"
-    _kube_info " - forward  | Port-forward to a service           | <service name> [exposed port number] (default 4000) [service port number]"
-    _kube_info " - help     | Print this help                     |"
-    _kube_info " - image    | Print image name                    | <deployment name>"
-    _kube_info " - info     | Print yaml output of an object      | <object type or deployment name> [object name]"
-    _kube_info " - log      | Tail logs                           | <object type or deployment name> [object name] <any additionnals args...>"
-    _kube_info " - ns       | Change default namespace            | <namespace name>"
-    _kube_info " - restart  | Perform a restart of pods           | <object type or deployment name> [object name]"
-    _kube_info " - rollback | Undo a rollout                      | <object type or deployment name> [object name]"
-    _kube_info " - scale    | Scale a replicable                  | <object type or deployment name> [object name] <factor>"
-    _kube_info " - top      | Run top command                     | pod|node <object type or deployment name for pod filtering> [object name]"
-    _kube_info " - watch    | Watch pods                          | <object type or deployment name> <object name> <any additionnals args...>"
-    _kube_info " - *        | Call kubectl directly               | <any additionnals 'kubectl' args...>"
+    _kube_info " - context      | Switch context                      | <context name>"
+    _kube_info " - desc         | Describe an object                  | <object type or deployment name> [object name]"
+    _kube_info " - diff         | Run diff against multiple contexts  | <object type or deployment name> [object name]"
+    _kube_info " - edit         | Edit an object                      | <object type or deployment name> [object name]"
+    _kube_info " - env          | Generate .env file from deployments | <deployment name> [container name]"
+    _kube_info " - exec         | Execute a command in a pod          | <object type or deployment name> [object name] [-c <container name>] [-t for tty] <any commands... default to /bin/bash>"
+    _kube_info " - forward      | Port-forward to a service           | <service name> [exposed port number] (default 4000) [service port number]"
+    _kube_info " - help         | Print this help                     |"
+    _kube_info " - image        | Print image name                    | <deployment name>"
+    _kube_info " - info         | Print yaml output of an object      | <object type or deployment name> [object name]"
+    _kube_info " - log          | Tail logs                           | <object type or deployment name> [object name] <any additionnals args...>"
+    _kube_info " - ns           | Change default namespace            | <namespace name>"
+    _kube_info " - pods-on-node | List pods on a given node           | <node name> <any additionnals args...>"
+    _kube_info " - restart      | Perform a restart of pods           | <object type or deployment name> [object name]"
+    _kube_info " - rollback     | Undo a rollout                      | <object type or deployment name> [object name]"
+    _kube_info " - scale        | Scale a replicable                  | <object type or deployment name> [object name] <factor>"
+    _kube_info " - top          | Run top command                     | pod|node <object type or deployment name for pod filtering> [object name]"
+    _kube_info " - watch        | Watch pods                          | <object type or deployment name> <object name> <any additionnals args...>"
+    _kube_info " - *            | Call kubectl directly               | <any additionnals 'kubectl' args...>"
   }
 
   local ACTION
@@ -451,6 +452,20 @@ kube() {
     "${KUBECTL_COMMAND[@]}" get namespaces --output=yaml | yq eval '.items[].metadata.name' | fzf --select-1 --query="${1-}" | xargs "${KUBECTL_COMMAND[@]}" config set-context --current --namespace
     ;;
 
+  "pods-on-node" | "pon")
+    local FIRST=""
+    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      FIRST="${1}"
+      shift
+    fi
+
+    _kube_resources "nodes" "${FIRST}"
+
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
+      _kube_print_and_run "${KUBECTL_COMMAND[@]}" get pods --field-selector spec.nodeName="${RESOURCE_NAME}" --all-namespaces --output wide "${@}"
+    fi
+    ;;
+
   "restart")
     _kube_resources "${@}"
 
@@ -621,7 +636,7 @@ kube() {
 
 _fzf_complete_kube() {
   if [[ ${COMP_CWORD} -eq 1 ]]; then
-    mapfile -t COMPREPLY < <(compgen -W "context desc diff edit env exec forward image info log ns restart rollback top watch --context --namespace -n" -- "${COMP_WORDS[COMP_CWORD]}")
+    mapfile -t COMPREPLY < <(compgen -W "context desc diff edit env exec forward image info log ns pods-on-node restart rollback top watch --context --namespace -n" -- "${COMP_WORDS[COMP_CWORD]}")
     return
   fi
 
@@ -652,6 +667,12 @@ _fzf_complete_kube() {
   "ns" | "-n" | "--namespace")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
       kubectl get namespaces --output=yaml | yq eval '.items[].metadata.name'
+    )
+    ;;
+
+  "pods-on-node" | "pon")
+    FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
+      kubectl get nodes --output=yaml | yq eval '.items[].metadata.name'
     )
     ;;
   esac
