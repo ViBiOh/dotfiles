@@ -11,7 +11,7 @@ type Config struct {
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config {
 	var config Config
 
-	flags.New("${2:FlagValue}", "${3:FlagDesc}").Prefix(prefix).DocPrefix("{4:FlagPrefix}").StringVar(fs, &config.${1:FlagName}, "", overrides)
+	flags.New("${2:FlagValue}", "${3:FlagDesc}").Prefix(prefix).DocPrefix("${4:FlagPrefix}").StringVar(fs, &config.${1:FlagName}, "", overrides)
 
 	return &config
 }
