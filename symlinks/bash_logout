@@ -15,8 +15,4 @@ if [[ $(pgrep -a bash | wc -l) -eq 2 ]]; then
   fi
 fi
 
-if [[ -e ${PS1_BASH_TIMER:-} ]]; then
-  rm "${PS1_BASH_TIMER}"
-fi
-
 clear

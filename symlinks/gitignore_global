@@ -93,13 +93,13 @@ GitHub.sublime-settings
 .vscode/*
 .fleet/
 
-#-----#
-# zed #
-#-----#
-.zed/*
-
 # Local History for Visual Studio Code
 .history/
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+#-----#
+# zed #
+#-----#
+.zed/*
