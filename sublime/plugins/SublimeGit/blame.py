@@ -1,3 +1,4 @@
+import hashlib
 import re
 import subprocess
 from datetime import datetime, timedelta
@@ -266,8 +267,11 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             commit.get("author"),
             commit.get("time"),
             commit.get("summary"),
-            build_line_url(
-                self._git_remote, sha, commit.get("filename"), original_line_number
+            "{}/commit/{}#diff-{}R{}".format(
+                self._git_remote,
+                sha,
+                hashlib.sha256(commit.get("filename").encode("utf8")).hexdigest(),
+                original_line_number,
             ),
         )
 
