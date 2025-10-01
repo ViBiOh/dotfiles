@@ -23,6 +23,7 @@ line_regex = re.compile(
 author_regex = re.compile("^author\\s(?P<author>.*)")
 time_regex = re.compile("^author-time\\s(?P<time>.*)")
 summary_regex = re.compile("^summary\\s(?P<summary>.*)")
+filename_regex = re.compile("^filename\\s(?P<filename>.*)")
 
 
 def plugin_loaded() -> None:
@@ -65,6 +66,7 @@ def relative_time(date):
 
 def parse_git_blame(blame):
     lines = {}
+    original_lines = {}
     commits = {}
 
     current_sha = ""
@@ -77,7 +79,10 @@ def parse_git_blame(blame):
                 commits[current_commit.get("sha")] = current_commit
 
             current_sha = line_match.group("sha")
-            lines[int(line_match.group("final_line"))] = current_sha
+            final_line = int(line_match.group("final_line"))
+
+            lines[final_line] = current_sha
+            original_lines[final_line] = line_match.group("origin_line")
 
             if not commits.get(current_sha, None):
                 current_commit = {"sha": current_sha}
@@ -101,11 +106,17 @@ def parse_git_blame(blame):
             current_commit["summary"] = summary_match.group("summary")
             continue
 
+        filename_match = filename_regex.match(line)
+        if filename_match:
+            current_commit["filename"] = filename_match.group("filename")
+            continue
+
     if current_commit:
         commits[current_commit.get("sha")] = current_commit
 
     return {
         "lines": lines,
+        "original_lines": original_lines,
         "commits": commits,
     }
 
@@ -239,6 +250,12 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             self.clear_status(view)
             return
 
+        original_line_number = self._git_blame.get("original_lines").get(
+            self._line_number
+        )
+        if not original_line_number:
+            original_line_number = self._line_number
+
         commit = self._git_blame.get("commits").get(sha)
         if not commit:
             return
@@ -250,7 +267,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             commit.get("time"),
             commit.get("summary"),
             build_line_url(
-                self._git_remote, sha, self._git_info["path"], self._line_number
+                self._git_remote, sha, commit.get("filename"), original_line_number
             ),
         )
 
