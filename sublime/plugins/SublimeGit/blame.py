@@ -156,6 +156,8 @@ class SublimeGitBlame(sublime_plugin.EventListener):
     def refresh_file(self, view, force):
         file_name = view.file_name()
         if not file_name or len(file_name) == 0:
+            self._file_name = ""
+            self._git_blame = None
             return
 
         if not force and self._file_name == file_name:
@@ -212,6 +214,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
 
         self.refresh_file(view, False)
         if self._git_blame is None:
+            self.clear_status(view)
             return
 
         selection = selections[0]
