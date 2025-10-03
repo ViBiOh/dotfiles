@@ -5,6 +5,6 @@
   "file_patterns": [
     "test_*.py"
   ],
-  "file_regex": "(\\S[^:]*):(\\d+)(?::\\d)?: ([^\\n]+)",
+  "file_regex": "(\\S[^:]*):(\\d+)",
   "quiet": true
 }
