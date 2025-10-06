@@ -627,7 +627,9 @@ kube() {
     ;;
 
   *)
-    _kube_print_and_run "${KUBECTL_COMMAND[@]}" "${ACTION}" "${@}"
+    for context in "${KUBECTL_CONTEXTS[@]}"; do
+      _kube_print_and_run "kubectl" "${context}" "${ACTION}" "${@}"
+    done
 
     return 1
     ;;
