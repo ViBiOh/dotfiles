@@ -16,8 +16,6 @@ if command -v colima >/dev/null 2>&1; then
 fi
 
 if command -v docker >/dev/null 2>&1; then
-  export DOCKER_CONTENT_TRUST="1"
-
   docker_clean() {
     docker ps --all --quiet | xargs docker rm --force --volumes
     docker images --quiet | xargs docker rmi

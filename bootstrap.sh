@@ -24,7 +24,7 @@ main() {
 
     if command -v git >/dev/null 2>&1; then
       git init
-      git remote add origin "http://github.com/${GITHUB_USER}/${REPOSITORY_NAME}.git"
+      git remote add origin "https://github.com/${GITHUB_USER}/${REPOSITORY_NAME}.git"
       git fetch origin
       git checkout --force "${DOTFILES_BRANCH}"
     fi
