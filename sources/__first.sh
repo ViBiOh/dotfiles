@@ -16,7 +16,3 @@ add_to_path() {
   # Add entry to the beginning of the PATH
   export PATH="${1}:${PATH}"
 }
-
-if [[ -d "${HOME}/opt/bin" ]]; then
-  add_to_path "${HOME}/opt/bin"
-fi

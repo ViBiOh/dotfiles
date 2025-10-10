@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if [[ -d "${HOME}/opt/bin" ]]; then
+  add_to_path "${HOME}/opt/bin"
+fi
+
 packages_update() {
   if command -v brew >/dev/null 2>&1; then
     brew update

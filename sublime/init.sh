@@ -72,7 +72,7 @@ main() {
     local MERGE_PKG="${HOME}/Library/Application Support/Sublime Merge/Packages"
   fi
 
-  source "${SCRIPT_DIR}/../sources/_binary.sh"
+  source "${SCRIPT_DIR}/../sources/__binary.sh"
 
   symlink_settings "${TEXT_PKG}" "text"
   symlink_settings "${MERGE_PKG}" "merge"

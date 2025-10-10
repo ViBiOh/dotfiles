@@ -44,7 +44,7 @@ END_OF_BASH_PROFILE
 
     if ! command -v brew >/dev/null 2>&1; then
       /bin/bash -c "$(curl --disable --silent --show-error --location "https://raw.githubusercontent.com/Homebrew/install/master/install.sh")"
-      source "$(script_dir)/../sources/_homebrew.sh"
+      source "$(script_dir)/../sources/__homebrew.sh"
     fi
 
     packages_update

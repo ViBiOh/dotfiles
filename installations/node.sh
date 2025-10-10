@@ -58,7 +58,7 @@ install() {
   chmod +x "${HOME}/opt/bin/n"
 
   mkdir -p "${HOME}/opt/node"
-  source "${SCRIPT_DIR}/../sources/_first.sh"
+  source "${SCRIPT_DIR}/../sources/__first.sh"
   source "${SCRIPT_DIR}/../sources/node.sh"
   n "${NODE_VERSION}"
 
