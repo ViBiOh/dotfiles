@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ -d "${HOME}/opt/go/bin" ]]; then
-  export PATH="${HOME}/opt/go/bin:${PATH}"
+  add_to_path "${HOME}/opt/go/bin"
 fi
 
 if ! command -v go >/dev/null 2>&1; then
@@ -9,7 +9,7 @@ if ! command -v go >/dev/null 2>&1; then
 fi
 
 export GOPATH="${HOME}/opt/gopath"
-export PATH="${GOPATH}/bin:${PATH}"
+add_to_path "${GOPATH}/bin"
 
 alias pprof_http_cpu='go tool pprof -http localhost:12000 http://localhost:9999/debug/pprof/profile'
 alias pprof_http_memory='go tool pprof -http localhost:12001 http://localhost:9999/debug/pprof/heap'

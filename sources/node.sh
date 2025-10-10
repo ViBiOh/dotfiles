@@ -10,7 +10,7 @@ if ! command -v node >/dev/null 2>&1; then
   return
 fi
 
-export PATH="${HOME}/opt/node/bin:${PATH}"
+add_to_path "${HOME}/opt/node/bin"
 alias npmi='npm install --ignore-scripts'
 
 npm_headless_login() {

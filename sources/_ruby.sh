@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 export GEM_HOME="${HOME}/opt/ruby"
-export PATH="${GEM_HOME}/bin:${PATH}"
+add_to_path "${GEM_HOME}/bin"

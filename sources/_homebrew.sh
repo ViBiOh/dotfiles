@@ -8,7 +8,14 @@ if command -v brew >/dev/null 2>&1; then
   BREW_PREFIX="$(brew --prefix)"
   export BREW_PREFIX
 
-  export PATH="${BREW_PREFIX}/opt/libpq/bin:${BREW_PREFIX}/opt/ruby/bin:${BREW_PREFIX}/opt/openssl/bin:${BREW_PREFIX}/opt/grep/libexec/gnubin:${BREW_PREFIX}/opt/make/libexec/gnubin:${BREW_PREFIX}/opt/curl/bin:${BREW_PREFIX}/sbin:${PATH}"
+  add_to_path "${BREW_PREFIX}/sbin"
+  add_to_path "${BREW_PREFIX}/bin"
+  add_to_path "${BREW_PREFIX}/opt/curl/bin"
+  add_to_path "${BREW_PREFIX}/opt/make/libexec/gnubin"
+  add_to_path "${BREW_PREFIX}/opt/grep/libexec/gnubin"
+  add_to_path "${BREW_PREFIX}/opt/openssl/bin"
+  add_to_path "${BREW_PREFIX}/opt/ruby/bin"
+  add_to_path "${BREW_PREFIX}/opt/libpq/bin"
 
   brew_specific_version() {
     # cf. https://github.com/orgs/Homebrew/discussions/155
