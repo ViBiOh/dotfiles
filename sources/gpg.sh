@@ -8,6 +8,21 @@ if [[ -z ${SSH_AUTH_SOCK:-} ]]; then
   export SSH_AUTH_SOCK
 fi
 
+gpg_temp() {
+  GNUPGHOME="$(mktemp -d -t "$(date +%Y.%m.%d)")"
+  export GNUPGHOME
+
+  (
+    cd "${GNUPGHOME}" || return
+    curl --disable --silent --show-error --location --max-time 60 --output "gpg.conf" "https://raw.githubusercontent.com/drduh/YubiKey-Guide/master/config/gpg.conf"
+  )
+}
+
+gpg_temp_clear() {
+  rm -rf "${GNUPGHOME}"
+  unset GNUPGHOME
+}
+
 gpg_agent_start() {
   if [[ $(pgrep gpg-agent | wc -l) -eq 1 ]]; then
     return 0
