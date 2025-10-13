@@ -57,25 +57,6 @@ kube() {
 
   local RESOURCE_NAMESPACE="${KUBE_NS:-}"
 
-  OPTIND=0
-  while getopts ":n:" option; do
-    case "${option}" in
-    n)
-      RESOURCE_NAMESPACE="${OPTARG}"
-      ;;
-    :)
-      printf -- "option -%s requires a value\n" "${OPTARG}" 1>&2
-      return 1
-      ;;
-    \?)
-      printf -- "option -%s is invalid\n" "${OPTARG}" 1>&2
-      return 2
-      ;;
-    esac
-  done
-
-  shift $((OPTIND - 1))
-
   local RESOURCE_TYPE
   local RESOURCE_NAME
 
@@ -179,6 +160,10 @@ kube() {
 
   if [[ ${#KUBECTL_CONTEXT} -ne 0 ]]; then
     KUBECTL_COMMAND+=("${KUBECTL_CONTEXT[@]}")
+  fi
+
+  if [[ -z ${RESOURCE_NAMESPACE} ]]; then
+    RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces --output=yaml | yq eval '.items[].metadata.name' | fzf --prompt="Namespace: ")"
   fi
 
   case ${ACTION} in
