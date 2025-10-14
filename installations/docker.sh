@@ -40,7 +40,9 @@ install() {
       sudo mkdir -p "/usr/local/bin"
     fi
 
-    colima nerdctl install --path "${HOME}/opt/bin/docker" --force
+    if ! command -v docker >/dev/null 2>&1; then
+      colima nerdctl install --path "${HOME}/opt/bin/docker" --force
+    fi
 
     source "${SCRIPT_DIR}/../sources/docker.sh"
 
