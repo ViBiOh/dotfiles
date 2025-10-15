@@ -1,0 +1,9 @@
+{
+  "shell_cmd": "terraform test -no-color -filter=tests/$file_name",
+  "working_dir": "$file_path/../",
+  "selector": "source.hcl",
+  "file_patterns": [
+    "*.tftest.hcl"
+  ],
+  "quiet": true
+}
