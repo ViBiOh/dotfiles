@@ -163,7 +163,7 @@ kube() {
   fi
 
   if [[ -z ${RESOURCE_NAMESPACE} ]]; then
-    RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces --output=yaml | yq eval '.items[].metadata.name' | fzf --prompt="Namespace: ")"
+    RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces --output=yaml 2>/dev/null | yq eval '.items[].metadata.name' | fzf --prompt="Namespace: ")"
   fi
 
   case ${ACTION} in
@@ -635,31 +635,31 @@ _fzf_complete_kube() {
   case ${COMP_WORDS[COMP_CWORD - 1]} in
   "context" | "--context")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl config get-contexts --output name
+      kubectl config get-contexts --output name 2>/dev/null
     )
     ;;
 
   "forward")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl get services "${NAMESPACE_SCOPE}" --output=yaml | yq eval '.items[].metadata.name'
+      kubectl get services "${NAMESPACE_SCOPE}" --output=yaml 2>/dev/null | yq eval '.items[].metadata.name'
     )
     ;;
 
   "desc" | "describe" | "diff" | "edit" | "env" | "exec" | "image" | "images" | "info" | "log" | "logs" | "restart" | "rollback" | "top" | "watch")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl get deployments.app "${NAMESPACE_SCOPE}" --output=yaml | yq eval '.items[].metadata.name'
+      kubectl get deployments.app "${NAMESPACE_SCOPE}" --output=yaml 2>/dev/null | yq eval '.items[].metadata.name'
     )
     ;;
 
   "ns" | "-n" | "--namespace")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl get namespaces --output=yaml | yq eval '.items[].metadata.name'
+      kubectl get namespaces --output=yaml 2>/dev/null | yq eval '.items[].metadata.name'
     )
     ;;
 
   "pods-on-node" | "pon")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl get nodes --output=yaml | yq eval '.items[].metadata.name'
+      kubectl get nodes --output=yaml 2>/dev/null | yq eval '.items[].metadata.name'
     )
     ;;
   esac
