@@ -5,5 +5,8 @@
   "settings": {
     "manageGoplsBinary": false,
     "gopls.expandWorkspaceToModule": false
-  }
+  },
+  "gopls.templateExtensions": [
+    "tmpl"
+  ]
 }
