@@ -162,8 +162,10 @@ kube() {
     KUBECTL_COMMAND+=("${KUBECTL_CONTEXT[@]}")
   fi
 
-  if [[ -z ${RESOURCE_NAMESPACE} ]]; then
-    RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces --output=yaml 2>/dev/null | yq eval '.items[].metadata.name' | fzf --prompt="Namespace: ")"
+  if [[ ${ACTION} != "context" ]]; then
+    if [[ -z ${RESOURCE_NAMESPACE} ]]; then
+      RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces --output=yaml 2>/dev/null | yq eval '.items[].metadata.name' | fzf --prompt="Namespace: ")"
+    fi
   fi
 
   case ${ACTION} in
