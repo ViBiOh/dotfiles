@@ -1,5 +1,31 @@
 #!/usr/bin/env bash
 
+declare -g AWS_EXEC_ACCOUNT
+
+if which -s aws; then
+  aws_exec() {
+    if [[ -z ${AWS_EXEC_ACCOUNT:-} ]]; then
+      AWS_EXEC_ACCOUNT="$(printf "%s\n" "${AWS_ACCOUNTS[@]}" | fzf --height=20 --ansi --reverse --select-1 --prompt "Profile: ")"
+    fi
+
+    if [[ -n ${AWS_EXEC_ACCOUNT} ]]; then
+      var_print_and_run aws-vault exec "${AWS_EXEC_ACCOUNT}" -- "$(which aws)" ${@}
+    fi
+  }
+
+  aws_unset() {
+    AWS_EXEC_ACCOUNT=""
+  }
+
+  aws() {
+    if [[ -n ${AWS_ACCOUNTS:-} ]]; then
+      aws_exec ${@}
+    else
+      "$(which aws)" ${@}
+    fi
+  }
+fi
+
 aws_regions() {
   local ENDPOINTS
   ENDPOINTS="$(_aws_endpoints)"
