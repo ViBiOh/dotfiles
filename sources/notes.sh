@@ -16,7 +16,7 @@ notes() {
     cd "${REAL_NOTES_FOLDER}" || return
 
     while IFS= read -r file; do
-      gpg --yes --encrypt --recipient "${NOTES_AUTHOR:-}" --output "encrypted/${file}" "${file}"
+      gpg --yes --encrypt --recipient "${NOTES_AUTHOR:-}" --output "encrypted/${file}.gpg" "${file}"
     done < <(rg --files --glob '*.md')
   }
 
