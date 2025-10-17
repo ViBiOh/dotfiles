@@ -2,29 +2,26 @@
 
 declare -g AWS_EXEC_ACCOUNT
 
-if which -s aws; then
-  aws_exec() {
-    if [[ -z ${AWS_EXEC_ACCOUNT:-} ]]; then
-      AWS_EXEC_ACCOUNT="$(printf "%s\n" "${AWS_ACCOUNTS[@]}" | fzf --height=20 --ansi --reverse --select-1 --prompt "Profile: ")"
-    fi
+aws_exec() {
+  if [[ -z ${AWS_ACCOUNTS:-} ]]; then
+    "$(which aws)" ${@}
+    return
+  fi
 
-    if [[ -n ${AWS_EXEC_ACCOUNT} ]]; then
-      var_print_and_run aws-vault exec "${AWS_EXEC_ACCOUNT}" -- "$(which aws)" ${@}
-    fi
-  }
+  if [[ -z ${AWS_EXEC_ACCOUNT:-} ]]; then
+    AWS_EXEC_ACCOUNT="$(printf "%s\n" "${AWS_ACCOUNTS[@]}" | fzf --height=20 --ansi --reverse --select-1 --prompt "Profile: ")"
+  fi
 
-  aws_unset() {
-    AWS_EXEC_ACCOUNT=""
-  }
+  if [[ -n ${AWS_EXEC_ACCOUNT} ]]; then
+    var_print_and_run aws-vault exec "${AWS_EXEC_ACCOUNT}" -- "$(which aws)" ${@}
+  fi
+}
 
-  aws() {
-    if [[ -n ${AWS_ACCOUNTS:-} ]]; then
-      aws_exec ${@}
-    else
-      "$(which aws)" ${@}
-    fi
-  }
-fi
+aws_unset() {
+  AWS_EXEC_ACCOUNT=""
+}
+
+alias aws=aws_exec
 
 aws_regions() {
   local ENDPOINTS
