@@ -224,7 +224,7 @@ stock() {
     printf -- "%s" "${YAHOO_OUTPUT}" | jq -r '.chart.result[0].indicators.quote[0].open | join(",")' | spark
   fi
 
-  printf "\nSource: https://finance.yahoo.com/quote/%s\n" "${1:-DDOG}"
+  printf -- "\nSource: https://finance.yahoo.com/quote/%s\n" "${1:-DDOG}"
 }
 
 date_in() {

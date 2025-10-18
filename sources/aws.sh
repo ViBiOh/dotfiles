@@ -9,7 +9,7 @@ aws_exec() {
   fi
 
   if [[ -z ${AWS_EXEC_ACCOUNT:-} ]]; then
-    AWS_EXEC_ACCOUNT="$(printf "%s\n" "${AWS_ACCOUNTS[@]}" | fzf --height=20 --ansi --reverse --select-1 --prompt "Profile: ")"
+    AWS_EXEC_ACCOUNT="$(printf -- "%s\n" "${AWS_ACCOUNTS[@]}" | fzf --height=20 --ansi --reverse --select-1 --prompt "Profile: ")"
   fi
 
   if [[ -n ${AWS_EXEC_ACCOUNT} ]]; then

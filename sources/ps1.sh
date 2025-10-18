@@ -111,6 +111,22 @@ __previous_status_ps1() {
 
 PS1+=' $(__previous_status_ps1)'
 
+human_duration() {
+  ((h = ${1} / 3600))
+  if [[ ${h} -gt 0 ]]; then
+    printf -- "%dh" "${h}"
+  fi
+
+  ((m = (${1} % 3600) / 60))
+  if [[ ${m} -gt 0 ]]; then
+    printf -- "%dm" "${m}"
+  fi
+
+  ((s = ${1} % 60))
+
+  printf -- "%ds" "${s}"
+}
+
 __elapsed_ps1() {
   local _START="${1}"
 
@@ -118,7 +134,7 @@ __elapsed_ps1() {
     local _ELAPSED=$((EPOCHSECONDS - _START))
 
     if [[ ${_ELAPSED} -gt 0 ]]; then
-      printf -- "⏳%ss" "${_ELAPSED}"
+      printf -- "⏳%s" "$(human_duration "${_ELAPSED}")"
     fi
   fi
 }
