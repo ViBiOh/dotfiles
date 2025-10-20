@@ -136,10 +136,15 @@ kube() {
     _kube_info " - *            | Call kubectl directly               | <any additionnals 'kubectl' args...>"
   }
 
-  local ACTION
+  local ACTION="help"
   if [[ ${#} -gt 0 ]]; then
     ACTION="${1}"
     shift
+  fi
+
+  if [[ ${ACTION} == "help" ]]; then
+    _kube_help
+    return
   fi
 
   if [[ ${ACTION} != "context" ]] && [[ ${#KUBECTL_CONTEXT} -eq 0 ]] && [[ $(yq eval '.contexts | length' "${KUBECONFIG:-${HOME}/.kube/config}") -gt 1 ]]; then
@@ -366,10 +371,6 @@ kube() {
         fi
       fi
     fi
-    ;;
-
-  "help")
-    _kube_help
     ;;
 
   "image" | "images")
