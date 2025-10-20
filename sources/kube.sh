@@ -111,9 +111,6 @@ kube() {
   _kube_help() {
     _kube_info "Usage: kube [--context=<name>...?] [options?] ACTION"
 
-    _kube_info "\nPossibles options are\n"
-    _kube_info " - -n Narrow resource search to given namespace (default search in all namespaces)"
-
     _kube_info "\nPossibles actions are                            | args\n"
     _kube_info " - context      | Switch context                      | <context name>"
     _kube_info " - desc         | Describe an object                  | <object type or deployment name> [object name]"
