@@ -1,6 +1,6 @@
 import re
 import subprocess
-from os.path import dirname
+from os.path import dirname, isdir
 
 origin_regex = re.compile("^.*@(?P<url>.*):(?P<repository>.*?)(.git)?\\n?$")
 
@@ -10,6 +10,9 @@ def git_path(file_name):
         return
 
     working_dir = dirname(file_name)
+
+    if not isdir(working_dir):
+        return
 
     is_git = subprocess.call(
         ["git", "rev-parse", "--is-inside-work-tree"], cwd=working_dir

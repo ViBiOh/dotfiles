@@ -40,6 +40,7 @@ class SublimeGitLineHistory(sublime_plugin.WindowCommand):
         relative_file = file.replace(folder, "").lstrip("/")
 
         self.panel = window.create_output_panel("line_history")
+        self.panel.set_syntax_file("Packages/Diff/Diff.sublime-syntax")
         window.run_command("show_panel", {"panel": "output.line_history"})
 
         if self.task:
