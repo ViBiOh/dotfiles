@@ -34,7 +34,8 @@ class SublimeGitLineHistory(sublime_plugin.WindowCommand):
             return
 
         view = window.active_view()
-        line_number = view.rowcol(view.sel()[0].begin())[0] + 1
+        start_line = view.rowcol(view.sel()[0].begin())[0] + 1
+        end_line = view.rowcol(view.sel()[0].end())[0] + 1
 
         relative_file = file.replace(folder, "").lstrip("/")
 
@@ -50,7 +51,7 @@ class SublimeGitLineHistory(sublime_plugin.WindowCommand):
                 "log-pretty",
                 "--no-color",
                 "-L",
-                "{},{}:{}".format(line_number, line_number, relative_file),
+                "{},{}:{}".format(start_line, end_line, relative_file),
             ],
             output=self.queue_write,
             cwd=folder,
