@@ -70,9 +70,6 @@ kube() {
     fi
 
     local RESOURCE_NAMESPACE_QUERY="--all-namespaces"
-    if [[ -n ${RESOURCE_NAMESPACE} ]]; then
-      RESOURCE_NAMESPACE_QUERY="--namespace=${RESOURCE_NAMESPACE}"
-    fi
 
     if [[ -z ${RESOURCE} ]]; then
       RESOURCE="deployments.apps"
@@ -80,8 +77,16 @@ kube() {
 
     local YAML_QUERY='.items[] | (.kind | downcase) + "/" + .metadata.namespace + "/" + .metadata.name'
 
-    if [[ ${RESOURCE} == "ns" || ${RESOURCE} =~ ^namespaces? ]]; then
+    if [[ ${RESOURCE} == "ns" || ${RESOURCE} =~ ^namespaces? || ${RESOURCE} =~ ^nodes? ]]; then
       YAML_QUERY='.items[] | (.kind | downcase) + "//" + .metadata.name'
+    else
+      if [[ -z ${RESOURCE_NAMESPACE} ]]; then
+        RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces --output=yaml 2>/dev/null | yq eval '.items[].metadata.name' | fzf --prompt="Namespace: ")"
+      fi
+
+      if [[ -n ${RESOURCE_NAMESPACE} ]]; then
+        RESOURCE_NAMESPACE_QUERY="--namespace=${RESOURCE_NAMESPACE}"
+      fi
     fi
 
     local KUBE_RESOURCE
@@ -162,12 +167,6 @@ kube() {
 
   if [[ ${#KUBECTL_CONTEXT} -ne 0 ]]; then
     KUBECTL_COMMAND+=("${KUBECTL_CONTEXT[@]}")
-  fi
-
-  if [[ ${ACTION} != "context" ]] && [[ ${ACTION} != "pods-on-node" ]] && [[ ${ACTION} != "pon" ]]; then
-    if [[ -z ${RESOURCE_NAMESPACE} ]]; then
-      RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces --output=yaml 2>/dev/null | yq eval '.items[].metadata.name' | fzf --prompt="Namespace: ")"
-    fi
   fi
 
   case ${ACTION} in
@@ -444,7 +443,7 @@ kube() {
       shift
     fi
 
-    _kube_resources "nodes" "${FIRST}"
+    _kube_resources "nodes" "${FIRST:- }"
 
     if [[ -n ${RESOURCE_NAME:-} ]]; then
       _kube_print_and_run "${KUBECTL_COMMAND[@]}" get pods --field-selector spec.nodeName="${RESOURCE_NAME}" --all-namespaces --output wide "${@}"
