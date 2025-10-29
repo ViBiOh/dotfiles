@@ -599,8 +599,14 @@ kube() {
       if [[ -n ${PODS_LABELS-} ]]; then
         EXTRA_ARGS+=("--selector=${PODS_LABELS}" "${RESOURCE_NAMESPACE}")
       fi
-    elif [[ -n ${RESOURCE_NAMESPACE-} ]]; then
-      EXTRA_ARGS+=("--namespace=${RESOURCE_NAMESPACE}")
+    else
+      if [[ -z ${RESOURCE_NAMESPACE} ]]; then
+        RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces --output=yaml 2>/dev/null | yq eval '.items[].metadata.name' | fzf --prompt="Namespace: ")"
+      fi
+
+      if [[ -n ${RESOURCE_NAMESPACE-} ]]; then
+        EXTRA_ARGS+=("--namespace=${RESOURCE_NAMESPACE}")
+      fi
     fi
 
     if command -v kmux >/dev/null 2>&1; then
