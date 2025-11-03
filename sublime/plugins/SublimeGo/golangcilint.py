@@ -11,6 +11,7 @@ class GolangCILint(Linter):
         # because they indicate code that won't compile.
         r"(?:\s+\((?:(?P<error>typecheck)|(?P<code>[^()]+))\))?$"
     )
+
     # All other linter issues are treated as warnings.
     default_type = WARNING
     defaults = {
@@ -20,11 +21,4 @@ class GolangCILint(Linter):
     tempfile_suffix = "-"
 
     def cmd(self):
-        if self.settings.get("v1", False):
-            return "golangci-lint run ${args} ${file_path}"
-        return (
-            "golangci-lint run ${args}"
-            " --output.text.path=stdout"
-            " --show-stats=0"
-            " ${file_path}"
-        )
+        return "golangci-lint run --fix ${file_path}"
