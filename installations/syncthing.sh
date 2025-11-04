@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 install() {
   # renovate: datasource=github-releases depName=syncthing/syncthing
-  local SYNCTHING_VERSION="v2.0.10"
+  local SYNCTHING_VERSION="v2.0.11"
 
   local SYNCTHING_RELEASE
   SYNCTHING_RELEASE="syncthing-$(normalized_os "macos")-$(normalized_arch "amd64" "arm" "arm64")-${SYNCTHING_VERSION}"
