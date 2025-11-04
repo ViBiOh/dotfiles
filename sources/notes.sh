@@ -35,7 +35,7 @@ notes() {
       else
         mv "decrypted/${FILENAME}" "${FILENAME}"
       fi
-    done < <(rg --files --glob 'encrypted/*')
+    done < <(rg --files --glob 'encrypted/*.gpg')
 
     rm -rf "decrypted"
   }
