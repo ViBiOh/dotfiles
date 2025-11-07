@@ -224,12 +224,13 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             self.clear_status(view)
             return
 
+        selection = selections[0]
+
         self.refresh_file(view, False)
         if self._git_blame is None:
             self.clear_status(view)
             return
 
-        selection = selections[0]
         current_point = selection.begin()
         line_number = view.rowcol(current_point)[0] + 1  # index start at 0
 
