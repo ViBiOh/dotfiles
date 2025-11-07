@@ -47,6 +47,23 @@ stock() {
 
   _stock_evolution
   printf -- "%s %s%s%s" "${CURRENT_PRICE}" "${EVOLUTION_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%"
+
+  local CURRENT_TIMESTAMP
+  CURRENT_TIMESTAMP="$(date +%s)"
+
+  local REGULAR_START
+  REGULAR_START=$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta.currentTradingPeriod.regular.start')
+
+  local REGULAR_END
+  REGULAR_END=$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta.currentTradingPeriod.regular.end')
+
+  if [[ ${CURRENT_TIMESTAMP} -lt ${REGULAR_START} ]] || [[ ${CURRENT_TIMESTAMP} -gt ${REGULAR_END} ]]; then
+    CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].indicators.quote[0].open[-1]')"
+    PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
+
+    _stock_evolution
+    printf -- "#[fg=colour255] | %s %s%s%s" "${CURRENT_PRICE}" "${EVOLUTION_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%"
+  fi
 }
 
-stock DDOG
+stock "DDOG"
