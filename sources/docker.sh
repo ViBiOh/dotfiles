@@ -1,29 +1,19 @@
 #!/usr/bin/env bash
 
-if command -v colima >/dev/null 2>&1; then
-  docker_start() {
-    colima start --runtime=containerd --disk=10 --vm-type=vz --mount-type=virtiofs
-  }
+if command -v container >/dev/null 2>&1; then
+  alias docker=container
 
-  docker_stop() {
-    colima stop
-    colima delete --force
-  }
+  container_clean() {
+    container list --all --quiet | xargs container delete --force --volumes
+    container image list --quiet | xargs container image delete
+    container network list --format 'json' | jq --raw-output '.[] | select(.id != "default") | .id' | xargs container network delete
+    container volume list --quiet | xargs container volume delete
 
-  docker_login() {
-    pass show "dev/docker" | head -1 | docker login --username "$(pass_get "dev/docker" "login")" --password-stdin
+    container system stop
   }
 fi
 
 if command -v docker >/dev/null 2>&1; then
-  docker_clean() {
-    docker ps --all --quiet | xargs docker rm --force --volumes
-    docker images --quiet | xargs docker rmi
-    docker images --format '{{ .Repository }}:{{ .Tag}}' | xargs docker rmi
-    docker network ls --format '{{ json .}}' | jq --raw-output 'select(.Name != "bridge" and .ID != "") | .Name' | xargs docker network rm
-    docker volume ls --quiet | xargs docker volume rm
-  }
-
   redis() {
     docker run --name "redis" --rm --publish "127.0.0.1:6379:6379" "redis" redis-server --save "" --appendonly no --loglevel warning
   }
