@@ -148,8 +148,8 @@ stock() {
   STOCK_CURRENCY="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .currency')"
 
   local EVOLUTION_PERCENT
-  local OUTPUT_COLOR="${GREEN}"
-  local EVOLUTION_SIGN="↗"
+  local OUTPUT_COLOR
+  local EVOLUTION_SIGN
 
   _stock_evolution() {
     EVOLUTION_PERCENT="$(printf -- "scale = 4; 100 * ((%s / %s) - 1)" "${CURRENT_PRICE}" "${PREVIOUS_PRICE}" | bc)"
