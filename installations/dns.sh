@@ -17,6 +17,16 @@ install() {
   local UNBOUND_PORT="${UNBOUND_PORT:-53}"
   local UNBOUND_CONTROL="${UNBOUND_CONTROL:-yes}"
 
+  local UNBOUND_INTERFACE_IPV4="127.0.0.1"
+  local UNBOUND_INTERFACE_IPV6="::1"
+  local UNBOUND_ALL_RULE="refuse"
+
+  if [[ ${UNBOUND_SERVER:-no} == "yes" ]]; then
+    UNBOUND_INTERFACE_IPV4="0.0.0.0"
+    UNBOUND_INTERFACE_IPV6="::"
+    UNBOUND_ALL_RULE="allow"
+  fi
+
   # Default to CloudFlare
   local UNBOUND_FORWARD="${UNBOUND_FORWARD:-
   forward-addr: 2606:4700:4700::1111@853#cloudflare-dns.com
@@ -34,12 +44,12 @@ install() {
   username: root
   chroot: \"\"
 
-  interface: 127.0.0.1
-  interface: ::1
+  interface: ${UNBOUND_INTERFACE_IPV4}
+  interface: ${UNBOUND_INTERFACE_IPV6}
   port: ${UNBOUND_PORT}
   num-threads: 4
 
-  access-control: 0.0.0.0/0 refuse
+  access-control: 0.0.0.0/0 ${UNBOUND_ALL_RULE}
   access-control: 127.0.0.0/8 allow
 
   do-ip4: yes
