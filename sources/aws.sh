@@ -4,7 +4,7 @@ declare -g AWS_EXEC_ACCOUNT
 
 aws_exec() {
   if [[ -z ${AWS_ACCOUNTS:-} ]]; then
-    "$(which aws)" ${@}
+    "$(which aws)" "${@}"
     return
   fi
 
@@ -13,7 +13,7 @@ aws_exec() {
   fi
 
   if [[ -n ${AWS_EXEC_ACCOUNT} ]]; then
-    var_print_and_run aws-vault exec "${AWS_EXEC_ACCOUNT}" -- "$(which aws)" ${@}
+    var_print_and_run aws-vault exec "${AWS_EXEC_ACCOUNT}" -- "$(which aws)" "${@}"
   fi
 }
 
