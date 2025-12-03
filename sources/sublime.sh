@@ -18,7 +18,14 @@ sublime_add_project() {
   local currentDir
   currentDir="$(readlink -f "$(pwd)")"
 
-  if ! git_is_inside || [[ ${currentDir} != $(git_root) ]]; then
+  if git_is_inside; then
+    if [[ ${currentDir} != $(git_root) ]]; then
+      if ! var_confirm "Current dir is not the root of the Git repository. Continue"; then
+        return
+      fi
+    fi
+  else
+    var_error "Not inside a Git repository"
     return
   fi
 
