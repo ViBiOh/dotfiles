@@ -317,7 +317,7 @@ kube() {
         fi
 
         local CONTAINER_SELECTION
-        CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" pods ${POD_GETTER_ARG} --output yaml | yq "${POD_CONTAINER_QUERY}.spec.containers *d .spec.initContainers | .[].name" | fzf --select-1 --prompt="Container: ")"
+        CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" pods ${POD_GETTER_ARG} --output yaml | yq "${POD_CONTAINER_QUERY}[.spec.containers[].name] + [.spec.initContainers[].name] | .[]" | fzf --select-1 --prompt="Container: ")"
 
         if [[ -n ${CONTAINER_SELECTION:-} ]]; then
           EXTRA_OPTIONS+=" --container ${CONTAINER_SELECTION}"
@@ -376,7 +376,7 @@ kube() {
       if command -v kmux >/dev/null 2>&1; then
         _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" image "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
       else
-        _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml \| yq eval '.spec.template.spec.containers *d .spec.template.spec.initContainers | .[].image'
+        _kube_print_and_run "${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml \| yq eval '[.spec.template.spec.containers[].image] + [.spec.template.spec.initContainers[].image] | .[]'
       fi
     fi
     ;;
@@ -415,7 +415,7 @@ kube() {
 
       if [[ -n ${PODS_LABELS} ]]; then
         local KUBE_CONTAINER
-        KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get pods "${RESOURCE_NAMESPACE}" --selector="${PODS_LABELS}" --output=yaml | yq eval '.items[].spec.containers *d .items[].spec.initContainers | .[].name' | sort -u | fzf --select-1 --prompt="Container: ")"
+        KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get pods "${RESOURCE_NAMESPACE}" --selector="${PODS_LABELS}" --output=yaml | yq eval '[.items[].spec.containers[].name] + [.items[].spec.initContainers[].name] | .[]' | sort -u | fzf --select-1 --prompt="Container: ")"
         if [[ -n ${KUBE_CONTAINER:-} ]]; then
           KUBE_CONTAINER="--container=${KUBE_CONTAINER}"
         fi
