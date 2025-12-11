@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 if command -v container >/dev/null 2>&1; then
-  ln -s "${BREW_PREFIX}/bin/container" "${HOME}/opt/bin/docker"
-
   container_clean() {
     container list --all --quiet | xargs container delete --force --volumes
     container image list --quiet | xargs container image delete
