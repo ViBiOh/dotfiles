@@ -9,6 +9,10 @@ if command -v container >/dev/null 2>&1; then
 
     container system stop
   }
+
+  container_override_dns() {
+    container exec buildkit /bin/sh -c 'echo "nameserver 1.1.1.1" > /etc/resolv.conf'
+  }
 fi
 
 if command -v docker >/dev/null 2>&1; then
