@@ -618,7 +618,7 @@ _jira_epic() {
   JIRA_JQL+=" ORDER BY updated DESC"
 
   local JIRA_OUTPUT
-  JIRA_OUTPUT="$(_jira_request "/rest/api/3/search" --get --data-urlencode "maxResults=50" --data-urlencode "jql=${JIRA_JQL}")"
+  JIRA_OUTPUT="$(_jira_request "/rest/api/3/search/jql" --get --data-urlencode "maxResults=50" --data-urlencode "jql=${JIRA_JQL}")"
 
   if [[ -z ${JIRA_OUTPUT} ]]; then
     return
