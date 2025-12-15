@@ -1,0 +1,16 @@
+<snippet>
+  <content><![CDATA[
+type ${1:Flag} struct{}
+
+func With${1:Flag}(ctx context.Context) context.Context {
+  return context.WithValue(ctx, ${1:Flag}{}, struct{}{})
+}
+
+func Is${1:Flag}(ctx context.Context) bool {
+  return ctx.Value(${1:Flag}{}) != nil
+}
+]]></content>
+  <tabTrigger>gcv</tabTrigger>
+  <scope>source.go</scope>
+  <description>Go Context Value</description>
+</snippet>
