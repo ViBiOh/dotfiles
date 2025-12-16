@@ -31,12 +31,21 @@ backup_clean() {
 }
 
 backup_rclone() {
-  rclone sync \
-    --password-command 'pass infra/rclone' \
-    --progress \
-    --multi-thread-streams "8" \
-    --delete-excluded \
-    --exclude ".stfolder/**" \
-    --exclude ".fibr/*/**" \
-    "." "scw-crypt:"
+  local REMOTE_NAME
+  REMOTE_NAME="$(rclone config dump --password-command 'pass infra/rclone' | jq -r 'keys[]' | fzf --height=20 --ansi --reverse --prompt "Remote: ")"
+
+  if [[ -z ${REMOTE_NAME} ]]; then
+    return
+  fi
+
+  if var_confirm "Backup current folder to ${REMOTE_NAME}"; then
+    rclone sync \
+      --password-command 'pass infra/rclone' \
+      --progress \
+      --multi-thread-streams "8" \
+      --delete-excluded \
+      --exclude ".stfolder/**" \
+      --exclude ".fibr/*/**" \
+      "." "${REMOTE_NAME}:"
+  fi
 }
