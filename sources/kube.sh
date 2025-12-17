@@ -313,7 +313,7 @@ kube() {
 
         if ! [[ ${RESOURCE_TYPE} =~ pods? ]]; then
           POD_GETTER_ARG=" --selector $("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --output yaml | yq '.spec.selector.matchLabels | to_entries | map(.key + "=" + .value) | join(",")')"
-          POD_CONTAINER_QUERY=".items[0]"
+          POD_CONTAINER_QUERY=".items[0] | "
         fi
 
         local CONTAINER_SELECTION
