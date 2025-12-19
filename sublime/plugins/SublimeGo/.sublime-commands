@@ -4,6 +4,10 @@
     "command": "go_test"
   },
   {
+    "caption": "Go Test Function",
+    "command": "go_function_test"
+  },
+  {
     "caption": "Go Test Debug",
     "command": "go_test_debug"
   }

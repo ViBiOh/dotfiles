@@ -1,3 +1,4 @@
+import os
 import threading
 
 import sublime_plugin
@@ -8,9 +9,51 @@ from .async_task import AsyncTask
 from .env_loader import load_git_root_env
 
 
+class GoFunctionTestInput(sublime_plugin.TextInputHandler):
+    def __init__(self, window, previous):
+        self.window = window
+        self.previous = previous
+
+    def name(self):
+        return "test_filter"
+
+    def description(self):
+        return "Filter"
+
+    def initial_text(self):
+        if not self.window:
+            return "Test*"
+
+        current_function = self._get_function_name()
+        if self.previous and self.previous.startswith(current_function):
+            return self.previous
+
+        return current_function
+
+    def _get_function_name(self):
+        view = self.window.active_view()
+
+        current_point = view.sel()[0].begin()
+        current_function = ""
+
+        for function_symbol in [
+            x for x in view.symbol_regions() if x.kind[0] == sublime.KIND_ID_FUNCTION
+        ]:
+            if function_symbol.region.begin() < current_point:
+                current_function = function_symbol.name
+            else:
+                return current_function
+
+        return current_function
+
+
 class GoFunctionTest(sublime_plugin.WindowCommand):
     task = None
     panel = None
+    previous_filter = ""
+
+    def input(self, args):
+        return GoFunctionTestInput(self.window, self.previous_filter)
 
     def is_enabled(self, kill=False):
         if kill:
@@ -18,7 +61,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
 
         return True
 
-    def run(self, kill=False):
+    def run(self, test_filter, kill=False):
         if kill:
             if self.task:
                 self.task.kill()
@@ -41,7 +84,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
         if self.task:
             self.task.kill()
 
-        function_name = self.get_function_name(window)
+        self.previous_filter = test_filter
 
         self.task = AsyncTask(
             command=[
@@ -52,7 +95,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
                 "-count=1",
                 "-timeout=30s",
                 "-run",
-                function_name,
+                test_filter,
             ],
             output=self.queue_write,
             cwd=working_dir,
@@ -64,19 +107,3 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
 
     def do_write(self, text):
         self.panel.run_command("append", {"characters": text})
-
-    def get_function_name(self, window):
-        view = window.active_view()
-
-        current_point = view.sel()[0].begin()
-        current_function = ""
-
-        for function_symbol in [
-            x for x in view.symbol_regions() if x.kind[0] == sublime.KIND_ID_FUNCTION
-        ]:
-            if function_symbol.region.begin() < current_point:
-                current_function = function_symbol.name
-            else:
-                return current_function
-
-        return current_function
