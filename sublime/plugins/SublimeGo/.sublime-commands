@@ -10,5 +10,19 @@
   {
     "caption": "Go Test Debug",
     "command": "go_test_debug"
+  },
+  {
+    "caption": "Show Go Test output",
+    "command": "show_panel",
+    "args": {
+      "panel": "output.gotest"
+    }
+  },
+  {
+    "caption": "Show Go Run output",
+    "command": "show_panel",
+    "args": {
+      "panel": "output.gorun"
+    }
   }
 ]
