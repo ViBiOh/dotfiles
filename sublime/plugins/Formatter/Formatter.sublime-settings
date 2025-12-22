@@ -1,7 +1,7 @@
 {
 	"selectors": {
 		"source.go": [["goimports"], ["gofumpt", "-extra"]],
-		"source.sql": [["sqlformat", "--reindent", "--indent_columns", "--indent_after_first", "--reindent_aligned", "-"]],
+		"source.sql": [["sqlformat", "--reindent", "--indent_columns", "--reindent_aligned", "-"]],
 		"source.js": [["prettier", "--no-color", "--stdin-filepath", "file.js"]],
 		"source.json": [["jq"]],
 		"source.jsx": [["prettier", "--no-color", "--stdin-filepath", "file.jsx"]],
