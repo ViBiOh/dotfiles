@@ -1,3 +1,0 @@
-com.intellij.ja
-com.intellij.ko
-com.intellij.zh

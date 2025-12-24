@@ -1,9 +1,0 @@
-<application>
-  <component name="GoFoldingSettings">
-    <option name="isOneLineReturnFunctions" value="false" />
-    <option name="isOneLineErrorHandlingBlocks" value="false" />
-    <option name="isOneLineCaseClauses" value="false" />
-    <option name="isEmptyFunctions" value="false" />
-    <option name="isEmptyStructOrInterfaceTypeDefs" value="false" />
-  </component>
-</application>
