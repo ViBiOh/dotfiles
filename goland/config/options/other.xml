@@ -1,0 +1,72 @@
+<application>
+  <component name="ActionHistoryManager">
+    <ids>
+      <option value="Annotate" />
+      <option value="ReopenClosedTab" />
+      <option value="CreateLauncherScript" />
+      <option value="GitHub.Copy.Link" />
+    </ids>
+  </component>
+  <component name="DatadogUsageSettings">
+    <option name="trackingConsent" value="NO" />
+  </component>
+  <component name="FileEditorProviderManager">{}</component>
+  <component name="LangManager">
+    <option name="languageName" value="go" />
+  </component>
+  <component name="NotRoamableUiSettings">
+    <option name="fontSize" value="13.0" />
+    <option name="presentationModeIdeScale" value="1.75" />
+  </component>
+  <component name="PropertyService"><![CDATA[{
+  "keyToString": {
+    "EXPORTABILITY_SORTER.file.structure.state": "true",
+    "LayoutCode.codeCleanup": "true",
+    "LayoutCode.optimizeImports": "true",
+    "RunOnceActivity.VFSInitializationConditionsToFusReporter": "true",
+    "RunOnceActivity.go.enabled.exportability.sorter": "true",
+    "RunOnceActivity.go.init.cfg.2": "true",
+    "RunOnceActivity.go.init.cfg.line.markers": "true",
+    "RunOnceActivity.go.optimizeImportsByDefault": "true",
+    "RunOnceActivity.go.suggest.all.rc.was.enabled.once": "true",
+    "RunOnceActivity.llm.installer.activate.toolwindow": "true",
+    "RunOnceActivity.terminal.shell.command.handling.was.disabled.once": "true",
+    "evlsprt.243": "1934bcdd180",
+    "evlsprt3.243": "3",
+    "experimental.ui.on.first.startup": "true",
+    "experimental.ui.switch": "true",
+    "experimental.ui.used.version": "243.21565.208",
+    "experimentalFeature.terminal.shell.command.handling": "false",
+    "fileTypeChangedCounter": "1",
+    "fontSizeToResetConsole": "13.0",
+    "fontSizeToResetEditor": "13.0",
+    "go.first.run.time": "1732705619910",
+    "got.it.tooltip.database.schema.control.got.it": "1",
+    "got.it.tooltip.dd.codeInsight.editor.widget.got.it": "1",
+    "llm.installer.last.toolwindow.state": "LLM_INSTALLER",
+    "migrated.non.roamable.values.from.general.settings": "true",
+    "previousColorScheme": "_@user_Dark",
+    "registry.to.advanced.settings.migration.build": "GO-243.21565.208",
+    "ts.lib.d.ts.version": "5.4.3"
+  },
+  "keyToStringList": {
+    "fileTypeDetectors": [
+      "com.intellij.ide.scratch.ScratchFileServiceImpl$Detector",
+      "com.goide.execution.testing.frameworks.gofuzz.corpus.GoFuzzCorpusFileTypeDetector",
+      "com.intellij.docker.dockerFile.DockerFileTypeDetector",
+      "com.intellij.javascript.debugger.sourcemap.SourceMapFileType$MyFileTypeDetector",
+      "com.intellij.database.vfs.DbStorageFileType$Detector",
+      "org.jetbrains.plugins.textmate.TextMateFileType$TextMateFileDetector"
+    ]
+  }
+}]]></component>
+  <component name="ShownTips">{
+  &quot;shownTips&quot;: {
+    &quot;FindInPath&quot;: 1732521517583
+  },
+  &quot;proposedTips&quot;: {
+    &quot;FindInPath&quot;: 1732521517251
+  },
+  &quot;tipsOrderSeed&quot;: 1732521517221
+}</component>
+</application>

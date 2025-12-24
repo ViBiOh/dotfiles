@@ -1,0 +1,6 @@
+<application>
+  <component name="UISettings">
+    <option name="smoothScrolling" value="false" />
+    <option name="UI_DENSITY" value="COMPACT" />
+  </component>
+</application>
