@@ -2,7 +2,7 @@
 	<content><![CDATA[
 import _ "net/http/pprof"
 go func() {
-	fmt.Println(http.ListenAndServe("localhost:9999", http.DefaultServeMux))
+	fmt.Println(http.ListenAndServe("127.0.0.1:9999", http.DefaultServeMux))
 }()
 
 ]]></content>

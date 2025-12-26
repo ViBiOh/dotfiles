@@ -11,9 +11,9 @@ fi
 export GOPATH="${HOME}/opt/gopath"
 add_to_path "${GOPATH}/bin"
 
-alias pprof_http_cpu='go tool pprof -http localhost:12000 http://localhost:9999/debug/pprof/profile'
-alias pprof_http_memory='go tool pprof -http localhost:12001 http://localhost:9999/debug/pprof/heap'
-alias pprof_http_goroutine='go tool pprof -http localhost:12002 http://localhost:9999/debug/pprof/goroutine'
+alias pprof_http_cpu='go tool pprof -http 127.0.0.1:12000 http://127.0.0.1:9999/debug/pprof/profile'
+alias pprof_http_memory='go tool pprof -http 127.0.0.1:12001 http://127.0.0.1:9999/debug/pprof/heap'
+alias pprof_http_goroutine='go tool pprof -http 127.0.0.1:12002 http://127.0.0.1:9999/debug/pprof/goroutine'
 
 alias go_bench="go test -bench=. -benchmem -run='^$'"
 
