@@ -31,7 +31,7 @@ clean() {
 }
 
 install() {
-  packages_install "go" "graphviz"
+  packages_install "go" "golangci-lint" "graphviz"
 
   source "$(script_dir)/../sources/_golang.sh"
   mkdir -p "${GOPATH}"
@@ -39,9 +39,7 @@ install() {
   if command -v go >/dev/null 2>&1; then
     go install "github.com/derailed/popeye@latest"
     go install "github.com/go-delve/delve/cmd/dlv@latest"
-    go install "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
     go install "github.com/hmarr/codeowners/cmd/codeowners@latest"
-    go install "github.com/jpillora/chisel@latest"
     go install "github.com/tsenart/vegeta@latest"
     go install "go.uber.org/mock/mockgen@latest"
     go install "golang.org/x/perf/cmd/benchstat@latest"
