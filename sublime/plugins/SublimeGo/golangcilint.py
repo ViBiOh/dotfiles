@@ -36,4 +36,4 @@ class GolangCILint(Linter):
         if not file.startswith(folder):
             return "true ${file_path}"
 
-        return "golangci-lint run --fix ${file_path}"
+        return "golangci-lint run --fix --allow-parallel-runners ${file_path}"
