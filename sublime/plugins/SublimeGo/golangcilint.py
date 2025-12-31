@@ -21,4 +21,19 @@ class GolangCILint(Linter):
     tempfile_suffix = "-"
 
     def cmd(self):
+        view = self.view
+        if not view:
+            return "true ${file_path}"
+
+        window = view.window()
+        if not window:
+            return "true ${file_path}"
+
+        variables = window.extract_variables()
+        folder = variables.get("folder")
+        file = variables.get("file")
+
+        if not file.startswith(folder):
+            return "true ${file_path}"
+
         return "golangci-lint run --fix ${file_path}"
