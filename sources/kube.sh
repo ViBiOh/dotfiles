@@ -150,8 +150,11 @@ kube() {
   fi
 
   if [[ ${ACTION} != "context" ]] && [[ ${#KUBECTL_CONTEXT} -eq 0 ]] && [[ $(yq eval '.contexts | length' "${KUBECONFIG:-${HOME}/.kube/config}") -gt 1 ]]; then
+    local CURRENT_CONTEXT
+    CURRENT_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
+
     local CONTEXTS
-    CONTEXTS="$(yq eval '.contexts[].name' "${KUBECONFIG:-${HOME}/.kube/config}" | fzf --prompt="Contexts: " --multi)"
+    CONTEXTS="$(yq eval ".contexts[].name | select(. != \"${CURRENT_CONTEXT}\")" "${KUBECONFIG:-${HOME}/.kube/config}" | awk "BEGIN{print \"${CURRENT_CONTEXT}\"}1" | fzf --prompt="Contexts: " --multi)"
 
     for context in ${CONTEXTS}; do
       KUBECTL_CONTEXTS+=("--context=${context}")
