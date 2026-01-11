@@ -1,0 +1,4 @@
+{
+  "shell_cmd": "$file",
+  "working_dir": "$file_path"
+}
