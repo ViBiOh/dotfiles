@@ -298,7 +298,7 @@ class SublimeGitCodeowners(sublime_plugin.EventListener):
         view.erase_status(self._status_key)
 
     def print_status(self, view, value):
-        view.set_status(self._status_key, "Owner {}".format(value))
+        view.set_status(self._status_key, value)
 
     def _is_enabled(self):
         return _settings_obj.get("show_codeowners", True)
