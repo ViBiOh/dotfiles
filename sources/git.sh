@@ -17,7 +17,6 @@ fi
 git_large_repos() {
   git config index.threads true
   git config feature.manyFiles true
-  git update-index --index-version 4
   git config core.fsmonitor true
   git config fetch.writeCommitGraph true
   git commit-graph write --reachable
