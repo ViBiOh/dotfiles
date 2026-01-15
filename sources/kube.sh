@@ -75,13 +75,13 @@ kube() {
       RESOURCE="deployments.apps"
     fi
 
-    local YAML_QUERY='.items[] | (.kind | downcase) + "/" + .metadata.namespace + "/" + .metadata.name'
+    local JSONPATH_QUERY='{range .items[*]}{.kind}/{.metadata.namespace}/{.metadata.name}{"\n"}{end}'
 
     if [[ ${RESOURCE} == "ns" || ${RESOURCE} =~ ^namespaces? || ${RESOURCE} =~ ^nodes? ]]; then
-      YAML_QUERY='.items[] | (.kind | downcase) + "//" + .metadata.name'
+      JSONPATH_QUERY='{range .items[*]}{.kind}//{.metadata.name}{"\n"}{end}'
     else
       if [[ -z ${RESOURCE_NAMESPACE} ]]; then
-        RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces --output=yaml 2>/dev/null | yq eval '.items[].metadata.name' | fzf --prompt="Namespace: ")"
+        RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | fzf --prompt="Namespace: ")"
       fi
 
       if [[ -n ${RESOURCE_NAMESPACE} ]]; then
@@ -90,9 +90,9 @@ kube() {
     fi
 
     local KUBE_RESOURCE
-    KUBE_RESOURCE="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE}" "${RESOURCE_NAMESPACE_QUERY}" --output=yaml | yq eval "${YAML_QUERY}" | fzf --select-1 --query="${QUERY}")"
+    KUBE_RESOURCE="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE}" "${RESOURCE_NAMESPACE_QUERY}" "--output=jsonpath=${JSONPATH_QUERY}" | fzf --select-1 --query="${QUERY}")"
 
-    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $1 }')"
+    RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | tr '[:upper:]' '[:lower:]' | awk -F '/' '{ print $1 }')"
     RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
     RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
 
@@ -433,7 +433,7 @@ kube() {
     ;;
 
   "ns")
-    "${KUBECTL_COMMAND[@]}" get namespaces --output=yaml | yq eval '.items[].metadata.name' | fzf --select-1 --query="${1-}" | xargs "${KUBECTL_COMMAND[@]}" config set-context --current --namespace
+    "${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | fzf --select-1 --query="${1-}" | xargs "${KUBECTL_COMMAND[@]}" config set-context --current --namespace
     ;;
 
   "pods-on-node" | "pon")
@@ -601,7 +601,7 @@ kube() {
       fi
     else
       if [[ -z ${RESOURCE_NAMESPACE} ]]; then
-        RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces --output=yaml 2>/dev/null | yq eval '.items[].metadata.name' | fzf --prompt="Namespace: ")"
+        RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | fzf --prompt="Namespace: ")"
       fi
 
       if [[ -n ${RESOURCE_NAMESPACE-} ]]; then
@@ -646,25 +646,25 @@ _fzf_complete_kube() {
 
   "forward")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl get services "${NAMESPACE_SCOPE}" --output=yaml 2>/dev/null | yq eval '.items[].metadata.name'
+      kubectl get services "${NAMESPACE_SCOPE}" '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null
     )
     ;;
 
   "desc" | "describe" | "diff" | "edit" | "env" | "exec" | "image" | "images" | "info" | "log" | "logs" | "restart" | "rollback" | "top" | "watch")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl get deployments.app "${NAMESPACE_SCOPE}" --output=yaml 2>/dev/null | yq eval '.items[].metadata.name'
+      kubectl get deployments.app "${NAMESPACE_SCOPE}" '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null
     )
     ;;
 
   "ns" | "-n" | "--namespace")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl get namespaces --output=yaml 2>/dev/null | yq eval '.items[].metadata.name'
+      kubectl get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null
     )
     ;;
 
   "pods-on-node" | "pon")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
-      kubectl get nodes --output=yaml 2>/dev/null | yq eval '.items[].metadata.name'
+      kubectl get nodes '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null
     )
     ;;
   esac
