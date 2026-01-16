@@ -62,51 +62,62 @@
 	autocorrect = prompt
 
 [alias]
-	last-tag = ! git describe --tag --abbrev=0 2> /dev/null
 	remote-repository = ! [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@.*:([^\\.]*)(.git)?$ ]] && printf -- '%s' \"${BASH_REMATCH[1]}\"
 	web-url = ! [[ "$(git remote get-url --push $(git remote show | head -1))" =~ ^.*@(.*)[:/](.*)/(.*)$ ]] && printf -- 'https://%s/%s/%s' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]%.git}"
 	web = ! open "$(git web-url)"
 	webcommit = "!f() { open "$(git web-url)/commit/${1:-}"; }; f"
 	pr = ! open "$(git web-url)/compare/$(git default-branch)...$(git current-branch)?expand=1"
-	fco = "!f() { local GIT_BRANCH="$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query="remotes/${1:-}" | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||')"; [[ -n "${GIT_BRANCH}" ]] && git switch "${GIT_BRANCH}"; }; f"
-	fixup = ! git ci --fixup "$(git log-pretty "origin/$(git default-branch).." --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{printf(\"%s\", $1)}')"
+
 	file-list = ! git ls-files | grep --invert-match package-lock.json | grep --extended-regexp --invert-match '.jpg$|.jpeg$|.png$|.gif$|.ico$|.lock$|.sum$|.jar$|.bat$|.otf$|.woff$|.svg$|.xml$'
 	files-commits = ! git log --format=format: --name-only | grep --extended-regexp --invert-match '^$' | sort | uniq -c | sort -rg | head -10
 	lines-count = ! git file-list | xargs wc -l 2>/dev/null | tail -1
 	authors-commits = ! git log --format=%an | grep --extended-regexp --invert-match '^$' | sort | uniq -c | sort -rg | head -10
 	authors-lines = ! git file-list | xargs -n 1 git blame --porcelain 2>/dev/null | grep '^author ' | sed 's|author ||g' | sort | uniq -c | sort -rg | head -10
-	copr = "!f() { git fetch origin "pull/${1}/head:pr/${1}" && git switch "pr/${1}"; }; f"
-	up = "!f() { git pull --rebase origin "${1:-$(git default-branch)}"; }; f"
-	tidy = "!f() { git rebase --signoff --interactive "origin/${1:-$(git default-branch)}"; }; f"
+
 	adiws = ! git diff --no-color --ignore-all-space | git apply --cached
 	adibl = ! git diff --no-color --ignore-blank-lines | git apply --cached
-	commend = ci --amend --no-edit
-	pushf = push --force-with-lease
+
+	up = "!f() { git pull --rebase origin "${1:-$(git default-branch)}"; }; f"
+	tidy = "!f() { git rebase --signoff --interactive "origin/${1:-$(git default-branch)}"; }; f"
 	pp = ! git pull && git push
-	pur = ! git push && git pr
-	co = checkout
-	ci = commit --signoff
-	d = diff --ignore-all-space
+	pushf = push --force-with-lease
+
 	s = status --short --branch
+	d = diff --ignore-all-space
+	ci = commit --signoff
+	commend = ci --amend --no-edit
+	fixup = ! git ci --fixup "$(git log-pretty "origin/$(git default-branch).." --grep "^fixup" --invert-grep | fzf --height 20 --ansi --reverse | awk '{printf(\"%s\", $1)}')"
+	pur = ! git push && git pr
+
+	root = rev-parse --show-toplevel
+	last-tag = describe --tags --abbrev=0
+
 	unstage = reset HEAD --
-	fresh-clean = ! git reset HEAD -- . && git checkout -- . && git clean -ffxd
+	undo = "!f() { cd "${GIT_PREFIX:-.}"; git reset "${2:-origin/$(git default-branch)}" -- "${1:-}"; git checkout -- "${1:-}"; git reset HEAD -- "${1:-}"; }; f"
 	list-merged-stash = ! git fsck --unreachable --no-progress | grep commit | cut -d' ' -f3 | xargs git log --merges --no-walk --grep=WIP
+
+	set-head = remote set-head origin -a
 	default-branch = ! git config get --default $(git rev-parse --abbrev-ref origin/HEAD | sed 's|^origin/||') branch.overridden-default
 	force-default-branch = "!f() { git config set "branch.overridden-default" "${1}"; }; f"
 	unforce-default-branch = config unset "branch.overridden-default"
 	current-branch = rev-parse --abbrev-ref HEAD
-	set-head = remote set-head origin -a
 	default = ! git switch "$(git default-branch)"
+
+	co = checkout
+	copr = "!f() { git fetch origin "pull/${1}/head:pr/${1}" && git switch "pr/${1}"; }; f"
+	fco = "!f() { local GIT_BRANCH="$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query="remotes/${1:-}" | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||')"; [[ -n "${GIT_BRANCH}" ]] && git switch "${GIT_BRANCH}"; }; f"
+
 	log-pretty = log --color --date=local --pretty=format:'%C(red)%h%C(reset)%C(yellow)%d%C(reset) %s %C(green)(%cr) %C(magenta)(%cd) %C(bold blue)<%an>%C(reset)'
 	lg = log-pretty --graph
 	changelog = ! git log-pretty --no-merges "${2:-HEAD}...${1:-$(git last-tag)}"
 	find = log-pretty -S
 	filehistory = log-pretty --
 	linehistory = log-pretty -L
+
 	sweep = ! git prune && git remote prune origin && git branch --list --format '%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' | grep --extended-regexp --invert-match '^$' | xargs git branch --delete --force && git gc --quiet
-	undo = "!f() { cd "${GIT_PREFIX:-.}"; git reset "${2:-origin/$(git default-branch)}" -- "${1:-}"; git checkout -- "${1:-}"; git reset HEAD -- "${1:-}"; }; f"
 	unlock-ref = update-ref -d
 	unshallow = ! git remote set-branches origin '*' && git pull --unshallow
+	fresh-clean = ! git reset HEAD -- . && git checkout -- . && git clean -ffxd
 
 [merge]
 	tool = smerge
