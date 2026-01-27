@@ -222,13 +222,13 @@ kube() {
       declare -a DIFF_ARGS
       for context in "${KUBECTL_CONTEXTS[@]}"; do
         if [[ ${context} =~ ^--context= ]]; then
-          DIFF_ARGS+=("<(kubectl ${context} get ${RESOURCE_TYPE} --namespace ${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '\"${context}\", ${QUERY}')")
+          DIFF_ARGS+=("<(kubectl ${context} get ${RESOURCE_TYPE} ${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '\"${context}\", ${QUERY}')")
         elif ! [[ ${context} =~ ^--context ]]; then
-          DIFF_ARGS+=("<(kubectl --context ${context} get ${RESOURCE_TYPE} --namespace ${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '\"${context}\", ${QUERY}')")
+          DIFF_ARGS+=("<(kubectl --context ${context} get ${RESOURCE_TYPE} ${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '\"${context}\", ${QUERY}')")
         fi
       done
 
-      eval "vimdiff -R ${DIFF_ARGS[*]}"
+      _kube_print_and_run "vimdiff -R ${DIFF_ARGS[*]}"
     fi
     ;;
 
