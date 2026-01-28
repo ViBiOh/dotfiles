@@ -17,8 +17,6 @@ kube() {
 
   if [[ -n ${BASH_VERSION} ]]; then
     history -s "${FUNCNAME[0]} ${*}"
-  elif [[ -n ${ZSH_VERSION} ]]; then
-    print -s "${funcstack[1]} ${*}"
   fi
 
   _kube_print_and_run() {
@@ -317,24 +315,22 @@ kube() {
 
       shift $((OPTIND - 1))
 
+      local CONTAINER_SELECTION
       if [[ ${CONTAINER_SELECTED} -eq 0 ]]; then
-        local POD_GETTER_ARG="${RESOURCE_NAME}"
-        local POD_CONTAINER_QUERY="."
 
-        if ! [[ ${RESOURCE_TYPE} =~ pods? ]]; then
-          POD_GETTER_ARG=" --selector $("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --output yaml | yq '.spec.selector.matchLabels | to_entries | map(.key + "=" + .value) | join(",")')"
-          POD_CONTAINER_QUERY=".items[0] | "
-        fi
-
-        local CONTAINER_SELECTION
-        CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" pods ${POD_GETTER_ARG} --output yaml | yq "${POD_CONTAINER_QUERY}[.spec.containers[].name] + [.spec.initContainers[].name] | .[]" | fzf --select-1 --prompt="Container: ")"
-
-        if [[ -n ${CONTAINER_SELECTION:-} ]]; then
-          EXTRA_OPTIONS+=" --container ${CONTAINER_SELECTION}"
+        if [[ ${RESOURCE_TYPE} =~ pods? ]]; then
+          CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" pods "${RESOURCE_NAME}" --output yaml | yq ".[.spec.containers[].name] + [.spec.initContainers[].name] | .[]" | fzf --select-1 --prompt="Container: ")"
+        else
+          CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" pods --selector "$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --output yaml | yq '.spec.selector.matchLabels | to_entries | map(.key + "=" + .value) | join(",")')" --output yaml | yq ".items[0] | [.spec.containers[].name] + [.spec.initContainers[].name] | .[]" | fzf --select-1 --prompt="Container: ")"
         fi
       fi
 
-      _kube_print_and_run "${KUBECTL_COMMAND[@]}" exec "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" ${EXTRA_OPTIONS} --stdin -- "${@-/bin/bash}"
+      if [[ -n ${CONTAINER_SELECTION:-} ]]; then
+        _kube_print_and_run "${KUBECTL_COMMAND[@]}" exec "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --container "${CONTAINER_SELECTION}" --stdin -- "${@:-/bin/bash}"
+      else
+        _kube_print_and_run "${KUBECTL_COMMAND[@]}" exec "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --stdin -- "${@:-/bin/bash}"
+      fi
+
     fi
 
     ;;
