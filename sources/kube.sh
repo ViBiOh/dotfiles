@@ -15,11 +15,21 @@ kube() {
   local BLUE='\033[0;34m'
   local RESET='\033[0m'
 
-  history -s "${FUNCNAME[0]} ${*}"
+  if [[ -n ${BASH_VERSION} ]]; then
+    history -s "${FUNCNAME[0]} ${*}"
+  elif [[ -n ${ZSH_VERSION} ]]; then
+    print -s "${funcstack[1]} ${*}"
+  fi
 
   _kube_print_and_run() {
     printf -- "%b%s%b\n" "${YELLOW}" "${*}" "${RESET}" 1>&2
-    history -s "${*}"
+
+    if [[ -n ${BASH_VERSION} ]]; then
+      history -s "${*}"
+    elif [[ -n ${ZSH_VERSION} ]]; then
+      print -s "${*}"
+    fi
+
     eval "${*}"
   }
 
@@ -156,13 +166,13 @@ kube() {
     local CONTEXTS
     CONTEXTS="$(yq eval ".contexts[].name | select(. != \"${CURRENT_CONTEXT}\")" "${KUBECONFIG:-${HOME}/.kube/config}" | awk "BEGIN{print \"${CURRENT_CONTEXT}\"}1" | fzf --prompt="Contexts: " --multi)"
 
-    for context in ${CONTEXTS}; do
+    while IFS= read -r context; do
       KUBECTL_CONTEXTS+=("--context=${context}")
 
       if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
         KUBECTL_CONTEXT+=("--context=${context}")
       fi
-    done
+    done < <(printf "%s\n" "${CONTEXTS}")
   fi
 
   if [[ ${#KUBECTL_CONTEXT} -ne 0 ]]; then
