@@ -13,6 +13,7 @@ kube_clean_contexts() {
 kube() {
   local YELLOW='\033[33m'
   local BLUE='\033[0;34m'
+  local GREEN='\033[0;32m'
   local RESET='\033[0m'
 
   if [[ -n ${BASH_VERSION} ]]; then
@@ -47,7 +48,7 @@ kube() {
     if [[ ${1-} =~ ^--context= ]]; then
       KUBECTL_CONTEXTS+=("${1}")
 
-      if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
+      if [[ ${#KUBECTL_CONTEXT[@]} -eq 0 ]]; then
         KUBECTL_CONTEXT+=("${1}")
       fi
 
@@ -55,7 +56,7 @@ kube() {
     else
       KUBECTL_CONTEXTS+=("--context=${2}")
 
-      if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
+      if [[ ${#KUBECTL_CONTEXT[@]} -eq 0 ]]; then
         KUBECTL_CONTEXT+=("--context=${2}")
       fi
 
@@ -157,7 +158,7 @@ kube() {
     return
   fi
 
-  if [[ ${ACTION} != "context" ]] && [[ ${#KUBECTL_CONTEXT} -eq 0 ]] && [[ $(yq eval '.contexts | length' "${KUBECONFIG:-${HOME}/.kube/config}") -gt 1 ]]; then
+  if [[ ${ACTION} != "context" ]] && [[ ${#KUBECTL_CONTEXT[@]} -eq 0 ]] && [[ $(yq eval '.contexts | length' "${KUBECONFIG:-${HOME}/.kube/config}") -gt 1 ]]; then
     local CURRENT_CONTEXT
     CURRENT_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
 
@@ -167,13 +168,13 @@ kube() {
     while IFS= read -r context; do
       KUBECTL_CONTEXTS+=("--context=${context}")
 
-      if [[ ${#KUBECTL_CONTEXT} -eq 0 ]]; then
+      if [[ ${#KUBECTL_CONTEXT[@]} -eq 0 ]]; then
         KUBECTL_CONTEXT+=("--context=${context}")
       fi
     done < <(printf "%s\n" "${CONTEXTS}")
   fi
 
-  if [[ ${#KUBECTL_CONTEXT} -ne 0 ]]; then
+  if [[ ${#KUBECTL_CONTEXT[@]} -ne 0 ]]; then
     KUBECTL_COMMAND+=("${KUBECTL_CONTEXT[@]}")
   fi
 
@@ -190,7 +191,7 @@ kube() {
 
       if [[ -n ${TMUX-} ]]; then
         local CONTEXT_FILENAME
-        CONTEXT_FILENAME="$(printf '%s' "${CONTEXT}" | md5)"
+        CONTEXT_FILENAME="$(printf '%s' "${CONTEXT}" | md5sum | cut -d' ' -f1)"
 
         if ! [[ -e "${TMP_CONTEXT_LOCATION}/${CONTEXT_FILENAME}" ]]; then
           mkdir -p "${TMP_CONTEXT_LOCATION}"
@@ -232,7 +233,7 @@ kube() {
         if [[ ${context} =~ ^--context= ]]; then
           DIFF_ARGS+=("<(kubectl ${context} get ${RESOURCE_TYPE} ${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '\"${context}\", ${QUERY}')")
         elif ! [[ ${context} =~ ^--context ]]; then
-          DIFF_ARGS+=("<(kubectl --context ${context} get ${RESOURCE_TYPE} ${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '\"${context}\", ${QUERY}')")
+          DIFF_ARGS+=("<(kubectl --context=${context} get ${RESOURCE_TYPE} ${RESOURCE_NAMESPACE} ${RESOURCE_NAME} --output=yaml | yq eval --prettyPrint '\"${context}\", ${QUERY}')")
         fi
       done
 
@@ -289,40 +290,12 @@ kube() {
     _kube_resources "${FIRST}" "${SECOND}"
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
-      local EXTRA_OPTIONS
-      local CONTAINER_SELECTED=0
-
-      OPTIND=0
-      while getopts ":c:t" option; do
-        case "${option}" in
-        c)
-          EXTRA_OPTIONS+=" --container ${OPTARG}"
-          CONTAINER_SELECTED=1
-          ;;
-        t)
-          EXTRA_OPTIONS+=" --tty"
-          ;;
-        :)
-          printf -- "option -%s requires a value\n" "${OPTARG}" 1>&2
-          return 1
-          ;;
-        \?)
-          printf -- "option -%s is invalid\n" "${OPTARG}" 1>&2
-          return 2
-          ;;
-        esac
-      done
-
-      shift $((OPTIND - 1))
-
       local CONTAINER_SELECTION
-      if [[ ${CONTAINER_SELECTED} -eq 0 ]]; then
 
-        if [[ ${RESOURCE_TYPE} =~ pods? ]]; then
-          CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" pods "${RESOURCE_NAME}" --output yaml | yq ".[.spec.containers[].name] + [.spec.initContainers[].name] | .[]" | fzf --select-1 --prompt="Container: ")"
-        else
-          CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" pods --selector "$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --output yaml | yq '.spec.selector.matchLabels | to_entries | map(.key + "=" + .value) | join(",")')" --output yaml | yq ".items[0] | [.spec.containers[].name] + [.spec.initContainers[].name] | .[]" | fzf --select-1 --prompt="Container: ")"
-        fi
+      if [[ ${RESOURCE_TYPE} =~ pods? ]]; then
+        CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" pods "${RESOURCE_NAME}" --output yaml | yq "[.spec.containers[].name] + [.spec.initContainers[].name] | .[]" | fzf --select-1 --prompt="Container: ")"
+      else
+        CONTAINER_SELECTION="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" pods --selector "$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --output yaml | yq '.spec.selector.matchLabels | to_entries | map(.key + "=" + .value) | join(",")')" --output yaml | yq ".items[0] | [.spec.containers[].name] + [.spec.initContainers[].name] | .[]" | fzf --select-1 --prompt="Container: ")"
       fi
 
       if [[ -n ${CONTAINER_SELECTION:-} ]]; then
@@ -330,7 +303,6 @@ kube() {
       else
         _kube_print_and_run "${KUBECTL_COMMAND[@]}" exec "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}/${RESOURCE_NAME}" --stdin -- "${@:-/bin/bash}"
       fi
-
     fi
 
     ;;
@@ -477,7 +449,7 @@ kube() {
     _kube_resources "${@}"
 
     if [[ -n ${RESOURCE_NAME-} ]]; then
-      if [[ ${#KUBECTL_CONTEXTS} -eq 0 ]]; then
+      if [[ ${#KUBECTL_CONTEXTS[@]} -eq 0 ]]; then
         _kube_print_and_run kubectl rollout undo "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
       else
         for context in "${KUBECTL_CONTEXTS[@]}"; do
@@ -559,8 +531,6 @@ kube() {
       if [[ -n ${FIRST:-} ]]; then
         _kube_resources "${FIRST}" "${SECOND}"
 
-        local EXTRA_ARGS=()
-
         if [[ -n ${RESOURCE_NAME-} ]]; then
           local PODS_LABELS
           PODS_LABELS="$(_kube_pod_labels)"
@@ -572,7 +542,7 @@ kube() {
       fi
     fi
 
-    if [[ ${#KUBECTL_CONTEXTS} -eq 0 ]]; then
+    if [[ ${#KUBECTL_CONTEXTS[@]} -eq 0 ]]; then
       _kube_print_and_run "kubectl" top "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
     else
       for context in "${KUBECTL_CONTEXTS[@]}"; do
