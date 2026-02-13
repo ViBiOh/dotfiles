@@ -190,7 +190,7 @@ main() {
   source_bashrc
 
   if [[ ${DOTFILES_RC} -eq 1 ]]; then
-    if ! command -v fzf 2>/dev/null 2>&1; then
+    if ! command -v fzf >/dev/null 2>&1; then
       do_mandatory_actions "install"
     fi
 
