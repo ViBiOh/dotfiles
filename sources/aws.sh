@@ -1,29 +1,31 @@
 #!/usr/bin/env bash
 
-declare -g AWS_EXEC_ACCOUNT
-
 AWS_CLI_BINARY="$(which -a aws | grep bin)"
 
-aws_exec() {
-  if [[ -z ${AWS_ACCOUNTS:-} ]]; then
-    "${AWS_CLI_BINARY}" "${@}"
-    return
-  fi
+if [[ -n ${AWS_CLI_BINARY} ]]; then
+  declare -g AWS_EXEC_ACCOUNT
 
-  if [[ -z ${AWS_EXEC_ACCOUNT:-} ]]; then
-    AWS_EXEC_ACCOUNT="$(printf -- "%s\n" "${AWS_ACCOUNTS[@]}" | fzf --height=20 --ansi --reverse --select-1 --prompt "Profile: ")"
-  fi
+  aws_exec() {
+    if [[ -z ${AWS_ACCOUNTS:-} ]]; then
+      "${AWS_CLI_BINARY}" "${@}"
+      return
+    fi
 
-  if [[ -n ${AWS_EXEC_ACCOUNT} ]]; then
-    var_print_and_run aws-vault exec "${AWS_EXEC_ACCOUNT}" -- "${AWS_CLI_BINARY}" "${@}"
-  fi
-}
+    if [[ -z ${AWS_EXEC_ACCOUNT:-} ]]; then
+      AWS_EXEC_ACCOUNT="$(printf -- "%s\n" "${AWS_ACCOUNTS[@]}" | fzf --height=20 --ansi --reverse --select-1 --prompt "Profile: ")"
+    fi
 
-aws_unset() {
-  AWS_EXEC_ACCOUNT=""
-}
+    if [[ -n ${AWS_EXEC_ACCOUNT} ]]; then
+      var_print_and_run aws-vault exec "${AWS_EXEC_ACCOUNT}" -- "${AWS_CLI_BINARY}" "${@}"
+    fi
+  }
 
-alias aws=aws_exec
+  aws_unset() {
+    AWS_EXEC_ACCOUNT=""
+  }
+
+  alias aws=aws_exec
+fi
 
 aws_regions() {
   local ENDPOINTS
