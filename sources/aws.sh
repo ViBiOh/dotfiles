@@ -2,9 +2,11 @@
 
 declare -g AWS_EXEC_ACCOUNT
 
+AWS_CLI_BINARY="$(which -a aws | grep bin)"
+
 aws_exec() {
   if [[ -z ${AWS_ACCOUNTS:-} ]]; then
-    "$(which aws)" "${@}"
+    "${AWS_CLI_BINARY}" "${@}"
     return
   fi
 
@@ -13,7 +15,7 @@ aws_exec() {
   fi
 
   if [[ -n ${AWS_EXEC_ACCOUNT} ]]; then
-    var_print_and_run aws-vault exec "${AWS_EXEC_ACCOUNT}" -- "$(which aws)" "${@}"
+    var_print_and_run aws-vault exec "${AWS_EXEC_ACCOUNT}" -- "${AWS_CLI_BINARY}" "${@}"
   fi
 }
 
