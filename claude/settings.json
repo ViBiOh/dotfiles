@@ -1,20 +1,31 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm test*)",
-      "Bash(npm run test*)",
-      "Bash(pytest*)",
-      "Bash(go test*)",
-      "Bash(go build*)",
+      "Bash(bzl run*)",
       "Bash(cargo test*)",
-      "Bash(bzl run*)"
+      "Bash(go build*)",
+      "Bash(go test*)",
+      "Bash(grep*)",
+      "Bash(npm run test*)",
+      "Bash(npm test*)",
+      "Bash(pytest*)"
     ],
     "deny": [
       "Bash(git add*)",
       "Bash(git checkout*)",
+      "Bash(git clone*)",
       "Bash(git commit*)",
+      "Bash(git init*)",
+      "Bash(git merge*)",
+      "Bash(git pull*)",
       "Bash(git pull*)",
       "Bash(git push*)",
+      "Bash(git push*)",
+      "Bash(git rebase*)",
+      "Bash(git rm*)",
+      "Bash(git switch*)",
+      "Bash(git tag*)",
+      "Bash(git worktree*)",
       "Bash(go get*)",
       "Bash(go install*)",
       "Bash(npm install*)",
