@@ -16,6 +16,7 @@ class AsyncTask:
         if self.proc is not None:
             self.kill()
 
+        self.write("# {}\n".format(cwd))
         self.write(" ".join(command) + "\n\n")
 
         try:
