@@ -65,5 +65,5 @@ clear_folder_and_lock() {
 
 brew_clean_all() {
   brew remove --force "$(brew list)" --ignore-dependencies
-  brew cleanup
+  brew cleanup --prune 30
 }
