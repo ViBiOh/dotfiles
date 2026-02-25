@@ -87,19 +87,7 @@ GitHub.sublime-settings
 .idea/
 .fleet/
 
-#--------#
-# VsCode #
-#--------#
-.vscode/*
-.fleet/
-
-# Local History for Visual Studio Code
-.history/
-
-# Built Visual Studio Code Extensions
-*.vsix
-
-#-----#
-# zed #
-#-----#
-.zed/*
+#----#
+# Go #
+#----#
+__debug_bin*

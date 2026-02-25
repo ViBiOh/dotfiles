@@ -37,6 +37,8 @@ install() {
   mkdir -p "${GOPATH}"
 
   if command -v go >/dev/null 2>&1; then
+    go telemetry off
+
     go install "github.com/derailed/popeye@latest"
     go install "github.com/go-delve/delve/cmd/dlv@latest"
     go install "github.com/hmarr/codeowners/cmd/codeowners@latest"
