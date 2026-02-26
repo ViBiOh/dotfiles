@@ -58,7 +58,7 @@ package_exists() {
 
 packages_clean() {
   if command -v brew >/dev/null 2>&1; then
-    brew cleanup -s
+    brew cleanup --prune 30 --scrub
   elif command -v apt-get >/dev/null 2>&1; then
     export DEBIAN_FRONTEND=noninteractive
     sudo apt-get autoremove --yes

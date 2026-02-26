@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+install() {
+  packages_install "standard-notes"
+}
