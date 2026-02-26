@@ -2,14 +2,17 @@
   "permissions": {
     "allow": [
       "Bash(bzl run*)",
+      "Bash(bzl test*)",
       "Bash(cargo test*)",
+      "Bash(cd*)",
       "Bash(go build*)",
       "Bash(go test*)",
       "Bash(go vet*)",
       "Bash(grep*)",
       "Bash(npm run test*)",
       "Bash(npm test*)",
-      "Bash(pytest*)"
+      "Bash(pytest*)",
+      "Bash(tee*)"
     ],
     "deny": [
       "Bash(git add*)",
