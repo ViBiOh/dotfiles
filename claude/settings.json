@@ -5,6 +5,7 @@
       "Bash(cargo test*)",
       "Bash(go build*)",
       "Bash(go test*)",
+      "Bash(go vet*)",
       "Bash(grep*)",
       "Bash(npm run test*)",
       "Bash(npm test*)",
