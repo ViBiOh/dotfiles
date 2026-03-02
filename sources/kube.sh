@@ -16,16 +16,16 @@ kube() {
   local GREEN='\033[0;32m'
   local RESET='\033[0m'
 
-  if [[ -n ${BASH_VERSION} ]]; then
+  if [[ -n ${BASH_VERSION:-} ]]; then
     history -s "${FUNCNAME[0]} ${*}"
   fi
 
   _kube_print_and_run() {
     printf -- "%b%s%b\n" "${YELLOW}" "${*}" "${RESET}" 1>&2
 
-    if [[ -n ${BASH_VERSION} ]]; then
+    if [[ -n ${BASH_VERSION:-} ]]; then
       history -s "${*}"
-    elif [[ -n ${ZSH_VERSION} ]]; then
+    elif [[ -n ${ZSH_VERSION:-} ]]; then
       print -s "${*}"
     fi
 
@@ -73,7 +73,7 @@ kube() {
     local RESOURCE="${1-}"
     local QUERY="${2-}"
 
-    if [[ -n ${RESOURCE} ]] && [[ -z ${QUERY} ]]; then
+    if [[ -n ${RESOURCE:-} ]] && [[ -z ${QUERY:-} ]]; then
       QUERY="${RESOURCE}"
       RESOURCE=""
     fi
@@ -93,7 +93,7 @@ kube() {
         RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | fzf --prompt="Namespace: ")"
       fi
 
-      if [[ -n ${RESOURCE_NAMESPACE} ]]; then
+      if [[ -n ${RESOURCE_NAMESPACE:-} ]]; then
         RESOURCE_NAMESPACE_QUERY="--namespace=${RESOURCE_NAMESPACE}"
       fi
     fi
@@ -105,7 +105,7 @@ kube() {
     RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
     RESOURCE_NAME="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $3 }')"
 
-    if [[ -n ${RESOURCE_NAMESPACE} ]]; then
+    if [[ -n ${RESOURCE_NAMESPACE:-} ]]; then
       RESOURCE_NAMESPACE="--namespace=${RESOURCE_NAMESPACE}"
     fi
   }
@@ -183,13 +183,13 @@ kube() {
     local CONTEXT
     CONTEXT="$(yq eval '.contexts[].name' "${KUBECONFIG:-${HOME}/.kube/config}" | fzf --select-1 --query="${1-}")"
 
-    if [[ -n ${CONTEXT-} ]]; then
+    if [[ -n ${CONTEXT:-} ]]; then
       if [[ "$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")" == "${CONTEXT}" ]]; then
         _kube_info "Already on context '${CONTEXT}'"
         return
       fi
 
-      if [[ -n ${TMUX-} ]]; then
+      if [[ -n ${TMUX:-} ]]; then
         local CONTEXT_FILENAME
         CONTEXT_FILENAME="$(printf '%s' "${CONTEXT}" | md5sum | cut -d' ' -f1)"
 
@@ -209,7 +209,7 @@ kube() {
   "desc" | "describe")
     _kube_resources "${@}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       _kube_print_and_run "${KUBECTL_COMMAND[@]}" describe "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}"
     fi
     ;;
@@ -222,7 +222,7 @@ kube() {
 
     _kube_resources "${@}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       local QUERY="."
       if [[ ${RESOURCE_TYPE} =~ secrets? ]]; then
         QUERY=".data[] |= @base64d"
@@ -244,27 +244,27 @@ kube() {
   "edit")
     _kube_resources "${@}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       _kube_print_and_run "${KUBECTL_COMMAND[@]}" edit "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}"
     fi
     ;;
 
   "env")
     local FIRST=""
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+    if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
       FIRST="${1}"
       shift
     fi
 
     local SECOND=""
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+    if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
       SECOND="${1}"
       shift
     fi
 
     _kube_resources "${FIRST}" "${SECOND}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
         _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" env "${RESOURCE_TYPE}" "${RESOURCE_NAME}" "${@}"
       else
@@ -276,20 +276,20 @@ kube() {
 
   "exec")
     local FIRST=""
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+    if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
       FIRST="${1}"
       shift
     fi
 
     local SECOND=""
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^[-/] ]]; then
+    if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^[-/] ]]; then
       SECOND="${1}"
       shift
     fi
 
     _kube_resources "${FIRST}" "${SECOND}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       local CONTAINER_SELECTION
 
       if [[ ${RESOURCE_TYPE} =~ pods? ]]; then
@@ -310,7 +310,7 @@ kube() {
   "forward")
     _kube_resources "services" "${1:- }"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       shift 1
 
       local LOCAL_PORT="${1:-}"
@@ -336,7 +336,7 @@ kube() {
         KUBE_PORT="$("${KUBECTL_COMMAND[@]}" get "${RESOURCE_TYPE}" "${RESOURCE_NAMESPACE}" "${RESOURCE_NAME}" --output=yaml | yq eval '.spec.ports[] | .targetPort' | fzf --select-1 --prompt="Port: ")"
       fi
 
-      if [[ -n ${KUBE_PORT-} ]]; then
+      if [[ -n ${KUBE_PORT:-} ]]; then
         if command -v kmux >/dev/null 2>&1; then
           _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" port-forward "${RESOURCE_TYPE}" "${RESOURCE_NAME}" "${LOCAL_PORT}:${KUBE_PORT}" "${@}"
         else
@@ -350,7 +350,7 @@ kube() {
   "image" | "images")
     _kube_resources "${@}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
         _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" image "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
       else
@@ -362,7 +362,7 @@ kube() {
   "info")
     _kube_resources "${@}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       local QUERY="."
       if [[ ${RESOURCE_TYPE} =~ secrets? ]]; then
         QUERY=".data[] |= @base64d"
@@ -374,24 +374,24 @@ kube() {
 
   "log" | "logs")
     local FIRST=""
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+    if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
       FIRST="${1}"
       shift
     fi
 
     local SECOND=""
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+    if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
       SECOND="${1}"
       shift
     fi
 
     _kube_resources "${FIRST}" "${SECOND}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       local PODS_LABELS
       PODS_LABELS="$(_kube_pod_labels)"
 
-      if [[ -n ${PODS_LABELS} ]]; then
+      if [[ -n ${PODS_LABELS:-} ]]; then
         local KUBE_CONTAINER
         KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get pods "${RESOURCE_NAMESPACE}" --selector="${PODS_LABELS}" --output=yaml | yq eval '[.items[].spec.containers[].name] + [.items[].spec.initContainers[].name] | .[]' | sort -u | fzf --select-1 --prompt="Container: ")"
         if [[ -n ${KUBE_CONTAINER:-} ]]; then
@@ -416,7 +416,7 @@ kube() {
 
   "pods-on-node" | "pon")
     local FIRST=""
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+    if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
       FIRST="${1}"
       shift
     fi
@@ -431,7 +431,7 @@ kube() {
   "restart")
     _kube_resources "${@}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
         _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" restart "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
       else
@@ -448,7 +448,7 @@ kube() {
   "rollback")
     _kube_resources "${@}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       if [[ ${#KUBECTL_CONTEXTS[@]} -eq 0 ]]; then
         _kube_print_and_run kubectl rollout undo "${RESOURCE_NAMESPACE}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}"
       else
@@ -462,13 +462,13 @@ kube() {
 
   "scale")
     local FIRST=""
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+    if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
       FIRST="${1}"
       shift
     fi
 
     local SECOND=""
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+    if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
       SECOND="${1}"
       shift
     fi
@@ -477,14 +477,14 @@ kube() {
     if [[ ${SECOND:-} =~ [0-9]+(\.[0-9])? ]]; then
       KUBE_SCALE_FACTOR="${SECOND}"
       SECOND=""
-    elif [[ -n ${1-} ]]; then
+    elif [[ -n ${1:-} ]]; then
       KUBE_SCALE_FACTOR="${1:-1}"
       shift
     fi
 
     _kube_resources "${FIRST}" "${SECOND}"
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       if command -v kmux >/dev/null 2>&1; then
         _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" "${RESOURCE_NAMESPACE}" scale "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --factor "${KUBE_SCALE_FACTOR}" "${@}"
       else
@@ -510,20 +510,20 @@ kube() {
     local EXTRA_ARGS=()
     local TOP_SUB_COMMAND="pod"
 
-    if [[ -n ${1-} ]] && [[ ${1-} =~ ^(pod|node)s?$ ]]; then
+    if [[ -n ${1:-} ]] && [[ ${1-} =~ ^(pod|node)s?$ ]]; then
       TOP_SUB_COMMAND="${1}"
       shift
     fi
 
     if [[ ${TOP_SUB_COMMAND} =~ ^pods? ]]; then
       local FIRST=""
-      if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
         FIRST="${1}"
         shift
       fi
 
       local SECOND=""
-      if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
         SECOND="${1}"
         shift
       fi
@@ -531,11 +531,11 @@ kube() {
       if [[ -n ${FIRST:-} ]]; then
         _kube_resources "${FIRST}" "${SECOND}"
 
-        if [[ -n ${RESOURCE_NAME-} ]]; then
+        if [[ -n ${RESOURCE_NAME:-} ]]; then
           local PODS_LABELS
           PODS_LABELS="$(_kube_pod_labels)"
 
-          if [[ -n ${PODS_LABELS-} ]]; then
+          if [[ -n ${PODS_LABELS:-} ]]; then
             EXTRA_ARGS+=("--selector=${PODS_LABELS}" "${RESOURCE_NAMESPACE}")
           fi
         fi
@@ -552,13 +552,13 @@ kube() {
     ;;
 
   "watch")
-    if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+    if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
       local FIRST=""
       FIRST="${1}"
       shift
 
       local SECOND=""
-      if [[ -n ${1-} ]] && ! [[ ${1-} =~ ^- ]]; then
+      if [[ -n ${1:-} ]] && ! [[ ${1-} =~ ^- ]]; then
         SECOND="${1}"
         shift
       fi
@@ -568,11 +568,11 @@ kube() {
 
     local EXTRA_ARGS=()
 
-    if [[ -n ${RESOURCE_NAME-} ]]; then
+    if [[ -n ${RESOURCE_NAME:-} ]]; then
       local PODS_LABELS
       PODS_LABELS="$(_kube_pod_labels)"
 
-      if [[ -n ${PODS_LABELS-} ]]; then
+      if [[ -n ${PODS_LABELS:-} ]]; then
         EXTRA_ARGS+=("--selector=${PODS_LABELS}" "${RESOURCE_NAMESPACE}")
       fi
     else
@@ -580,7 +580,7 @@ kube() {
         RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | fzf --prompt="Namespace: ")"
       fi
 
-      if [[ -n ${RESOURCE_NAMESPACE-} ]]; then
+      if [[ -n ${RESOURCE_NAMESPACE:-} ]]; then
         EXTRA_ARGS+=("--namespace=${RESOURCE_NAMESPACE}")
       fi
     fi

@@ -32,7 +32,7 @@ sublime_add_project() {
   local projectName
   projectName="$(basename "${currentDir}")"
 
-  if [[ -n ${NAME_PREFIX} ]]; then
+  if [[ -n ${NAME_PREFIX:-} ]]; then
     projectName="${NAME_PREFIX}_${projectName}"
   fi
 

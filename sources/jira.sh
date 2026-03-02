@@ -122,7 +122,7 @@ _jira() {
         }
       }')"
 
-    if [[ -n ${JIRA_USER-} ]]; then
+    if [[ -n ${JIRA_USER:-} ]]; then
       JIRA_CREATE_ISSUE_PAYLOAD="$(_jira_append_create "$(jq --null-input --arg user "${JIRA_USER}" '{fields: { assignee: {id: $user} } }')")"
     fi
 
@@ -164,7 +164,7 @@ _jira() {
       local JIRA_ISSUE_CREATION
       JIRA_ISSUE_CREATION="$(_jira_request "/rest/api/3/issue" --request "POST" --header "Content-Type: application/json" --data "${JIRA_CREATE_ISSUE_PAYLOAD}")"
 
-      if [[ -n ${JIRA_ISSUE_CREATION} ]]; then
+      if [[ -n ${JIRA_ISSUE_CREATION:-} ]]; then
         local JIRA_ISSUE
         JIRA_ISSUE="$(printf -- "%s" "${JIRA_ISSUE_CREATION}" | jq --raw-output '.key')"
 
@@ -282,13 +282,13 @@ _jira_branch() {
 
   local BRANCH_PREFIX
   _jira_read "BRANCH_PREFIX" "${JIRA_BRANCH_PREFIX:-}"
-  if [[ -n ${BRANCH_PREFIX} ]]; then
+  if [[ -n ${BRANCH_PREFIX:-} ]]; then
     JIRA_BRANCH_NAME="${BRANCH_PREFIX}${JIRA_BRANCH_NAME}"
   fi
 
   local BRANCH_SUFFIX
   _jira_read "BRANCH_SUFFIX" "${JIRA_BRANCH_SUFFIX:-}"
-  if [[ -n ${BRANCH_SUFFIX} ]]; then
+  if [[ -n ${BRANCH_SUFFIX:-} ]]; then
     JIRA_BRANCH_NAME="${JIRA_BRANCH_NAME}${BRANCH_SUFFIX}"
   fi
 
@@ -367,7 +367,7 @@ _jira_read() {
   shift || true
 
   local VAR_DEFAULT_DISPLAY=""
-  if [[ -n ${VAR_DEFAULT} ]]; then
+  if [[ -n ${VAR_DEFAULT:-} ]]; then
     VAR_DEFAULT_DISPLAY=" [${VAR_DEFAULT}]"
   fi
 
@@ -385,9 +385,9 @@ _jira_read_input() {
   local VAR_NAME="${1}"
   shift
 
-  if [[ -n ${BASH_VERSION} ]]; then
+  if [[ -n ${BASH_VERSION:-} ]]; then
     read -r -p "${VAR_PROMPT}" "${VAR_NAME}" </dev/tty
-  elif [[ -n ${ZSH_VERSION} ]]; then
+  elif [[ -n ${ZSH_VERSION:-} ]]; then
     read -r "${VAR_NAME}?${VAR_PROMPT}" </dev/tty
   else
     return 1
@@ -489,7 +489,7 @@ _jira_github_pull_request() {
         '{title: $title, base: $base, head: $head, body: $body, draft: true}'
     )")"
 
-  if [[ -n ${GITHUB_OUTPUT} ]]; then
+  if [[ -n ${GITHUB_OUTPUT:-} ]]; then
     open "$(printf -- "%s" "${GITHUB_OUTPUT}" | jq --raw-output '.html_url')"
   fi
 }
@@ -589,7 +589,7 @@ _jira_issue() {
     JIRA_JQL+=" AND reporter = currentUser()"
   fi
 
-  if [[ -n ${2-} ]]; then
+  if [[ -n ${2:-} ]]; then
     if [[ ${2} =~ ([A-Z0-9]+[-_][0-9]+) ]]; then
       JIRA_JQL+=" AND id = '${BASH_REMATCH[1]}'"
     else
@@ -602,7 +602,7 @@ _jira_issue() {
   local JIRA_OUTPUT
   JIRA_OUTPUT="$(_jira_request "/rest/api/3/search/jql" --get --data-urlencode "maxResults=200" --data-urlencode "fields=id,key,summary" --data-urlencode "jql=${JIRA_JQL}")"
 
-  if [[ -z ${JIRA_OUTPUT} ]]; then
+  if [[ -z ${JIRA_OUTPUT:-} ]]; then
     return
   fi
 
@@ -620,7 +620,7 @@ _jira_epic() {
   local JIRA_OUTPUT
   JIRA_OUTPUT="$(_jira_request "/rest/api/3/search/jql" --get --data-urlencode "maxResults=50" --data-urlencode "jql=${JIRA_JQL}")"
 
-  if [[ -z ${JIRA_OUTPUT} ]]; then
+  if [[ -z ${JIRA_OUTPUT:-} ]]; then
     return
   fi
 

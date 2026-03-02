@@ -2,7 +2,7 @@
 
 AWS_CLI_BINARY="$(which -a aws | grep bin)"
 
-if [[ -n ${AWS_CLI_BINARY} ]]; then
+if [[ -n ${AWS_CLI_BINARY:-} ]]; then
   declare -g AWS_EXEC_ACCOUNT
 
   aws_exec() {
@@ -15,7 +15,7 @@ if [[ -n ${AWS_CLI_BINARY} ]]; then
       AWS_EXEC_ACCOUNT="$(printf -- "%s\n" "${AWS_ACCOUNTS[@]}" | fzf --height=20 --ansi --reverse --select-1 --prompt "Profile: ")"
     fi
 
-    if [[ -n ${AWS_EXEC_ACCOUNT} ]]; then
+    if [[ -n ${AWS_EXEC_ACCOUNT:-} ]]; then
       var_print_and_run aws-vault exec "${AWS_EXEC_ACCOUNT}" -- "${AWS_CLI_BINARY}" "${@}"
     fi
   }

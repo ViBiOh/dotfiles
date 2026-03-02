@@ -24,7 +24,7 @@ if command -v git >/dev/null 2>&1; then
     local OUTPUT
     OUTPUT="$(grip | awk '{print $1}')"
 
-    if [[ -n ${OUTPUT} ]]; then
+    if [[ -n ${OUTPUT:-} ]]; then
       git webcommit "${OUTPUT}"
     fi
 

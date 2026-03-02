@@ -88,7 +88,7 @@ browse_actions() {
     local INSTALL_NAME
     INSTALL_NAME="$(printf -- "%s" "${BASENAME_FILE%.sh}" | tr "[:lower:]" "[:upper:]")"
 
-    if [[ -n ${FILE_LIMIT} ]] && [[ ${INSTALL_NAME} != "${FILE_LIMIT}" ]]; then
+    if [[ -n ${FILE_LIMIT:-} ]] && [[ ${INSTALL_NAME} != "${FILE_LIMIT}" ]]; then
       continue
     fi
 

@@ -43,7 +43,7 @@ if command -v fzf >/dev/null 2>&1; then
       var_read MODULE_VERSION "${2:-latest}"
     fi
 
-    if [[ -n ${MODULE_VERSION} ]]; then
+    if [[ -n ${MODULE_VERSION:-} ]]; then
       printf -- "MODULE_VERSION=%s\n" "${MODULE_VERSION}"
       MODULE_VERSION="@${MODULE_VERSION}"
 

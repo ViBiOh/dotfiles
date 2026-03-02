@@ -15,7 +15,7 @@ script_dir() {
 }
 
 clean() {
-  if [[ -n ${GOPATH-} ]]; then
+  if [[ -n ${GOPATH:-} ]]; then
     sudo rm -rf "${GOPATH}"
     mkdir -p "${GOPATH}"
   fi

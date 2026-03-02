@@ -14,7 +14,7 @@ if [[ -n ${SSH_CONNECTION:-} ]]; then
   PS1+="@${RED}\h${RESET}"
 fi
 
-if [[ -n ${PS1} ]]; then
+if [[ -n ${PS1:-} ]]; then
   PS1+=" "
 fi
 
@@ -81,7 +81,7 @@ __git_ps1() {
       _GIT_STATUS_FILES+="%"
     fi
 
-    if [[ -n ${_GIT_STATUS_FILES} ]]; then
+    if [[ -n ${_GIT_STATUS_FILES:-} ]]; then
       _GIT_STATUS_FILES="|${_GIT_STATUS_FILES}"
     fi
 
