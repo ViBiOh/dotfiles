@@ -20,12 +20,4 @@ if command -v brew >/dev/null 2>&1; then
   add_to_path "${BREW_PREFIX}/opt/openssl/bin"
   add_to_path "${BREW_PREFIX}/opt/ruby/bin"
   add_to_path "${BREW_PREFIX}/opt/libpq/bin"
-
-  brew_specific_version() {
-    # cf. https://github.com/orgs/Homebrew/discussions/155
-
-    brew tap-new "$(whoami)/${1}"
-    brew extract --version "${2}" "${1}" "$(whoami)/${1}"
-    brew install "${1}/${2}"
-  }
 fi
