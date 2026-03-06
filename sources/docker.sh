@@ -8,6 +8,8 @@ if command -v container >/dev/null 2>&1; then
     container volume list --quiet | xargs container volume delete
 
     container system stop
+
+    rm -rf "${HOME}/Library/Application Support/com.apple.container"
   }
 
   container_override_dns() {
