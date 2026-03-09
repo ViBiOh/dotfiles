@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-if [[ -e "${HOME}/.fzf.bash" ]]; then
-  source "${HOME}/.fzf.bash"
-fi
-
 if ! command -v fzf >/dev/null 2>&1; then
   return
+fi
+
+if [[ -e "${HOME}/.fzf.bash" ]]; then
+  source "${HOME}/.fzf.bash"
+else
+  eval "$(fzf --bash)"
 fi
 
 export FZF_DEFAULT_OPTS="--height=20 --ansi --reverse"
