@@ -1,3 +1,4 @@
+import json
 import subprocess
 import threading
 
@@ -143,6 +144,18 @@ class CompactYaml(command):
                 ["yq", "--prettyPrint", "--no-colors"],
             ],
         )
+
+
+class UnescapeJson(command):
+    def format(self, view, file, region, working_dir):
+        value = view.substr(region)
+
+        try:
+            return json.loads('"' + value + '"')
+        except (json.JSONDecodeError, TypeError) as error:
+            print(error)
+
+        return value
 
 
 class SublimeFormatOnSave(sublime_plugin.EventListener):

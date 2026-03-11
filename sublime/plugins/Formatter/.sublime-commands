@@ -8,6 +8,10 @@
     "command": "compact_json"
   },
   {
+    "caption": "Formatter: Unescape JSON",
+    "command": "unescape_json"
+  },
+  {
     "caption": "Formatter: Compact YAML",
     "command": "compact_yaml"
   },
