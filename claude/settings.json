@@ -20,6 +20,7 @@
       "Bash(bzl build*)",
       "Bash(bzl run*)",
       "Bash(bzl test*)",
+      "Bash(BZL_*)",
       "Bash(gh*)",
       "Bash(git add*)",
       "Bash(git checkout*)",

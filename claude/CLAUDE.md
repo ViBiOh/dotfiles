@@ -35,6 +35,18 @@ I primarily use Claude Code for:
 - Report test results before considering work complete
 - This helps catch issues early before I commit changes
 
+## Build & Run
+
+**CRITICAL**: Never use Bazel commands (bazel build, bazel test, bazel run, etc.)
+
+- Always use the native tooling equivalent instead
+- Go: `go build`, `go test`, `go run`
+- Java/Kotlin: `gradle`, `maven`
+- Python: `pip`, `pytest`
+- JavaScript/TypeScript: `npm`, `yarn`, `pnpm`
+- Rust: `cargo build`, `cargo test`
+- If unsure of the native equivalent, ask before running anything
+
 ## Code Quality Preferences
 
 - Avoid over-engineering - keep solutions simple and focused
