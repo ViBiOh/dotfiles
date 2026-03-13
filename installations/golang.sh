@@ -31,7 +31,7 @@ clean() {
 }
 
 install() {
-  packages_install "go" "golangci-lint" "graphviz"
+  packages_install "go" "golangci-lint" "graphviz" "go-size-analyzer"
 
   source "$(script_dir)/../sources/_golang.sh"
   mkdir -p "${GOPATH}"
