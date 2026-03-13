@@ -15,6 +15,8 @@ shopt -s cdspell
 
 # history configuration
 export HISTCONTROL=ignoreboth:erasedups
+export HISTTIMEFORMAT="%y-%m%-d %T "
+export HISTIGNORE="ls:ll:cd:pwd:bg:fg:history"
 export LESSHISTFILE=/dev/null
 
 # When the shell exits, append to the history file instead of overwriting it
