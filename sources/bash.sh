@@ -15,7 +15,7 @@ shopt -s cdspell
 
 # history configuration
 export HISTCONTROL=ignoreboth:erasedups
-export HISTTIMEFORMAT="%y-%m%-d %T "
+export HISTTIMEFORMAT="%y-%m-%d %T "
 export HISTIGNORE="ls:ll:cd:pwd:bg:fg:history"
 export LESSHISTFILE=/dev/null
 
