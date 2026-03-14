@@ -32,6 +32,7 @@ install() {
 
   ssh-keyscan "github.com" >"${HOME}/.ssh/known_hosts"
   ssh-keyscan "gitlab.com" >>"${HOME}/.ssh/known_hosts"
+  ssh-keyscan "codeberg.org" >>"${HOME}/.ssh/known_hosts"
 
   find "${HOME}/.ssh/" -name "config_*" -type f -exec cat {} + >>"${HOME}/.ssh/config"
   find "${HOME}/.ssh/" -name "known_hosts_*" -type f -exec cat {} + >>"${HOME}/.ssh/known_hosts"
