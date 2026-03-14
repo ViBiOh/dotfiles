@@ -11,7 +11,7 @@ fi
 
 # Show hostname if SSH
 if [[ -n ${SSH_CONNECTION:-} ]]; then
-  if [[ -z ${PS!:-} ]]; then
+  if [[ -z ${PS1:-} ]]; then
     PS1+="@"
   fi
 
