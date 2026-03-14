@@ -18,6 +18,9 @@ install() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     EXTRA_CONFIG="
   UseKeyChain no"
+
+    echo "Include /etc/ssh/ssh_config.d/*
+" | sudo tee "/etc/ssh/ssh_config" >/dev/null
   fi
 
   mkdir -p "${HOME}/.ssh"
