@@ -16,7 +16,8 @@
       "Bash(npm run test*)",
       "Bash(npm test*)",
       "Bash(pytest*)",
-      "Bash(tee*)"
+      "Bash(tee*)",
+      "Bash(wc*)"
     ],
     "deny": [
       "Bash(bzl build*)",
@@ -45,7 +46,7 @@
   "model": "opus[1m]",
   "statusLine": {
     "type": "command",
-    "command": "input=$(cat); cost=$(printf \"%s\" \"$input\" | jq -r '.cost.total_cost_usd // empty'); used=$(printf \"%s\" \"$input\" | jq -r '.context_window.used_percentage // empty'); cwd=$(printf \"%s\" \"$input\" | jq -r '.cwd // empty'); cost_str=$([ -n \"$cost\" ] && printf \"\\e[34m$%.2f\\e[0m\" \"$cost\" || echo \"\"); ctx_str=$([ -n \"$used\" ] && printf \"\\e[33m%.0f%%\\e[0m\" \"$used\" || echo \"\"); cwd_str=$([ -n \"$cwd\" ] && printf \"\\e[32m%s\\e[0m\" \"~${cwd#$HOME}\" || echo \"\"); parts=\"\"; [ -n \"$cost_str\" ] && parts=\"$cost_str\"; [ -n \"$ctx_str\" ] && parts=$([ -n \"$parts\" ] && printf \"%s | %s\" \"$parts\" \"$ctx_str\" || printf \"%s\" \"$ctx_str\"); [ -n \"$cwd_str\" ] && parts=$([ -n \"$parts\" ] && printf \"%s | %s\" \"$parts\" \"$cwd_str\" || printf \"%s\" \"$cwd_str\"); printf \"%s\" \"$parts\""
+    "command": "input=$(cat); cost=$(printf \"%s\" \"$input\" | jq -r '.cost.total_cost_usd // empty'); used=$(printf \"%s\" \"$input\" | jq -r '.context_window.used_percentage // empty'); cwd=$(printf \"%s\" \"$input\" | jq -r '.cwd // empty'); cost_str=$([ -n \"$cost\" ] && printf \"\\e[34m$%.2f\\e[0m\" \"$cost\" || echo \"\"); ctx_str=$([ -n \"$used\" ] && printf \"\\e[33m%.0f%%\\e[0m\" \"$used\" || echo \"\"); cwd_str=$(if [ -n \"$cwd\" ]; then rel=\"~${cwd#$HOME}\"; trimmed=\"${rel#~/}\"; if [ \"$trimmed\" = \"$rel\" ]; then printf \"\\e[32m%s\\e[0m\" \"$rel\"; else IFS='/' read -ra parts <<< \"$trimmed\"; n=${#parts[@]}; if [ \"$n\" -le 3 ]; then printf \"\\e[32m~/%s\\e[0m\" \"$trimmed\"; else last3=\"${parts[$n-3]}/${parts[$n-2]}/${parts[$n-1]}\"; printf \"\\e[32m~\\/...\\/%s\\e[0m\" \"$last3\"; fi; fi; else echo \"\"; fi); parts=\"\"; [ -n \"$cost_str\" ] && parts=\"$cost_str\"; [ -n \"$ctx_str\" ] && parts=$([ -n \"$parts\" ] && printf \"%s | %s\" \"$parts\" \"$ctx_str\" || printf \"%s\" \"$ctx_str\"); [ -n \"$cwd_str\" ] && parts=$([ -n \"$parts\" ] && printf \"%s | %s\" \"$parts\" \"$cwd_str\" || printf \"%s\" \"$cwd_str\"); printf \"%s\" \"$parts\""
   },
   "spinnerVerbs": {
     "mode": "replace",
