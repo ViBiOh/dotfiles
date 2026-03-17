@@ -45,7 +45,7 @@
   "model": "opus[1m]",
   "statusLine": {
     "type": "command",
-    "command": "input=$(cat); cost=$(printf \"%s\" \"$input\" | jq -r '.cost.total_cost_usd // empty'); used=$(printf \"%s\" \"$input\" | jq -r '.context_window.used_percentage // empty'); cwd=$(printf \"%s\" \"$input\" | jq -r '.cwd // empty'); cost_str=$([ -n \"$cost\" ] && printf \"\\e[34m$%.2f\\e[0m\" \"$cost\" || echo \"\"); ctx_str=$([ -n \"$used\" ] && printf \"\\e[33m%.0f%%\\e[0m\" \"$used\" || echo \"\"); parts=\"\"; [ -n \"$cwd\" ] && parts=$(printf \"\\e[32m%s\\e[0m\" \"~${cwd#$HOME}\"); [ -n \"$cost_str\" ] && parts=$([ -n \"$parts\" ] && printf \"%s | %s\" \"$parts\" \"$cost_str\" || printf \"%s\" \"$cost_str\"); [ -n \"$ctx_str\" ] && parts=$([ -n \"$parts\" ] && printf \"%s | %s\" \"$parts\" \"$ctx_str\" || printf \"%s\" \"$ctx_str\"); printf \"%s\" \"$parts\""
+    "command": "input=$(cat); cost=$(printf \"%s\" \"$input\" | jq -r '.cost.total_cost_usd // empty'); used=$(printf \"%s\" \"$input\" | jq -r '.context_window.used_percentage // empty'); cwd=$(printf \"%s\" \"$input\" | jq -r '.cwd // empty'); cost_str=$([ -n \"$cost\" ] && printf \"\\e[34m$%.2f\\e[0m\" \"$cost\" || echo \"\"); ctx_str=$([ -n \"$used\" ] && printf \"\\e[33m%.0f%%\\e[0m\" \"$used\" || echo \"\"); cwd_str=$([ -n \"$cwd\" ] && printf \"\\e[32m%s\\e[0m\" \"~${cwd#$HOME}\" || echo \"\"); parts=\"\"; [ -n \"$cost_str\" ] && parts=\"$cost_str\"; [ -n \"$ctx_str\" ] && parts=$([ -n \"$parts\" ] && printf \"%s | %s\" \"$parts\" \"$ctx_str\" || printf \"%s\" \"$ctx_str\"); [ -n \"$cwd_str\" ] && parts=$([ -n \"$parts\" ] && printf \"%s | %s\" \"$parts\" \"$cwd_str\" || printf \"%s\" \"$cwd_str\"); printf \"%s\" \"$parts\""
   },
   "spinnerVerbs": {
     "mode": "replace",
