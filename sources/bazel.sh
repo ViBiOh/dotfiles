@@ -8,3 +8,30 @@ bzl_run() {
     var_print_and_run bzl run "${BZL_TARGET}"
   fi
 }
+
+gazelle() {
+  local CURRENT_DIR
+  CURRENT_DIR="$(readlink -f "$(pwd)")"
+
+  local GIT_ROOT_PATH
+  GIT_ROOT_PATH="$(git rev-parse --show-toplevel)"
+
+  local GAZELLE_TARGET="${CURRENT_DIR#"${GIT_ROOT_PATH}"}"
+
+  var_print_and_run bzl run --ui_event_filters=-info,-stdout,-stderr //:gazelle -- fix "${GAZELLE_TARGET#/}"
+}
+
+bazel_clean() {
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    rm -rf "${HOME}/Library/Caches/bazel"
+    rm -rf "${HOME}/Library/Caches/bazelisk"
+
+    sudo rm -rf "/private/var/tmp/"
+
+    sudo mkdir -p "/var/tmp/_bazel_$(whoami)"
+    sudo chown "$(whoami)" "/var/tmp/_bazel_$(whoami)"
+
+    sudo mkdir -p "/var/tmp/zig-cache"
+    sudo chown "$(whoami)" "/var/tmp/zig-cache"
+  fi
+}
