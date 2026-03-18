@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if ! command -v bzl >/dev/null 2>&1; then
+  return
+fi
+
 bzl_run() {
   local BZL_TARGET
   BZL_TARGET="$(bzl query ... 2>/dev/null | fzf --select-1 --query="${1:-}")"

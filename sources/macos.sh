@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if ! [[ ${OSTYPE} =~ ^darwin ]]; then
+  return
+fi
+
 fix_spotlight() {
   sudo mdutil -a -d -i off
   sudo mdutil -X "/"

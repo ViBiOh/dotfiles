@@ -3,7 +3,11 @@
 GPG_TTY="$(tty)"
 export GPG_TTY
 
-if [[ -z ${SSH_AUTH_SOCK:-} ]] && command -v gpgconf >/dev/null 2>&1; then
+if ! command -v gpgconf >/dev/null 2>&1; then
+  return
+fi
+
+if [[ -z ${SSH_AUTH_SOCK:-} ]]; then
   SSH_AUTH_SOCK="$(gpgconf --list-dirs "agent-ssh-socket")"
   export SSH_AUTH_SOCK
 fi

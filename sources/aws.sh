@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if ! command -v aws >/dev/null 2>&1; then
+  return
+fi
+
 AWS_CLI_BINARY="$(which -a aws | grep bin)"
 
 if [[ -n ${AWS_CLI_BINARY:-} ]]; then

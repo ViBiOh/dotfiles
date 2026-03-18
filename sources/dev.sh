@@ -282,68 +282,6 @@ rainbow() {
   }'
 }
 
-order_66() {
-  var_confirm "Erase all data"
-
-  sudo --reset-timestamp echo "Erasing..."
-
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    sudo networksetup -setdnsservers "Wi-Fi" Empty
-    sudo networksetup -setsearchdomains "Wi-Fi" Empty
-
-    for interface in "USB 10/100/1000 LAN" "Thunderbolt Ethernet Slot 0" "Thunderbolt Ethernet Slot 1"; do
-      if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i "${interface}") -gt 0 ]]; then
-        sudo networksetup -setdnsservers "${interface}" Empty
-        sudo networksetup -setsearchdomains "${interface}" Empty
-      fi
-    done
-
-    if [[ "$(type -t "notes_erase")" == "function" ]]; then
-      notes_erase
-    fi
-  fi
-
-  _order_66_script_dir() {
-    local FILE_SOURCE="${BASH_SOURCE[0]}"
-
-    if [[ -L ${FILE_SOURCE} ]]; then
-      dirname "$(readlink "${FILE_SOURCE}")"
-    else
-      (
-        cd "$(dirname "${FILE_SOURCE}")" && pwd
-      )
-    fi
-  }
-
-  "$(_order_66_script_dir)/../init.sh" -c
-
-  ssh_agent_stop
-  gpg_agent_stop
-
-  sudo rm -rf \
-    "${HOME}/.ssh" \
-    "${HOME}/.gnupg" \
-    "${HOME}/.local" \
-    "${HOME}/.localrc" \
-    "${HOME}/.config" \
-    "${HOME}/.bash_history" \
-    "${HOME}/.bash_profile" \
-    "${PASSWORD_STORE_DIR:-${HOME}/.password-store}" \
-    "${HOME}/code" \
-    "${HOME}/opt" \
-    "${HOME}/workspace" \
-    "${HOME}/Documents" \
-    "${HOME}/Library/Application Support/Sublime Text/Local/*" \
-    "${HOME}/Library/Application Support/Sublime Merge/Local/*"
-
-  # Clean broken symlinks in home directory
-  find "${HOME}" -maxdepth 1 -type l ! -exec test -e {} \; -exec rm {} \;
-
-  if [[ -e "/opt/k3s/k3s-clean" ]]; then
-    /opt/k3s/k3s-clean
-  fi
-}
-
 if command -v vegeta >/dev/null 2>&1; then
   loadtest() {
     if [[ ${#} -lt 1 ]]; then

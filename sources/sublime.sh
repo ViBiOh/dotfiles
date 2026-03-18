@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if ! command -v subl >/dev/null 2>&1; then
+  return
+fi
+
 script_dir() {
   local FILE_SOURCE="${BASH_SOURCE[0]}"
 
