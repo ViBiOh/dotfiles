@@ -6,8 +6,4 @@ install() {
   if package_exists "alacritty"; then
     packages_install_desktop "alacritty"
   fi
-
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    ln -f -s "/Applications/Alacritty.app/Contents/MacOS/alacritty" "${HOME}/opt/bin/alacritty"
-  fi
 }
