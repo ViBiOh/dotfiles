@@ -78,11 +78,11 @@ __git_ps1() {
     fi
 
     if [[ $((_GIT_LOCAL_CHANGE & 8)) -ne 0 ]]; then
-      _GIT_STATUS_FILES+="$"
+      _GIT_STATUS_FILES+="%"
     fi
 
     if [[ $((_GIT_LOCAL_CHANGE & 16)) -ne 0 ]]; then
-      _GIT_STATUS_FILES+="%"
+      _GIT_STATUS_FILES+="$"
     fi
 
     if [[ -n ${_GIT_STATUS_FILES:-} ]]; then
