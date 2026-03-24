@@ -4,6 +4,10 @@ jira() {
   _jira "${JIRA_DOMAIN}" "Basic $(pass_get "${JIRA_PASS}" "basic")" "${@}"
 }
 
+_jira_generate_basic() {
+  printf "%s:%s" "$(pass_get "${JIRA_PASS}" "username")" "$(pass_get "${JIRA_PASS}" "password")" | base64 -w 0
+}
+
 _jira() {
   if [[ ${#} -lt 2 ]]; then
     _jira_help
