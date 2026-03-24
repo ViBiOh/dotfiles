@@ -29,11 +29,3 @@ install() {
 
   pip install "ansible" "passlib" "ansible-lint" "jmespath" "yamllint"
 }
-
-credentials() {
-  if ! command -v pass >/dev/null 2>&1 || ! [[ -d ${PASSWORD_STORE_DIR:-${HOME}/.password-store} ]]; then
-    return
-  fi
-
-  extract_secret "dev/ansible" ".ansible-vault-pass"
-}
