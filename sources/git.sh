@@ -1,8 +1,22 @@
 #!/usr/bin/env bash
 
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
 if ! command -v git >/dev/null 2>&1; then
   return
 fi
+
+source "$(script_dir)/../scripts/meta" && meta_init "git"
 
 if command -v delta >/dev/null 2>&1; then
   export GIT_PAGER='delta --dark'

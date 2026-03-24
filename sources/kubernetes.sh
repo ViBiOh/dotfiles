@@ -1,33 +1,49 @@
 #!/usr/bin/env bash
 
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
+if ! command -v kubectl >/dev/null 2>&1; then
+  return
+fi
+
+source "$(script_dir)/../scripts/meta" && meta_init "kubernetes"
+
 kube_ssh_tunnel() {
   ssh_forward_local 6443 6443 "${KUBERNETES_MASTER}"
 }
 
-if command -v kubectl >/dev/null 2>&1; then
-  if command -v yq >/dev/null 2>&1; then
-    __kube_ps1() {
-      # preserve exit status
-      local exit="${?}"
+if command -v yq >/dev/null 2>&1; then
+  __kube_ps1() {
+    # preserve exit status
+    local exit="${?}"
 
-      local CONFIG_FILE="${KUBECONFIG:-${HOME}/.kube/config}"
-      if ! [[ -e ${CONFIG_FILE} ]]; then
-        return "${exit}"
-      fi
-
-      local K8S_CONTEXT
-      K8S_CONTEXT="$(yq eval '.current-context as $context | .contexts[] | select(.name == $context) | .context.cluster + "/" + (.context.namespace // "default")' "${CONFIG_FILE}")"
-
-      if [[ -n ${K8S_CONTEXT:-} ]]; then
-        printf -- " 🐳 %s" "${K8S_CONTEXT}"
-      fi
-
+    local CONFIG_FILE="${KUBECONFIG:-${HOME}/.kube/config}"
+    if ! [[ -e ${CONFIG_FILE} ]]; then
       return "${exit}"
-    }
-  fi
+    fi
+
+    local K8S_CONTEXT
+    K8S_CONTEXT="$(yq eval '.current-context as $context | .contexts[] | select(.name == $context) | .context.cluster + "/" + (.context.namespace // "default")' "${CONFIG_FILE}")"
+
+    if [[ -n ${K8S_CONTEXT:-} ]]; then
+      printf -- " 🐳 %s" "${K8S_CONTEXT}"
+    fi
+
+    return "${exit}"
+  }
 fi
 
-if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
+if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 && command -v yq >/dev/null 2>&1 && command -v rg >/dev/null 2>&1; then
   helm_select_chart() {
     local CHART_REPOSITORY
     CHART_REPOSITORY="$(helm repo list --output json | jq --raw-output '.[].name' | fzf --select-1 --query="${1-}")"
@@ -99,44 +115,6 @@ if command -v helm >/dev/null 2>&1 && command -v delta >/dev/null 2>&1 && comman
     if var_confirm "Perform upgrade"; then
       var_print_and_run helm upgrade --namespace "${NAMESPACE}" "${NAME}" "${CHART}" --version "${VERSION}" "${@}"
     fi
-  }
-
-  helm_crds_manifests() {
-    local HELM_CHART
-    HELM_CHART="$(helm_select_chart "" "" "")"
-
-    local CHART
-    CHART="$(printf '%s' "${HELM_CHART}" | awk -F '@' '{ print $1 }')"
-    local VERSION
-    VERSION="$(printf '%s' "${HELM_CHART}" | awk -F '@' '{ print $2 }')"
-
-    if [[ -z ${CHART-} ]] || [[ -z ${VERSION-} ]]; then
-      return 1
-    fi
-
-    local CURRENT_DIR
-    CURRENT_DIR="$(pwd)"
-
-    (
-      local TEMP_FOLDER
-      TEMP_FOLDER="$(mktemp -d)"
-      cd "${TEMP_FOLDER}" || false
-
-      local CHART_BASENAME
-      CHART_BASENAME="$(basename "${CHART}")"
-
-      helm pull "${CHART}" --version "${VERSION}" --untar
-
-      if [[ -d "${CHART_BASENAME}/crds/" ]]; then
-        printf -- "%bCopying %b%s%b to current folder%b\n" "${BLUE}" "${YELLOW}" "$(find "${CHART_BASENAME}/crds" -type f -print0 | xargs -0 printf -- "%s, " | sed 's|, $||')" "${BLUE}" "${RESET}" 1>&2
-        cp "${CHART_BASENAME}/crds/"* "${CURRENT_DIR}/"
-      else
-        var_warning "no crds/ folder in this chart, searching for definition..."
-        rg -- "^kind: CustomResourceDefinition" "${CHART_BASENAME}/"
-      fi
-
-      rm -rf "${CHART_BASENAME}" "${TEMP_FOLDER}"
-    )
   }
 fi
 
