@@ -9,7 +9,7 @@ clean() {
 }
 
 install() {
-  packages_install "gnupg" "yubikey-personalization" "hopenpgp-tools" "ykman"
+  packages_install "gnupg" "hopenpgp-tools" "ykman"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install "pinentry-mac"
