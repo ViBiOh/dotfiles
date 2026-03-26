@@ -128,3 +128,6 @@
 [mergetool "smerge"]
 	cmd = smerge mergetool \"$BASE\" \"$LOCAL\" \"$REMOTE\" -o \"$MERGED\"
 	trustExitCode = true
+
+[url "ssh://git@github.com/FoorBar/"]
+	insteadOf = https://github.com/FoorBar/

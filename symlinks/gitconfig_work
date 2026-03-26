@@ -1,5 +1,2 @@
 [user]
 	email = vibioh@foobar.com
-
-[url "ssh://git@github.com/FoorBar/"]
-	insteadOf = https://github.com/FoorBar/
