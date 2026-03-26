@@ -98,7 +98,6 @@ forward-zone:
       sudo unbound-control-setup -d "${UNBOUND_CONF_FOLDER}"
     fi
 
-    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q reload || true
     sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop || true
 
     printf -- "Waiting 1 second before starting unbound...\n"
