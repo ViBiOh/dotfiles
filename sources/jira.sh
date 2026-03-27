@@ -190,6 +190,10 @@ _jira() {
 
     ;;
 
+  "list")
+    _jira_list "${scope}" "${1-}"
+    ;;
+
   "pr")
     if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
       _jira_error "not in a git directory"
@@ -441,6 +445,7 @@ _jira_help() {
   _jira_info "\nPossibles actions are                                  | args\n"
   _jira_info " - branch      Switch git repository branch to ticket  | <search text>?"
   _jira_info " - create      Create a ticket interactively           |"
+  _jira_info " - list        List assigned ticket"
   _jira_info " - pr          Open pull-request for current branch"
   _jira_info " - print       Print ticket ID                         | <search text>?"
   _jira_info " - summary     Print the summary of a ticket           | <search text>?"
@@ -584,8 +589,8 @@ _jira_request() {
   printf -- "%s" "${JIRA_OUTPUT}"
 }
 
-_jira_issue() {
-  local JIRA_JQL="status NOT IN (Done, Closed, Resolved)"
+_jira_list() {
+  local JIRA_JQL="status NOT IN (Done, Closed, Resolved, Archive, Blocked, \"Blocked ⛔️\", \"Wont'Do\")"
 
   if [[ ${1-} == "assignee" ]]; then
     JIRA_JQL+=" AND assignee = currentUser()"
@@ -610,7 +615,11 @@ _jira_issue() {
     return
   fi
 
-  printf -- "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .key + " " + .fields.summary' |
+  printf -- "%s" "${JIRA_OUTPUT}" | jq --raw-output '.issues[] | .key + " " + .fields.summary'
+}
+
+_jira_issue() {
+  _jira_list "${@}" |
     fzf --exit-0 --prompt="Issue: " --select-1 |
     awk '{printf("%s", $1)}'
 }

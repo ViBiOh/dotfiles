@@ -165,8 +165,6 @@ dns_allow() {
     return 1
   fi
 
-  local GREP_PIPELINE=()
-
   dns_unblock ${websites[${WEBSITE}]}
 }
 
