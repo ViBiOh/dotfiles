@@ -49,12 +49,10 @@ dns_set() {
     return
   fi
 
-  for interface in "Wi-Fi" "USB 10/100/1000 LAN" "Thunderbolt Ethernet Slot 0" "Thunderbolt Ethernet Slot 1"; do
-    if [[ $(sudo networksetup -listnetworkserviceorder | grep -c -i "${interface}") -gt 0 ]]; then
-      sudo networksetup -setdnsservers "${interface}" "${@:-}"
-      sudo networksetup -setsearchdomains "${interface}" "local"
-    fi
-  done
+  while IFS= read -r interface; do
+    sudo networksetup -setdnsservers "${interface}" "${@:-}"
+    sudo networksetup -setsearchdomains "${interface}" "local"
+  done <<<"$(sudo networksetup -listallnetworkservices | tail +2)"
 
   dns_flush
 }
