@@ -64,6 +64,13 @@ kube() {
     fi
   done
 
+  local ALL_NAMESPACES=0
+  for arg in "${@}"; do
+    if [[ ${arg} == "-A" ]] || [[ ${arg} == "--all-namespaces" ]]; then
+      ALL_NAMESPACES=1
+    fi
+  done
+
   local RESOURCE_NAMESPACE="${KUBE_NS:-}"
 
   local RESOURCE_TYPE
@@ -89,7 +96,7 @@ kube() {
     if [[ ${RESOURCE} == "ns" || ${RESOURCE} =~ ^namespaces? || ${RESOURCE} =~ ^nodes? ]]; then
       JSONPATH_QUERY='{range .items[*]}{.kind}//{.metadata.name}{"\n"}{end}'
     else
-      if [[ -z ${RESOURCE_NAMESPACE} ]]; then
+      if [[ -z ${RESOURCE_NAMESPACE} ]] && [[ ${ALL_NAMESPACES} -eq 0 ]]; then
         RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | fzf --prompt="Namespace: ")"
       fi
 
@@ -576,7 +583,7 @@ kube() {
         EXTRA_ARGS+=("--selector=${PODS_LABELS}" "${RESOURCE_NAMESPACE}")
       fi
     else
-      if [[ -z ${RESOURCE_NAMESPACE} ]]; then
+      if [[ -z ${RESOURCE_NAMESPACE} ]] && [[ ${ALL_NAMESPACES} -eq 0 ]]; then
         RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | fzf --prompt="Namespace: ")"
       fi
 
@@ -613,7 +620,7 @@ _fzf_complete_kube() {
     NAMESPACE_SCOPE="--namespace=${KUBE_NS}"
   fi
 
-  case ${COMP_WORDS[COMP_CWORD - 1]} in
+  case ${COMP_WORDS[COMP_CWORD-1]} in
   "context" | "--context")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
       kubectl config get-contexts --output name 2>/dev/null
