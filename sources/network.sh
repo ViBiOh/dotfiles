@@ -50,9 +50,9 @@ dns_set() {
   fi
 
   while IFS= read -r interface; do
-    sudo networksetup -setdnsservers "${interface}" "${@:-}"
-    sudo networksetup -setsearchdomains "${interface}" "local"
-  done <<<"$(sudo networksetup -listallnetworkservices | tail +2)"
+    sudo networksetup -setdnsservers "${interface#\*}" "${@:-}"
+    sudo networksetup -setsearchdomains "${interface#\*}" "local"
+  done <<<"$(sudo networksetup -listallnetworkservices | tail -n+2)"
 
   dns_flush
 }

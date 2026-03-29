@@ -75,9 +75,9 @@ order_66() {
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     while IFS= read -r interface; do
-      sudo networksetup -setdnsservers "${interface}" Empty
-      sudo networksetup -setsearchdomains "${interface}" Empty
-    done <<<"$(sudo networksetup -listallnetworkservices | tail +2)"
+      sudo networksetup -setdnsservers "${interface#\*}" Empty
+      sudo networksetup -setsearchdomains "${interface#\*}" Empty
+    done <<<"$(sudo networksetup -listallnetworkservices | tail -n+2)"
   fi
 
   _order_66_script_dir() {
