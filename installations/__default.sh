@@ -19,6 +19,7 @@ symlink() {
   SCRIPT_DIR="$(script_dir)"
 
   symlink_home "${SCRIPT_DIR}/../symlinks/bashrc"
+  symlink_home "${SCRIPT_DIR}/../symlinks/bash_profile"
   symlink_home "${SCRIPT_DIR}/../symlinks/bash_logout"
   symlink_home "${SCRIPT_DIR}/../symlinks/bash_sessions_disable"
   symlink_home "${SCRIPT_DIR}/../symlinks/curlrc"
@@ -44,14 +45,6 @@ install() {
   mkdir -p "${HOME}/opt/completions"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
-    cat >"${HOME}/.bash_profile" <<END_OF_BASH_PROFILE
-#!/usr/bin/env bash
-
-if [[ -f "${HOME}/.bashrc" ]]; then
-  source "${HOME}/.bashrc"
-fi
-END_OF_BASH_PROFILE
-
     PACKAGES+=("bash-completion@2")
     PACKAGES+=("pstree")
 
