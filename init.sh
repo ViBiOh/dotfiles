@@ -188,6 +188,7 @@ main() {
 
   mkdir -p "${HOME}/opt/bin"
   if ! [[ -L "${HOME}/.bashrc" ]]; then
+    rm -f "${HOME}/.bashrc"
     ln -s "${CURRENT_DIR}/symlinks/bashrc" "${HOME}/.bashrc"
   fi
   source_bashrc
