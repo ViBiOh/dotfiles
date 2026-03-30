@@ -14,6 +14,13 @@ script_dir() {
   fi
 }
 
+symlink() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(script_dir)"
+
+  symlink_home "${SCRIPT_DIR}/../symlinks/npmrc"
+}
+
 clean() {
   if command -v npm >/dev/null 2>&1; then
     npm cache clean --force
@@ -28,6 +35,8 @@ clean() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     rm -rf "${HOME}/Library/Caches/Yarn"
   fi
+
+  SYMLINK_ONLY_CLEAN=true symlink
 }
 
 install() {

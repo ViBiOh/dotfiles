@@ -23,15 +23,6 @@ usage() {
   printf -- "  -h\tPrint this help\n"
 }
 
-create_symlinks() {
-  while IFS= read -r -d '' file; do
-    local BASENAME_FILE
-    BASENAME_FILE="$(basename "${file}")"
-
-    [[ -r ${file} ]] && [[ -e ${file} ]] && rm -f "${HOME}/.${BASENAME_FILE}" && ln -s "${file}" "${HOME}/.${BASENAME_FILE}"
-  done < <(find "${CURRENT_DIR}/symlinks" -type f -print0)
-}
-
 do_action() {
   local ACTION_FILENAME="${1}"
   shift
@@ -181,32 +172,32 @@ main() {
 
   shift $((OPTIND - 1))
 
-  if [[ ${RUN_SYMLINKS} -eq 1 ]]; then
-    print_title "symlinks"
-    create_symlinks
-  fi
-
-  mkdir -p "${HOME}/opt/bin"
-  source_bashrc
-
-  if [[ ${DOTFILES_RC} -eq 1 ]]; then
-    if ! command -v fzf >/dev/null 2>&1; then
-      do_mandatory_actions "install"
-    fi
-
-    source_bashrc
-    create_dotfilesrc
-    source_bashrc
-  fi
-
   local ACTIONS=()
 
   if [[ ${RUN_CLEAN} -eq 1 ]]; then
     ACTIONS+=("clean")
   fi
 
+  if [[ ${RUN_SYMLINKS} -eq 1 ]]; then
+    ACTIONS+=("symlink")
+  fi
+
   if [[ ${RUN_INSTALL} -eq 1 ]]; then
     ACTIONS+=("install")
+  fi
+
+  mkdir -p "${HOME}/opt/bin"
+  ln -s "${CURRENT_DIR}/symlinks/bashrc" "${HOME}/.bashrc"
+  source_bashrc
+
+  if [[ ${DOTFILES_RC} -eq 1 ]]; then
+    if ! command -v fzf >/dev/null 2>&1; then
+      do_mandatory_actions "${ACTIONS[@]}"
+    fi
+
+    source_bashrc
+    create_dotfilesrc
+    source_bashrc
   fi
 
   if [[ ${#ACTIONS[@]} -ne 0 ]]; then

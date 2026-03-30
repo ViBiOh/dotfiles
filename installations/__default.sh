@@ -14,12 +14,27 @@ script_dir() {
   fi
 }
 
+symlink() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(script_dir)"
+
+  symlink_home "${SCRIPT_DIR}/../symlinks/bashrc"
+  symlink_home "${SCRIPT_DIR}/../symlinks/bash_logout"
+  symlink_home "${SCRIPT_DIR}/../symlinks/bash_session_disable"
+  symlink_home "${SCRIPT_DIR}/../symlinks/curlrc"
+  symlink_home "${SCRIPT_DIR}/../symlinks/editorconfig"
+  symlink_home "${SCRIPT_DIR}/../symlinks/ignore"
+  symlink_home "${SCRIPT_DIR}/../symlinks/inputrc"
+}
+
 clean() {
   sudo rm -rf "${HOME}/.config/htop" "${HOME}/opt"
   rm -rf "${HOME}/.cache"
 
   # Clean broken symlinks in home directory
   find "${HOME}" -maxdepth 1 -type l ! -exec test -e {} \; -exec rm {} \;
+
+  SYMLINK_ONLY_CLEAN=true symlink
 }
 
 install() {

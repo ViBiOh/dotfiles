@@ -14,9 +14,19 @@ script_dir() {
   fi
 }
 
+symlink() {
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(script_dir)"
+
+  symlink_home "${SCRIPT_DIR}/../symlinks/ansible.cfg"
+  symlink_home "${SCRIPT_DIR}/../symlinks/ansible_vault_pass.sh"
+}
+
 clean() {
   rm -rf "${HOME}/.ansible/"
   rm -rf "${HOME}/.ansible"*[^.cfg]
+
+  SYMLINK_ONLY_CLEAN=true symlink
 }
 
 install() {
