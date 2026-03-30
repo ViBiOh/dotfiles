@@ -187,7 +187,9 @@ main() {
   fi
 
   mkdir -p "${HOME}/opt/bin"
-  ln -s "${CURRENT_DIR}/symlinks/bashrc" "${HOME}/.bashrc"
+  if ! [[ -L "${HOME}/.bashrc" ]]; then
+    ln -s "${CURRENT_DIR}/symlinks/bashrc" "${HOME}/.bashrc"
+  fi
   source_bashrc
 
   if [[ ${DOTFILES_RC} -eq 1 ]]; then

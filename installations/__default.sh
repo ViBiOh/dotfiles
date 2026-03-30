@@ -20,7 +20,7 @@ symlink() {
 
   symlink_home "${SCRIPT_DIR}/../symlinks/bashrc"
   symlink_home "${SCRIPT_DIR}/../symlinks/bash_logout"
-  symlink_home "${SCRIPT_DIR}/../symlinks/bash_session_disable"
+  symlink_home "${SCRIPT_DIR}/../symlinks/bash_sessions_disable"
   symlink_home "${SCRIPT_DIR}/../symlinks/curlrc"
   symlink_home "${SCRIPT_DIR}/../symlinks/editorconfig"
   symlink_home "${SCRIPT_DIR}/../symlinks/ignore"
