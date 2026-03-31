@@ -13,13 +13,12 @@ print_title() {
 
 usage() {
   printf -- "Usage: %s [flags]\n" "${0}"
-  printf -- "  -a\tRun all stages: symlinks, clean, install and passwords\n"
+  printf -- "  -a\tRun all stages: clean, install and passwords\n"
   printf -- "  -c\tClean install and temporary files\n"
   printf -- "  -d\tRecreate dotfilesrc\n"
   printf -- "  -i\tInstall and configure softwares\n"
   printf -- "  -l\tLimiting execution to given filename\n"
   printf -- "  -p\tRetrieve and write credentials\n"
-  printf -- "  -s\tCreate symlinks into \${HOME}\n"
   printf -- "  -h\tPrint this help\n"
 }
 
@@ -116,7 +115,6 @@ main() {
   local FILE_LIMIT=""
   local FILE_RESTART=0
   local DOTFILES_RC=0
-  local RUN_SYMLINKS=0
   local RUN_CLEAN=0
   local RUN_INSTALL=0
   local RUN_PASSWORDS=0
@@ -125,7 +123,6 @@ main() {
   while getopts ":l:r:acdhips" option; do
     case "${option}" in
     a)
-      RUN_SYMLINKS=1
       RUN_CLEAN=1
       RUN_INSTALL=1
       RUN_PASSWORDS=1
@@ -145,9 +142,6 @@ main() {
       ;;
     p)
       RUN_PASSWORDS=1
-      ;;
-    s)
-      RUN_SYMLINKS=1
       ;;
     l)
       FILE_LIMIT="$(printf -- "%s" "${OPTARG}" | tr "[:lower:]" "[:upper:]")"
@@ -176,10 +170,6 @@ main() {
 
   if [[ ${RUN_CLEAN} -eq 1 ]]; then
     ACTIONS+=("clean")
-  fi
-
-  if [[ ${RUN_SYMLINKS} -eq 1 ]]; then
-    ACTIONS+=("symlink")
   fi
 
   if [[ ${RUN_INSTALL} -eq 1 ]]; then

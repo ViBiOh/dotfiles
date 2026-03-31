@@ -28,6 +28,8 @@ clean() {
 }
 
 install() {
+  symlink
+
   packages_install "tmux"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then

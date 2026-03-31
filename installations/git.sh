@@ -28,6 +28,8 @@ clean() {
 }
 
 install() {
+  symlink
+
   packages_install "git" "git-lfs"
 
   if package_exists "git-delta"; then

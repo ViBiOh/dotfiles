@@ -40,6 +40,8 @@ clean() {
 }
 
 install() {
+  symlink
+
   if ! command -v git >/dev/null 2>&1; then
     var_error "git is required"
     exit

@@ -30,6 +30,8 @@ clean() {
 }
 
 install() {
+  symlink
+
   source "$(script_dir)/../sources/_python.sh"
 
   if ! command -v pip >/dev/null 2>&1; then

@@ -26,6 +26,8 @@ clean() {
 }
 
 install() {
+  symlink
+
   if package_exists "alacritty"; then
     packages_install_desktop "alacritty"
   fi

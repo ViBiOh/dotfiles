@@ -26,5 +26,7 @@ clean() {
 }
 
 install() {
+  symlink
+
   packages_install "ripgrep"
 }

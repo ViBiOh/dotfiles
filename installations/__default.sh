@@ -39,6 +39,8 @@ clean() {
 }
 
 install() {
+  symlink
+
   local PACKAGES=("bash" "make" "grep" "htop" "openssl" "curl" "ncdu" "jq" "pv")
 
   mkdir -p "${HOME}/opt/bin"
