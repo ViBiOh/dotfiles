@@ -120,7 +120,7 @@ main() {
   local RUN_PASSWORDS=0
 
   OPTIND=0
-  while getopts ":l:r:acdhips" option; do
+  while getopts ":l:r:acdhip" option; do
     case "${option}" in
     a)
       RUN_CLEAN=1
