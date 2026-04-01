@@ -16,3 +16,17 @@ add_to_path() {
   # Add entry to the beginning of the PATH
   export PATH="${1}:${PATH}"
 }
+
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
+export DOTFILES_SOURCES_DIR="$(script_dir)"

@@ -4,20 +4,6 @@ if ! command -v subl >/dev/null 2>&1; then
   return
 fi
 
-script_dir() {
-  local FILE_SOURCE="${BASH_SOURCE[0]}"
-
-  if [[ -L ${FILE_SOURCE} ]]; then
-    dirname "$(readlink "${FILE_SOURCE}")"
-  else
-    (
-      cd "$(dirname "${FILE_SOURCE}")" && pwd
-    )
-  fi
-}
-
-SUBLIME_SCRIPT_DIR="$(script_dir)"
-
 sublime_add_project() {
   local currentDir
   currentDir="$(readlink -f "$(pwd)")"
@@ -40,7 +26,7 @@ sublime_add_project() {
     projectName="${NAME_PREFIX}_${projectName}"
   fi
 
-  fileName="${SUBLIME_SCRIPT_DIR}/../sublime/projects/${projectName}.sublime-project"
+  fileName="${DOTFILES_SOURCES_DIR}/../sublime/projects/${projectName}.sublime-project"
   jq --compact-output --null-input --arg path "${currentDir}" '{folders: [{path: $path}]}' >"${fileName}"
   subl --project "${fileName}"
 }
