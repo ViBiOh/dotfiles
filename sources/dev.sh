@@ -300,7 +300,7 @@ if command -v systemctl >/dev/null 2>&1; then
 fi
 
 aziz() {
-  curl --disable --silent --show-error --location --max-time 30 --request POST "http://${HUE_API}/api/groups/${HUE_GROUP}" --data state=on --data method=PATCH >/dev/null
+  curl --disable --silent --show-error --location --max-time 30 --request POST --user "$(pass_get "infra/hue" "login"):$(pass "infra/hue" | head -1)" "${HUE_API}/api/groups/${HUE_GROUP}" --data state=on --data method=PATCH >/dev/null
 }
 
 json() {
