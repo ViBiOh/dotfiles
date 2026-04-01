@@ -5,20 +5,8 @@
 set -o nounset -o pipefail -o errexit
 
 if [[ \${TRACE:-0} == "1" ]]; then
-  set -o xtrace
+	set -o xtrace
 fi
-
-script_dir() {
-  local FILE_SOURCE="\${BASH_SOURCE[0]}"
-
-  if [[ -L \${FILE_SOURCE} ]]; then
-    dirname "\$(readlink "\${FILE_SOURCE}")"
-  else
-    (
-      cd "\$(dirname "\${FILE_SOURCE}")" && pwd
-    )
-  fi
-}
 
 main() {
 }
