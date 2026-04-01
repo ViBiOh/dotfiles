@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -o nounset -o pipefail -o errexit
-readonly CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 print_title() {
   local line="--------------------------------------------------------------------------------"
@@ -30,7 +30,7 @@ do_action() {
     unset -f "${action}"
   done
 
-  source "${CURRENT_DIR}/installations/${ACTION_FILENAME}"
+  source "${DOTFILES_DIR}/installations/${ACTION_FILENAME}"
 
   for action in "${@}"; do
     if [[ $(type -t "${action}") == "function" ]]; then
@@ -61,7 +61,7 @@ END_OF_DOTFILES_RC
     INSTALL_NAME="$(printf -- "%s" "${BASENAME_FILE%.sh}" | tr "[:lower:]" "[:upper:]")"
 
     echo "export DOTFILES_${INSTALL_NAME}=\"true\"" >>"${HOME}/.dotfilesrc"
-  done < <(find "${CURRENT_DIR}/installations" -not -name "__*" -type f | LC_ALL=C sort | fzf --multi --print0 --preview 'cat {}')
+  done < <(find "${DOTFILES_DIR}/installations" -not -name "__*" -type f | LC_ALL=C sort | fzf --multi --print0 --preview 'cat {}')
 }
 
 browse_actions() {
@@ -93,7 +93,7 @@ browse_actions() {
     fi
 
     FILE_TO_INSTALL+=("${BASENAME_FILE}")
-  done < <(find "${CURRENT_DIR}/installations/"*.sh -not -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
+  done < <(find "${DOTFILES_DIR}/installations/"*.sh -not -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
 
   for install_file in "${FILE_TO_INSTALL[@]}"; do
     do_action "${install_file}" "${@}"
@@ -179,7 +179,7 @@ main() {
   mkdir -p "${HOME}/opt/bin"
   if ! [[ -L "${HOME}/.bashrc" ]]; then
     rm -f "${HOME}/.bashrc"
-    ln -s "${CURRENT_DIR}/symlinks/bashrc" "${HOME}/.bashrc"
+    ln -s "${DOTFILES_DIR}/symlinks/bashrc" "${HOME}/.bashrc"
   fi
   source_bashrc
 

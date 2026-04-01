@@ -2,18 +2,6 @@
 
 set -o nounset -o pipefail -o errexit
 
-script_dir() {
-  local FILE_SOURCE="${BASH_SOURCE[0]}"
-
-  if [[ -L ${FILE_SOURCE} ]]; then
-    dirname "$(readlink "${FILE_SOURCE}")"
-  else
-    (
-      cd "$(dirname "${FILE_SOURCE}")" && pwd
-    )
-  fi
-}
-
 clean() {
   rm -rf "${HOME}/.pgpass"
   rm -rf "${HOME}/.psql_history"
@@ -21,7 +9,7 @@ clean() {
 }
 
 install() {
-  source "$(script_dir)/../sources/_python.sh"
+  source "${DOTFILES_DIR}/sources/_python.sh"
 
   if ! command -v pip >/dev/null 2>&1; then
     var_error "pip is required"

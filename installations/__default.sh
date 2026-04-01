@@ -2,30 +2,15 @@
 
 set -o nounset -o pipefail -o errexit
 
-script_dir() {
-  local FILE_SOURCE="${BASH_SOURCE[0]}"
-
-  if [[ -L ${FILE_SOURCE} ]]; then
-    dirname "$(readlink "${FILE_SOURCE}")"
-  else
-    (
-      cd "$(dirname "${FILE_SOURCE}")" && pwd
-    )
-  fi
-}
-
 symlink() {
-  local SCRIPT_DIR
-  SCRIPT_DIR="$(script_dir)"
-
-  symlink_home "${SCRIPT_DIR}/../symlinks/bashrc"
-  symlink_home "${SCRIPT_DIR}/../symlinks/bash_profile"
-  symlink_home "${SCRIPT_DIR}/../symlinks/bash_logout"
-  symlink_home "${SCRIPT_DIR}/../symlinks/bash_sessions_disable"
-  symlink_home "${SCRIPT_DIR}/../symlinks/curlrc"
-  symlink_home "${SCRIPT_DIR}/../symlinks/editorconfig"
-  symlink_home "${SCRIPT_DIR}/../symlinks/ignore"
-  symlink_home "${SCRIPT_DIR}/../symlinks/inputrc"
+  symlink_home "${DOTFILES_DIR}/symlinks/bashrc"
+  symlink_home "${DOTFILES_DIR}/symlinks/bash_profile"
+  symlink_home "${DOTFILES_DIR}/symlinks/bash_logout"
+  symlink_home "${DOTFILES_DIR}/symlinks/bash_sessions_disable"
+  symlink_home "${DOTFILES_DIR}/symlinks/curlrc"
+  symlink_home "${DOTFILES_DIR}/symlinks/editorconfig"
+  symlink_home "${DOTFILES_DIR}/symlinks/ignore"
+  symlink_home "${DOTFILES_DIR}/symlinks/inputrc"
 }
 
 clean() {
@@ -52,7 +37,7 @@ install() {
 
     if ! command -v brew >/dev/null 2>&1; then
       /bin/bash -c "$(curl --disable --silent --show-error --location "https://raw.githubusercontent.com/Homebrew/install/master/install.sh")"
-      source "$(script_dir)/../sources/__homebrew.sh"
+      source "${DOTFILES_DIR}/sources/__homebrew.sh"
     fi
 
     packages_update

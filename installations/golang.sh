@@ -2,18 +2,6 @@
 
 set -o nounset -o pipefail -o errexit
 
-script_dir() {
-  local FILE_SOURCE="${BASH_SOURCE[0]}"
-
-  if [[ -L ${FILE_SOURCE} ]]; then
-    dirname "$(readlink "${FILE_SOURCE}")"
-  else
-    (
-      cd "$(dirname "${FILE_SOURCE}")" && pwd
-    )
-  fi
-}
-
 clean() {
   if [[ -n ${GOPATH:-} ]]; then
     sudo rm -rf "${GOPATH}"
@@ -33,7 +21,7 @@ clean() {
 install() {
   packages_install "go" "golangci-lint" "graphviz" "go-size-analyzer"
 
-  source "$(script_dir)/../sources/_golang.sh"
+  source "${DOTFILES_DIR}/sources/_golang.sh"
   mkdir -p "${GOPATH}"
 
   if command -v go >/dev/null 2>&1; then

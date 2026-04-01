@@ -2,18 +2,6 @@
 
 set -o nounset -o pipefail -o errexit
 
-script_dir() {
-  local FILE_SOURCE="${BASH_SOURCE[0]}"
-
-  if [[ -L ${FILE_SOURCE} ]]; then
-    dirname "$(readlink "${FILE_SOURCE}")"
-  else
-    (
-      cd "$(dirname "${FILE_SOURCE}")" && pwd
-    )
-  fi
-}
-
 clean() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo rm -rf "${HOME}/Library/Caches/Sublime Text"
@@ -61,6 +49,6 @@ install() {
   rm -rf "${SUBLIME_TEXT_FILENAME}"
 
   if command -v subl >/dev/null 2>&1; then
-    "$(script_dir)/../sublime/init.sh"
+    "${DOTFILES_DIR}/sublime/init.sh"
   fi
 }

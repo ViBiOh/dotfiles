@@ -2,23 +2,8 @@
 
 set -o nounset -o pipefail -o errexit
 
-script_dir() {
-  local FILE_SOURCE="${BASH_SOURCE[0]}"
-
-  if [[ -L ${FILE_SOURCE} ]]; then
-    dirname "$(readlink "${FILE_SOURCE}")"
-  else
-    (
-      cd "$(dirname "${FILE_SOURCE}")" && pwd
-    )
-  fi
-}
-
 symlink() {
-  local SCRIPT_DIR
-  SCRIPT_DIR="$(script_dir)"
-
-  symlink_home "${SCRIPT_DIR}/../symlinks/npmrc"
+  symlink_home "${DOTFILES_DIR}/symlinks/npmrc"
 }
 
 clean() {
@@ -52,9 +37,6 @@ install() {
     exit
   fi
 
-  local SCRIPT_DIR
-  SCRIPT_DIR="$(script_dir)"
-
   local NODE_VERSION="latest"
 
   rm -rf "${HOME}/n-install"
@@ -69,8 +51,8 @@ install() {
   chmod +x "${HOME}/opt/bin/n"
 
   mkdir -p "${HOME}/opt/node"
-  source "${SCRIPT_DIR}/../sources/__first.sh"
-  source "${SCRIPT_DIR}/../sources/node.sh"
+  source "${DOTFILES_DIR}/sources/__first.sh"
+  source "${DOTFILES_DIR}/sources/node.sh"
   n "${NODE_VERSION}"
 
   if ! command -v npm >/dev/null 2>&1; then

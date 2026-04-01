@@ -2,18 +2,6 @@
 
 set -o nounset -o pipefail -o errexit
 
-script_dir() {
-  local FILE_SOURCE="${BASH_SOURCE[0]}"
-
-  if [[ -L ${FILE_SOURCE} ]]; then
-    dirname "$(readlink "${FILE_SOURCE}")"
-  else
-    (
-      cd "$(dirname "${FILE_SOURCE}")" && pwd
-    )
-  fi
-}
-
 clean() {
   rm -rf "${HOME}/.python_history"
 
@@ -24,8 +12,6 @@ clean() {
 }
 
 install() {
-  local SCRIPT_DIR
-  SCRIPT_DIR="$(script_dir)"
 
   if package_exists "python"; then
     packages_install "python"
@@ -51,8 +37,8 @@ install() {
 
   python3 -m venv "${HOME}/opt/python/venv"
 
-  source "${SCRIPT_DIR}/../sources/__first.sh"
-  source "${SCRIPT_DIR}/../sources/_python.sh"
+  source "${DOTFILES_DIR}/sources/__first.sh"
+  source "${DOTFILES_DIR}/sources/_python.sh"
 
   if ! command -v pip >/dev/null 2>&1; then
     return

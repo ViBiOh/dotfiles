@@ -2,18 +2,6 @@
 
 set -o nounset -o pipefail -o errexit
 
-script_dir() {
-  local FILE_SOURCE="${BASH_SOURCE[0]}"
-
-  if [[ -L ${FILE_SOURCE} ]]; then
-    dirname "$(readlink "${FILE_SOURCE}")"
-  else
-    (
-      cd "$(dirname "${FILE_SOURCE}")" && pwd
-    )
-  fi
-}
-
 clean() {
   rm -rf "${HOME}/.config/gcloud"
 }
@@ -30,7 +18,7 @@ install() {
   tar -C "${HOME}/opt" -xzf "${GCLOUD_ARCHIVE}"
   rm -rf "${GCLOUD_ARCHIVE}"
 
-  source "$(script_dir)/../sources/gcloud.sh"
+  source "${DOTFILES_DIR}/sources/gcloud.sh"
 
   if command -v gcloud >/dev/null 2>&1; then
     gcloud components update --quiet
