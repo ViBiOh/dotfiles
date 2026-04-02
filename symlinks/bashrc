@@ -38,11 +38,7 @@ source_all() {
 
   if [[ -e "${SCRIPT_DIR}/../scripts/meta" ]]; then
     source "${SCRIPT_DIR}/../scripts/meta" && meta_init \
-      "github" \
-      "pass" \
-      "scw" \
       "ssh" \
-      "tmux" \
       "var" \
       "version"
   fi
