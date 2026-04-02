@@ -53,6 +53,7 @@
 	updateRefs = true
 
 [log]
+	date = local
 	abbrevCommit = true
 
 [color]
