@@ -20,7 +20,10 @@
       "Bash(prettier*)",
       "Bash(pytest*)",
       "Bash(tee*)",
-      "Bash(wc*)"
+      "Bash(wc*)",
+      "mcp__atlassian__getConfluencePage",
+      "mcp__atlassian__searchConfluenceUsingCql",
+      "mcp__datadog__get_datadog_notebook"
     ],
     "deny": [
       "Bash(bzl build*)",
