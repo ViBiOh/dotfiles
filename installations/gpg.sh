@@ -2,7 +2,13 @@
 
 set -o nounset -o pipefail -o errexit
 
+symlink() {
+  symlink_home ".gnupg/gpg.conf"
+}
+
 clean() {
+  SYMLINK_ONLY_CLEAN=true symlink
+
   if command -v gpgconf >/dev/null 2>&1; then
     gpgconf --kill gpg-agent
   fi
@@ -26,29 +32,6 @@ install() {
 default-cache-ttl 3600
 max-cache-ttl 3600
 pinentry-program ${BREW_PREFIX}/bin/pinentry-mac" >"${HOME}/.gnupg/gpg-agent.conf"
-
-  echo "personal-cipher-preferences AES256 AES192 AES
-personal-digest-preferences SHA512 SHA384 SHA256
-personal-compress-preferences ZLIB BZIP2 ZIP Uncompressed
-default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed
-cert-digest-algo SHA512
-s2k-digest-algo SHA512
-s2k-cipher-algo AES256
-charset utf-8
-fixed-list-mode
-no-comments
-no-emit-version
-no-greeting
-keyid-format 0xlong
-list-options show-uid-validity
-verify-options show-uid-validity
-with-fingerprint
-require-cross-certification
-no-symkey-cache
-use-agent
-throw-keyids
-keyserver hkps://keys.openpgp.org" >"${HOME}/.gnupg/gpg.conf"
-
 }
 
 credentials() {

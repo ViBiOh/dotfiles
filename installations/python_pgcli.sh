@@ -2,7 +2,13 @@
 
 set -o nounset -o pipefail -o errexit
 
+symlink() {
+  symlink_home ".config/pgcli/config"
+}
+
 clean() {
+  SYMLINK_ONLY_CLEAN=true symlink
+
   rm -rf "${HOME}/.pgpass"
   rm -rf "${HOME}/.psql_history"
   rm -rf "${HOME}/.config/pgcli"
@@ -22,19 +28,6 @@ install() {
     packages_install "libpq-dev"
     pip install "pgcli"
   fi
-
-  if ! command -v pgcli >/dev/null 2>&1; then
-    return
-  fi
-
-  mkdir -p "${HOME}/.config/pgcli"
-
-  echo "[main]
-multi_line = True
-auto_expand = True
-row_limit = 100
-log_level = ERROR
-" >"${HOME}/.config/pgcli/config"
 }
 
 credentials() {
