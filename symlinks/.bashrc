@@ -34,29 +34,26 @@ script_dir() {
 
 export DOTFILES_SOURCES_DIR="$(script_dir)"
 
-source_all() {
-  if [[ -e "${DOTFILES_SOURCES_DIR}/../scripts/meta" ]]; then
-    source "${DOTFILES_SOURCES_DIR}/../scripts/meta" && meta_init \
-      "ssh" \
-      "var" \
-      "version"
-  fi
-
-  for file in "${DOTFILES_SOURCES_DIR}/../sources/"*; do
-    [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
-  done
-
-  if [[ -e "${DOTFILES_SOURCES_DIR}/../../work/bash_source.sh" ]]; then
-    source "${DOTFILES_SOURCES_DIR}/../../work/bash_source.sh"
-  fi
-}
+set_locale
 
 if [[ -e "${HOME}/.dotfilesrc" ]]; then
   source "${HOME}/.dotfilesrc"
 fi
 
-set_locale
-source_all
+if [[ -e "${DOTFILES_SOURCES_DIR}/../scripts/meta" ]]; then
+  source "${DOTFILES_SOURCES_DIR}/../scripts/meta" && meta_init \
+    "ssh" \
+    "var" \
+    "version"
+fi
+
+for file in "${DOTFILES_SOURCES_DIR}/../sources/"*; do
+  [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
+done
+
+if [[ -e "${DOTFILES_SOURCES_DIR}/../../work/bash_source.sh" ]]; then
+  source "${DOTFILES_SOURCES_DIR}/../../work/bash_source.sh"
+fi
 
 if [[ -e "${HOME}/.localrc" ]]; then
   source "${HOME}/.localrc"
@@ -64,4 +61,3 @@ fi
 
 unset -f set_locale
 unset -f script_dir
-unset -f source_all
