@@ -32,24 +32,23 @@ script_dir() {
   fi
 }
 
-source_all() {
-  local SCRIPT_DIR
-  SCRIPT_DIR="$(script_dir)"
+export DOTFILES_SOURCES_DIR="$(script_dir)"
 
-  if [[ -e "${SCRIPT_DIR}/../scripts/meta" ]]; then
-    source "${SCRIPT_DIR}/../scripts/meta" && meta_init \
+source_all() {
+  if [[ -e "${DOTFILES_SOURCES_DIR}/../scripts/meta" ]]; then
+    source "${DOTFILES_SOURCES_DIR}/../scripts/meta" && meta_init \
       "ssh" \
       "var" \
       "version"
   fi
 
-  for file in "${SCRIPT_DIR}/../sources/"*; do
+  for file in "${DOTFILES_SOURCES_DIR}/../sources/"*; do
     [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
   done
 
-  # if [[ -e "${SCRIPT_DIR}/../../work/bash_source.sh" ]]; then
-  #   source "${SCRIPT_DIR}/../../work/bash_source.sh"
-  # fi
+  if [[ -e "${DOTFILES_SOURCES_DIR}/../../work/bash_source.sh" ]]; then
+    source "${DOTFILES_SOURCES_DIR}/../../work/bash_source.sh"
+  fi
 }
 
 set_locale
