@@ -15,7 +15,9 @@ clean() {
 }
 
 install() {
-  packages_install "gnupg" "hopenpgp-tools" "ykman"
+  symlink
+
+  packages_install "gnupg" "ykman"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install "pinentry-mac"

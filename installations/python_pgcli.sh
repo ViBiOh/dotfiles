@@ -15,6 +15,8 @@ clean() {
 }
 
 install() {
+  symlink
+
   source "${DOTFILES_DIR}/sources/_python.sh"
 
   if ! command -v pip >/dev/null 2>&1; then
