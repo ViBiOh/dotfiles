@@ -9,7 +9,7 @@ bzl_run() {
   BZL_TARGET="$(bzl query ... 2>/dev/null | fzf --select-1 --query="${1:-}")"
 
   if [[ -n ${BZL_TARGET:-} ]]; then
-    var_print_and_run bzl run "${BZL_TARGET}"
+    var_print_and_run bzl run --ui_event_filters=-INFO,-DEBUG,-STDOUT,-STDERR --show_progress_rate_limit=10 "${BZL_TARGET}"
   fi
 }
 
@@ -22,7 +22,7 @@ gazelle() {
 
   local GAZELLE_TARGET="${CURRENT_DIR#"${GIT_ROOT_PATH}"}"
 
-  var_print_and_run bzl run --ui_event_filters=-info,-stdout,-stderr //:gazelle -- fix "${GAZELLE_TARGET#/}"
+  var_print_and_run bzl run --ui_event_filters=-INFO,-DEBUG,-STDOUT,-STDERR //:gazelle -- fix "${GAZELLE_TARGET#/}"
 }
 
 bazel_clean() {
