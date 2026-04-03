@@ -9,5 +9,5 @@ clean() {
 install() {
   packages_install "claude-code"
 
-  "${DOTFILES_DIR}/claude/init.sh"
+  "${DOTFILES_DIR}/tools/claude/init.sh"
 }

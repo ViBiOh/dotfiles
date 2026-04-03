@@ -49,6 +49,6 @@ install() {
   rm -rf "${SUBLIME_TEXT_FILENAME}"
 
   if command -v subl >/dev/null 2>&1; then
-    "${DOTFILES_DIR}/sublime/init.sh"
+    "${DOTFILES_DIR}/tools/sublime/init.sh"
   fi
 }
