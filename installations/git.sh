@@ -15,7 +15,7 @@ clean() {
 install() {
   symlink
 
-  packages_install "git" "git-lfs"
+  packages_install "git"
 
   if package_exists "git-delta"; then
     packages_install "git-delta"
@@ -32,6 +32,5 @@ install() {
     curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "git" "git_hooks"
   )
 
-  # https://git-scm.com/docs/git#Documentation/git.txt---list-cmdsltgroupgtltgroupgt82308203
-  ln -s -f "${DOTFILES_DIR}/tools/git/git-coco.sh" "${HOME}/opt/bin/git-coco"
+  "${DOTFILES_DIR}/tools/git/init.sh"
 }
