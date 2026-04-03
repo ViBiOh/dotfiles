@@ -94,10 +94,7 @@ main() {
   if command -v pip >/dev/null 2>&1; then
     pip install "python-lsp-server" "black" "isort" "pycodestyle" "sqlparse"
 
-    cat >"${HOME}/.config/pycodestyle" <<PYCODESTYLEEND
-[pycodestyle]
-max-line-length = 160
-PYCODESTYLEEND
+    symlink_home ".config/pycodestyle"
   fi
 
   install_shfmt
