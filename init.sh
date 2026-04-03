@@ -176,7 +176,6 @@ main() {
     ACTIONS+=("install")
   fi
 
-  mkdir -p "${HOME}/opt/bin"
   rm -f "${HOME}/.bashrc"
   ln -s "${DOTFILES_DIR}/symlinks/.bashrc" "${HOME}/.bashrc"
   source_bashrc

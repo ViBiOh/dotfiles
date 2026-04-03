@@ -51,15 +51,15 @@ source_all() {
   fi
 }
 
+if [[ -e "${HOME}/.dotfilesrc" ]]; then
+  source "${HOME}/.dotfilesrc"
+fi
+
 set_locale
 source_all
 
 if [[ -e "${HOME}/.localrc" ]]; then
   source "${HOME}/.localrc"
-fi
-
-if [[ -e "${HOME}/.dotfilesrc" ]]; then
-  source "${HOME}/.dotfilesrc"
 fi
 
 unset -f set_locale
