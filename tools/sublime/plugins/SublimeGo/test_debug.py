@@ -1,8 +1,7 @@
 import threading
 
-import sublime_plugin
-
 import sublime
+import sublime_plugin
 
 
 class GoTestDebug(sublime_plugin.WindowCommand):

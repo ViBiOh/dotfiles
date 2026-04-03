@@ -1,11 +1,10 @@
-import sublime_plugin
-
 import sublime
+import sublime_plugin
 
 from .async_task import AsyncTask
 
 
-class SublimeGitFileHistory(sublime_plugin.WindowCommand):
+class SublimeGitLineHistory(sublime_plugin.WindowCommand):
     task = None
     panel = None
 
@@ -33,11 +32,15 @@ class SublimeGitFileHistory(sublime_plugin.WindowCommand):
         if not file or len(file) == 0:
             return
 
+        view = window.active_view()
+        start_line = view.rowcol(view.sel()[0].begin())[0] + 1
+        end_line = view.rowcol(view.sel()[0].end())[0] + 1
+
         relative_file = file.replace(folder, "").lstrip("/")
 
-        self.panel = window.create_output_panel("file_history")
+        self.panel = window.create_output_panel("line_history")
         self.panel.set_syntax_file("Packages/Diff/Diff.sublime-syntax")
-        window.run_command("show_panel", {"panel": "output.file_history"})
+        window.run_command("show_panel", {"panel": "output.line_history"})
 
         if self.task:
             self.task.kill()
@@ -47,10 +50,8 @@ class SublimeGitFileHistory(sublime_plugin.WindowCommand):
                 "git",
                 "log-pretty",
                 "--no-color",
-                "--follow",
-                "--patch",
-                "--",
-                relative_file,
+                "-L",
+                "{},{}:{}".format(start_line, end_line, relative_file),
             ],
             output=self.queue_write,
             cwd=folder,

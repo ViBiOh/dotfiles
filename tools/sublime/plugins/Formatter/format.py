@@ -2,9 +2,8 @@ import json
 import subprocess
 import threading
 
-import sublime_plugin
-
 import sublime
+import sublime_plugin
 
 PLUGIN_NAME = "Formatter"
 PLUGIN_SETTINGS = "{}.sublime-settings".format(PLUGIN_NAME)

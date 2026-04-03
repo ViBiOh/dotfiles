@@ -1,6 +1,5 @@
-import sublime_plugin
-
 import sublime
+import sublime_plugin
 
 
 class SublimeGitLinepath(sublime_plugin.WindowCommand):

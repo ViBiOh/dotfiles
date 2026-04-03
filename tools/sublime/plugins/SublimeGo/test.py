@@ -1,9 +1,8 @@
 import os
 import threading
 
-import sublime_plugin
-
 import sublime
+import sublime_plugin
 
 from .async_task import AsyncTask
 from .env_loader import load_git_root_env

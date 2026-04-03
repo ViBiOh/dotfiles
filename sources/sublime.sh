@@ -26,7 +26,9 @@ sublime_add_project() {
     projectName="${NAME_PREFIX}_${projectName}"
   fi
 
-  fileName="${DOTFILES_SOURCES_DIR}/../sublime/projects/${projectName}.sublime-project"
+  fileName="${DOTFILES_SOURCES_DIR}/../tools/sublime/projects/${projectName}.sublime-project"
+  mkdir -p "$(dirname "${fileName}")"
+
   jq --compact-output --null-input --arg path "${currentDir}" '{folders: [{path: $path}]}' >"${fileName}"
   subl --project "${fileName}"
 }

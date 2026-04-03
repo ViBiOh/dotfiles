@@ -1,9 +1,8 @@
 import subprocess
 from os.path import dirname
 
-import sublime_plugin
-
 import sublime
+import sublime_plugin
 
 from .utils import git_path, git_remote
 

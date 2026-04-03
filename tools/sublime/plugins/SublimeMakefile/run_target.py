@@ -2,9 +2,8 @@ import re
 import subprocess
 import threading
 
-import sublime_plugin
-
 import sublime
+import sublime_plugin
 
 from .async_task import AsyncTask
 
