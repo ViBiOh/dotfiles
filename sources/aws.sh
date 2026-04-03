@@ -7,7 +7,7 @@ fi
 AWS_CLI_BINARY="$(which -a aws | grep bin)"
 
 if [[ -n ${AWS_CLI_BINARY:-} ]]; then
-  declare -g AWS_EXEC_ACCOUNT
+  declare AWS_EXEC_ACCOUNT
 
   aws_exec() {
     if [[ -z ${AWS_ACCOUNTS:-} ]]; then

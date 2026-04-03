@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 symlink() {
-  symlink_home "${DOTFILES_DIR}/symlinks/vimrc"
+  symlink_home ".vimrc"
 }
 
 clean() {

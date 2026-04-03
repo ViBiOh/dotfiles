@@ -3,14 +3,14 @@
 set -o nounset -o pipefail -o errexit
 
 symlink() {
-  symlink_home "${DOTFILES_DIR}/symlinks/bashrc"
-  symlink_home "${DOTFILES_DIR}/symlinks/bash_profile"
-  symlink_home "${DOTFILES_DIR}/symlinks/bash_logout"
-  symlink_home "${DOTFILES_DIR}/symlinks/bash_sessions_disable"
-  symlink_home "${DOTFILES_DIR}/symlinks/curlrc"
-  symlink_home "${DOTFILES_DIR}/symlinks/editorconfig"
-  symlink_home "${DOTFILES_DIR}/symlinks/ignore"
-  symlink_home "${DOTFILES_DIR}/symlinks/inputrc"
+  symlink_home ".bashrc"
+  symlink_home ".bash_profile"
+  symlink_home ".bash_logout"
+  symlink_home ".bash_sessions_disable"
+  symlink_home ".curlrc"
+  symlink_home ".editorconfig"
+  symlink_home ".ignore"
+  symlink_home ".inputrc"
 }
 
 clean() {

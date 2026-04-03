@@ -3,9 +3,12 @@
 set -o nounset -o pipefail -o errexit
 
 symlink() {
-  symlink_home "${DOTFILES_DIR}/symlinks/gitconfig"
-  symlink_home "${DOTFILES_DIR}/symlinks/gitconfig_work"
-  symlink_home "${DOTFILES_DIR}/symlinks/gitignore_global"
+  symlink_home ".gitconfig"
+  symlink_home ".gitconfig_work"
+  symlink_home ".gitignore_global"
+
+  # https://git-scm.com/docs/git#Documentation/git.txt---list-cmdsltgroupgtltgroupgt82308203
+  symlink_home "opt/bin/git-coco"
 }
 
 clean() {
@@ -31,6 +34,4 @@ install() {
     cd "${DOTFILES_DIR}/"
     curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" "git" "git_hooks"
   )
-
-  "${DOTFILES_DIR}/tools/git/init.sh"
 }

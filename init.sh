@@ -177,10 +177,8 @@ main() {
   fi
 
   mkdir -p "${HOME}/opt/bin"
-  if ! [[ -L "${HOME}/.bashrc" ]]; then
-    rm -f "${HOME}/.bashrc"
-    ln -s "${DOTFILES_DIR}/symlinks/bashrc" "${HOME}/.bashrc"
-  fi
+  rm -f "${HOME}/.bashrc"
+  ln -s "${DOTFILES_DIR}/symlinks/.bashrc" "${HOME}/.bashrc"
   source_bashrc
 
   if [[ ${DOTFILES_RC} -eq 1 ]]; then

@@ -3,8 +3,8 @@
 set -o nounset -o pipefail -o errexit
 
 symlink() {
-  symlink_home "${DOTFILES_DIR}/symlinks/ansible.cfg"
-  symlink_home "${DOTFILES_DIR}/symlinks/ansible_vault_pass.sh"
+  symlink_home ".ansible.cfg"
+  symlink_home ".ansible_vault_pass.sh"
 }
 
 clean() {

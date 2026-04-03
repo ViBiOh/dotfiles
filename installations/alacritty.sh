@@ -3,7 +3,7 @@
 set -o nounset -o pipefail -o errexit
 
 symlink() {
-  symlink_home "${DOTFILES_DIR}/symlinks/alacritty.toml"
+  symlink_home ".alacritty.toml"
 }
 
 clean() {

@@ -47,9 +47,9 @@ source_all() {
     [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
   done
 
-  if [[ -e "${SCRIPT_DIR}/../../work/bash_source.sh" ]]; then
-    source "${SCRIPT_DIR}/../../work/bash_source.sh"
-  fi
+  # if [[ -e "${SCRIPT_DIR}/../../work/bash_source.sh" ]]; then
+  #   source "${SCRIPT_DIR}/../../work/bash_source.sh"
+  # fi
 }
 
 set_locale
