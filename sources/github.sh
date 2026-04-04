@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 github_token() {
-  meta_check "pass"
-
   pass_get "dev/github" "token"
 }
 

@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 codeberg_token() {
-  meta_check "pass"
-
   pass_get "dev/codeberg" "token"
 }
 
