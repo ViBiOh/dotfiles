@@ -10,6 +10,25 @@ codeberg_http_init() {
   http_init_client --header "Authorization: token $(codeberg_token)"
 }
 
+codeberg() {
+  codeberg_http_init
+
+  local API_PATH="${1-}"
+  shift || true
+
+  http_request "https://codeberg.org/api/v1${API_PATH}" "${@}"
+
+  if ! [[ ${HTTP_STATUS} =~ 2.. ]]; then
+    http_handle_error
+    http_reset
+    return 1
+  fi
+
+  jq --raw-output "." "${HTTP_OUTPUT}"
+
+  http_reset
+}
+
 codeberg_configure() {
   meta_check "var" "http"
 
@@ -50,6 +69,9 @@ codeberg_configure() {
 
   codeberg_set_secret "${CODEBERG_REPOSITORY}" "SCW_ACCES_KEY" "$(pass_get "dev/scaleway" "registry_access_key")"
   codeberg_set_secret "${CODEBERG_REPOSITORY}" "SCW_SECRET_KEY" "$(pass_get "dev/scaleway" "registry_secret_key")"
+
+  codeberg_set_hook "${CODEBERG_REPOSITORY}" "https://flux.vibioh.fr$(flux_hook)"
+  codeberg_set_hook "${CODEBERG_REPOSITORY}" "https://flux.vibioh.fr$(flux_hook "" "image")"
 
   http_reset
 }
@@ -135,25 +157,21 @@ codeberg_set_hook() {
   local HOOK_URL="${1}"
   shift
 
-  http_request "https://codeberg.org/api/v1/repos/${CODEBERG_REPOSITORY}/hooks"
-  if [[ ${HTTP_STATUS} == "404" ]]; then
-    VARIABLE_METHOD="POST"
-  fi
-
   http_request \
-    --request "${VARIABLE_METHOD}" \
+    --request "POST" \
     --header "Content-Type: application/json" \
     --data "$(json --arg "url" "${HOOK_URL}" '{
       branch_filter: "main",
       events: ["push"],
       config: {
-        url: $url
+        url: $url,
+        content_type: "json"
       },
       type: "forgejo"
     }')" \
     "https://codeberg.org/api/v1/repos/${CODEBERG_REPOSITORY}/hooks"
   if [[ ${HTTP_STATUS} != "201" ]]; then
-    http_handle_error "Unable to set ${VARIABLE_NAME} hook of ${CODEBERG_REPOSITORY}"
+    http_handle_error "Unable to set hook to ${HOOK_URL} of ${CODEBERG_REPOSITORY}"
     http_reset
     return 1
   fi

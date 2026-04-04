@@ -20,6 +20,7 @@ github() {
 
   if ! [[ ${HTTP_STATUS} =~ 2.. ]]; then
     http_handle_error
+    http_reset
     return 1
   fi
 
