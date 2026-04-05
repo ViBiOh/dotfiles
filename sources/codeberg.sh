@@ -64,14 +64,25 @@ codeberg_configure() {
     return 1
   fi
 
-  codeberg_set_variable "${CODEBERG_REPOSITORY}" "DOCKER_NAMESPACE" "vibioh"
-  codeberg_set_variable "${CODEBERG_REPOSITORY}" "DOCKER_REGISTRY" "rg.fr-par.scw.cloud"
+  if var_confirm "PGO"; then
+    codeberg_set_secret "${CODEBERG_REPOSITORY}" "DD_APP_KEY" "$(pass_get "datadog/dogfood" "app_key")"
+    codeberg_set_secret "${CODEBERG_REPOSITORY}" "DD_API_KEY" "$(pass_get "datadog/dogfood" "api_key")"
+  fi
 
-  codeberg_set_secret "${CODEBERG_REPOSITORY}" "SCW_ACCES_KEY" "$(pass_get "dev/scaleway" "registry_access_key")"
-  codeberg_set_secret "${CODEBERG_REPOSITORY}" "SCW_SECRET_KEY" "$(pass_get "dev/scaleway" "registry_secret_key")"
+  if var_confirm "Docker"; then
+    codeberg_set_variable "${CODEBERG_REPOSITORY}" "DOCKER_NAMESPACE" "vibioh"
+    codeberg_set_variable "${CODEBERG_REPOSITORY}" "DOCKER_REGISTRY" "rg.fr-par.scw.cloud"
 
-  codeberg_set_hook "${CODEBERG_REPOSITORY}" "https://flux.vibioh.fr$(flux_hook)"
-  codeberg_set_hook "${CODEBERG_REPOSITORY}" "https://flux.vibioh.fr$(flux_hook "" "image")"
+    codeberg_set_secret "${CODEBERG_REPOSITORY}" "SCW_ACCES_KEY" "$(pass_get "dev/scaleway" "registry_access_key")"
+    codeberg_set_secret "${CODEBERG_REPOSITORY}" "SCW_SECRET_KEY" "$(pass_get "dev/scaleway" "registry_secret_key")"
+  fi
+
+  if var_confirm "Flux"; then
+    codeberg_set_secret "${CODEBERG_REPOSITORY}" "FLUX_TOKEN" "$(pass "infra/flux")"
+    codeberg_set_secret "${CODEBERG_REPOSITORY}" "FLUX_WEBHOOK_URL" "https://flux.vibioh.fr$(flux_hook "" "image")"
+
+    codeberg_set_hook "${CODEBERG_REPOSITORY}" "https://flux.vibioh.fr$(flux_hook)"
+  fi
 
   http_reset
 }
