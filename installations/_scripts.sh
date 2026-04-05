@@ -10,7 +10,6 @@ install() {
   (
     cd "${DOTFILES_DIR}/"
     curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" \
-      "github" \
       "http" \
       "rotate.sh" \
       "ssh" \
