@@ -119,7 +119,7 @@ get_co_author() {
 }
 
 main() {
-  source "$(script_dir)/../../../scripts/meta" && meta_check "var" "git" "github" "http"
+  source "$(script_dir)/../../../scripts/meta" && meta_check "var" "git" "http"
 
   if ! git_is_inside; then
     var_error "not inside a git tree"
