@@ -32,7 +32,8 @@ script_dir() {
   fi
 }
 
-export DOTFILES_SOURCES_DIR="$(script_dir)"
+DOTFILES_SOURCES_DIR="$(script_dir)"
+export DOTFILES_SOURCES_DIR
 
 set_locale
 
@@ -41,10 +42,7 @@ if [[ -e "${HOME}/.dotfilesrc" ]]; then
 fi
 
 if [[ -e "${DOTFILES_SOURCES_DIR}/../scripts/meta" ]]; then
-  source "${DOTFILES_SOURCES_DIR}/../scripts/meta" && meta_init \
-    "ssh" \
-    "var" \
-    "version"
+  source "${DOTFILES_SOURCES_DIR}/../scripts/meta" && meta_init "var"
 fi
 
 for file in "${DOTFILES_SOURCES_DIR}/../sources/"*; do

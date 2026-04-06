@@ -382,7 +382,7 @@ github_clean_subscription() {
 }
 
 github_release() {
-  meta_check "var" "git" "http" "version"
+  meta_check "var" "git" "http"
 
   if ! git_is_inside; then
     var_warning "not inside a git tree"

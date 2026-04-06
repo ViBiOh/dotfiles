@@ -12,9 +12,7 @@ install() {
     curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh" | bash -s -- "-c" \
       "http" \
       "rotate.sh" \
-      "ssh" \
-      "var" \
-      "version"
+      "var"
   )
 
   source "${DOTFILES_DIR}/scripts/meta" && meta_check "var"
