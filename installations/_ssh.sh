@@ -21,6 +21,11 @@ install() {
 
     echo "Include /etc/ssh/ssh_config.d/*
 " | sudo tee "/etc/ssh/ssh_config" >/dev/null
+
+    if command -v op >/dev/null 2>&1; then
+      EXTRA_CONFIG+='
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"'
+    fi
   fi
 
   mkdir -p "${HOME}/.ssh"
@@ -30,8 +35,7 @@ install() {
   ChallengeResponseAuthentication no
   HashKnownHosts yes${EXTRA_CONFIG}
   ServerAliveInterval 300
-  ServerAliveCountMax 2
-" >"${HOME}/.ssh/config"
+  ServerAliveCountMax 2" >"${HOME}/.ssh/config"
 
   ssh-keyscan "github.com" >"${HOME}/.ssh/known_hosts"
   ssh-keyscan "gitlab.com" >>"${HOME}/.ssh/known_hosts"
