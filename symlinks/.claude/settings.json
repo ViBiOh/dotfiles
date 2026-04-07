@@ -5,6 +5,7 @@
       "Bash(cat*)",
       "Bash(cd*)",
       "Bash(find*)",
+      "Bash(git diff*)",
       "Bash(go build*)",
       "Bash(go doc*)",
       "Bash(go generate:*)",
