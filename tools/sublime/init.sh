@@ -63,8 +63,6 @@ install_shfmt() {
 main() {
   local SCRIPT_DIR
   SCRIPT_DIR="$(script_dir)"
-  DOTFILES_DIR="$(cd "${SCRIPT_DIR}/../../" && pwd)"
-  export DOTFILES_DIR
 
   local TEXT_PKG="${HOME}/.config/sublime-text/Packages"
   local MERGE_PKG="${HOME}/.config/sublime-merge/Packages"
@@ -75,7 +73,6 @@ main() {
   fi
 
   source "${SCRIPT_DIR}/../../sources/__binary.sh"
-  source "${SCRIPT_DIR}/../../sources/symlink.sh"
 
   symlink_settings "${TEXT_PKG}" "text"
   symlink_settings "${MERGE_PKG}" "merge"
@@ -97,7 +94,8 @@ main() {
   if command -v pip >/dev/null 2>&1; then
     pip install "python-lsp-server" "black" "isort" "pycodestyle" "sqlparse"
 
-    symlink_home ".config/pycodestyle"
+    rm -rf "${HOME}/.config/pycodestyle"
+    ln -s "${SCRIPT_DIR}/../../symlinks/.config/pycodestyle" "${HOME}/.config/pycodestyle"
   fi
 
   install_shfmt
