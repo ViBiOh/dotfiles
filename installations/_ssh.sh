@@ -19,9 +19,6 @@ install() {
     EXTRA_CONFIG="
   UseKeyChain no"
 
-    echo "Include /etc/ssh/ssh_config.d/*
-" | sudo tee "/etc/ssh/ssh_config" >/dev/null
-
     if command -v op >/dev/null 2>&1; then
       EXTRA_CONFIG+='
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"'
