@@ -187,7 +187,10 @@ main() {
 
     source_bashrc
     create_dotfilesrc
-    source_bashrc
+  fi
+
+  if [[ -e "${HOME}/.dotfilesrc" ]]; then
+    source "${HOME}/.dotfilesrc"
   fi
 
   if [[ ${#ACTIONS[@]} -ne 0 ]]; then

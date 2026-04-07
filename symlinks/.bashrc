@@ -32,14 +32,16 @@ script_dir() {
   fi
 }
 
+source_if_exists() {
+  if [[ -e ${1} ]]; then
+    source "${1}"
+  fi
+}
+
 DOTFILES_SOURCES_DIR="$(script_dir)"
 export DOTFILES_SOURCES_DIR
 
 set_locale
-
-if [[ -e "${HOME}/.dotfilesrc" ]]; then
-  source "${HOME}/.dotfilesrc"
-fi
 
 if [[ -e "${DOTFILES_SOURCES_DIR}/../scripts/meta" ]]; then
   source "${DOTFILES_SOURCES_DIR}/../scripts/meta" && meta_init "var"
@@ -49,13 +51,9 @@ for file in "${DOTFILES_SOURCES_DIR}/../sources/"*; do
   [[ -r ${file} ]] && [[ -f ${file} ]] && source "${file}"
 done
 
-if [[ -e "${DOTFILES_SOURCES_DIR}/../../work/bash_source.sh" ]]; then
-  source "${DOTFILES_SOURCES_DIR}/../../work/bash_source.sh"
-fi
-
-if [[ -e "${HOME}/.localrc" ]]; then
-  source "${HOME}/.localrc"
-fi
+source_if_exists "${DOTFILES_SOURCES_DIR}/../../work/bash_source.sh"
+source_if_exists "${HOME}/.localrc"
 
 unset -f set_locale
 unset -f script_dir
+unset -f source_if_exists
