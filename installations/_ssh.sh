@@ -13,26 +13,11 @@ clean() {
 }
 
 install() {
-  local EXTRA_CONFIG=""
+  symlink_home ".ssh/config"
 
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    EXTRA_CONFIG="
-  UseKeyChain no"
-
-    if command -v op >/dev/null 2>&1; then
-      EXTRA_CONFIG+='
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"'
-    fi
+  if command -v op >/dev/null 2>&1; then
+    symlink_home ".ssh/config.d/op"
   fi
-
-  mkdir -p "${HOME}/.ssh"
-
-  echo "Host *
-  PasswordAuthentication no
-  ChallengeResponseAuthentication no
-  HashKnownHosts yes${EXTRA_CONFIG}
-  ServerAliveInterval 300
-  ServerAliveCountMax 2" >"${HOME}/.ssh/config"
 
   ssh-keyscan "github.com" >"${HOME}/.ssh/known_hosts"
   ssh-keyscan "gitlab.com" >>"${HOME}/.ssh/known_hosts"
@@ -44,5 +29,5 @@ credentials() {
     return
   fi
 
-  extract_secret "infra/ssh" ".ssh/config"
+  extract_secret "infra/ssh" ".ssh/config.d/infra"
 }
