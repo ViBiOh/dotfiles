@@ -194,6 +194,17 @@ _jira() {
     _jira_list "${scope}" "${1-}"
     ;;
 
+  "open")
+    local JIRA_ISSUE
+    JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
+
+    if [[ -z ${JIRA_ISSUE} ]]; then
+      return
+    fi
+
+    open "$(_jira_url "${JIRA_ISSUE}")"
+    ;;
+
   "pr")
     if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
       _jira_error "not in a git directory"
@@ -446,6 +457,7 @@ _jira_help() {
   _jira_info " - branch      Switch git repository branch to ticket  | <search text>?"
   _jira_info " - create      Create a ticket interactively           |"
   _jira_info " - list        List assigned ticket"
+  _jira_info " - open        Open ticket                             | <search text>?"
   _jira_info " - pr          Open pull-request for current branch"
   _jira_info " - print       Print ticket ID                         | <search text>?"
   _jira_info " - summary     Print the summary of a ticket           | <search text>?"
