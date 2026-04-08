@@ -18,6 +18,9 @@ indent_style = space
 [{*.go,go.mod}]
 indent_style = tab
 
+[.gitconfig*]
+indent_style = tab
+
 [*.py]
 indent_size = 4
 indent_style = space
