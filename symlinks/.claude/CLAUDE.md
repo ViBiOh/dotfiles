@@ -69,6 +69,11 @@ I primarily use Claude Code for:
 - No unnecessary comments, docstrings, or type annotations unless requested
 - Delete unused code completely - no backwards-compatibility hacks
 
+## Jira Tickets
+
+- Always use the Atlassian MCP server to fetch Jira tickets — never guess or rely on memory alone
+- When looking at a ticket, always fetch the parent ticket as well to get full context
+
 ## Communication Style
 
 - Be concise and direct - short answers, straight to the point

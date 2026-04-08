@@ -172,6 +172,7 @@ codeberg_set_hook() {
     --request "POST" \
     --header "Content-Type: application/json" \
     --data "$(json --arg "url" "${HOOK_URL}" '{
+      active: true,
       branch_filter: "main",
       events: ["push"],
       config: {
