@@ -15,6 +15,10 @@ clean() {
 install() {
   symlink_home ".ssh/config"
 
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    symlink_home ".ssh/config.d/macos"
+  fi
+
   if command -v op >/dev/null 2>&1; then
     symlink_home ".ssh/config.d/op"
   fi
