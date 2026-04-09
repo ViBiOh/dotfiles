@@ -34,6 +34,12 @@ I primarily use Claude Code for:
 - Report test results before considering work complete
 - This helps catch issues early before I commit changes
 
+## Design Approach
+
+- Before implementing, propose the approach and wait for approval. Do NOT start editing multiple files unprompted.
+- Look at existing patterns/modules in the codebase first. Prefer shared modules over inline implementations.
+- Never hardcode values that should be configurable. Never duplicate paths or logic.
+
 ## Build & Run
 
 **CRITICAL**: Never use Bazel commands (bazel build, bazel test, bazel run, etc.)
