@@ -60,12 +60,16 @@ do_mandatory_actions() {
   do_action "__fzf.sh" "${@}"
 }
 
-create_dotfilesrc() {
-  printf -- "Select files to install\n"
-
+source_dotfilesrc() {
   if [[ -e "${HOME}/.dotfilesrc" ]]; then
     source "${HOME}/.dotfilesrc"
   fi
+}
+
+create_dotfilesrc() {
+  printf -- "Select files to install\n"
+
+  source_dotfilesrc
 
   local FILES=()
   local FZF_BIND_ACTIONS=""
@@ -235,9 +239,7 @@ main() {
     create_dotfilesrc
   fi
 
-  if [[ -e "${HOME}/.dotfilesrc" ]]; then
-    source "${HOME}/.dotfilesrc"
-  fi
+  source_dotfilesrc
 
   if [[ ${#ACTIONS[@]} -ne 0 ]]; then
     browse_actions "${ACTIONS[@]}"
