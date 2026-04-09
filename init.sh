@@ -63,6 +63,37 @@ do_mandatory_actions() {
 create_dotfilesrc() {
   printf -- "Select files to install\n"
 
+  if [[ -e "${HOME}/.dotfilesrc" ]]; then
+    source "${HOME}/.dotfilesrc"
+  fi
+
+  local FILES=()
+  local FZF_BIND_ACTIONS=""
+  local POS=0
+
+  while IFS= read -r -d '' file; do
+    FILES+=("${file}")
+    POS=$((POS + 1))
+
+    local BASENAME_FILE
+    BASENAME_FILE="$(basename "${file}")"
+
+    local INSTALL_NAME
+    INSTALL_NAME="$(printf -- "%s" "${BASENAME_FILE%.sh}" | tr "[:lower:]" "[:upper:]")"
+
+    local ENABLE_VARIABLE_NAME="DOTFILES_${INSTALL_NAME}"
+    if [[ ${!ENABLE_VARIABLE_NAME:-} == "true" ]]; then
+      FZF_BIND_ACTIONS+="pos(${POS})+select+"
+    fi
+  done < <(find "${DOTFILES_DIR}/installations" -not -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
+
+  local FZF_OPTS=(--multi --print0 --preview 'cat {}')
+  if [[ -n ${FZF_BIND_ACTIONS} ]]; then
+    FZF_OPTS+=(--bind "load:${FZF_BIND_ACTIONS}pos(1)")
+  fi
+
+  var_info "${FZF_OPTS[@]}"
+
   cat >"${HOME}/.dotfilesrc" <<END_OF_DOTFILES_RC
 #!/usr/bin/env bash
 
@@ -76,7 +107,7 @@ END_OF_DOTFILES_RC
     INSTALL_NAME="$(printf -- "%s" "${BASENAME_FILE%.sh}" | tr "[:lower:]" "[:upper:]")"
 
     echo "export DOTFILES_${INSTALL_NAME}=\"true\"" >>"${HOME}/.dotfilesrc"
-  done < <(find "${DOTFILES_DIR}/installations" -not -name "__*" -type f | LC_ALL=C sort | fzf --multi --print0 --preview 'cat {}')
+  done < <(printf '%s\n' "${FILES[@]}" | fzf "${FZF_OPTS[@]}")
 }
 
 browse_actions() {
