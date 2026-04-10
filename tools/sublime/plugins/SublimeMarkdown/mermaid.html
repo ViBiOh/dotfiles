@@ -1,9 +1,8 @@
 <script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
   mermaid.initialize({ startOnLoad: false });
-    await mermaid.run({
-      querySelector: '.mermaid > code',
-    });
+  await mermaid.run({ querySelector: ".mermaid > code" });
 </script>
 
 <style>

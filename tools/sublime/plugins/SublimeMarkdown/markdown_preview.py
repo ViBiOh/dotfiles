@@ -21,7 +21,6 @@ class MarkdownPreview(sublime_plugin.WindowCommand):
         tmp = tempfile.NamedTemporaryFile(
             suffix=".html", prefix="md-preview-", delete=False
         )
-        tmp_path = tmp.name
         tmp.close()
 
         def task():
@@ -33,13 +32,13 @@ class MarkdownPreview(sublime_plugin.WindowCommand):
                     "--include-after-body",
                     sublime.packages_path() + "/SublimeMarkdown/mermaid.html",
                     "--output",
-                    tmp_path,
+                    tmp.name,
                     file,
                 ],
                 cwd=working_dir,
             )
 
-            webbrowser.open("file://" + tmp_path)
-            sublime.set_timeout(lambda: os.unlink(tmp_path), 5000)
+            webbrowser.open("file://" + tmp.name)
+            sublime.set_timeout(lambda: os.unlink(tmp.name), 5000)
 
         threading.Thread(target=task).start()

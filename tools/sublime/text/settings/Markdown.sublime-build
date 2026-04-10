@@ -1,0 +1,7 @@
+{
+  "target": "markdown_preview",
+  "selector": "text.html.markdown",
+  "file_patterns": [
+    "*.md"
+  ]
+}
