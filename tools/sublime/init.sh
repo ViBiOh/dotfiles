@@ -82,6 +82,11 @@ main() {
   install_plugin "${TEXT_PKG}" "SublimeGo"
   install_plugin "${TEXT_PKG}" "SublimeLayout"
   install_plugin "${TEXT_PKG}" "SublimeMakefile"
+  install_plugin "${TEXT_PKG}" "SublimeMarkdown"
+
+  if command -v brew >/dev/null 2>&1; then
+    brew install pandoc
+  fi
 
   if command -v go >/dev/null 2>&1; then
     go install "golang.org/x/tools/gopls@latest"
