@@ -220,7 +220,7 @@ codeberg_create_release() {
     --arg body "${CHANGELOG}" \
     '{tag_name: $tag, target_commitish: $target, name: $name, body: $body}')"
 
-  http_request --request "POST" "https://codeberg.org/api/v1/repos/${CODEBERG_REPOSITORY}/releases" --data "${PAYLOAD}"
+  http_request --request "POST" "https://codeberg.org/api/v1/repos/${CODEBERG_REPOSITORY}/releases" --header "Content-Type: application/json" --data "${PAYLOAD}"
   if [[ ${HTTP_STATUS} != "201" ]]; then
     http_handle_error "Unable to create release"
     http_reset
