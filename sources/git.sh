@@ -27,3 +27,24 @@ git_large_repos() {
 git_large_repos_status() {
   git fsmonitor--daemon status
 }
+
+git_repository() {
+  if ! git_is_inside; then
+    return
+  fi
+
+  local REMOTE_URL
+  REMOTE_URL="$(git remote get-url --push "$(git remote show | head -1)")"
+
+  if [[ ${REMOTE_URL} =~ ^.*@(.*)[:/](.*)/(.*)$ ]]; then
+    jq --null-input --compact-output \
+      --arg url "${BASH_REMATCH[1]}" \
+      --arg owner "${BASH_REMATCH[2]}" \
+      --arg name "${BASH_REMATCH[3]%.git}" \
+      '{
+          url: $url,
+          owner: $owner,
+          name: $name
+        }'
+  fi
+}

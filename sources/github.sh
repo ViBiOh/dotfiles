@@ -424,12 +424,12 @@ github_release() {
   local GIT_TAG
   GIT_TAG="$(version_semver "${VERSION}" "${VERSION_REF}" "quiet")"
 
-  var_read GITHUB_REPOSITORY "$(git_remote_repository)"
+  var_read GITHUB_REPOSITORY "$(git_repository | jq -r '.owner + "/" + .name')"
   var_read RELEASE_NAME "${GIT_TAG}"
 
   var_info "Creating release ${RELEASE_NAME} for ${GITHUB_REPOSITORY}..."
 
-  http_init_client --header "Authorization: token $(github_token)" --header "Accept: application/vnd.github+json" --header "X-GitHub-Api-Version: 2022-11-28"
+  github_http_init
   HTTP_CLIENT_ARGS+=("--max-time" "120")
 
   local PAYLOAD
@@ -451,6 +451,8 @@ github_release() {
   http_reset
 
   var_success "${GITHUB_REPOSITORY}@${RELEASE_NAME} created!"
+
+  http_reset
 
   unset GITHUB_REPOSITORY
   unset RELEASE_NAME

@@ -59,7 +59,7 @@ is_github() {
 }
 
 get_issue() {
-  http_request "https://api.github.com/repos/$(git_remote_repository)/issues?per_page=100"
+  http_request "https://api.github.com/repos/$(git_repository | jq -r '.owner + "/" + .name')/issues?per_page=100"
 
   if [[ ${HTTP_STATUS} != "200" ]]; then
     http_handle_error "Unable to list issues"
@@ -80,7 +80,7 @@ get_issue() {
 }
 
 get_co_author() {
-  http_request "https://api.github.com/repos/$(git_remote_repository)/contributors?per_page=100"
+  http_request "https://api.github.com/repos/$(git_repository | jq -r '.owner + "/" + .name')/contributors?per_page=100"
 
   if [[ ${HTTP_STATUS} != "200" ]]; then
     http_handle_error "Unable to list contributors"
