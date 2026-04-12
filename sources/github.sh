@@ -381,55 +381,25 @@ github_clean_subscription() {
   http_reset
 }
 
-github_release() {
-  meta_check "var" "git" "http"
+github_create_release() {
+  meta_check "var"
 
-  if ! git_is_inside; then
-    var_warning "not inside a git tree"
+  if [[ ${#} -ne 4 ]]; then
+    var_red "Usage: github_create_release GITHUB_REPOSITORY RELEASE_NAME VERSION_REF CHANGELOG"
     return 1
   fi
 
-  var_info "Identifying semver"
-
-  local LAST_TAG
-  LAST_TAG="$(git_last_tag)"
-
-  local VERSION_REF
-  local PREVIOUS_REF
-
-  if [[ -n ${LAST_TAG:-} ]]; then
-    VERSION_REF="$(git log --no-merges --invert-grep --grep "\[skip ci\] Automated" --color --pretty=format:'%Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' "HEAD...${LAST_TAG}" | fzf --height=20 --ansi --reverse | awk '{printf("%s", $1)}')"
-    var_read PREVIOUS_REF "$(git tag --sort=-creatordate | grep --invert-match "${VERSION_REF}" | head -1)"
-  else
-    PREVIOUS_REF="HEAD^1"
-    VERSION_REF="HEAD"
-  fi
-
-  local CHANGELOG
-  CHANGELOG=$(git_changelog "${VERSION_REF}" "${PREVIOUS_REF}")
-  printf -- "%bCHANGELOG:%b\n\n%s%b\n\n" "${YELLOW}" "${GREEN}" "${CHANGELOG}" "${RESET}"
-
-  local VERSION_TYPE="patch"
-  if [[ ${CHANGELOG} =~ \#\ BREAKING\ CHANGES ]]; then
-    VERSION_TYPE="major"
-  elif [[ ${CHANGELOG} =~ \#\ Features ]]; then
-    VERSION_TYPE="minor"
-  fi
-
-  printf -- "%bRelease seems to be a %b%s%b\n" "${BLUE}" "${YELLOW}" "${VERSION_TYPE}" "${RESET}"
-  var_info "Specify explicit git tag or major|minor|patch for semver increment"
-  local VERSION
-  VERSION="$(printf -- "%bpatch\n%bminor\n%bmajor" "${GREEN}" "${YELLOW}" "${RED}" | fzf --height=20 --ansi --reverse)"
-
-  local GIT_TAG
-  GIT_TAG="$(version_semver "${VERSION}" "${VERSION_REF}" "quiet")"
-
-  var_read GITHUB_REPOSITORY "$(git_repository | jq -r '.owner + "/" + .name')"
-  var_read RELEASE_NAME "${GIT_TAG}"
-
-  var_info "Creating release ${RELEASE_NAME} for ${GITHUB_REPOSITORY}..."
+  local GITHUB_REPOSITORY="${1}"
+  shift
+  local RELEASE_NAME="${1}"
+  shift
+  local VERSION_REF="${1}"
+  shift
+  local CHANGELOG="${1}"
+  shift
 
   github_http_init
+
   HTTP_CLIENT_ARGS+=("--max-time" "120")
 
   local PAYLOAD
@@ -446,16 +416,8 @@ github_release() {
     http_reset
     return 1
   fi
-  rm "${HTTP_OUTPUT}"
 
   http_reset
-
-  var_success "${GITHUB_REPOSITORY}@${RELEASE_NAME} created!"
-
-  http_reset
-
-  unset GITHUB_REPOSITORY
-  unset RELEASE_NAME
 }
 
 github_compare_version() {

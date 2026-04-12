@@ -55,7 +55,7 @@ codeberg_configure() {
 
     has_projects: false,
     has_packages: false,
-    has_releases: false,
+    has_releases: true,
     has_wiki: false
   }')"
   if [[ ${HTTP_STATUS} != "200" ]]; then
@@ -184,6 +184,45 @@ codeberg_set_hook() {
     "https://codeberg.org/api/v1/repos/${CODEBERG_REPOSITORY}/hooks"
   if [[ ${HTTP_STATUS} != "201" ]]; then
     http_handle_error "Unable to set hook to ${HOOK_URL} of ${CODEBERG_REPOSITORY}"
+    http_reset
+    return 1
+  fi
+
+  http_reset
+}
+
+codeberg_create_release() {
+  meta_check "var"
+
+  if [[ ${#} -ne 4 ]]; then
+    var_red "Usage: codeberg_create_release CODEBERG_REPOSITORY RELEASE_NAME VERSION_REF CHANGELOG"
+    return 1
+  fi
+
+  local CODEBERG_REPOSITORY="${1}"
+  shift
+  local RELEASE_NAME="${1}"
+  shift
+  local VERSION_REF="${1}"
+  shift
+  local CHANGELOG="${1}"
+  shift
+
+  codeberg_http_init
+
+  HTTP_CLIENT_ARGS+=("--max-time" "120")
+
+  local PAYLOAD
+  PAYLOAD="$(jq --compact-output --null-input \
+    --arg tag "${RELEASE_NAME}" \
+    --arg target "$(git rev-parse "${VERSION_REF}")" \
+    --arg name "${RELEASE_NAME}" \
+    --arg body "${CHANGELOG}" \
+    '{tag_name: $tag, target_commitish: $target, name: $name, body: $body}')"
+
+  http_request --request "POST" "https://codeberg.org/api/v1/repos/${CODEBERG_REPOSITORY}/releases" --data "${PAYLOAD}"
+  if [[ ${HTTP_STATUS} != "201" ]]; then
+    http_handle_error "Unable to create release"
     http_reset
     return 1
   fi
