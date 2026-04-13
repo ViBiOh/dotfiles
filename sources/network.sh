@@ -108,7 +108,10 @@ dns_allow() {
     linkedin.com
   "
 
-  websites["aws"]="analytics.console.aws.a2z.com"
+  websites["aws"]="
+    analytics.console.aws.a2z.com
+    awstrack.me
+  "
 
   websites["datadog"]="
     www.datadoghq-browser-agent.com
