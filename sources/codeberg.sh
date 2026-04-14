@@ -79,9 +79,9 @@ codeberg_configure() {
 
   if var_confirm "Flux"; then
     codeberg_set_secret "${CODEBERG_REPOSITORY}" "FLUX_TOKEN" "$(pass "infra/flux")"
-    codeberg_set_secret "${CODEBERG_REPOSITORY}" "FLUX_WEBHOOK_URL" "https://flux.vibioh.fr$(flux_hook "" "image")"
+    codeberg_set_secret "${CODEBERG_REPOSITORY}" "FLUX_WEBHOOK_URL" "https://flux.vibioh.fr$(flux_hook "" "$(basename "${CODEBERG_REPOSITORY}")-image")"
 
-    codeberg_set_hook "${CODEBERG_REPOSITORY}" "https://flux.vibioh.fr$(flux_hook)"
+    codeberg_set_hook "${CODEBERG_REPOSITORY}" "https://flux.vibioh.fr$(flux_hook "" "$(basename "${CODEBERG_REPOSITORY}")")"
   fi
 
   http_reset
