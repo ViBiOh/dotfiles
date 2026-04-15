@@ -25,17 +25,13 @@ gazelle() {
   var_print_and_run bzl run --ui_event_filters=-INFO,-DEBUG,-STDOUT,-STDERR //:gazelle -- fix "${GAZELLE_TARGET#/}"
 }
 
-bazel_clean() {
+bazel_hard_clean() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     rm -rf "${HOME}/Library/Caches/bazel"
     rm -rf "${HOME}/Library/Caches/bazelisk"
 
-    sudo rm -rf "/private/var/tmp/"
-
+    sudo rm -rf "/var/tmp/_bazel_$(whoami)"
     sudo mkdir -p "/var/tmp/_bazel_$(whoami)"
     sudo chown "$(whoami)" "/var/tmp/_bazel_$(whoami)"
-
-    sudo mkdir -p "/var/tmp/zig-cache"
-    sudo chown "$(whoami)" "/var/tmp/zig-cache"
   fi
 }
