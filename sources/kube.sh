@@ -653,4 +653,25 @@ _fzf_complete_kube() {
   esac
 }
 
+kube_autoscaler() {
+  yq '(.spec.minReplicas) + " " + (.status.currentReplicas) + " " + (.spec.maxReplicas)' | awk '{
+    min=$1; cur=$2; max=$3; w=40;
+
+    pct=(max>min) ? (cur-min)/(max-min)*100 : 0;
+    pos=int(pct/100*w);
+
+    reset="\033[0m";
+    if (pct>=90) color="\033[31m";
+    else if (pct>=60) color="\033[33m";
+    else color="\033[32m";
+
+    printf "%smin=%d current=%d max=%d (%.0f%%)%s\n", color, min, cur, max, pct, reset;
+    printf "%s[", color;
+
+    for(i=0;i<w;i++) printf (i==pos) ? "|" : (i<pos) ? "=" : ".";
+
+    printf "]%s\n", reset;
+  }'
+}
+
 [[ -n ${BASH} ]] && complete -F _fzf_complete_kube -o default -o bashdefault kube
