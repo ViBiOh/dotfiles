@@ -57,13 +57,13 @@ stock() {
 
   local REGULAR_END
   REGULAR_END=$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta.currentTradingPeriod.regular.end')
+  CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].indicators.quote[0].open[-1]')"
 
-  if [[ ${CURRENT_TIMESTAMP} -lt ${REGULAR_START} ]] || [[ ${CURRENT_TIMESTAMP} -gt ${REGULAR_END} ]]; then
-    CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].indicators.quote[0].open[-1]')"
+  if [[ ${CURRENT_TIMESTAMP} -lt ${REGULAR_START} ]] || [[ ${CURRENT_TIMESTAMP} -gt ${REGULAR_END} ]] && [[ ${CURRENT_PRICE:-} != "null" ]]; then
     PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
 
     _stock_evolution
-    printf -- "#[fg=colour255] | %s %s%s%s" "${CURRENT_PRICE}" "${EVOLUTION_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%"
+    printf -- "#[fg=colour255] | %s %b%s%s%b" "${CURRENT_PRICE}" "${OUTPUT_COLOR}" "${EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
   fi
 }
 

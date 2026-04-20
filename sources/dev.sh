@@ -171,8 +171,9 @@ stock() {
   local CURRENT_TIMESTAMP
   CURRENT_TIMESTAMP="$(date +%s)"
 
-  if [[ ${CURRENT_TIMESTAMP} -lt ${REGULAR_START} ]] || [[ ${CURRENT_TIMESTAMP} -gt ${REGULAR_END} ]]; then
-    CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].indicators.quote[0].open[-1]')"
+  CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].indicators.quote[0].open[-1]')"
+
+  if [[ ${CURRENT_TIMESTAMP} -lt ${REGULAR_START} ]] || [[ ${CURRENT_TIMESTAMP} -gt ${REGULAR_END} ]] && [[ ${CURRENT_PRICE:-} != "null" ]]; then
     PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
 
     _stock_evolution
