@@ -96,8 +96,6 @@ create_dotfilesrc() {
     FZF_OPTS+=(--bind "load:${FZF_BIND_ACTIONS}pos(1)")
   fi
 
-  var_info "${FZF_OPTS[@]}"
-
   cat >"${HOME}/.dotfilesrc" <<END_OF_DOTFILES_RC
 #!/usr/bin/env bash
 
