@@ -7,7 +7,7 @@ fi
 if [[ -e "${DOTFILES_SOURCES_DIR}/../scripts/meta" ]]; then
   source "${DOTFILES_SOURCES_DIR}/../scripts/meta" && meta_init "git"
 
-  if ! [[ -e ${DOTFILES_SOURCES_DIR}/../scripts/hooks/ ]]; then
+  if ! [[ -d ${DOTFILES_SOURCES_DIR}/../scripts/hooks/ ]]; then
     meta_init "git_hooks"
   fi
 fi
