@@ -4,7 +4,9 @@ if ! command -v git >/dev/null 2>&1; then
   return
 fi
 
-source "${DOTFILES_SOURCES_DIR}/../scripts/meta" && meta_init "git"
+if [[ -e "${DOTFILES_SOURCES_DIR}/../scripts/meta" ]]; then
+  source "${DOTFILES_SOURCES_DIR}/../scripts/meta" && meta_init "git"
+fi
 
 if command -v delta >/dev/null 2>&1; then
   export GIT_PAGER='delta --dark'
