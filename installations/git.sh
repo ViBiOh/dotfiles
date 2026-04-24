@@ -6,9 +6,6 @@ symlink() {
   symlink_home ".gitconfig"
   symlink_home ".gitconfig_work"
   symlink_home ".gitignore_global"
-
-  # https://git-scm.com/docs/git#Documentation/git.txt---list-cmdsltgroupgtltgroupgt82308203
-  symlink_home "opt/bin/git-coco"
 }
 
 clean() {
