@@ -114,3 +114,59 @@ git_release() {
   unset REPOSITORY_NAME
   unset RELEASE_NAME
 }
+
+git_hooks_toggle() {
+  if [[ ${SCRIPTS_NO_GIT_HOOKS:-} == "true" ]]; then
+    var_info "Git hooks enabled"
+    unset SCRIPTS_NO_GIT_HOOKS
+  else
+    var_info "Git hooks disabled"
+    export SCRIPTS_NO_GIT_HOOKS="true"
+  fi
+}
+
+git_hooks_toggle_config() {
+  if ! git_is_inside; then
+    return
+  fi
+
+  local CONFIG_NAME="${1}"
+  shift
+
+  local TOGGLE_INVERTED="${1:-false}"
+  shift
+
+  if [[ $(git config "${CONFIG_NAME}") == "true" ]]; then
+    if [[ ${TOGGLE_INVERTED} == "true" ]]; then
+      var_info "Disabling ${CONFIG_NAME}"
+    else
+      var_info "Enabling ${CONFIG_NAME}"
+    fi
+
+    git config --unset "${CONFIG_NAME}"
+  else
+    if [[ ${TOGGLE_INVERTED} == "true" ]]; then
+      var_info "Enabling ${CONFIG_NAME}"
+    else
+      var_info "Disabling ${CONFIG_NAME}"
+    fi
+
+    git config "${CONFIG_NAME}" "true"
+  fi
+}
+
+git_hooks_no_yaml_format() {
+  git_hooks_toggle_config "hooks.noYamlFormat"
+}
+
+git_hooks_no_md_format() {
+  git_hooks_toggle_config "hooks.noMarkdownFormat"
+}
+
+git_hooks_bazelle_gazelle() {
+  git_hooks_toggle_config "hooks.bazelleGazelle" "true"
+}
+
+git_hooks_json_sort() {
+  git_hooks_toggle_config "hooks.jsonSort" "true"
+}
