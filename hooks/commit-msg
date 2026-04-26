@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail
+
+if [[ ${TRACE:-0} == "1" ]]; then
+  set -o xtrace
+fi
+
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
+main() {
+  if [[ ${SCRIPTS_NO_GIT_HOOKS:-} == "true" ]]; then
+    return 0
+  fi
+
+  source "$(script_dir)/../scripts/meta" && meta_check "var" "git"
+
+  local FIRST_LINE
+  FIRST_LINE="$(head -1 "${1}")"
+
+  if git_is_commit_wip "${FIRST_LINE}"; then
+    exit 0
+  fi
+
+  if ! git_is_conventional_commit "${FIRST_LINE}"; then
+    _git_conventional_commit_guidelines
+
+    var_warning "To disable, use 'git commit -n' or SCRIPTS_NO_GIT_HOOKS=true"
+    exit 1
+  fi
+
+  if ! git_is_valid_description "${FIRST_LINE}"; then
+    _git_valid_description_guideline "${FIRST_LINE}"
+
+    if ! var_confirm "Do you want to override"; then
+      exit 1
+    fi
+  fi
+
+  exit 0
+}
+
+main "${@}"

@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail
+
+if [[ ${TRACE:-0} == "1" ]]; then
+  set -o xtrace
+fi
+
+script_dir() {
+  local FILE_SOURCE="${BASH_SOURCE[0]}"
+
+  if [[ -L ${FILE_SOURCE} ]]; then
+    dirname "$(readlink "${FILE_SOURCE}")"
+  else
+    (
+      cd "$(dirname "${FILE_SOURCE}")" && pwd
+    )
+  fi
+}
+
+main() {
+  if [[ ${SCRIPTS_NO_GIT_HOOKS:-} == "true" ]]; then
+    return 0
+  fi
+
+  source "$(script_dir)/../scripts/meta" && meta_check "git"
+
+  local BRANCH_NAME
+  BRANCH_NAME=$(git branch --show-current)
+
+  local FIRST_LINE
+  FIRST_LINE="$(head -1 "${1}")"
+
+  if git_is_commit_wip "${FIRST_LINE}"; then
+    exit 0
+  fi
+
+  if [[ -n ${BRANCH_NAME:-} && ${BRANCH_NAME} =~ (features/|fixes/|feat-|fix-)?([A-Z0-9]+[-_][0-9]+) ]]; then
+    local PREFIX="${BASH_REMATCH[2]}"
+
+    if [[ ! ${FIRST_LINE} =~ ${PREFIX} ]]; then
+      if git_is_conventional_commit "${FIRST_LINE}"; then
+        perl -pi'' -e "s|^(revert:\ )?($(printf -- "%s\|" "${!CONVENTIONAL_COMMIT_SCOPES[@]}"))(\(.+\))?(\!?):|\1\2\3\4: ${PREFIX}|" "${1}"
+      else
+        perl -pi'' -e "s|^|${PREFIX} |" "${1}"
+      fi
+    fi
+  fi
+
+  if [[ ${2-} == "commit" ]]; then
+    local ORIGINAL_COMMITTER
+    ORIGINAL_COMMITTER=$(git show --format="%aN <%aE>" HEAD | head -1)
+
+    local CURRENT_COMMITTER
+    CURRENT_COMMITTER="$(git var GIT_COMMITTER_IDENT | sed -n 's|^\(.*>\).*$|\1|p')"
+
+    if [[ ${ORIGINAL_COMMITTER} != "${CURRENT_COMMITTER}" ]]; then
+      local CO_AUTHOR_LINE="Co-authored-by: ${CURRENT_COMMITTER}"
+
+      local WITH_TRAILER
+      WITH_TRAILER="$(mktemp)"
+
+      git interpret-trailers --where start --trailer "${CO_AUTHOR_LINE}" <"${1}" >"${WITH_TRAILER}"
+
+      cat "${WITH_TRAILER}" >"${1}"
+      rm "${WITH_TRAILER}"
+    fi
+  fi
+
+  exit 0
+}
+
+main "${@}"

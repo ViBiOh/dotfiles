@@ -17,7 +17,7 @@
 	autocrlf = input
 	excludesfile = ~/.gitignore_global
 	ignorecase = false
-	hooksPath = "~/code/dotfiles/scripts/hooks"
+	hooksPath = "~/code/dotfiles/hooks"
 
 [diff]
 	mnemonicPrefix = true

@@ -6,10 +6,6 @@ fi
 
 if [[ -e "${DOTFILES_SOURCES_DIR}/../scripts/meta" ]]; then
   source "${DOTFILES_SOURCES_DIR}/../scripts/meta" && meta_init "git"
-
-  if ! [[ -d ${DOTFILES_SOURCES_DIR}/../scripts/hooks/ ]]; then
-    meta_init "git_hooks"
-  fi
 fi
 
 if command -v delta >/dev/null 2>&1; then
