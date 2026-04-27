@@ -37,7 +37,7 @@ install() {
 
   python3 -m venv "${HOME}/opt/python/venv"
 
-  source "${DOTFILES_DIR}/sources/__first.sh"
+  source "${DOTFILES_DIR}/sources/__binary.sh"
   source "${DOTFILES_DIR}/sources/_python.sh"
 
   if ! command -v pip >/dev/null 2>&1; then
