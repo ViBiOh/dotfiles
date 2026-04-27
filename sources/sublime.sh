@@ -1,7 +1,41 @@
 #!/usr/bin/env bash
 
+sublime_install() {
+  if [[ ${#} -ne 1 ]]; then
+    var_error "Usage sublime_install SUBLIME_TEXT_VERSION"
+    return 1
+  fi
+
+  local SUBLIME_TEXT_VERSION="${1}"
+  shift
+
+  local FILENAME_SUFFIX
+  FILENAME_SUFFIX="$(normalized_arch "amd64" "arm" "arm64").tar.xz"
+
+  local OUTPUT_FOLDER="${HOME}/opt/"
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    OUTPUT_FOLDER="${HOME}/Applications"
+    FILENAME_SUFFIX="mac.zip"
+    rm -rf "${OUTPUT_FOLDER}/Sublime Text.app"
+  fi
+
+  local SUBLIME_TEXT_FILENAME="sublime_text_build_${SUBLIME_TEXT_VERSION}_${FILENAME_SUFFIX}"
+  curl --disable --silent --show-error --location --max-time 300 --remote-name "https://download.sublimetext.com/${SUBLIME_TEXT_FILENAME}"
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    unzip -d "${OUTPUT_FOLDER}" -o "${SUBLIME_TEXT_FILENAME}"
+    ln -f -s "${OUTPUT_FOLDER}/Sublime Text.app/Contents/SharedSupport/bin/subl" "${HOME}/opt/bin/subl"
+  else
+    tar -xf "${SUBLIME_TEXT_FILENAME}" -C "${OUTPUT_FOLDER}"
+    ln -f -s "${OUTPUT_FOLDER}/sublime_text/sublime_text" "${HOME}/opt/bin/subl"
+  fi
+
+  rm -rf "${SUBLIME_TEXT_FILENAME}"
+}
+
 if ! command -v subl >/dev/null 2>&1; then
-  return
+ return
 fi
 
 sublime_add_project() {
