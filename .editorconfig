@@ -14,7 +14,10 @@ indent_size = 4
 [Makefile]
 indent_style = tab
 
-[{*.sublime-settings,*.sublime-snippet}]
+[*.sublime-settings]
+indent_style = space
+
+[*.sublime-snippet]
 indent_style = tab
 
 [sublime/text/settings/*]
