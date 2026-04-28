@@ -15,10 +15,10 @@ install() {
   fi
 
   local SUBLIME_TEXT_VERSION
-  SUBLIME_TEXT_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/dev_update_check" | jq ".latest_version")"
+  SUBLIME_TEXT_VERSION="$(sublime_dev_version)"
 
   local SUBLIME_TEXT_STABLE_VERSION
-  SUBLIME_TEXT_STABLE_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/stable_update_check" | jq ".latest_version")"
+  SUBLIME_TEXT_STABLE_VERSION="$(sublime_stable_version)"
 
   if [[ ${SUBLIME_TEXT_VERSION} < ${SUBLIME_TEXT_STABLE_VERSION} ]]; then
     SUBLIME_TEXT_VERSION="${SUBLIME_TEXT_STABLE_VERSION}"

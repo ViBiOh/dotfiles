@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+sublime_dev_version() {
+  curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/dev_update_check" | jq ".latest_version"
+}
+
+sublime_stable_version() {
+  curl --disable --silent --show-error --location --max-time 30 "https://www.sublimetext.com/updates/4/stable_update_check" | jq ".latest_version"
+}
+
+sublime_versions() {
+  var_info "Stable version: $(sublime_stable_version)"
+  var_warning "Dev version: $(sublime_dev_version)"
+}
+
 sublime_install() {
   if [[ ${#} -ne 1 ]]; then
     var_error "Usage sublime_install SUBLIME_TEXT_VERSION"
@@ -35,7 +48,7 @@ sublime_install() {
 }
 
 if ! command -v subl >/dev/null 2>&1; then
- return
+  return
 fi
 
 sublime_add_project() {
