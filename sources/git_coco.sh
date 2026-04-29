@@ -8,7 +8,7 @@ git_coco() {
       local WORDS=()
       read -r -a WORDS <<<"$(printf -- "%s" "${1}" | sed 's|_| |g;s|-| |g;s|\.| |g')"
 
-      COMPONENTS=("${COMPONENTS[@]}" "${WORDS[@]}")
+      COMPONENTS=("${COMPONENTS[@]}" "${1}" "${WORDS[@]}")
     }
 
     for file in $(git diff --name-only --cached); do
