@@ -49,6 +49,8 @@ ssh_proxy() {
   var_print_and_run ssh -C2qTnN -D 8080 "${1:-}"
 }
 
+[[ -n ${BASH} ]] && complete -F _fzf_complete_ssh_notrigger -o default -o bashdefault ssh_proxy
+
 ssh_agent_running() {
   ps -p "${SSH_AGENT_PID-}" >/dev/null 2>&1
 }
