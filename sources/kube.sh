@@ -400,9 +400,13 @@ kube() {
 
       if [[ -n ${PODS_LABELS:-} ]]; then
         local KUBE_CONTAINER
-        KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get pods "${RESOURCE_NAMESPACE}" --selector="${PODS_LABELS}" --output=yaml | yq eval '[.items[].spec.containers[].name] + [.items[].spec.initContainers[].name] | .[]' | sort -u | fzf --select-1 --prompt="Container: ")"
+        KUBE_CONTAINER="$("${KUBECTL_COMMAND[@]}" get pods "${RESOURCE_NAMESPACE}" --selector="${PODS_LABELS}" --output=yaml | yq eval '[.items[].spec.containers[].name] + [.items[].spec.initContainers[].name] | .[]' | sort -u | awk 'BEGIN{print "None"}1' | fzf --select-1 --prompt="Container: ")"
         if [[ -n ${KUBE_CONTAINER:-} ]]; then
-          KUBE_CONTAINER="--container=${KUBE_CONTAINER}"
+          if [[ ${KUBE_CONTAINER} == "None" ]]; then
+            KUBE_CONTAINER=""
+          else
+            KUBE_CONTAINER="--container=${KUBE_CONTAINER}"
+          fi
         fi
       fi
 
