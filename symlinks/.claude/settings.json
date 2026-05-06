@@ -16,6 +16,7 @@
       "Bash(grep*)",
       "Bash(head*)",
       "Bash(ls*)",
+      "Bash(mockgen*)",
       "Bash(npm run test*)",
       "Bash(npm test*)",
       "Bash(prettier*)",
