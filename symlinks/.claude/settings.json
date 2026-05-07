@@ -55,7 +55,6 @@
       "Bash(pip install*)"
     ]
   },
-  "model": "opus[1m]",
   "spinnerVerbs": {
     "mode": "replace",
     "verbs": [
