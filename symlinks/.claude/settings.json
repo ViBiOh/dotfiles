@@ -55,6 +55,10 @@
       "Bash(pip install*)"
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
   "spinnerVerbs": {
     "mode": "replace",
     "verbs": [
