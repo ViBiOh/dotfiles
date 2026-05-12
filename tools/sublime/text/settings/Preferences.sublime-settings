@@ -21,6 +21,7 @@
   "tree_animation_enabled": false,
   "word_wrap": true,
   "ignored_packages": [
+    "Debugger",
     "Vintage",
   ],
 }
