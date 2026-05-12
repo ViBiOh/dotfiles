@@ -4,6 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 clean() {
   rm -rf "${HOME}/.python_history"
+  rm -rf "${HOME}/opt/python"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     rm -rf "${HOME}/Library/Caches/pip"
@@ -12,7 +13,6 @@ clean() {
 }
 
 install() {
-
   if package_exists "python"; then
     packages_install "python"
   fi
@@ -34,7 +34,6 @@ install() {
   fi
 
   mkdir -p "${HOME}/opt/python"
-
   python3 -m venv "${HOME}/opt/python/venv"
 
   source "${DOTFILES_DIR}/sources/__binary.sh"
