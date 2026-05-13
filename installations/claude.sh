@@ -17,5 +17,5 @@ clean() {
 install() {
   symlink
 
-  packages_install "claude-code"
+  packages_install_desktop "claude-code"
 }
