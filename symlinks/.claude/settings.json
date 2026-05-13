@@ -29,6 +29,9 @@
       "mcp__atlassian__getJiraIssue",
       "mcp__atlassian__searchConfluenceUsingCql",
       "mcp__atlassian__searchJiraIssuesUsingJql",
+      "mcp__datadog-google-workspace__get_presentation",
+      "mcp__datadog-google-workspace__get_slide",
+      "mcp__datadog-google-workspace__get_slide_thumbnail",
       "mcp__datadog__get_datadog_notebook"
     ],
     "deny": [
