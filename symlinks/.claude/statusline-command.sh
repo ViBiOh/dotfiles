@@ -15,4 +15,4 @@ BAR=""
 printf "\033[34m%s\033[0m %s \033[33m%s\033[0m" \
   "$(printf "%s" "${input}" | jq -r '.model.display_name')" \
   "${BAR}" \
-  "$(jq -r '.cost.total_cost_usd // 0 | . * 1000 | round | . / 1000 | tostring' | awk '{printf "$%.3f", $1}')"
+  "$(printf "%s" "${input}" | jq -r '(.cost.total_cost_usd // 0) | . * 10000 | round | . / 10000' | awk '{printf "$%.2f", $1}')"
