@@ -32,7 +32,12 @@
       "mcp__datadog-google-workspace__get_presentation",
       "mcp__datadog-google-workspace__get_slide",
       "mcp__datadog-google-workspace__get_slide_thumbnail",
-      "mcp__datadog__get_datadog_notebook"
+      "mcp__datadog__aggregate_spans",
+      "mcp__datadog__get_datadog_notebook",
+      "mcp__datadog__get_datadog_trace",
+      "mcp__datadog__list_datadog_skills",
+      "mcp__datadog__load_datadog_skill",
+      "mcp__datadog__search_datadog_spans"
     ],
     "deny": [
       "Bash(bzl build*)",
