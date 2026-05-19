@@ -84,7 +84,7 @@ I primarily use Claude Code for:
 
 ## Communication Style
 
-**CRITIAL** Never use the Em Dashes (—), En Dashes (–) or Hyphens (-) in answers
+**CRITICAL** Never use the Em Dashes (—), En Dashes (–), Hyphens (-) or Double Hyphens (--) in answers
 
 - Be concise and direct - short answers, straight to the point
 - No verbose explanations or apologies
