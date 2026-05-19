@@ -1,0 +1,71 @@
+{
+  "$schema": "https://charm.land/crush.json",
+  "providers": {
+    "anthropic": {
+      "api_key": "$(pass datadog/anthropic)"
+    }
+  },
+  "models": {
+    "large": {
+      "model": "claude-sonnet-4-6",
+      "provider": "anthropic",
+      "reasoning_effort": "high",
+      "max_tokens": 64000
+    }
+  },
+  "lsp": {
+    "go": {
+      "command": "gopls",
+      "filetypes": [
+        "go"
+      ]
+    },
+    "python": {
+      "command": "pylsp",
+      "filetypes": [
+        "python"
+      ]
+    },
+    "typescript": {
+      "command": "typescript-language-server",
+      "args": [
+        "--stdio"
+      ],
+      "filetypes": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+      ],
+      "init_options": {
+        "maxTsServerMemory": 16384,
+        "tsserver": {
+          "path": "$HOME/opt/node/lib/node_modules/typescript/lib/"
+        }
+      }
+    },
+    "terraform": {
+      "command": "terraform-ls",
+      "args": [
+        "serve"
+      ],
+      "filetypes": [
+        "terraform"
+      ]
+    }
+  },
+  "options": {
+    "disable_metrics": true,
+    "context_paths": [
+      "$HOME/.config/crush/AGENTS.md"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^bash$",
+        "command": "$HOME/.local/share/crush/hooks/deny-dangerous.sh"
+      }
+    ]
+  }
+}
