@@ -24,7 +24,7 @@ usage() {
 
 symlink_home() {
   local SYMLINK_SOURCE="${DOTFILES_DIR}/symlinks/${1}"
-  local SYMLINK_TARGET="${HOME}/${1}"
+  local SYMLINK_TARGET="${HOME}/${2:-${1}}"
 
   rm -rf "${SYMLINK_TARGET}"
 
