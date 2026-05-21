@@ -78,6 +78,9 @@ reset, checkout, rebase, or any command that changes git state. Git is my safety
 
 ## Code Quality Preferences
 
+- Variables must have at least 3 characters; exceptions: `a`, `b` when identity is irrelevant (e.g.
+  swap), `i`, `j`, `k` for index-based loops, and single-letter names established by language
+  convention (e.g. `t` for `*testing.T` in Go, `r`/`w` for request/response in HTTP handlers)
 - Avoid over-engineering - keep solutions simple and focused
 - Don't add features beyond what was requested
 - Only add error handling for scenarios that can actually occur
