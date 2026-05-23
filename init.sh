@@ -89,7 +89,7 @@ create_dotfilesrc() {
     if [[ ${!ENABLE_VARIABLE_NAME:-} == "true" ]]; then
       FZF_BIND_ACTIONS+="pos(${POS})+select+"
     fi
-  done < <(find "${DOTFILES_DIR}/installations" -not -name "__*" -type f -print0 | LC_ALL=C sort --zero-terminated)
+  done < <(find "${DOTFILES_DIR}/installations" -not -name "__*" -not -name ".*" -type f -print0 | LC_ALL=C sort --zero-terminated)
 
   local FZF_OPTS=(--multi --print0 --preview 'cat {}')
   if [[ -n ${FZF_BIND_ACTIONS} ]]; then
