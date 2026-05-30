@@ -5,7 +5,7 @@ if ! command -v kubectl >/dev/null 2>&1; then
 fi
 
 kube_ssh_tunnel() {
-  ssh_forward_local 6443 6443 "${KUBERNETES_MASTER}"
+  ssh_forward_to_local 6443 6443 "${KUBERNETES_MASTER}"
 }
 
 kubernetes_shell() {

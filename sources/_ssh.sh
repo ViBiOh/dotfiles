@@ -20,7 +20,7 @@ ssh_forward_to_local() {
   var_print_and_run ssh -N -L "${LOCAL_PORT}:127.0.0.1:${REMOTE_PORT}" "${@}"
 }
 
-ssh_forward_to_remote() {
+ssh_forward_from_remote() {
   meta_check "var"
 
   if [[ ${#} -lt 3 ]]; then
