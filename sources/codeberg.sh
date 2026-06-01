@@ -64,11 +64,6 @@ codeberg_configure() {
     return 1
   fi
 
-  if var_confirm "PGO"; then
-    codeberg_set_secret "${CODEBERG_REPOSITORY}" "DD_APP_KEY" "$(pass_get "datadog/dogfood" "app_key")"
-    codeberg_set_secret "${CODEBERG_REPOSITORY}" "DD_API_KEY" "$(pass_get "datadog/dogfood" "api_key")"
-  fi
-
   if var_confirm "Docker"; then
     codeberg_set_variable "${CODEBERG_REPOSITORY}" "DOCKER_NAMESPACE" "vibioh"
     codeberg_set_variable "${CODEBERG_REPOSITORY}" "DOCKER_REGISTRY" "rg.fr-par.scw.cloud"
