@@ -41,7 +41,7 @@ receivers:
       grpc:
 
 exporters:
-  logging:
+  debug:
     verbosity: detailed
 
 service:
@@ -50,13 +50,13 @@ service:
       receivers:
         - otlp
       exporters:
-        - logging
+        - debug
 
     traces:
       receivers:
         - otlp
       exporters:
-        - logging
+        - debug
 EOF
 
     docker run \
@@ -64,7 +64,7 @@ EOF
       --rm \
       --publish "127.0.0.1:4317:4317/tcp" \
       --volume "${OTEL_CONFIG_FILE}:/var/config.yaml:ro" \
-      otel/opentelemetry-collector -- --config "/var/config.yaml"
+      otel/opentelemetry-collector --config "/var/config.yaml"
 
     rm -f "${OTEL_CONFIG_FILE}"
   }
