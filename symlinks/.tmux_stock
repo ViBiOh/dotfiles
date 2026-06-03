@@ -2,6 +2,13 @@
 
 set -o nounset -o pipefail -o errexit
 
+_CACHE_FILE="/tmp/.tmux_stock_cache"
+
+if find "${_CACHE_FILE}" -mmin -5 2>/dev/null | grep -q .; then
+  cat "${_CACHE_FILE}"
+  exit 0
+fi
+
 stock() {
   local YAHOO_OUTPUT
   YAHOO_OUTPUT="$(
@@ -75,4 +82,5 @@ stock() {
   fi
 }
 
-stock "DDOG"
+_RESULT="$(stock "DDOG" 2>/dev/null)" || exit 0
+printf -- "%s" "${_RESULT}" | tee "${_CACHE_FILE}"
