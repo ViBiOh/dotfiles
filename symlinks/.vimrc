@@ -179,8 +179,8 @@ if exists(':autocmd') && exists(':augroup')
       autocmd FileType tf setlocal equalprg=terraform\ fmt\ -no-color\ -\ 2>/dev/null
     endif
 
-    if executable('black')
-      autocmd FileType python setlocal equalprg=black\ --quiet\ -\ 2>/dev/null
+    if executable('ruff')
+      autocmd FileType python setlocal equalprg=ruff\ format\ --quiet\ -\ 2>/dev/null
     endif
 
     if executable('prettier')

@@ -97,7 +97,7 @@ main() {
   fi
 
   if command -v pip >/dev/null 2>&1; then
-    pip install "python-lsp-server" "black" "isort" "pycodestyle" "sqlparse"
+    pip install "python-lsp-server" "ruff" "isort" "pycodestyle" "sqlparse"
 
     rm -rf "${HOME}/.config/pycodestyle"
     ln -s "${SCRIPT_DIR}/../../symlinks/.config/pycodestyle" "${HOME}/.config/pycodestyle"

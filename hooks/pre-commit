@@ -159,12 +159,12 @@ python_check() {
     return
   fi
 
-  if command -v isort >/dev/null 2>&1 && command -v black >/dev/null 2>&1; then
+  if command -v isort >/dev/null 2>&1 && command -v ruff >/dev/null 2>&1; then
     var_info "Formatting Python files"
     run_command isort --quiet ${PYTHON_FILES[@]}
-    run_command black --quiet ${PYTHON_FILES[@]}
+    run_command ruff format --quiet ${PYTHON_FILES[@]}
   else
-    var_warning "cannot format Python files: isort or black not found. Skipping."
+    var_warning "cannot format Python files: isort or ruff not found. Skipping."
   fi
 }
 
