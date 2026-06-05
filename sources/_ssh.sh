@@ -45,8 +45,8 @@ ssh_proxy() {
     return 1
   fi
 
-  var_info "SSH SOCKS: 127.0.0.1:8080 -> ${1:-}"
-  var_print_and_run ssh -C2qTnN -D 8080 "${1:-}"
+  var_info "SSH SOCKS: 127.0.0.1:8080 -> ${*}"
+  var_print_and_run ssh -C2qTnN -D 8080 "${@}"
 }
 
 [[ -n ${BASH} ]] && complete -F _fzf_complete_ssh_notrigger -o default -o bashdefault ssh_proxy
