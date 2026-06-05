@@ -15,5 +15,9 @@ clean() {
 install() {
   symlink
 
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    brew trust --formula charmbracelet/tap/crush
+  fi
+
   packages_install "charmbracelet/tap/crush"
 }
