@@ -199,7 +199,7 @@ yaml_check() {
     if command -v npx >/dev/null 2>&1; then
       var_info "Formatting YAML files..."
 
-      run_command npx prettier --write ${YAML_FILES[@]}
+      run_command npx prettier --no-bracket-spacing --write ${YAML_FILES[@]}
     else
       var_warning "cannot format YAML files: npx not found. Skipping."
     fi

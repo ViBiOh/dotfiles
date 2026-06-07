@@ -69,6 +69,7 @@ reset, checkout, rebase, or any command that changes git state. Git is my safety
 
 - **Formatting**: After writing or modifying any `.md` file, always run `prettier --write` on it
 - **Links**: Never put backticks inside markdown link text (e.g. ``[`foo`](url)``). Jira does not render that syntax. Use plain text instead: `[foo](url)`.
+- **Prose wrapping**: Never manually hard-wrap prose lines. Write paragraphs as single continuous lines and let the editor or renderer handle wrapping.
 
 ## Code Quality Preferences
 
