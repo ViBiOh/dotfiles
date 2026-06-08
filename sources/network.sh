@@ -78,25 +78,21 @@ dns_allow() {
   websites["reddit"]="
       preview.redd.it
       v.redd.it
-      redd.it
       alb.reddit.com
       external-preview.redd.it
       gateway.reddit.com
       gql.reddit.com
       oauth.reddit.com
       www.reddit.com
-      reddit.com
       styles.redditmedia.com
       thumbs.redditmedia.com
       www.redditmedia.com
-      redditmedia.com
       www.redditstatic.com
       reddit.map.fastly.net
   "
 
   websites["linkedin"]="
     www.linkedin.com
-    linkedin.com
     media.licdn.com
     static.licdn.com
     dms.licdn.com
@@ -105,7 +101,6 @@ dns_allow() {
   websites["linkedin_blog"]="
     content.linkedin.com
     engineering.linkedin.com
-    linkedin.com
   "
 
   websites["aws"]="
@@ -117,34 +112,26 @@ dns_allow() {
     www.datadoghq-browser-agent.com
     browser-intake-datadoghq.eu
     live.logs.datadoghq.com
-    logs.datadoghq.com
   "
 
   websites["mtv"]="
-    googlesyndication.com
     pagead2.googlesyndication.com
     securepubads.g.doubleclick.net
-    g.doubleclick.net
-    doubleclick.net
     sdk.iad-01.braze.com
     iad-01.braze.com
-    braze.com
   "
 
   websites["twitter"]="
     api.twitter.com
     www.twitter.com
-    twitter.com
     x.com
     t.co
     abs.twimg.com
     pbs.twimg.com
-    twimg.com
   "
 
   websites["instagram"]="
     www.instagram.com
-    instagram.com
     static.cdninstagram.com
     scontent-.\{3,4\}\(.\)\?\.cdninstagram.com
     cdninstagram.com
@@ -152,7 +139,6 @@ dns_allow() {
 
   websites["gtm"]="
     www.googletagmanager.com
-    googletagmanager.com
   "
 
   websites["laposte"]="
@@ -171,9 +157,15 @@ dns_allow() {
 
 dns_unblock() {
   local GREP_PIPELINE=()
+  local current
 
   for entry in "${@}"; do
-    GREP_PIPELINE+=("--regexp" "${entry}")
+    current="${entry}"
+
+    while [[ ${current} == *.* ]]; do
+      GREP_PIPELINE+=("--regexp" "^local-zone: \"${current}\" refuse")
+      current="${current#*.}"
+    done
   done
 
   local UNBOUND_BLOCKLIST
