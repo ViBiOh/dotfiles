@@ -65,13 +65,20 @@ kube() {
   done
 
   local ALL_NAMESPACES=0
+  local RESOURCE_NAMESPACE="${KUBE_NS:-}"
+  local _prev_arg=""
+
   for arg in "${@}"; do
     if [[ ${arg} == "-A" ]] || [[ ${arg} == "--all-namespaces" ]]; then
       ALL_NAMESPACES=1
+    elif [[ ${_prev_arg} == "-n" ]] || [[ ${_prev_arg} == "--namespace" ]]; then
+      RESOURCE_NAMESPACE="${arg}"
+    elif [[ ${arg} =~ ^--namespace= ]]; then
+      RESOURCE_NAMESPACE="${arg#--namespace=}"
     fi
-  done
 
-  local RESOURCE_NAMESPACE="${KUBE_NS:-}"
+    _prev_arg="${arg}"
+  done
 
   local RESOURCE_TYPE
   local RESOURCE_NAME
