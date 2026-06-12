@@ -31,6 +31,8 @@
       "Bash(tee*)",
       "Bash(wc*)",
       "Bash(xargs grep:*)",
+      "mcp__atlassian__createIssueLink",
+      "mcp__atlassian__createJiraIssue",
       "mcp__atlassian__getConfluencePage",
       "mcp__atlassian__getConfluencePageDescendants",
       "mcp__atlassian__getIssueLinkTypes",
@@ -42,10 +44,13 @@
       "mcp__datadog-google-workspace__get_slide",
       "mcp__datadog-google-workspace__get_slide_thumbnail",
       "mcp__datadog__aggregate_spans",
+      "mcp__datadog__get_datadog_metric",
+      "mcp__datadog__get_datadog_metric_context",
       "mcp__datadog__get_datadog_notebook",
       "mcp__datadog__get_datadog_trace",
       "mcp__datadog__list_datadog_skills",
       "mcp__datadog__load_datadog_skill",
+      "mcp__datadog__search_datadog_metrics",
       "mcp__datadog__search_datadog_spans"
     ],
     "deny": [
