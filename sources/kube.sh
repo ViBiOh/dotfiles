@@ -104,7 +104,10 @@ kube() {
       JSONPATH_QUERY='{range .items[*]}{.kind}//{.metadata.name}{"\n"}{end}'
     else
       if [[ -z ${RESOURCE_NAMESPACE} ]] && [[ ${ALL_NAMESPACES} -eq 0 ]]; then
-        RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | fzf --prompt="Namespace: ")"
+        local CURRENT_CONTEXT_NAMESPACE
+        CURRENT_CONTEXT_NAMESPACE="$(yq eval '.contexts[] | select(.name == "stripe.us1.staging.dog") | .context.namespace' "${KUBECONFIG:-${HOME}/.kube/config}")"
+
+        RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | grep -v "${CURRENT_CONTEXT_NAMESPACE}" | awk "BEGIN{print \"${CURRENT_CONTEXT_NAMESPACE}\"}1" | fzf --prompt="Namespace: ")"
       fi
 
       if [[ -n ${RESOURCE_NAMESPACE:-} ]]; then
