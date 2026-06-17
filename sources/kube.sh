@@ -71,10 +71,13 @@ kube() {
   for arg in "${@}"; do
     if [[ ${arg} == "-A" ]] || [[ ${arg} == "--all-namespaces" ]]; then
       ALL_NAMESPACES=1
+      shift
     elif [[ ${_prev_arg} == "-n" ]] || [[ ${_prev_arg} == "--namespace" ]]; then
       RESOURCE_NAMESPACE="${arg}"
+      shift 2
     elif [[ ${arg} =~ ^--namespace= ]]; then
       RESOURCE_NAMESPACE="${arg#--namespace=}"
+      shift
     fi
 
     _prev_arg="${arg}"
