@@ -107,8 +107,11 @@ kube() {
       JSONPATH_QUERY='{range .items[*]}{.kind}//{.metadata.name}{"\n"}{end}'
     else
       if [[ -z ${RESOURCE_NAMESPACE} ]] && [[ ${ALL_NAMESPACES} -eq 0 ]]; then
+        local CURRENT_CONTEXT
+        CURRENT_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
+
         local CURRENT_CONTEXT_NAMESPACE
-        CURRENT_CONTEXT_NAMESPACE="$(yq eval '.contexts[] | select(.name == "stripe.us1.staging.dog") | .context.namespace' "${KUBECONFIG:-${HOME}/.kube/config}")"
+        CURRENT_CONTEXT_NAMESPACE="$(yq eval ".contexts[] | select(.name == '${CURRENT_CONTEXT}') | .context.namespace // \"default\"" "${KUBECONFIG:-${HOME}/.kube/config}")"
 
         RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | grep -v "${CURRENT_CONTEXT_NAMESPACE}" | awk "BEGIN{print \"${CURRENT_CONTEXT_NAMESPACE}\"}1" | fzf --prompt="Namespace: ")"
       fi
@@ -600,9 +603,13 @@ kube() {
         EXTRA_ARGS+=("--selector=${PODS_LABELS}" "${RESOURCE_NAMESPACE}")
       fi
     else
-      if [[ -z ${RESOURCE_NAMESPACE} ]] && [[ ${ALL_NAMESPACES} -eq 0 ]]; then
-        RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | fzf --prompt="Namespace: ")"
-      fi
+      local CURRENT_CONTEXT
+      CURRENT_CONTEXT="$(yq eval '.current-context' "${KUBECONFIG:-${HOME}/.kube/config}")"
+
+      local CURRENT_CONTEXT_NAMESPACE
+      CURRENT_CONTEXT_NAMESPACE="$(yq eval ".contexts[] | select(.name == \"${CURRENT_CONTEXT}\") | .context.namespace // \"default\"" "${KUBECONFIG:-${HOME}/.kube/config}")"
+
+      RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | grep -v "${CURRENT_CONTEXT_NAMESPACE}" | awk "BEGIN{print \"${CURRENT_CONTEXT_NAMESPACE}\"}1" | fzf --prompt="Namespace: ")"
 
       if [[ -n ${RESOURCE_NAMESPACE:-} ]]; then
         EXTRA_ARGS+=("--namespace=${RESOURCE_NAMESPACE}")
