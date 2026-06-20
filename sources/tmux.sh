@@ -8,14 +8,14 @@ tmux_is_inside() {
   return 0
 }
 
-tmux_split_cmd() (
+tmux_split_cmd() {
   if ! tmux_is_inside; then
     printf -- "not inside a tmux\n"
     return 1
   fi
 
   tmux split-window -hd -c "$(pwd)" -t "${TMUX_PANE}" "bash --rcfile <(echo '. ~/.bash_profile;${*}')" && tmux select-layout tiled
-)
+}
 
 tmux_batch() {
   local BATCH_ACTION="echo"
@@ -89,4 +89,15 @@ tmux_batch() {
       tmux_split_cmd "${ARGS[@]}"
     done
   )
+}
+
+tmux_ssh_all() {
+  for file in "${HOME}/.ssh/config.d/"*; do
+    local HOSTS_IN_SSH
+    HOSTS_IN_SSH="$(cat "${file}" | grep '^Host' | grep -v '*' | grep -v '^$' | awk '{print $2}')"
+
+    for host in ${HOSTS_IN_SSH}; do
+      tmux_split_cmd ssh "${host}"
+    done
+  done
 }
