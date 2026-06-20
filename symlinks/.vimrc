@@ -205,7 +205,3 @@ endif
 if exists(':execute')
   command W :execute ':silent w !sudo tee % > /dev/null' | :edit!
 endif
-
-" Search using ctrl-p and fzf
-set rtp+=~/opt/fzf
-noremap <C-p> :FZF<return>
