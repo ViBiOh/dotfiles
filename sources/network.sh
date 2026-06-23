@@ -130,12 +130,11 @@ dns_allow() {
     pbs.twimg.com
   "
 
-  websites["instagram"]="
+  websites["instagram"]='
     www.instagram.com
     static.cdninstagram.com
-    scontent-.\{3,4\}\(.\)\?\.cdninstagram.com
-    cdninstagram.com
-  "
+    scontent-.\{3,4\}\(.\)?.cdninstagram.com
+  '
 
   websites["gtm"]="
     www.googletagmanager.com
@@ -164,6 +163,11 @@ dns_unblock() {
 
     while [[ ${current} == *.* ]]; do
       GREP_PIPELINE+=("--regexp" "^local-zone: \"${current}\" refuse")
+
+      if [[ ${current} =~ \\ ]]; then
+        break
+      fi
+
       current="${current#*.}"
     done
   done
