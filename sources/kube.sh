@@ -564,13 +564,13 @@ kube() {
           PODS_LABELS="$(_kube_pod_labels)"
 
           if [[ -n ${PODS_LABELS:-} ]]; then
-            EXTRA_ARGS+=("${RESOURCE_NAMESPACE_QUERY}" "--selector=${PODS_LABELS}")
+            EXTRA_ARGS+=("--selector=${PODS_LABELS}")
           fi
         fi
+      else
+        _kube_namespace_query
       fi
     fi
-
-    _kube_namespace_query
 
     if [[ ${#KUBECTL_CONTEXTS[@]} -eq 0 ]]; then
       _kube_print_and_run "kubectl" top "${TOP_SUB_COMMAND}" ${RESOURCE_NAMESPACE_QUERY} "${@}" "${EXTRA_ARGS[@]}"
