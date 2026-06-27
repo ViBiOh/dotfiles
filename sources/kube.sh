@@ -573,10 +573,10 @@ kube() {
     _kube_namespace_query
 
     if [[ ${#KUBECTL_CONTEXTS[@]} -eq 0 ]]; then
-      _kube_print_and_run "kubectl" top ${RESOURCE_NAMESPACE_QUERY} "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
+      _kube_print_and_run "kubectl" top "${TOP_SUB_COMMAND}" ${RESOURCE_NAMESPACE_QUERY} "${@}" "${EXTRA_ARGS[@]}"
     else
       for context in "${KUBECTL_CONTEXTS[@]}"; do
-        _kube_print_and_run "kubectl" "${context}" top ${RESOURCE_NAMESPACE_QUERY} "${TOP_SUB_COMMAND}" "${@}" "${EXTRA_ARGS[@]}"
+        _kube_print_and_run "kubectl" "${context}" top "${TOP_SUB_COMMAND}" ${RESOURCE_NAMESPACE_QUERY} "${@}" "${EXTRA_ARGS[@]}"
       done
     fi
     ;;
