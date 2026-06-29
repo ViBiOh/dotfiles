@@ -64,7 +64,7 @@ kube() {
         KUBECTL_CONTEXT+=("--context=${arg}")
       fi
     elif [[ ${arg} == "-A" ]] || [[ ${arg} == "--all-namespaces" ]]; then
-      RESOURCE_NAMESPACE_QUERY="--all-namespaces"
+      RESOURCE_NAMESPACE="all"
     elif [[ ${arg} =~ ^--namespace= ]]; then
       RESOURCE_NAMESPACE="${arg#--namespace=}"
     elif [[ ${_prev_arg} == "-n" ]] || [[ ${_prev_arg} == "--namespace" ]]; then
@@ -76,6 +76,12 @@ kube() {
       fi
     fi
   done
+
+  if [[ ${RESOURCE_NAMESPACE:-} == "all" ]]; then
+    RESOURCE_NAMESPACE_QUERY="--all-namespaces"
+  else
+    RESOURCE_NAMESPACE_QUERY="--namespace=${RESOURCE_NAMESPACE}"
+  fi
 
   set -- "${args[@]}"
 
@@ -605,7 +611,7 @@ kube() {
       if [[ -n ${PODS_LABELS:-} ]]; then
         EXTRA_ARGS+=("--selector=${PODS_LABELS}")
       fi
-    else
+    elif [[ -z ${RESOURCE_NAMESPACE_QUERY:-} ]]; then
       _kube_namespace_query
     fi
 
