@@ -79,7 +79,7 @@ kube() {
 
   if [[ ${RESOURCE_NAMESPACE:-} == "all" ]]; then
     RESOURCE_NAMESPACE_QUERY="--all-namespaces"
-  else
+  elif [[ -n ${RESOURCE_NAMESPACE:-} ]]; then
     RESOURCE_NAMESPACE_QUERY="--namespace=${RESOURCE_NAMESPACE}"
   fi
 
