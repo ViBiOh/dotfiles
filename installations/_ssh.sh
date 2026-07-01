@@ -19,6 +19,10 @@ install() {
     symlink_home ".ssh/config.d/macos"
   fi
 
+  if command -v op >/dev/null 2>&1; then
+    symlink_home ".ssh/config.d/op"
+  fi
+
   ssh-keyscan "github.com" >"${HOME}/.ssh/known_hosts"
   ssh-keyscan "gitlab.com" >>"${HOME}/.ssh/known_hosts"
   ssh-keyscan "codeberg.org" >>"${HOME}/.ssh/known_hosts"
