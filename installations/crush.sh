@@ -10,6 +10,8 @@ symlink() {
 
 clean() {
   SYMLINK_ONLY_CLEAN=true symlink
+
+  rm -rf "${HOME}/.crush"
 }
 
 install() {

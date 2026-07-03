@@ -15,6 +15,8 @@ symlink() {
 
 clean() {
   sudo rm -rf "${HOME}/.config/htop" "${HOME}/opt"
+
+  rm -rf "${HOME}/.local"
   rm -rf "${HOME}/.cache"
 
   # Clean broken symlinks in home directory
