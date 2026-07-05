@@ -7,10 +7,10 @@
   },
   "models": {
     "large": {
-      "model": "claude-sonnet-4-6",
+      "model": "claude-opus-4-7",
       "provider": "anthropic",
       "reasoning_effort": "high",
-      "max_tokens": 64000
+      "max_tokens": 200000
     }
   },
   "lsp": {
