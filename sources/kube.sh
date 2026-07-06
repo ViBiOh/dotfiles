@@ -13,15 +13,19 @@ kube_clean_contexts() {
 _kube_print_and_run() {
   declare ARGS=()
 
-  for arg in "${@}"; do
-    if [[ -z ${arg} ]]; then
-      continue
-    elif [[ ${arg} =~ ^[_[:alnum:]\/-]+$ ]]; then
-      ARGS+=("${arg}")
-    else
-      ARGS+=("'${arg//\'/\'\"\'\"\'}'")
-    fi
-  done
+  if [[ ${#} -gt 1 ]]; then
+    for arg in "${@}"; do
+      if [[ -z ${arg} ]]; then
+        continue
+      elif [[ ${arg} =~ ^[_[:alnum:]\/=-]+$ ]]; then
+        ARGS+=("${arg}")
+      else
+        ARGS+=("'${arg//\'/\'\"\'\"\'}'")
+      fi
+    done
+  else
+    ARGS+=("${1:-}")
+  fi
 
   printf -- "%b%s%b\n" "${YELLOW}" "${ARGS[*]}" "${RESET}" 1>&2
 
@@ -285,7 +289,7 @@ kube() {
         fi
       done
 
-      _kube_print_and_run vimdiff -R "${DIFF_ARGS[*]}"
+      _kube_print_and_run "vimdiff -R ${DIFF_ARGS[*]}"
     fi
     ;;
 
@@ -452,12 +456,11 @@ kube() {
       fi
 
       if [[ ${RESOURCE_TYPE} =~ ^(cronjob|daemonset|deployment|job|pod|namespace|service|node|statefulset)s? ]] && _kube_has_kmux; then
-        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[*]}" log "${RESOURCE_NAMESPACE_QUERY}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --since=1h "${KUBE_CONTAINER}" "${*}"
+        _kube_print_and_run kmux "${KUBECTL_CONTEXTS[@]}" log "${RESOURCE_NAMESPACE_QUERY}" "${RESOURCE_TYPE}" "${RESOURCE_NAME}" --since=1h "${KUBE_CONTAINER}" "${*}"
       else
-
         printf -- "%bTailing logs for %b%s%b where labels are %b%s%b\n" "${BLUE}" "${GREEN}" "${RESOURCE_TYPE}/${RESOURCE_NAMESPACE}/${RESOURCE_NAME}" "${BLUE}" "${YELLOW}" "${PODS_LABELS}" "${RESET}"
 
-        _kube_print_and_run "${KUBECTL_COMMAND[*]}" logs ${RESOURCE_NAMESPACE_QUERY} --ignore-errors --prefix "--selector=${PODS_LABELS}" --follow --since=1h ${KUBE_CONTAINER} "${*}"
+        _kube_print_and_run "${KUBECTL_COMMAND[@]}" logs ${RESOURCE_NAMESPACE_QUERY} --ignore-errors --prefix "--selector=${PODS_LABELS}" --follow --since=1h ${KUBE_CONTAINER} "${*}"
       fi
     fi
     ;;
