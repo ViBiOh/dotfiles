@@ -4,7 +4,7 @@ set -o nounset -o pipefail -o errexit
 
 symlink() {
   symlink_home ".config/crush/crush.json"
-  symlink_home ".config/agents.md" ".config/crush/AGENTS.md"
+  symlink_home ".config/AGENTS.md"
   symlink_home ".config/crush/hooks/bash-policy.sh"
 }
 
