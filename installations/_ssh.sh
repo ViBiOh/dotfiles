@@ -2,7 +2,21 @@
 
 set -o nounset -o pipefail -o errexit
 
+symlink() {
+  symlink_home ".ssh/config"
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    symlink_home ".ssh/config.d/macos"
+  fi
+
+  if command -v op >/dev/null 2>&1; then
+    symlink_home ".ssh/config.d/op"
+  fi
+}
+
 clean() {
+  SYMLINK_ONLY_CLEAN=true symlink
+
   if command -v ssh_agent_stop >/dev/null 2>&1; then
     set +e
     ssh_agent_stop
@@ -13,15 +27,7 @@ clean() {
 }
 
 install() {
-  symlink_home ".ssh/config"
-
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    symlink_home ".ssh/config.d/macos"
-  fi
-
-  if command -v op >/dev/null 2>&1; then
-    symlink_home ".ssh/config.d/op"
-  fi
+  symlink
 
   ssh-keyscan "github.com" >"${HOME}/.ssh/known_hosts"
   ssh-keyscan "gitlab.com" >>"${HOME}/.ssh/known_hosts"
