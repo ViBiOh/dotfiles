@@ -33,64 +33,70 @@ __git_ps1() {
   # preserve exit status
   local exit="${?}"
 
-  if [[ $(git rev-parse --is-inside-work-tree 2>&1) == "true" ]]; then
-    local _GIT_STATUS_BRANCH
-    local _GIT_LOCAL_CHANGE=0
+  local _GIT_STATUS
+  _GIT_STATUS="$(git status --porcelain=v2 --branch --show-stash --untracked-files=normal 2>/dev/null)" || return "${exit}"
 
-    while read -r line; do
-      if [[ ${line} =~ ^#\ branch\.head\ (.*) ]]; then
-        _GIT_STATUS_BRANCH="${BASH_REMATCH[1]}"
-      fi
+  local _GIT_STATUS_BRANCH
+  local _GIT_LOCAL_CHANGE=0
 
-      if [[ ${line} =~ ^[1|2]\ .[MTADRC] ]]; then
-        _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 1))
-      fi
-
-      if [[ ${line} =~ ^[1|2]\ [MTADRC] ]]; then
-        _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 2))
-      fi
-
-      if [[ ${line} =~ ^u ]]; then
-        _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 4))
-      fi
-
-      if [[ ${line} =~ ^\? ]]; then
-        _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 8))
-      fi
-
-      if [[ ${line} =~ ^#\ stash ]]; then
-        _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 16))
-      fi
-    done <<<"$(git status --porcelain=v2 --branch --show-stash --untracked-files=normal)"
-
-    local _GIT_STATUS_FILES=""
-
-    if [[ $((_GIT_LOCAL_CHANGE & 1)) -ne 0 ]]; then
-      _GIT_STATUS_FILES+="*"
+  while read -r line; do
+    if [[ ${line} =~ ^#\ branch\.head\ (.*) ]]; then
+      _GIT_STATUS_BRANCH="${BASH_REMATCH[1]}"
     fi
 
-    if [[ $((_GIT_LOCAL_CHANGE & 2)) -ne 0 ]]; then
-      _GIT_STATUS_FILES+="+"
+    if [[ ${line} =~ ^[12]\ .[MTADRC] ]]; then
+      _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 1))
     fi
 
-    if [[ $((_GIT_LOCAL_CHANGE & 4)) -ne 0 ]]; then
-      _GIT_STATUS_FILES+="💥"
+    if [[ ${line} =~ ^[12]\ [MTADRC] ]]; then
+      _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 2))
     fi
 
-    if [[ $((_GIT_LOCAL_CHANGE & 8)) -ne 0 ]]; then
-      _GIT_STATUS_FILES+="%"
+    if [[ ${line} =~ ^u ]]; then
+      _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 4))
     fi
 
-    if [[ $((_GIT_LOCAL_CHANGE & 16)) -ne 0 ]]; then
-      _GIT_STATUS_FILES+="$"
+    if [[ ${line} =~ ^\? ]]; then
+      _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 8))
     fi
 
-    if [[ -n ${_GIT_STATUS_FILES:-} ]]; then
-      _GIT_STATUS_FILES="|${_GIT_STATUS_FILES}"
+    if [[ ${line} =~ ^#\ stash ]]; then
+      _GIT_LOCAL_CHANGE=$((_GIT_LOCAL_CHANGE | 16))
     fi
 
-    printf -- " (%s%s)" "${_GIT_STATUS_BRANCH}" "${_GIT_STATUS_FILES}"
+    # All flags set and branch known: nothing more to learn.
+    if [[ ${_GIT_LOCAL_CHANGE} -eq 31 && -n ${_GIT_STATUS_BRANCH:-} ]]; then
+      break
+    fi
+  done <<<"${_GIT_STATUS}"
+
+  local _GIT_STATUS_FILES=""
+
+  if [[ $((_GIT_LOCAL_CHANGE & 1)) -ne 0 ]]; then
+    _GIT_STATUS_FILES+="*"
   fi
+
+  if [[ $((_GIT_LOCAL_CHANGE & 2)) -ne 0 ]]; then
+    _GIT_STATUS_FILES+="+"
+  fi
+
+  if [[ $((_GIT_LOCAL_CHANGE & 4)) -ne 0 ]]; then
+    _GIT_STATUS_FILES+="💥"
+  fi
+
+  if [[ $((_GIT_LOCAL_CHANGE & 8)) -ne 0 ]]; then
+    _GIT_STATUS_FILES+="%"
+  fi
+
+  if [[ $((_GIT_LOCAL_CHANGE & 16)) -ne 0 ]]; then
+    _GIT_STATUS_FILES+="$"
+  fi
+
+  if [[ -n ${_GIT_STATUS_FILES:-} ]]; then
+    _GIT_STATUS_FILES="|${_GIT_STATUS_FILES}"
+  fi
+
+  printf -- " (%s%s)" "${_GIT_STATUS_BRANCH}" "${_GIT_STATUS_FILES}"
 
   return "${exit}"
 }
