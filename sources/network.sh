@@ -133,7 +133,7 @@ dns_allow() {
   websites["instagram"]='
     www.instagram.com
     static.cdninstagram.com
-    scontent-.\{3,4\}\(.\)?.cdninstagram.com
+    scontent-cdg[0-9]-[0-9]\.cdninstagram.com
   '
 
   websites["gtm"]="
