@@ -2,7 +2,7 @@
 
 version_bump() {
   if [[ -e package.json ]]; then
-    var_print_and_run npx npm-check-updates -u
+    var_print_and_run npx --quiet npm-check-updates -u
     npm install --ignore-scripts
     npm audit fix
   fi

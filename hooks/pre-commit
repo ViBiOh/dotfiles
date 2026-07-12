@@ -199,7 +199,7 @@ yaml_check() {
     if command -v npx >/dev/null 2>&1; then
       var_info "Formatting YAML files..."
 
-      run_command npx prettier --no-bracket-spacing --write ${YAML_FILES[@]}
+      run_command npx --quiet prettier --no-bracket-spacing --write ${YAML_FILES[@]}
     else
       var_warning "cannot format YAML files: npx not found. Skipping."
     fi
@@ -256,7 +256,7 @@ markdown_check() {
   if [[ $(git config "hooks.noMarkdownFormat") != "true" ]]; then
     if command -v npx >/dev/null 2>&1; then
       var_info "Formatting Markdown files..."
-      run_command npx prettier --write ${MARKDOWN_FILES[@]}
+      run_command npx --quiet prettier --write ${MARKDOWN_FILES[@]}
     else
       var_warning "cannot format Markdown files: npx not found. Skipping."
     fi
