@@ -1,5 +1,3 @@
-import os
-import signal
 import subprocess
 import threading
 
@@ -15,6 +13,7 @@ class AsyncTask:
         if self.proc is not None:
             self.kill()
 
+        self.write("# {}\n".format(cwd))
         self.write(" ".join(command) + "\n\n")
 
         try:
@@ -30,7 +29,7 @@ class AsyncTask:
             threading.Thread(target=self.read, args=(self.proc.stdout,)).start()
 
         except Exception as e:
-            self.write("[exception]\n" + getattr(e, "message", repr(e)))
+            self.write("[exception]\n" + repr(e))
 
     def enabled(self, kill=False):
         if kill:
@@ -66,7 +65,10 @@ class AsyncTask:
 
     def read(self, reader):
         for line in reader:
-            self.write(line.decode(self.encoding))
+            try:
+                self.write(line.decode(self.encoding))
+            except UnicodeDecodeError:
+                self.write(line.hex() + "\n")
 
         if self.killed:
             msg = "Cancelled"

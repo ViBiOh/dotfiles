@@ -1,6 +1,3 @@
-import binascii
-import os
-import signal
 import subprocess
 import threading
 
@@ -32,7 +29,7 @@ class AsyncTask:
             threading.Thread(target=self.read, args=(self.proc.stdout,)).start()
 
         except Exception as e:
-            self.write("[exception]\n" + getattr(e, "message", repr(e)))
+            self.write("[exception]\n" + repr(e))
 
     def enabled(self, kill=False):
         if kill:

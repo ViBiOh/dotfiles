@@ -19,6 +19,10 @@ def load_env_file(cwd, name):
         env_values = subprocess.check_output(
             [
                 "make",
+                "--warn-undefined-variables",
+                "--no-builtin-variables",
+                "--no-builtin-rules",
+                "-R",
                 "TARGET_ENV_FILE={}".format(env_file),
             ],
             stderr=subprocess.STDOUT,

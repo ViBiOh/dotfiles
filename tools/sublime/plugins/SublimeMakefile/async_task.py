@@ -1,11 +1,5 @@
-import binascii
-import os
-import re
-import signal
 import subprocess
 import threading
-
-pstree_pid = re.compile("- (?P<pid>[0-9]+) ")
 
 
 class AsyncTask:
@@ -19,6 +13,7 @@ class AsyncTask:
         if self.proc is not None:
             self.kill()
 
+        self.write("# {}\n".format(cwd))
         self.write(" ".join(command) + "\n\n")
 
         try:
@@ -34,7 +29,7 @@ class AsyncTask:
             threading.Thread(target=self.read, args=(self.proc.stdout,)).start()
 
         except Exception as e:
-            self.write("[exception]\n" + getattr(e, "message", repr(e)))
+            self.write("[exception]\n" + repr(e))
 
     def enabled(self, kill=False):
         if kill:
@@ -53,7 +48,7 @@ class AsyncTask:
     def kill_child(self):
         try:
             child_processes = subprocess.check_output(
-                ["pstree", str(self.proc.pid)],
+                ["pgrep", "-P", str(self.proc.pid)],
                 stderr=subprocess.STDOUT,
             )
         except subprocess.CalledProcessError as e:
@@ -64,14 +59,9 @@ class AsyncTask:
             print("unable to list child process: {}".format(output))
             return
 
-        for line in child_processes.decode().rstrip().split("\n"):
-            pid_match = pstree_pid.search(line)
-            if pid_match:
-                if (
-                    subprocess.call(["kill", "-s", "SIGTERM", pid_match.group("pid")])
-                    != 0
-                ):
-                    print("unable to kill {}".format(line))
+        for line in child_processes.decode("utf8").rstrip().split("\n"):
+            if subprocess.call(["kill", "-s", "SIGTERM", line]) != 0:
+                print("unable to kill {}".format(line))
 
     def read(self, reader):
         for line in reader:

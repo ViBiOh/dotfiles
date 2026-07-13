@@ -133,18 +133,6 @@ class CompactJson(command):
         )
 
 
-class CompactYaml(command):
-    def format(self, view, file, region, working_dir):
-        return format(
-            view,
-            region,
-            working_dir,
-            [
-                ["yq", "--prettyPrint", "--no-colors"],
-            ],
-        )
-
-
 class UnescapeJson(command):
     def format(self, view, file, region, working_dir):
         value = view.substr(region)

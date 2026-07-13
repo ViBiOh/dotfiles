@@ -7,7 +7,7 @@ import sublime_plugin
 
 from .async_task import AsyncTask
 
-target_regex = re.compile("^[a-z].*:$")
+target_regex = re.compile("^[A-Za-z0-9_./-]+:")
 
 
 class MakefileTarget(sublime_plugin.ListInputHandler):
@@ -26,10 +26,12 @@ class MakefileTarget(sublime_plugin.ListInputHandler):
         for line in subprocess.run(
             [
                 "make",
-                "--question",
-                "--print-data-base",
+                "--warn-undefined-variables",
                 "--no-builtin-variables",
                 "--no-builtin-rules",
+                "-R",
+                "--question",
+                "--print-data-base",
             ],
             capture_output=True,
             text=True,

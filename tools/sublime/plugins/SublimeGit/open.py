@@ -86,7 +86,7 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
 
             if git_type == "Branch":
                 args += ["HEAD"]
-            elif "Default branch":
+            elif git_type == "Default branch":
                 args += ["origin/HEAD"]
 
             try:

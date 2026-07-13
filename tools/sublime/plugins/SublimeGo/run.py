@@ -1,6 +1,3 @@
-import os
-import threading
-
 import sublime
 import sublime_plugin
 
