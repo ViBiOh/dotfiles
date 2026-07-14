@@ -4,6 +4,8 @@ import sublime_plugin
 class SplitVertically(sublime_plugin.TextCommand):
     def run(self, edit):
         window = self.view.window()
+        if not window:
+            return
 
         window.set_layout(
             {
@@ -19,6 +21,8 @@ class SplitVertically(sublime_plugin.TextCommand):
 class ResetLayout(sublime_plugin.TextCommand):
     def run(self, edit):
         window = self.view.window()
+        if not window:
+            return
 
         window.set_layout(
             {"cols": [0.0, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1]]}

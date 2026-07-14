@@ -22,13 +22,17 @@ def format(view, region, working_dir, commands):
         return value
 
     for command in commands:
-        process = subprocess.Popen(
-            command,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=working_dir,
-        )
+        try:
+            process = subprocess.Popen(
+                command,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=working_dir,
+            )
+        except FileNotFoundError as err:
+            print("unable to run {}: {}".format(command[0], err))
+            return value
 
         timeout = threading.Timer(interval=5, function=process.terminate)
         timeout.start()
@@ -37,9 +41,12 @@ def format(view, region, working_dir, commands):
             process_out, process_err = process.communicate(value.encode("utf8"))
 
             error = process_err.decode("utf8")
-            if process.returncode != 0 or len(error) > 0:
+            if process.returncode != 0:
                 print(error, end="")
                 return value
+
+            if error:
+                print(error, end="")
 
             value = process_out.decode("utf8")
 

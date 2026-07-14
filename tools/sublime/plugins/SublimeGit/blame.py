@@ -1,13 +1,11 @@
 import hashlib
 import re
 import subprocess
-from datetime import datetime, timedelta
-from os.path import dirname
+from datetime import datetime
 
 import sublime
 import sublime_plugin
 
-from .open import build_line_url
 from .utils import git_path, git_remote
 
 PLUGIN_NAME = "SublimeGit"
@@ -84,8 +82,7 @@ def parse_git_blame(blame):
             lines[final_line] = current_sha
             original_lines[final_line] = line_match.group("origin_line")
 
-            if not commits.get(current_sha, None):
-                current_commit = {"sha": current_sha}
+            current_commit = commits.get(current_sha) or {"sha": current_sha}
 
             continue
 
@@ -194,9 +191,14 @@ class SublimeGitBlame(sublime_plugin.EventListener):
                 ],
                 stderr=subprocess.STDOUT,
                 cwd=git_info["root"],
+                timeout=10,
             )
 
             self._git_blame = parse_git_blame(git_blame.decode("utf8"))
+        except (FileNotFoundError, subprocess.TimeoutExpired) as err:
+            self._git_blame = None
+            print("unable to run git blame: {}".format(err))
+            return
         except subprocess.CalledProcessError as e:
             self._git_blame = None
 
@@ -329,10 +331,15 @@ class SublimeGitCodeowners(sublime_plugin.EventListener):
                 ],
                 stderr=subprocess.STDOUT,
                 cwd=self._git_info["root"],
+                timeout=5,
             )
 
-            self.print_status(
-                view, owners.decode("utf8").replace(self._git_info["path"], "").strip()
-            )
+            decoded = owners.decode("utf8").strip()
+            if decoded.startswith(self._git_info["path"]):
+                decoded = decoded[len(self._git_info["path"]) :].strip()
+
+            self.print_status(view, decoded)
+        except (FileNotFoundError, subprocess.TimeoutExpired) as err:
+            print("unable to run codeowners: {}".format(err))
         except subprocess.CalledProcessError as e:
             print(e.output.decode("utf8"), end="")

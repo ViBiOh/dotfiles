@@ -1,3 +1,5 @@
+import os
+
 import sublime
 import sublime_plugin
 
@@ -18,7 +20,7 @@ class SublimeGitLinepath(sublime_plugin.WindowCommand):
         view = window.active_view()
         line_number = view.rowcol(view.sel()[0].begin())[0] + 1
 
-        relative_file = file.replace(folder, "").lstrip("/")
+        relative_file = os.path.relpath(file, folder)
 
         url = "{}:{}".format(relative_file, line_number)
 

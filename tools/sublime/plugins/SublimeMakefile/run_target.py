@@ -1,6 +1,5 @@
 import re
 import subprocess
-import threading
 
 import sublime
 import sublime_plugin
@@ -21,22 +20,28 @@ class MakefileTarget(sublime_plugin.ListInputHandler):
         variables = self.window.extract_variables()
         working_dir = variables.get("file_path")
 
-        targets = []
+        try:
+            result = subprocess.run(
+                [
+                    "make",
+                    "--warn-undefined-variables",
+                    "--no-builtin-variables",
+                    "--no-builtin-rules",
+                    "-R",
+                    "--question",
+                    "--print-data-base",
+                ],
+                capture_output=True,
+                text=True,
+                cwd=working_dir,
+                timeout=10,
+            )
+        except (FileNotFoundError, subprocess.TimeoutExpired) as err:
+            print("unable to enumerate make targets: {}".format(err))
+            return []
 
-        for line in subprocess.run(
-            [
-                "make",
-                "--warn-undefined-variables",
-                "--no-builtin-variables",
-                "--no-builtin-rules",
-                "-R",
-                "--question",
-                "--print-data-base",
-            ],
-            capture_output=True,
-            text=True,
-            cwd=working_dir,
-        ).stdout.splitlines():
+        targets = []
+        for line in result.stdout.splitlines():
             if target_regex.match(line):
                 targets.append(line[:-1])
 

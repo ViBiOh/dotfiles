@@ -1,5 +1,4 @@
 import subprocess
-from os.path import dirname
 
 import sublime
 import sublime_plugin
@@ -69,10 +68,14 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
                         args,
                         stderr=subprocess.STDOUT,
                         cwd=git_info["root"],
+                        timeout=5,
                     )
                     .decode("utf8")
                     .rstrip()
                 )
+            except (FileNotFoundError, subprocess.TimeoutExpired) as err:
+                print("unable to get SHA: {}".format(err))
+                return
             except subprocess.CalledProcessError as e:
                 print("unable to get SHA: {}".format(e.output.decode("utf8")))
                 return
@@ -95,6 +98,7 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
                         args,
                         stderr=subprocess.STDOUT,
                         cwd=git_info["root"],
+                        timeout=5,
                     )
                     .decode("utf8")
                     .rstrip()
@@ -102,6 +106,9 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
 
                 if git_type == "Default branch":
                     ref = remove_prefix(ref, "origin/")
+            except (FileNotFoundError, subprocess.TimeoutExpired) as err:
+                print("unable to get branch: {}".format(err))
+                return
             except subprocess.CalledProcessError as e:
                 print("unable to get branch: {}".format(e.output.decode("utf8")))
                 return

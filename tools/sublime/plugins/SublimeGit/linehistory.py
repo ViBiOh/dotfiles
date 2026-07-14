@@ -1,3 +1,5 @@
+import os
+
 import sublime
 import sublime_plugin
 
@@ -36,7 +38,7 @@ class SublimeGitLineHistory(sublime_plugin.WindowCommand):
         start_line = view.rowcol(view.sel()[0].begin())[0] + 1
         end_line = view.rowcol(view.sel()[0].end())[0] + 1
 
-        relative_file = file.replace(folder, "").lstrip("/")
+        relative_file = os.path.relpath(file, folder)
 
         self.panel = window.create_output_panel("line_history")
         self.panel.set_syntax_file("Packages/Diff/Diff.sublime-syntax")

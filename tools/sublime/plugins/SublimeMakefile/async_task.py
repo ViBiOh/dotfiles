@@ -1,17 +1,16 @@
+import os
+import signal
 import subprocess
 import threading
 
 
 class AsyncTask:
     encoding = "utf-8"
-    killed = False
-    proc = None
 
     def __init__(self, command=["printf", "Hello"], cwd=None, env=None, output=print):
         self.output = output
-
-        if self.proc is not None:
-            self.kill()
+        self.killed = False
+        self.proc = None
 
         self.write("# {}\n".format(cwd))
         self.write(" ".join(command) + "\n\n")
@@ -23,8 +22,8 @@ class AsyncTask:
                 stderr=subprocess.STDOUT,
                 cwd=cwd,
                 env=env,
+                start_new_session=True,
             )
-            self.killed = False
 
             threading.Thread(target=self.read, args=(self.proc.stdout,)).start()
 
@@ -38,30 +37,34 @@ class AsyncTask:
         return False
 
     def kill(self):
-        if self.proc:
-            self.killed = True
-
-            self.kill_child()
-            self.proc.terminate()
-            self.proc = None
-
-    def kill_child(self):
-        try:
-            child_processes = subprocess.check_output(
-                ["pgrep", "-P", str(self.proc.pid)],
-                stderr=subprocess.STDOUT,
-            )
-        except subprocess.CalledProcessError as e:
-            output = e.output.decode("utf8")
-            if len(e.output.decode("utf8")) == 0:
-                return
-
-            print("unable to list child process: {}".format(output))
+        proc = self.proc
+        if proc is None:
             return
 
-        for line in child_processes.decode("utf8").rstrip().split("\n"):
-            if subprocess.call(["kill", "-s", "SIGTERM", line]) != 0:
-                print("unable to kill {}".format(line))
+        self.killed = True
+        self.proc = None
+
+        try:
+            pgid = os.getpgid(proc.pid)
+        except ProcessLookupError:
+            return
+
+        try:
+            os.killpg(pgid, signal.SIGTERM)
+        except ProcessLookupError:
+            return
+
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(pgid, signal.SIGKILL)
+            except ProcessLookupError:
+                return
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                print("unable to kill process group {}".format(pgid))
 
     def read(self, reader):
         for line in reader:

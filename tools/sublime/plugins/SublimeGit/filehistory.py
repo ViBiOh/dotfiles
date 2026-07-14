@@ -1,3 +1,5 @@
+import os
+
 import sublime
 import sublime_plugin
 
@@ -32,7 +34,7 @@ class SublimeGitFileHistory(sublime_plugin.WindowCommand):
         if not file or len(file) == 0:
             return
 
-        relative_file = file.replace(folder, "").lstrip("/")
+        relative_file = os.path.relpath(file, folder)
 
         self.panel = window.create_output_panel("file_history")
         self.panel.set_syntax_file("Packages/Diff/Diff.sublime-syntax")
