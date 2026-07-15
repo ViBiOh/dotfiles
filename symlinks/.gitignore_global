@@ -94,8 +94,9 @@ GitHub.sublime-settings
 
 __debug_bin*
 
-#--------#
-# Claude #
-#--------#
+#---------#
+# Agentic #
+#---------#
 
 **/.claude/settings.local.json
+.crush/
