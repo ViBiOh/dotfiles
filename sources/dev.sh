@@ -287,7 +287,16 @@ if command -v systemctl >/dev/null 2>&1; then
 fi
 
 aziz() {
-  curl --disable --silent --show-error --location --max-time 30 --request POST --user "$(pass_get "infra/hue" "login"):$(pass "infra/hue" | head -1)" "${HUE_API}/api/groups/${HUE_GROUP}" --data state=on --data method=PATCH >/dev/null
+  local HUE_CREDENTIALS
+  HUE_CREDENTIALS="$(pass_get "infra/hue" "login"):$(pass "infra/hue" | head -1)"
+
+  # Escape backslash then double quote for curl's config parser
+  HUE_CREDENTIALS="${HUE_CREDENTIALS//\\/\\\\}"
+  HUE_CREDENTIALS="${HUE_CREDENTIALS//\"/\\\"}"
+
+  curl --disable --silent --show-error --location --max-time 30 --request POST \
+    --config <(printf -- 'user = "%s"\n' "${HUE_CREDENTIALS}") \
+    "${HUE_API}/api/groups/${HUE_GROUP}" --data state=on --data method=PATCH >/dev/null
 }
 
 json() {

@@ -23,10 +23,15 @@ usage() {
 }
 
 symlink_home() {
+  if [[ -z ${1:-} ]]; then
+    printf -- "symlink_home: missing source name\n" >&2
+    return 1
+  fi
+
   local SYMLINK_SOURCE="${DOTFILES_DIR}/symlinks/${1}"
   local SYMLINK_TARGET="${HOME}/${2:-${1}}"
 
-  rm -rf "${SYMLINK_TARGET}"
+  rm -rf "${SYMLINK_TARGET:?}"
 
   if [[ ${SYMLINK_ONLY_CLEAN:-} != "true" ]]; then
     if ! [[ -e "$(dirname "${SYMLINK_TARGET}")" ]]; then

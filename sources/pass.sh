@@ -85,37 +85,6 @@ passfull() {
 
 [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passfull
 
-passweb() {
-  if [[ ${#} -ne 1 ]]; then
-    var_red "Usage: passweb PASS_NAME"
-    return 1
-  fi
-
-  local PASS_NAME="${1}"
-  shift
-
-  local PASS_URL
-  PASS_URL="$(pass_get "${PASS_NAME}" "url")"
-
-  if [[ -z ${PASS_URL} ]]; then
-    var_red "no url in the store"
-    return 1
-  fi
-
-  local PASS_URL_BASIC
-  PASS_URL_BASIC="$(pass_get "${PASS_NAME}" "url_basic")"
-
-  if [[ ${PASS_URL_BASIC:-} == "on" ]]; then
-    PASS_URL="${PASS_URL/#https:\/\//https:\/\/"$(urlencode "$(pass_get "${PASS_NAME}" "login")")":"$(urlencode "$(pass_get "${PASS_NAME}" "password")")"@}"
-    open --url "${PASS_URL}" -a firefox
-  else
-    open --url "${PASS_URL}"
-    passfull "${PASS_NAME}"
-  fi
-}
-
-[[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passweb
-
 pass_wifi_qrcode() {
   if [[ ${#} -lt 1 ]]; then
     var_red "Usage: pass_wifi_qrcode WIFI_NAME"

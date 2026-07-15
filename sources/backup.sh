@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 backup() {
-  tar -czf - . | pv | gpg --symmetric --cipher-algo AES256 --batch --passphrase "${1:-$(pass_get "infra/backup" "aes")}" >"$(basename "$(pwd)").tar.gz.gpg"
+  local BACKUP_PASSPHRASE="${1:-$(pass_get "infra/backup" "aes")}"
+
+  tar -czf - . | pv | gpg --symmetric --cipher-algo AES256 --batch --passphrase-fd 3 3< <(printf -- '%s' "${BACKUP_PASSPHRASE}") >"$(basename "$(pwd)").tar.gz.gpg"
 }
 
 backup_upload() {
@@ -21,9 +23,10 @@ backup_all() {
 
 backup_restore() {
   local BASE_FILENAME="${1:-backup}"
+  local BACKUP_PASSPHRASE="${2:-$(pass_get "infra/backup" "aes")}"
 
   mkdir "${BASE_FILENAME}"
-  gpg --decrypt --batch --passphrase "${2:-$(pass_get "infra/backup" "aes")}" "${BASE_FILENAME}.tar.gz.gpg" | pv | tar -xz -C "${BASE_FILENAME}" -
+  gpg --decrypt --batch --passphrase-fd 3 "${BASE_FILENAME}.tar.gz.gpg" 3< <(printf -- '%s' "${BACKUP_PASSPHRASE}") | pv | tar -xz -C "${BASE_FILENAME}" -
 }
 
 backup_clean() {

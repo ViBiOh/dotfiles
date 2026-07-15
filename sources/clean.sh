@@ -69,7 +69,9 @@ brew_clean_all() {
 }
 
 order_66() {
-  var_confirm "Erase all data"
+  if ! var_confirm "Erase all data"; then
+    return 1
+  fi
 
   sudo --reset-timestamp echo "Erasing..."
 

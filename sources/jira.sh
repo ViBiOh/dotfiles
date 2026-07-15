@@ -311,12 +311,11 @@ _jira_branch() {
     JIRA_BRANCH_NAME="${JIRA_BRANCH_NAME}${BRANCH_SUFFIX}"
   fi
 
-  local CHECKOUT_OPTION=""
-  if ! git rev-parse --quiet --verify "${JIRA_BRANCH_NAME}" >/dev/null 2>&1; then
-    CHECKOUT_OPTION+=" -b"
+  if git rev-parse --quiet --verify "${JIRA_BRANCH_NAME}" >/dev/null 2>&1; then
+    git checkout "${JIRA_BRANCH_NAME}"
+  else
+    git checkout -b "${JIRA_BRANCH_NAME}"
   fi
-
-  eval "git checkout ${CHECKOUT_OPTION} ${JIRA_BRANCH_NAME}"
 }
 
 _jira_transition() {
@@ -392,9 +391,7 @@ _jira_read() {
 
   _jira_read_input "${VAR_NAME}${VAR_DEFAULT_DISPLAY}=" "READ_VALUE"
 
-  local VAR_SAFE_VALUE
-  VAR_SAFE_VALUE="$(printf -- "%s" "${READ_VALUE:-${VAR_DEFAULT}}" | sed "s|'|\\\'|g")"
-  eval "${VAR_NAME}=$'${VAR_SAFE_VALUE}'"
+  printf -v "${VAR_NAME}" '%s' "${READ_VALUE:-${VAR_DEFAULT}}"
 }
 
 _jira_read_input() {

@@ -38,7 +38,7 @@ gcloud_account() {
 
 gcloud_kube_import() {
   local GCLOUD_PROJECT
-  GCLOUD_PROJECT="$(gcloud projects list --format json | gcloud projects list --format json | jq --raw-output '.[] | .projectId + " " + .name' | fzf --height=20 --ansi --reverse --select-1 --query="${1-}")"
+  GCLOUD_PROJECT="$(gcloud projects list --format json | jq --raw-output '.[] | .projectId + " " + .name' | fzf --height=20 --ansi --reverse --select-1 --query="${1-}")"
 
   if [[ -z ${GCLOUD_PROJECT:-} ]]; then
     return 1

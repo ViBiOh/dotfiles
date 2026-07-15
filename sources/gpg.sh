@@ -13,7 +13,7 @@ if [[ -z ${SSH_AUTH_SOCK:-} ]]; then
 fi
 
 gpg_agent_start() {
-  if [[ $(pgrep gpg-agent | wc -l) -eq 1 ]]; then
+  if pgrep -x gpg-agent >/dev/null; then
     return 0
   fi
 

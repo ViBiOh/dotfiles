@@ -17,7 +17,7 @@ flux_hook() {
     return 1
   fi
 
-  kubectl --context "${CONTEXT}" get receivers \
+  kubectl --context "${KUBE_CONTEXT}" get receivers \
     --namespace "$(printf '%s' "${FLUX_RECEIVER}" | awk -F '/' '{ print $1 }')" \
     "$(printf '%s' "${FLUX_RECEIVER}" | awk -F '/' '{ print $2 }')" \
     --output json | jq -r -c ".status.webhookPath"

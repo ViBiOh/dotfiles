@@ -1,20 +1,31 @@
 #!/usr/bin/env bash
 
 add_to_path() {
-  # Remove previous occurence of the path
-  PATH=${PATH/${1}/}
+  local NEW_ENTRY="${1}"
 
-  # Fix case when path was at the start
-  PATH=${PATH#:}
+  # Rebuild PATH keeping only exact-match-free, non-empty entries, then
+  # prepend the new entry. Iterates colon-separated fields with portable
+  # parameter expansion so an entry like /opt/bin never matches /opt/bindings.
+  local NEW_PATH="${NEW_ENTRY}"
+  local REMAINING="${PATH}"
 
-  # Fix case when path was in the middle
-  PATH=${PATH/::/:}
+  while [[ -n ${REMAINING} ]]; do
+    local ENTRY="${REMAINING%%:*}"
 
-  # Fix case when path was at the end
-  PATH=${PATH%:}
+    if [[ ${REMAINING} == *:* ]]; then
+      REMAINING="${REMAINING#*:}"
+    else
+      REMAINING=""
+    fi
 
-  # Add entry to the beginning of the PATH
-  export PATH="${1}:${PATH}"
+    if [[ -z ${ENTRY} ]] || [[ ${ENTRY} == "${NEW_ENTRY}" ]]; then
+      continue
+    fi
+
+    NEW_PATH="${NEW_PATH}:${ENTRY}"
+  done
+
+  export PATH="${NEW_PATH}"
 }
 
 archive_to_binary() {

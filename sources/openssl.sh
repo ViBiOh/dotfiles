@@ -5,25 +5,15 @@ random() {
 }
 
 openssl_cipher() {
-  if [[ ${#} -lt 1 ]]; then
-    printf -- "%bUsage: openssl_cipher PASSPHRASE%b\n" "${RED}" "${RESET}" 1>&2
-    return 1
-  fi
+  local PASSPHRASE="${1:-}"
+  var_read PASSPHRASE "" "secret"
 
-  local PASSPHRASE="${1}"
-  shift
-
-  openssl aes-256-cbc -e -k "${PASSPHRASE}" -pbkdf2 -base64
+  openssl aes-256-cbc -e -pbkdf2 -base64 -pass fd:3 3< <(printf -- '%s' "${PASSPHRASE}")
 }
 
 openssl_decipher() {
-  if [[ ${#} -lt 1 ]]; then
-    printf -- "%bUsage: openssl_decipher PASSPHRASE%b\n" "${RED}" "${RESET}" 1>&2
-    return 1
-  fi
+  local PASSPHRASE="${1:-}"
+  var_read PASSPHRASE "" "secret"
 
-  local PASSPHRASE="${1}"
-  shift
-
-  openssl aes-256-cbc -d -k "${PASSPHRASE}" -pbkdf2 -base64
+  openssl aes-256-cbc -d -pbkdf2 -base64 -pass fd:3 3< <(printf -- '%s' "${PASSPHRASE}")
 }

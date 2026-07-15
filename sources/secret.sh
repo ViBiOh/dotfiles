@@ -31,6 +31,8 @@ extract_secret() {
     rm -f "${SECRET_CONFIG_FILE}"
   fi
 
-  pass show "${SECRET_NAME}" >>"${SECRET_CONFIG_FILE}"
-  chmod 600 "${SECRET_CONFIG_FILE}"
+  (
+    umask 077
+    pass show "${SECRET_NAME}" >>"${SECRET_CONFIG_FILE}"
+  )
 }
