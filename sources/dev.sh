@@ -53,27 +53,6 @@ loop() {
   done
 }
 
-dot_env() {
-  local DOTENV_FILE="${1:-.env}"
-
-  if [[ -e ${DOTENV_FILE} ]]; then
-    comm -13 \
-      <(make --directory "${DOTFILES_SOURCES_DIR}/DotEnv/" | sort) \
-      <(make --directory "${DOTFILES_SOURCES_DIR}/DotEnv/" TARGET_ENV_FILE="$(readlink -f "${DOTENV_FILE}")" | sort) |
-      grep -E -v "^(CURDIR|GNUMAKEFLAGS|MAKEFILE_LIST|MAKEFLAGS|TARGET_ENV_FILE)="
-  fi
-}
-
-dot_env_json() {
-  dot_env "${@}" | jq --null-input --raw-input '
-def parse: capture("(?<key>[^=]*)=(?<value>.*)");
-
-reduce inputs as $line ({};
-  ($line | parse) as $p | .[$p.key] = ($p.value)
-)
-'
-}
-
 urlencode() {
   local old_lc_collate="${LC_COLLATE-}"
   LC_COLLATE="C"

@@ -49,8 +49,10 @@ class MakefileTarget(sublime_plugin.ListInputHandler):
 
 
 class MakefileRun(sublime_plugin.WindowCommand):
-    task = None
-    panel = None
+    def __init__(self, window):
+        super().__init__(window)
+        self.task = None
+        self.panel = None
 
     def input(self, args):
         if "kill" in args:

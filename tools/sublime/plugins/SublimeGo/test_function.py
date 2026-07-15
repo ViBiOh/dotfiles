@@ -1,6 +1,3 @@
-import os
-import threading
-
 import sublime
 import sublime_plugin
 
@@ -47,9 +44,11 @@ class GoFunctionTestInput(sublime_plugin.TextInputHandler):
 
 
 class GoFunctionTest(sublime_plugin.WindowCommand):
-    task = None
-    panel = None
-    previous_filter = ""
+    def __init__(self, window):
+        super().__init__(window)
+        self.task = None
+        self.panel = None
+        self.previous_filter = ""
 
     def input(self, args):
         return GoFunctionTestInput(self.window, self.previous_filter)

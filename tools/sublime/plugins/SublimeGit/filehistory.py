@@ -7,8 +7,10 @@ from .async_task import AsyncTask
 
 
 class SublimeGitFileHistory(sublime_plugin.WindowCommand):
-    task = None
-    panel = None
+    def __init__(self, window):
+        super().__init__(window)
+        self.task = None
+        self.panel = None
 
     def is_enabled(self, kill=False):
         if kill:

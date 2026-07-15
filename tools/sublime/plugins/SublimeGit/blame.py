@@ -1,4 +1,5 @@
 import hashlib
+import html
 import re
 import subprocess
 from datetime import datetime
@@ -144,12 +145,12 @@ class SublimeGitBlame(sublime_plugin.EventListener):
 
     def print_status(self, view, selection, author, moment, description, url):
         content = '<a href="{}">{}</a> <span style="color: var(--{})">({})</span> <span style="color: var(--{})">&lt;{}&gt;</span>'.format(
-            url,
-            description,
+            html.escape(url),
+            html.escape(description or ""),
             "greenish",
             relative_time(moment),
             "purplish",
-            author,
+            html.escape(author or ""),
         )
 
         view.add_regions(
@@ -172,6 +173,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             return
 
         self._file_name = file_name
+        self._line_number = 0
 
         git_info = git_path(file_name)
         if not git_info:
@@ -263,16 +265,22 @@ class SublimeGitBlame(sublime_plugin.EventListener):
         if not commit:
             return
 
+        filename = commit.get("filename")
+        moment = commit.get("time")
+        if not filename or not moment:
+            self.clear_status(view)
+            return
+
         self.print_status(
             view,
             selection,
             commit.get("author"),
-            commit.get("time"),
+            moment,
             commit.get("summary"),
             "{}/commit/{}#diff-{}R{}".format(
                 self._git_remote,
                 sha,
-                hashlib.sha256(commit.get("filename").encode("utf8")).hexdigest(),
+                hashlib.sha256(filename.encode("utf8")).hexdigest(),
                 original_line_number,
             ),
         )

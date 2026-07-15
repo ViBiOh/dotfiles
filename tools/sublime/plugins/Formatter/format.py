@@ -144,10 +144,14 @@ class UnescapeJson(command):
     def format(self, view, file, region, working_dir):
         value = view.substr(region)
 
-        try:
-            return json.loads('"' + value + '"')
-        except (json.JSONDecodeError, TypeError) as error:
-            print(error)
+        for candidate in (value, '"' + value + '"'):
+            try:
+                decoded = json.loads(candidate)
+            except (json.JSONDecodeError, TypeError):
+                continue
+
+            if isinstance(decoded, str):
+                return decoded
 
         return value
 
