@@ -536,7 +536,7 @@ _jira_github_request() {
       --dump-header "${HEADER_OUTPUT}" \
       --fail-with-body \
       --header "Accept: application/vnd.github+json" \
-      --header "Authorization: Bearer $(github_token)" \
+      --config <(printf -- 'header = "Authorization: Bearer %s"\n' "$(github_token)") \
       "${URL}" \
       "${@}"
   )"
@@ -582,7 +582,7 @@ _jira_request() {
       --dump-header "${HEADER_OUTPUT}" \
       --fail-with-body \
       --header "Accept: application/json" \
-      --header "Authorization: ${JIRA_AUTHORIZATION}" \
+      --config <(printf -- 'header = "Authorization: %s"\n' "${JIRA_AUTHORIZATION}") \
       "${URL}" \
       "${@}"
   )"

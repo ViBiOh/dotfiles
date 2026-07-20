@@ -33,7 +33,7 @@ npm_headless_login() {
     '{ name: $username, password: $password }')"
 
   local NPM_TOKEN
-  NPM_TOKEN="$(curl --disable --silent --show-error --location --max-time 10 --fail-with-body "https://${NPM_REGISTRY}/-/user/org.couchdb.user:${NPM_USERNAME}" --header "Accept: application/json" --header "Content-Type:application/json" --request PUT --data "${PAYLOAD}" | jq --raw-output '.token')"
+  NPM_TOKEN="$(printf -- '%s' "${PAYLOAD}" | curl --disable --silent --show-error --location --max-time 10 --fail-with-body "https://${NPM_REGISTRY}/-/user/org.couchdb.user:${NPM_USERNAME}" --header "Accept: application/json" --header "Content-Type:application/json" --request PUT --data @- | jq --raw-output '.token')"
 
   if [[ -z ${NPM_TOKEN} ]]; then
     return 1

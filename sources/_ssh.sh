@@ -3,6 +3,24 @@
 SSH_ENV="${HOME}/.ssh/environment"
 unset SSH_AUTH_SOCK
 
+# Loads the agent variables from SSH_ENV by parsing only the expected
+# assignments instead of sourcing the file, so a tampered environment file
+# cannot turn a read into arbitrary code execution.
+_ssh_load_env() {
+  [[ -f ${SSH_ENV-} ]] || return 0
+
+  local line
+  while IFS= read -r line; do
+    if [[ ${line} =~ ^(SSH_AUTH_SOCK|SSH_AGENT_PID)=([^\;[:space:]]+) ]]; then
+      export "${BASH_REMATCH[1]}=${BASH_REMATCH[2]}"
+    fi
+  done <"${SSH_ENV}"
+}
+
+_ssh_unset_env() {
+  unset SSH_AUTH_SOCK SSH_AGENT_PID
+}
+
 ssh_forward_to_local() {
   meta_check "var"
 
@@ -59,7 +77,7 @@ ssh_agent_stop() {
   if ssh_agent_running; then
     ssh-agent -k
 
-    source <(sed 's|export|unset|' "${SSH_ENV}")
+    _ssh_unset_env
     rm -rf "${SSH_ENV:?}"
   fi
 }
@@ -67,11 +85,12 @@ ssh_agent_stop() {
 ssh_agent_start() {
   printf -- "Initializing new SSH agent...\n"
 
-  touch "${SSH_ENV}"
-  chmod 600 "${SSH_ENV}"
+  # Create the file with restrictive permissions before writing to it, so there
+  # is no window where the agent socket path is world readable.
+  (umask 077 && : >"${SSH_ENV}")
 
   ssh-agent | grep --invert-match "^echo" >"${SSH_ENV}"
-  source "${SSH_ENV}"
+  _ssh_load_env
 }
 
 ssh_agent_init() {
@@ -94,7 +113,7 @@ ssh_agent_init() {
 }
 
 if [[ -f ${SSH_ENV-} ]]; then
-  source "${SSH_ENV}"
+  _ssh_load_env
 fi
 
 if ! ssh_agent_running && [[ $(type -t ssh_agent_init) == "function" ]]; then

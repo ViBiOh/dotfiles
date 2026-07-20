@@ -4,6 +4,19 @@ if ! command -v pass >/dev/null 2>&1 || ! command -v fzf >/dev/null 2>&1; then
   return
 fi
 
+# Waits for the user, then clears the clipboard so a copied secret does not
+# linger once they are done pasting it.
+_pass_clear_clipboard() {
+  if ! command -v pbcopy >/dev/null 2>&1; then
+    return
+  fi
+
+  read -s -r -p "  Press enter to clear clipboard"
+  printf -- "\n"
+
+  printf -- '' | pbcopy
+}
+
 pass_get() {
   if [[ ${#} -lt 2 ]]; then
     var_red "Usage: passget PASS_NAME PASS_FIELD"
@@ -62,6 +75,8 @@ passfor() {
 
     pass otp -c "${PASS_NAME}"
   fi
+
+  _pass_clear_clipboard
 }
 
 [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passfor
