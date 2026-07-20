@@ -17,7 +17,9 @@ _kube_print_and_run() {
     for arg in "${@}"; do
       if [[ -z ${arg} ]]; then
         continue
-      elif [[ ${arg} =~ ^[_[:alnum:]\/=-]+$ ]]; then
+      elif [[ ${arg} =~ ^[_[:alnum:]\/=-]+$ ]] || [[ ${arg} == "|" ]]; then
+        ARGS+=("${arg}")
+      elif [[ ${arg} =~ ^\'.*\'$ ]]; then
         ARGS+=("${arg}")
       else
         ARGS+=("'${arg//\'/\'\"\'\"\'}'")
