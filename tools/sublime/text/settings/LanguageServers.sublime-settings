@@ -9,7 +9,8 @@
   "javacript": {
     "enabled": true,
     "command": [
-      "typescript-language-server",
+      "tsc",
+      "--lsp",
       "--stdio"
     ],
     "initialization_options": {
