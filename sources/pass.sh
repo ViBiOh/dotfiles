@@ -4,17 +4,24 @@ if ! command -v pass >/dev/null 2>&1 || ! command -v fzf >/dev/null 2>&1; then
   return
 fi
 
-# Waits for the user, then clears the clipboard so a copied secret does not
-# linger once they are done pasting it.
 _pass_clear_clipboard() {
-  if ! command -v pbcopy >/dev/null 2>&1; then
+  local VALUE="${1-}"
+
+  if ! command -v pbcopy >/dev/null 2>&1 || ! command -v pbpaste >/dev/null 2>&1; then
     return
   fi
 
-  read -s -r -p "  Press enter to clear clipboard"
-  printf -- "\n"
+  # Background the timer inside a subshell so the interactive shell never adds it
+  # to its job table (no "[1] 12345" notice printed).
+  (
+    (
+      sleep "${PASS_CLIP_TIME:-15}"
 
-  printf -- '' | pbcopy
+      if [[ "$(pbpaste)" == "${VALUE}" ]]; then
+        printf -- '' | pbcopy
+      fi
+    ) >/dev/null 2>&1 &
+  )
 }
 
 pass_get() {
@@ -67,7 +74,11 @@ passfor() {
   local PASS_NAME="${1}"
   shift
 
-  pass_get "${PASS_NAME}" "password" | pbcopy
+  local PASS_PASSWORD
+  PASS_PASSWORD="$(pass_get "${PASS_NAME}" "password")"
+
+  printf -- '%s' "${PASS_PASSWORD}" | pbcopy
+  _pass_clear_clipboard "${PASS_PASSWORD}"
 
   if command -v pass >/dev/null 2>&1 && [[ -e "${PASSWORD_STORE_DIR:-${HOME}/.password-store}/${PASS_NAME}.gpg" ]] && [[ "$(pass show "${PASS_NAME}" | grep --count "^otpauth:")" -eq 1 ]]; then
     read -s -r -p "  Press enter for otp"
@@ -75,8 +86,6 @@ passfor() {
 
     pass otp -c "${PASS_NAME}"
   fi
-
-  _pass_clear_clipboard
 }
 
 [[ -n ${BASH} ]] && complete -F _fzf_complete_pass -o default -o bashdefault passfor
