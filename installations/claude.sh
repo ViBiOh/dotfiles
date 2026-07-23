@@ -6,6 +6,7 @@ symlink() {
   symlink_home ".claude/CLAUDE.md"
   symlink_home ".claude/settings.json"
   symlink_home ".claude/statusline-command.sh"
+  symlink_home ".claude/skills/go-review"
 }
 
 clean() {
