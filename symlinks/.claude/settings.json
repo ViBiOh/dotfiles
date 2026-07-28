@@ -61,6 +61,7 @@
       "mcp__datadog__search_datadog_spans"
     ],
     "deny": [
+      "Bash(brew*)",
       "Bash(bzl build*)",
       "Bash(bzl run*)",
       "Bash(bzl test*)",
@@ -81,7 +82,9 @@
       "Bash(git worktree*)",
       "Bash(go install*)",
       "Bash(npm install*)",
-      "Bash(pip install*)"
+      "Bash(pip install*)",
+      "Bash(terraform*)",
+      "Bash(tfenv*)"
     ]
   },
   "model": "opus[1m]",

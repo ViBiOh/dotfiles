@@ -12,6 +12,9 @@ NORMALIZED="${CMD#"${CMD%%[![:space:]]*}"}"
 NORMALIZED="$(printf -- '%s' "${NORMALIZED}" | tr -s ' \t' ' ')"
 
 DENY_PATTERNS=(
+  # Brew
+  '^brew'
+
   # Bazel
   '^bzl (build|run|test)'
   '^BZL_'
@@ -24,6 +27,10 @@ DENY_PATTERNS=(
 
   # Package installs
   '^(go install|npm install|pip install)'
+
+  # Terraform (running or installing it)
+  '^terraform'
+  '^tfenv'
 )
 
 for pattern in "${DENY_PATTERNS[@]}"; do
