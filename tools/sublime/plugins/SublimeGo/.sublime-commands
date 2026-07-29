@@ -24,5 +24,19 @@
     "args": {
       "panel": "output.gorun"
     }
+  },
+  {
+    "caption": "Go Lint: Enable golangci-lint --fix",
+    "command": "golangci_lint_fix",
+    "args": {
+      "enable": true
+    }
+  },
+  {
+    "caption": "Go Lint: Disable golangci-lint --fix",
+    "command": "golangci_lint_fix",
+    "args": {
+      "enable": false
+    }
   }
 ]

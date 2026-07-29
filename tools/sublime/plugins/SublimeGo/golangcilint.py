@@ -16,6 +16,7 @@ class GolangCILint(Linter):
     default_type = WARNING
     defaults = {
         "selector": "source.go",
+        "fix": False,
     }
 
     tempfile_suffix = "-"
@@ -36,4 +37,11 @@ class GolangCILint(Linter):
         if not file.startswith(folder):
             return "true ${file_path}"
 
-        return "golangci-lint run --fix --show-stats=false --allow-parallel-runners ${file_path}"
+        cmd = ["golangci-lint", "run", "--show-stats=false", "--allow-parallel-runners"]
+
+        if self.settings.get("fix"):
+            cmd.append("--fix")
+
+        cmd.append("${file_path}")
+
+        return " ".join(cmd)
