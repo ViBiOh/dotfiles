@@ -40,13 +40,25 @@ qrcode_wifi() {
 }
 
 loop() {
+  local STOP_ON_SUCCESS=0
+  if [[ "${1}" == "-s" || "${1}" == "--stop-on-success" ]]; then
+    STOP_ON_SUCCESS=1
+    shift
+  fi
+
   if [[ ${#} -lt 1 ]]; then
-    var_red "Usage: 'loop command' [interval?(default 60s)]"
+    var_red "Usage: 'loop [-s|--stop-on-success] command' [interval?(default 60s)]"
     return 1
   fi
 
   while true; do
     eval "${1}"
+    local EXIT_CODE=${?}
+
+    if [[ ${STOP_ON_SUCCESS} -eq 1 && ${EXIT_CODE} -eq 0 ]]; then
+      var_info "Command succeeded at $(date), stopping"
+      return 0
+    fi
 
     var_info "Ended at $(date), next in ${2:-60} seconds"
     sleep "${2:-60}"
