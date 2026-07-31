@@ -19,8 +19,7 @@ I primarily use AI agents for:
 
 ## Git Workflow
 
-**CRITICAL**: Never perform any mutable git operation, no commit, add, push, stash, branch creation,
-reset, checkout, rebase, or any command that changes git state. Git is my safety net, don't touch it.
+**CRITICAL**: Never perform any mutable git operation, no commit, add, push, stash, branch creation, reset, checkout, rebase, or any command that changes git state. Git is my safety net, don't touch it.
 
 - Read-only git commands are fine (`git status`, `git log`, `git diff`, `git blame`, etc.)
 - Focus on writing code and running tests only
@@ -70,7 +69,7 @@ reset, checkout, rebase, or any command that changes git state. Git is my safety
 
 ## Markdown
 
-- **Formatting**: After writing or modifying any `.md` file, always run `prettier --write` on it
+- **Formatting**: After writing or modifying any `.md` file, always run `prettier --prose-wrap=never --write` on it
 - **Links**: Never put backticks inside markdown link text (e.g. ``[`foo`](url)``). Jira does not render that syntax. Use plain text instead: `[foo](url)`.
 - **Prose wrapping**: Never manually hard-wrap prose lines. Write paragraphs as single continuous lines and let the editor or renderer handle wrapping.
 

@@ -37,6 +37,34 @@ REGION_KEY = "githubpullrequest.threads"
 DRAFT_REGION_KEY = "githubpullrequest.drafts"
 STATUS_KEY = "githubpullrequest.status"
 
+# Conventional Comments (https://conventionalcomments.org) labels, used by the
+# add-comment picker. Overridable via the `comment_labels` setting. The optional
+# `emoji` shows in the picker and is prefixed to the posted comment; drop it to get
+# a plain `label: subject`.
+_DEFAULT_COMMENT_LABELS = [
+    {"emoji": "👏", "label": "praise", "description": "highlight something positive"},
+    {
+        "emoji": "💅",
+        "label": "nitpick",
+        "description": "trivial, non-blocking preference",
+    },
+    {"emoji": "💡", "label": "suggestion", "description": "propose a specific change"},
+    {"emoji": "⚠️", "label": "issue", "description": "a problem that needs addressing"},
+    {"emoji": "📌", "label": "todo", "description": "small, necessary change"},
+    {"emoji": "❓", "label": "question", "description": "asking for clarification"},
+    {"emoji": "💭", "label": "thought", "description": "a non-blocking idea"},
+    {"emoji": "🧹", "label": "chore", "description": "process / housekeeping task"},
+    {"emoji": "📝", "label": "note", "description": "an FYI, non-blocking"},
+]
+
+
+def _label_tag(entry):
+    """'💡 suggestion' when the label has an emoji, else 'suggestion'."""
+    emoji = entry.get("emoji", "")
+    label = entry["label"]
+
+    return "{} {}".format(emoji, label) if emoji else label
+
 
 # --------------------------------------------------------------------------- #
 # small helpers
@@ -708,24 +736,55 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             return
 
         view = self.view
+        window = view.window()
 
-        def on_done(body):
-            if not body.strip():
+        where = "line {}".format(payload["line"])
+        if "start_line" in payload:
+            where = "lines {}-{}".format(payload["start_line"], payload["line"])
+
+        def queue(prefix, subject):
+            if not subject.strip():
                 return
 
-            SESSION.review.queue_comment(path, payload, body)
+            SESSION.review.queue_comment(path, payload, prefix + subject)
             _apply_draft_icons(view, path)
-            _refresh_files_panel(view.window())
+            _refresh_files_panel(window)
             _status("comment queued (submit the review to post)")
             _update_status()
 
-        label = "Comment on line {}:".format(payload["line"])
-        if "start_line" in payload:
-            label = "Comment on lines {}-{}:".format(
-                payload["start_line"], payload["line"]
+        def ask_subject(prefix):
+            tag = prefix[:-2] if prefix else ""  # "suggestion: " -> "suggestion"
+            prompt = "{} on {}:".format(tag or "Comment", where)
+            window.show_input_panel(
+                prompt, "", lambda subject: queue(prefix, subject), None, None
             )
 
-        self.view.window().show_input_panel(label, "", on_done, None, None)
+        # Conventional Comments: pick a label (fuzzy), then type the subject. The
+        # picker is skippable via its first entry and can be disabled in settings.
+        labels = []
+        if _settings().get("conventional_comments", True):
+            labels = _settings().get("comment_labels", _DEFAULT_COMMENT_LABELS)
+
+        if not labels:
+            ask_subject("")
+            return
+
+        items = [sublime.QuickPanelItem("(plain comment)", details="no label")]
+        items += [
+            sublime.QuickPanelItem(
+                _label_tag(entry), details=entry.get("description", "")
+            )
+            for entry in labels
+        ]
+
+        def on_label(index):
+            if index < 0:
+                return
+
+            prefix = "" if index == 0 else "{}: ".format(_label_tag(labels[index - 1]))
+            _main(lambda: ask_subject(prefix))
+
+        window.show_quick_panel(items, on_label)
 
 
 class GithubPullRequestShowCommentsCommand(sublime_plugin.TextCommand):
@@ -830,8 +889,8 @@ class GithubPullRequestSubmitReviewCommand(sublime_plugin.WindowCommand):
                 _main(lambda message=str(err): _error(message))
                 return
 
-            _main(lambda: _status("review submitted ({})".format(verdict)))
-            _reload_threads()
+            # Submitting is the end of the review: tear everything down.
+            _main(lambda: _end_review("review submitted ({}) — ended".format(verdict)))
 
         _async(worker)
 
@@ -848,18 +907,23 @@ class GithubPullRequestDiscardDraftsCommand(sublime_plugin.WindowCommand):
         _update_status()
 
 
+def _end_review(message="review ended"):
+    """Clear all decorations, the panel, and session state. Main-thread only."""
+    for window in sublime.windows():
+        for view in window.views():
+            _clear_view(view)
+        window.destroy_output_panel(FILES_PANEL)
+
+    SESSION.reset()
+    _status(message)
+
+
 class GithubPullRequestEndReviewCommand(sublime_plugin.WindowCommand):
     def is_enabled(self):
         return SESSION.active
 
     def run(self):
-        for window in sublime.windows():
-            for view in window.views():
-                _clear_view(view)
-            window.destroy_output_panel(FILES_PANEL)
-
-        SESSION.reset()
-        _status("review ended")
+        _end_review()
 
 
 # --------------------------------------------------------------------------- #

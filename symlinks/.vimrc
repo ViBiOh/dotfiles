@@ -184,7 +184,7 @@ if exists(':autocmd') && exists(':augroup')
     endif
 
     if executable('prettier')
-      autocmd FileType markdown setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.md\ 2>/dev/null
+      autocmd FileType markdown setlocal equalprg=prettier\ --no-color\ --prose-wrap=never --stdin-filepath\ file.md\ 2>/dev/null
       autocmd FileType yaml setlocal equalprg=prettier\ --no-color\ --no-bracket-spacing\ --stdin-filepath\ file.yaml\ 2>/dev/null
       autocmd FileType json setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.json\ 2>/dev/null
       autocmd FileType js setlocal equalprg=prettier\ --no-color\ --stdin-filepath\ file.js\ 2>/dev/null

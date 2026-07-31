@@ -28,18 +28,18 @@ That runs `install_plugin "${TEXT_PKG}" "GithubPullRequest"`. To install manuall
 
 Check out the PR branch (with your own git workflow), open the repo in Sublime, then from the command palette:
 
-| Command                                 | What it does                                                                                                                                                                             |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Load pull-request (current branch)**  | Infer the PR from the branch, fetch files + threads, open the changed-files panel.                                                                                                       |
-| **Load pull-request from URL**          | Same, but paste a PR URL instead of inferring.                                                                                                                                           |
-| **Show changed files**                  | Bottom panel: aligned table of changed files with `+N` (green) `-M` (red) `(K unresolved)` (yellow) `(P pending)` (gray). Double-click / Enter / F4 opens the file at the relevant line. |
-| **List all comments**                   | Cross-file quick-panel navigator of every thread; jumps to the file+line and shows the popup.                                                                                            |
-| **Comment on line or selection**        | Queue a review comment on the current line or multi-line selection (also on the right-click menu). Queued, not posted.                                                                   |
-| **Show comments on current line**       | Show the thread / pending popup for the cursor's line.                                                                                                                                   |
-| **Next comment** / **Previous comment** | Jump between commented lines in the current file.                                                                                                                                        |
-| **Submit review**                       | Pick a verdict (Comment / Approve / Request changes) and post all queued comments in one review.                                                                                         |
-| **Discard queued comments**             | Drop the local draft queue.                                                                                                                                                              |
-| **End review**                          | Clear all decorations, reference documents, and the panel. Git is untouched throughout.                                                                                                  |
+| Command | What it does |
+| --- | --- |
+| **Load pull-request (current branch)** | Infer the PR from the branch, fetch files + threads, open the changed-files panel. |
+| **Load pull-request from URL** | Same, but paste a PR URL instead of inferring. |
+| **Show changed files** | Bottom panel: aligned table of changed files with `+N` (green) `-M` (red) `(K unresolved)` (yellow) `(P pending)` (gray). Double-click / Enter / F4 opens the file at the relevant line. |
+| **List all comments** | Cross-file quick-panel navigator of every thread; jumps to the file+line and shows the popup. |
+| **Comment on line or selection** | Queue a review comment on the current line or multi-line selection (also on the right-click menu). First offers a fuzzy Conventional Comments label picker (skippable), then the body. Queued, not posted. |
+| **Show comments on current line** | Show the thread / pending popup for the cursor's line. |
+| **Next comment** / **Previous comment** | Jump between commented lines in the current file. |
+| **Submit review** | Pick a verdict (Comment / Approve / Request changes) and post all queued comments in one review. |
+| **Discard queued comments** | Drop the local draft queue. |
+| **End review** | Clear all decorations, reference documents, and the panel. Git is untouched throughout. |
 
 ### In the editor once a PR is loaded
 
@@ -57,11 +57,13 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 
 `GithubPullRequest.sublime-settings`:
 
-| Key                | Default      | Meaning                                                          |
-| ------------------ | ------------ | ---------------------------------------------------------------- |
-| `auto_show_popup`  | `true`       | Show the thread/draft popup on hover.                            |
-| `show_gutter_icon` | `true`       | Draw gutter icons for threads and drafts.                        |
-| `gutter_icon`      | `"bookmark"` | Icon name (`bookmark`, `dot`, `circle`) or a `Packages/...` png. |
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `auto_show_popup` | `true` | Show the thread/draft popup on hover. |
+| `show_gutter_icon` | `true` | Draw gutter icons for threads and drafts. |
+| `gutter_icon` | `"bookmark"` | Icon name (`bookmark`, `dot`, `circle`) or a `Packages/...` png. |
+| `conventional_comments` | `true` | Show the [Conventional Comments](https://conventionalcomments.org) label picker before typing a comment. |
+| `comment_labels` | standard set | The labels offered by the picker (`{emoji, label, description}` list). `emoji` is optional and, when present, shows in the picker and prefixes the posted comment (`💡 suggestion: …`). Replace with your own. |
 
 ## Known limitations
 

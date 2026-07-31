@@ -275,7 +275,7 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
   - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Popups (hover or command) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here.
 - `Context.sublime-menu` — right-click entry running `github_pull_request_add_comment` (enabled only when a PR is active).
 - `.sublime-commands` — palette entries, captions prefixed `GithubPullRequest:` (match siblings).
-- `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `gutter_icon`.
+- `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip); the chosen label is prefixed as `"<emoji> <label>: "` (emoji omitted if absent) to the typed subject before queuing.
 - `GithubPullRequestFiles.sublime-syntax` — colors the bottom panel (assigned to the output panel): `+N` green / `-M` red (markup.inserted/deleted), `(K unresolved)` yellow (markup.changed), `(P pending)` dimmed (comment). Foreground-only scopes so there is no background fill.
 
 ## Build waves

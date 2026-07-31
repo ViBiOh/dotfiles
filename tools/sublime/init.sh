@@ -86,7 +86,7 @@ main() {
   install_plugin "${TEXT_PKG}" "GithubPullRequest"
 
   if command -v brew >/dev/null 2>&1; then
-    brew install pandoc
+    brew install pandoc gh
   fi
 
   if command -v go >/dev/null 2>&1; then

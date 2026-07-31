@@ -17,7 +17,7 @@
       ["prettier", "--no-color", "--no-bracket-spacing", "--stdin-filepath", "file.yaml"]
     ],
     "text.html.markdown": [
-      ["prettier", "--no-color", "--stdin-filepath", "file.md"]
+      ["prettier", "--no-color", "--prose-wrap=never", "--stdin-filepath", "file.md"]
     ]
   },
   // Controls when format_on_save in run
