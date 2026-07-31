@@ -1,0 +1,11 @@
+[
+  { "caption": "-", "id": "githubpullrequest" },
+  {
+    "caption": "PR: Comment on line/selection",
+    "command": "github_pull_request_add_comment"
+  },
+  {
+    "caption": "PR: Show comments on line",
+    "command": "github_pull_request_show_comments"
+  }
+]

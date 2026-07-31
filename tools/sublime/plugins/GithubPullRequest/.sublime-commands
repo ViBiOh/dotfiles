@@ -1,0 +1,46 @@
+[
+  {
+    "caption": "GithubPullRequest: Load pull-request (current branch)",
+    "command": "github_pull_request_load"
+  },
+  {
+    "caption": "GithubPullRequest: Load pull-request from URL",
+    "command": "github_pull_request_load_url"
+  },
+  {
+    "caption": "GithubPullRequest: Show changed files",
+    "command": "github_pull_request_files_panel"
+  },
+  {
+    "caption": "GithubPullRequest: List all comments",
+    "command": "github_pull_request_list_comments"
+  },
+  {
+    "caption": "GithubPullRequest: Comment on line or selection",
+    "command": "github_pull_request_add_comment"
+  },
+  {
+    "caption": "GithubPullRequest: Show comments on current line",
+    "command": "github_pull_request_show_comments"
+  },
+  {
+    "caption": "GithubPullRequest: Next comment",
+    "command": "github_pull_request_next_comment"
+  },
+  {
+    "caption": "GithubPullRequest: Previous comment",
+    "command": "github_pull_request_prev_comment"
+  },
+  {
+    "caption": "GithubPullRequest: Submit review",
+    "command": "github_pull_request_submit_review"
+  },
+  {
+    "caption": "GithubPullRequest: Discard queued comments",
+    "command": "github_pull_request_discard_drafts"
+  },
+  {
+    "caption": "GithubPullRequest: End review",
+    "command": "github_pull_request_end_review"
+  }
+]

@@ -1,0 +1,22 @@
+%YAML 1.2
+---
+# Colors the GithubPullRequest "changed files" bottom panel: additions green, deletions
+# red, unresolved-comment count yellow, pending (queued) count dimmed. Uses the
+# diff markup / comment scopes, which carry a foreground color but no background
+# fill (unlike region.*ish). The +N / -M match is anchored at line start so
+# hyphens inside file paths (trailing "path:line") are never miscolored; the
+# parenthetical rules only match their literal words.
+hidden: true
+scope: source.githubpullrequest-files
+contexts:
+  main:
+    - match: '^PR #.*$'
+      scope: comment.line.githubpullrequest-files
+    - match: '^(\+\d+)\s+(-\d+)'
+      captures:
+        1: markup.inserted.githubpullrequest-files
+        2: markup.deleted.githubpullrequest-files
+    - match: '\(\d+ unresolved\)'
+      scope: markup.changed.githubpullrequest-files
+    - match: '\(\d+ pending\)'
+      scope: comment.githubpullrequest-files

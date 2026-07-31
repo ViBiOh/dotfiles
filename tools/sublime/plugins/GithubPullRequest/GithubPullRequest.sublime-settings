@@ -1,0 +1,11 @@
+{
+  // Show a thread popup automatically when hovering a line that has comments.
+  "auto_show_popup": true,
+
+  // Draw a gutter icon on lines that carry unresolved review threads.
+  "show_gutter_icon": true,
+
+  // Gutter icon: a built-in name ("bookmark", "dot", "circle") or a
+  // "Packages/..." png path.
+  "gutter_icon": "bookmark"
+}

@@ -83,6 +83,7 @@ main() {
   install_plugin "${TEXT_PKG}" "SublimeLayout"
   install_plugin "${TEXT_PKG}" "SublimeMakefile"
   install_plugin "${TEXT_PKG}" "SublimeMarkdown"
+  install_plugin "${TEXT_PKG}" "GithubPullRequest"
 
   if command -v brew >/dev/null 2>&1; then
     brew install pandoc
