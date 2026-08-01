@@ -84,14 +84,8 @@ class Review:
     def _git_run(self, args: List[str]) -> Tuple[int, str, str]:
         return self._git(args, self._cwd)
 
-    def resolve_pr(self, url: Optional[str] = None) -> Dict:
-        if url:
-            parsed = parse_pr_url(url)
-            number = parsed["number"] if parsed else None
-            view = self._gh.pr_view(number)
-        else:
-            view = self._gh.pr_view()
-
+    def resolve_pr(self) -> Dict:
+        view = self._gh.pr_view()
         coords = parse_pr_url(view["url"]) or {}
 
         self._pr = {

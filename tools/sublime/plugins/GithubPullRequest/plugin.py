@@ -510,7 +510,7 @@ def _reload_threads():
     _main(apply)
 
 
-def _load(window, url):
+def _load(window):
     cwd = _window_cwd(window)
     if cwd is None:
         _main(lambda: _error("open a folder from the repository first"))
@@ -525,7 +525,7 @@ def _load(window, url):
     review = Review(gh, root)
 
     try:
-        pr = review.resolve_pr(url)
+        pr = review.resolve_pr()
         files = review.changed_files()
         threads = review.review_threads()
     except GHError as err:
@@ -547,20 +547,7 @@ def _load(window, url):
 class GithubPullRequestLoadCommand(sublime_plugin.WindowCommand):
     def run(self, url=None):
         _status("loading pull request…")
-        _async(lambda: _load(self.window, url))
-
-
-class GithubPullRequestLoadUrlCommand(sublime_plugin.WindowCommand):
-    def run(self):
-        self.window.show_input_panel(
-            "PR URL:",
-            "",
-            lambda url: self.window.run_command(
-                "github_pull_request_load", {"url": url}
-            ),
-            None,
-            None,
-        )
+        _async(lambda: _load(self.window))
 
 
 FILES_PANEL = "githubpullrequest_files"
