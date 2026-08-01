@@ -162,12 +162,7 @@ class ResolvePRTest(unittest.TestCase):
     def test_resolve_pr(self):
         cases = {
             "from_current_branch": {
-                "url": None,
                 "expect_view_args": ["gh", "pr", "view", "--json"],
-            },
-            "from_url": {
-                "url": "https://github.com/octo/repo/pull/42/files",
-                "expect_view_args": ["gh", "pr", "view", "42", "--json"],
             },
         }
 
@@ -176,7 +171,7 @@ class ResolvePRTest(unittest.TestCase):
                 gh_runner = ScriptedGH(pr_view=json.dumps(_PR_VIEW))
                 review = _make_review(gh_runner, ScriptedGit())
 
-                result = review.resolve_pr(case["url"])
+                result = review.resolve_pr()
 
                 self.assertEqual(
                     gh_runner.calls[0]["args"][: len(case["expect_view_args"])],

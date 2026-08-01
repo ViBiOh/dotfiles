@@ -1,11 +1,7 @@
 [
   {
-    "caption": "GithubPullRequest: Load pull-request (current branch)",
+    "caption": "GithubPullRequest: Load pull-request",
     "command": "github_pull_request_load"
-  },
-  {
-    "caption": "GithubPullRequest: Load pull-request from URL",
-    "command": "github_pull_request_load_url"
   },
   {
     "caption": "GithubPullRequest: Show changed files",
