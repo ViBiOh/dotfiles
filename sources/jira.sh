@@ -205,38 +205,6 @@ _jira() {
     open "$(_jira_url "${JIRA_ISSUE}")"
     ;;
 
-  "pr")
-    if [[ $(git rev-parse --is-inside-work-tree 2>&1) != "true" ]]; then
-      _jira_error "not in a git directory"
-      return 1
-    fi
-
-    local GITHUB_REPOSITORY
-    if [[ "$(git remote get-url --push "$(git remote show | head -1)")" =~ ^.*@.*:([^\.]*)(.git)?$ ]]; then
-      GITHUB_REPOSITORY="${BASH_REMATCH[1]}"
-    else
-      _jira_error "unable to identify git remote repository"
-      return 1
-    fi
-
-    local GIT_CURRENT_BRANCH
-    GIT_CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-
-    local JIRA_TICKET_ID
-    JIRA_TICKET_ID="$(_jira_issue "${scope}" "${GIT_CURRENT_BRANCH}")"
-
-    if [[ -z ${JIRA_TICKET_ID} ]]; then
-      return
-    fi
-
-    _jira_github_branch "${GITHUB_REPOSITORY}" "${GIT_CURRENT_BRANCH}"
-    _jira_github_pull_request "${GITHUB_REPOSITORY}" "${GIT_CURRENT_BRANCH}" "${JIRA_TICKET_ID}"
-
-    if _jira_confirm "Change status" "true"; then
-      _jira_transition "${JIRA_TICKET_ID}"
-    fi
-    ;;
-
   "print")
     local JIRA_ISSUE
     JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
@@ -455,107 +423,10 @@ _jira_help() {
   _jira_info " - create      Create a ticket interactively           |"
   _jira_info " - list        List assigned ticket"
   _jira_info " - open        Open ticket                             | <search text>?"
-  _jira_info " - pr          Open pull-request for current branch"
   _jira_info " - print       Print ticket ID                         | <search text>?"
   _jira_info " - summary     Print the summary of a ticket           | <search text>?"
   _jira_info " - transition  Transition ticket to another state      | <search text>?"
   _jira_info " - url         Print URL for ticket                    | <search text>?"
-}
-
-_jira_github_branch() {
-  local GITHUB_REPOSITORY="${1}"
-  local GIT_CURRENT_BRANCH="${2}"
-
-  local GITHUB_PRINT_OUTPUT="false"
-  local GITHUB_PRINT_ERROR="false"
-
-  if ! _jira_github_request "/repos/${GITHUB_REPOSITORY}/branches/${GIT_CURRENT_BRANCH}"; then
-    _jira_warning "Remote branch '${GIT_CURRENT_BRANCH}' doesn't exist."
-
-    if _jira_confirm "Run 'git push'"; then
-      git push
-    fi
-  fi
-}
-
-_jira_github_pull_request() {
-  local GITHUB_REPOSITORY="${1}"
-  local GIT_CURRENT_BRANCH="${2}"
-  local JIRA_TICKET_ID="${3}"
-
-  local PULL_REQUEST_BODY
-  PULL_REQUEST_BODY="[${JIRA_TICKET_ID}]($(_jira_url "${JIRA_TICKET_ID}"))"
-
-  local GITHUB_PR_TEMPLATE
-  GITHUB_PR_TEMPLATE="$(git rev-parse --show-toplevel)/.github/PULL_REQUEST_TEMPLATE.md"
-  if [[ -e ${GITHUB_PR_TEMPLATE} ]]; then
-    PULL_REQUEST_BODY+=$'\n\n'
-    PULL_REQUEST_BODY+="$(cat "${GITHUB_PR_TEMPLATE}")"
-  fi
-
-  local GITHUB_PRINT_OUTPUT="true"
-  local GITHUB_PRINT_ERROR="true"
-
-  local GITHUB_OUTPUT
-  GITHUB_OUTPUT="$(_jira_github_request "/repos/${GITHUB_REPOSITORY}/pulls" \
-    --data "$(
-      jq --compact-output --null-input \
-        --arg title "$(_jira_summary "${JIRA_TICKET_ID}")" \
-        --arg base "$(git remote show origin | grep 'HEAD branch:' | awk '{printf("%s", $3)}')" \
-        --arg head "${GIT_CURRENT_BRANCH}" \
-        --arg body "${PULL_REQUEST_BODY}" \
-        '{title: $title, base: $base, head: $head, body: $body, draft: true}'
-    )")"
-
-  if [[ -n ${GITHUB_OUTPUT:-} ]]; then
-    open "$(printf -- "%s" "${GITHUB_OUTPUT}" | jq --raw-output '.html_url')"
-  fi
-}
-
-_jira_github_request() {
-  if [[ ${#} -lt 1 ]]; then
-    _jira_error "Usage: _github_request PATH [EXTRA_CURL_ARGS]"
-    return 1
-  fi
-
-  local HEADER_OUTPUT
-  HEADER_OUTPUT=$(mktemp)
-
-  local URL
-  URL="https://api.github.com${1-}"
-  shift 1
-
-  local GITHUB_OUTPUT
-  GITHUB_OUTPUT="$(
-    curl \
-      --disable \
-      --silent \
-      --show-error \
-      --location \
-      --max-time 10 \
-      --dump-header "${HEADER_OUTPUT}" \
-      --fail-with-body \
-      --header "Accept: application/vnd.github+json" \
-      --config <(printf -- 'header = "Authorization: Bearer %s"\n' "$(github_token)") \
-      "${URL}" \
-      "${@}"
-  )"
-
-  if [[ ${?} -ne 0 ]]; then
-    if [[ ${GITHUB_PRINT_ERROR:-} == "true" ]]; then
-      cat "${HEADER_OUTPUT}" >/dev/stderr
-      printf -- "%s\n" "${GITHUB_OUTPUT}" >/dev/stderr
-    fi
-
-    rm -f "${HEADER_OUTPUT}"
-    return 1
-  fi
-
-  rm -f "${HEADER_OUTPUT}"
-
-  if [[ ${GITHUB_PRINT_OUTPUT:-} == "true" ]]; then
-    printf -- "%s" "${GITHUB_OUTPUT}"
-  fi
 }
 
 _jira_request() {
