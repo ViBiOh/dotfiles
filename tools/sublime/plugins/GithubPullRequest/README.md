@@ -39,18 +39,18 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 | **Next comment** / **Previous comment** | Jump between commented lines in the current file. |
 | **Submit review** | Pick a verdict (Comment / Approve / Request changes) and post all queued comments in one review. |
 | **Discard queued comments** | Drop the local draft queue. |
-| **End review** | Clear all decorations, reference documents, and the panel. Git is untouched throughout. |
+| **End review** | Clear all decorations, reference documents, and the panel. If you have pending comments, asks whether to keep them on GitHub (restored next load) or discard them. Git is untouched throughout. |
 
 ### In the editor once a PR is loaded
 
 - **Diff** — the native gutter diff lights up per file via `set_reference_document` against the merge-base blob (read with read-only `git show`). Added files show all-green.
 - **Threads** — unresolved threads get a blue gutter icon; hover (or _Show comments_) opens an HTML popup with the rendered comment bodies (GitHub's `bodyHTML` down-converted to minihtml), plus **Reply**, **Resolve/Unresolve**, **Open in browser**, and **Apply** for ` ```suggestion ` blocks.
-- **Drafts** — queued comments get a purple gutter icon and a "pending" popup with a **Discard** link; the panel shows per-file and total pending counts.
+- **Drafts** — queued comments get a purple gutter icon and a "pending" popup with a **Discard** link; the panel shows per-file and total pending counts. They are restored from GitHub when you reload the PR.
 
 ## How it works (and what it will not do)
 
 - **Non-mutating.** No `gh pr checkout`, no branch, no `reset`, no writes of any kind. Only read-only git (`git show`, `git merge-base`, `rev-parse`). Your branch, index, and stash are never touched.
-- **Pending-review batching.** Comments queue locally and post together with a verdict, like github.com.
+- **Pending-review batching (server-backed).** Comments queue into a real GitHub pending review, then submit together with a verdict, like github.com. Because they live on GitHub, queued comments survive a Sublime crash/restart (restored when you reload the PR) and are visible on github.com until submitted.
 - **No sidebar badges.** There is no Sublime API to badge the sidebar file tree, so the changed-files list is the bottom panel (not the sidebar).
 
 ## Settings

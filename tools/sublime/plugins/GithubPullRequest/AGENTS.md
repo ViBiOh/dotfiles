@@ -21,7 +21,7 @@ Two layers:
 | `mapper.py` | `LineMap(file_diff)`: buffer row ↔ GitHub `(side, line)` coords, `is_commentable`, `added_rows`, `comment_range` (single + multi-line payloads). Duck-typed on `file_diff` (does NOT import `diff`). |
 | `render.py` | Pure minihtml builders: thread popup, pending popup, `bodyHTML`→minihtml sanitizer, suggestion extraction, `subl:githubpullrequest?...` action encode/decode. |
 | `gh.py` | Injectable subprocess client: `api` (with JSON `--input -` bodies), `graphql`, `pr_diff`, `pr_view`. |
-| `review.py` | Service composing the above: `resolve_pr`, `changed_files`, `review_threads` (GraphQL, paginated), `base_blob` (read-only `git show`), draft queue, `submit_review`, `reply_comment`, `set_thread_resolved`. |
+| `review.py` | Service composing the above: `resolve_pr`, `changed_files`, `review_threads` (GraphQL, paginated), `base_blob` (read-only `git show`), the server-backed draft queue (a real GitHub PENDING review — `load_pending`/`queue_comment`/`discard_draft`/`clear_drafts`; `_drafts` is a display mirror with `comment_id`s), `submit_review`, `reply_comment`, `set_thread_resolved`. |
 
 **Sublime glue** (`plugin.py` + `state.py`, imports `sublime`, only `py_compile` + `ruff` checkable headlessly):
 
@@ -70,6 +70,7 @@ The glue (`plugin.py`, `state.py`) cannot be exercised outside Sublime — verif
 - **Markdown fallback suggestion indexing** (`render._render_body`): the non-`body_html` popup path counts suggestions with `_FENCE_RE` while the Apply handler uses `_SUGGESTION_RE`, so indices could diverge. Real GitHub data always has `body_html` (both sides then use `suggestions_in`), so this is effectively test-only. Unify the two if you touch it.
 - **base-blob caching**: a transient `git show` failure caches `None` for the file for the session, so its gutter diff won't retry until reload. Intentional (avoids re-spawning git on every activate); revisit if it bites.
 - **`mapper.row_to_anchor` / `Anchor`**: part of the DESIGN interface and tested, but not currently called by the glue. Keep as public API or wire it in.
+- **Pending vs published threads assumption**: the draft queue is a server-side PENDING review; `review_threads()` (published `reviewThreads`) is assumed NOT to include pending comments, so drafts and posted threads stay distinct. If GitHub ever returns pending comments there, filter them out by author + pending state.
 - Deferred features: outdated-comment re-anchoring, reactions, viewed-file state, CI-checks display, multiple concurrent PRs.
 
 ## Where things plug in

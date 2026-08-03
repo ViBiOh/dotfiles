@@ -5,7 +5,7 @@ GitHub pull-request review inside Sublime Text 4. Transparent on startup; everyt
 ## Superseding decisions (this session)
 
 1. **Non-mutating diff.** The plugin NEVER mutates git. No `gh pr checkout`, no branch, no `reset`. The user is already on the PR branch (that is how the PR is inferred). The gutter diff is drawn with `view.set_reference_document(base_text)` against the merge-base blob, fetched with read-only `git show`. Only read-only git is ever used (`git show`, `git merge-base`, `git rev-parse`).
-2. **Pending-review batching.** Comments queue locally as a draft, then submit together with a verdict (APPROVE / COMMENT / REQUEST_CHANGES) in one API call, like github.com.
+2. **Pending-review batching (server-backed).** Comments queue into a real GitHub PENDING review (via GraphQL), then submit together with a verdict (APPROVE / COMMENT / REQUEST_CHANGES). Because the queue lives on GitHub, drafts survive crashes/restarts (restored by `load_pending` on reload) and show on github.com until submitted. The local `_drafts` list is just a display mirror.
 3. **Plugin-owned PR panel.** No Sublime API can badge the sidebar file tree, so a dedicated bottom output panel lists changed files with `+N -M` stats plus unresolved- and pending-comment counts, colored by a bundled syntax and navigable via `result_file_regex` (double-click / Enter / F4).
 
 Also removed since the first draft: deleted-line phantoms and LEFT-side (deleted-line) comment authoring (disliked in practice); the standalone quick-panel file list (folded into the bottom panel). Added: local **draft** comments shown with a distinct purple gutter icon and a pending popup.
@@ -209,9 +209,9 @@ class Review:
                  git_runner: Optional[Runner] = None) -> None:
         """git_runner runs read-only git (show/merge-base/rev-parse); injectable for tests."""
 
-    def resolve_pr(self, url: Optional[str] = None) -> Dict:
-        """No url -> infer from current branch via gh.pr_view(). url -> parse_pr_url then pr_view(n).
-           Returns {'number','title','base','head','head_oid','url','owner','repo'}. Caches it."""
+    def resolve_pr(self) -> Dict:
+        """Infer the PR from the current branch via gh.pr_view(); derive owner/repo from the
+           returned url. Returns {'number','title','base','head','head_oid','url','owner','repo'}."""
 
     def merge_base(self) -> str:
         """read-only `git merge-base HEAD origin/<base>` (fallback <base>). Cached."""
@@ -221,22 +221,39 @@ class Review:
 
     def review_threads(self) -> List[Dict]:
         """GraphQL pullRequest.reviewThreads (paginated). Each thread dict per the shape below.
-           Fetched once at load; the caller keys them by path."""
+           Fetched once at load; the caller keys them by path. (Submitted threads only — pending
+           review comments are NOT here; they come from load_pending.)"""
 
     def base_blob(self, path: str) -> Optional[str]:
         """read-only `git show <merge_base>:<path>` -> text, or None (added file / not found)."""
 
+    # --- server-backed draft queue (a real GitHub PENDING review) ---
+    # State: _pr_node_id (GraphQL PR id), _pending_review_id (None until created),
+    # and each draft carries a `comment_id` (server node id) for per-item discard.
+
+    def load_pending(self) -> None:
+        """One GraphQL query: viewer.login + pullRequest.id + reviews(states:[PENDING]).
+           Sets _pr_node_id; if a viewer-authored PENDING review exists, sets _pending_review_id
+           and rebuilds the draft mirror from its comments. Called once at load."""
+
     def queue_comment(self, path: str, payload: Dict, body: str) -> None:
-        """Append {path, **payload, body} to the local draft queue (does NOT post)."""
+        """NETWORK: _ensure_pending_review() (lazy addPullRequestReview -> id), then
+           addPullRequestReviewThread(reviewId, path, line, side, startLine?, startSide?, body);
+           append {path, side, line, start_line?, start_side?, body, comment_id} to the mirror."""
 
     def drafts(self) -> List[Dict]: ...
-    def discard_draft(self, index: int) -> None: ...
-    def clear_drafts(self) -> None: ...
+
+    def discard_draft(self, index: int) -> None:
+        """NETWORK: deletePullRequestReviewComment(comment_id); drop from mirror. If the mirror
+           becomes empty, also deletePullRequestReview and null the id."""
+
+    def clear_drafts(self) -> None:
+        """NETWORK: deletePullRequestReview when one exists; clear mirror + id."""
 
     def submit_review(self, verdict: str, body: str = "") -> Dict:
-        """verdict in {APPROVE, COMMENT, REQUEST_CHANGES}. POST /repos/{o}/{r}/pulls/{n}/reviews
-           with event=verdict, body, comments=[{path, line, side, start_line?, start_side?, body}].
-           Clears drafts on success. Returns the created review JSON."""
+        """verdict in {APPROVE, COMMENT, REQUEST_CHANGES}. With a pending review:
+           submitPullRequestReview(reviewId, event, body). Without one (e.g. a bare APPROVE):
+           REST POST /repos/{o}/{r}/pulls/{n}/reviews {event, body}. Clears mirror + id."""
 
     def reply_comment(self, thread_id: str, body: str) -> Dict:
         """GraphQL addPullRequestReviewThreadReply (or REST reply-to-comment)."""
@@ -272,7 +289,7 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
 
 - `state.py` — `SESSION` singleton: `pr` meta, `threads_by_path`, `files` + `files_by_path`, `line_maps: Dict[str, LineMap]`, `review: Review`, `base_blob_cache`, `root`/`cwd`, `active`. Plus `unresolved_count`, `pending_by_path`, and `file_entries_for_panel` (alphabetical, enriched with `unresolved` + `pending` counts).
 - `plugin.py` — commands + `GithubPullRequestListener`. All gh/git calls run through `sublime.set_timeout_async`; UI mutation (regions, popups, panels, status) back on the main thread via `set_timeout`. Decoration = `set_reference_document` diff (empty base for new files → all green)
-  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Popups (hover or command) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here.
+  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Popups (hover or command) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are now network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. `End review` with pending drafts prompts `yes_no_cancel` (Keep on GitHub / Discard from GitHub / Cancel).
 - `Context.sublime-menu` — right-click entry running `github_pull_request_add_comment` (enabled only when a PR is active).
 - `.sublime-commands` — palette entries, captions prefixed `GithubPullRequest:` (match siblings).
 - `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip); the chosen label is prefixed as `"<emoji> <label>: "` (emoji omitted if absent) to the typed subject before queuing.

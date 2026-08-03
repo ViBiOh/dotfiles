@@ -48,6 +48,59 @@ _UNRESOLVE_MUTATION = """mutation($id:ID!){
   }
 }"""
 
+# The local draft queue is backed by a real GitHub PENDING review, so queued
+# comments survive crashes/restarts and are visible on github.com until submitted.
+_PENDING_QUERY = """query($owner:String!,$repo:String!,$number:Int!){
+  viewer{ login }
+  repository(owner:$owner,name:$repo){
+    pullRequest(number:$number){
+      id
+      reviews(first:50, states:[PENDING]){
+        nodes{
+          id viewerDidAuthor
+          comments(first:100){ nodes{ id path line startLine body } }
+        }
+      }
+    }
+  }
+}"""
+
+_ADD_REVIEW_MUTATION = """mutation($pr:ID!){
+  addPullRequestReview(input:{pullRequestId:$pr}){
+    pullRequestReview{ id }
+  }
+}"""
+
+_ADD_THREAD_MUTATION = """mutation($rid:ID!,$path:String!,$line:Int!,$side:DiffSide!,$body:String!){
+  addPullRequestReviewThread(input:{pullRequestReviewId:$rid, path:$path, line:$line, side:$side, body:$body}){
+    thread{ comments(first:1){ nodes{ id } } }
+  }
+}"""
+
+_ADD_THREAD_RANGE_MUTATION = """mutation($rid:ID!,$path:String!,$line:Int!,$side:DiffSide!,$startLine:Int!,$startSide:DiffSide!,$body:String!){
+  addPullRequestReviewThread(input:{pullRequestReviewId:$rid, path:$path, line:$line, side:$side, startLine:$startLine, startSide:$startSide, body:$body}){
+    thread{ comments(first:1){ nodes{ id } } }
+  }
+}"""
+
+_DELETE_COMMENT_MUTATION = """mutation($id:ID!){
+  deletePullRequestReviewComment(input:{id:$id}){
+    pullRequestReviewComment{ id }
+  }
+}"""
+
+_DELETE_REVIEW_MUTATION = """mutation($rid:ID!){
+  deletePullRequestReview(input:{pullRequestReviewId:$rid}){
+    pullRequestReview{ id }
+  }
+}"""
+
+_SUBMIT_REVIEW_MUTATION = """mutation($rid:ID!,$event:PullRequestReviewEvent!,$body:String){
+  submitPullRequestReview(input:{pullRequestReviewId:$rid, event:$event, body:$body}){
+    pullRequestReview{ id state }
+  }
+}"""
+
 
 def _default_git_runner(
     args: List[str],
@@ -80,6 +133,8 @@ class Review:
         self._pr = None
         self._merge_base = None
         self._drafts = []
+        self._pr_node_id = None
+        self._pending_review_id = None
 
     def _git_run(self, args: List[str]) -> Tuple[int, str, str]:
         return self._git(args, self._cwd)
@@ -208,7 +263,67 @@ class Review:
 
         return out
 
+    def load_pending(self) -> None:
+        """Fetch the PR node id and restore any existing PENDING review authored by
+        the current user into the local draft mirror. Called once at load."""
+        data = self._gh.graphql(
+            _PENDING_QUERY,
+            {
+                "owner": self._pr["owner"],
+                "repo": self._pr["repo"],
+                "number": self._pr["number"],
+            },
+        )
+
+        pull = data["repository"]["pullRequest"]
+        self._pr_node_id = pull["id"]
+        self._pending_review_id = None
+        self._drafts = []
+
+        for review in pull["reviews"]["nodes"]:
+            if not review.get("viewerDidAuthor"):
+                continue
+
+            self._pending_review_id = review["id"]
+            for comment in review["comments"]["nodes"]:
+                # PullRequestReviewComment has no side field (it lives on the thread);
+                # the plugin only authors RIGHT-side drafts, so restore them as RIGHT.
+                draft = {
+                    "comment_id": comment["id"],
+                    "path": comment["path"],
+                    "body": comment["body"],
+                    "side": "RIGHT",
+                    "line": comment.get("line"),
+                }
+
+                if comment.get("startLine"):
+                    draft["start_line"] = comment["startLine"]
+                    draft["start_side"] = draft["side"]
+
+                self._drafts.append(draft)
+
+            break
+
+    def _ensure_pending_review(self) -> str:
+        if self._pending_review_id is None:
+            data = self._gh.graphql(_ADD_REVIEW_MUTATION, {"pr": self._pr_node_id})
+            self._pending_review_id = data["addPullRequestReview"]["pullRequestReview"][
+                "id"
+            ]
+
+        return self._pending_review_id
+
     def queue_comment(self, path: str, payload: Dict, body: str) -> None:
+        review_id = self._ensure_pending_review()
+
+        variables = {
+            "rid": review_id,
+            "path": path,
+            "line": payload["line"],
+            "side": payload["side"],
+            "body": body,
+        }
+
         draft = {
             "path": path,
             "body": body,
@@ -217,8 +332,17 @@ class Review:
         }
 
         if "start_line" in payload:
+            variables["startLine"] = payload["start_line"]
+            variables["startSide"] = payload["start_side"]
             draft["start_line"] = payload["start_line"]
             draft["start_side"] = payload["start_side"]
+            mutation = _ADD_THREAD_RANGE_MUTATION
+        else:
+            mutation = _ADD_THREAD_MUTATION
+
+        data = self._gh.graphql(mutation, variables)
+        nodes = data["addPullRequestReviewThread"]["thread"]["comments"]["nodes"]
+        draft["comment_id"] = nodes[0]["id"] if nodes else None
 
         self._drafts.append(draft)
 
@@ -226,42 +350,42 @@ class Review:
         return list(self._drafts)
 
     def discard_draft(self, index: int) -> None:
+        draft = self._drafts[index]
+
+        if draft.get("comment_id"):
+            self._gh.graphql(_DELETE_COMMENT_MUTATION, {"id": draft["comment_id"]})
+
         del self._drafts[index]
 
+        if not self._drafts:
+            self.clear_drafts()
+
     def clear_drafts(self) -> None:
+        if self._pending_review_id is not None:
+            self._gh.graphql(_DELETE_REVIEW_MUTATION, {"rid": self._pending_review_id})
+
         self._drafts = []
+        self._pending_review_id = None
 
     def submit_review(self, verdict: str, body: str = "") -> Dict:
         assert verdict in _VERDICTS
 
-        comments = []
-        for draft in self._drafts:
-            comment = {
-                "path": draft["path"],
-                "line": draft["line"],
-                "side": draft["side"],
-                "body": draft["body"],
-            }
+        if self._pending_review_id is not None:
+            result = self._gh.graphql(
+                _SUBMIT_REVIEW_MUTATION,
+                {"rid": self._pending_review_id, "event": verdict, "body": body},
+            )
+        else:
+            # No queued comments: post a bare review (e.g. a plain APPROVE) via REST.
+            path = "repos/{}/{}/pulls/{}/reviews".format(
+                self._pr["owner"], self._pr["repo"], self._pr["number"]
+            )
+            result = self._gh.api(
+                path, method="POST", input_obj={"event": verdict, "body": body}
+            )
 
-            if "start_line" in draft:
-                comment["start_line"] = draft["start_line"]
-                comment["start_side"] = draft["start_side"]
-
-            comments.append(comment)
-
-        payload = {
-            "event": verdict,
-            "body": body,
-            "comments": comments,
-        }
-
-        path = "repos/{}/{}/pulls/{}/reviews".format(
-            self._pr["owner"], self._pr["repo"], self._pr["number"]
-        )
-
-        result = self._gh.api(path, method="POST", input_obj=payload)
-
-        self.clear_drafts()
+        self._drafts = []
+        self._pending_review_id = None
 
         return result
 

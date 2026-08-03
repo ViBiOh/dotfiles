@@ -394,14 +394,23 @@ def _handle_action(view, href):
 
 
 def _discard_draft(index):
-    try:
-        SESSION.review.discard_draft(index)
-    except IndexError:
-        return
+    def worker():
+        try:
+            SESSION.review.discard_draft(index)
+        except IndexError:
+            return
+        except GHError as err:
+            _main(lambda message=str(err): _error(message))
+            return
 
-    _decorate_all_views()
-    _refresh_files_panel(sublime.active_window())
-    _status("draft discarded")
+        def apply():
+            _decorate_all_views()
+            _refresh_files_panel(sublime.active_window())
+            _status("draft discarded")
+
+        _main(apply)
+
+    _async(worker)
 
 
 def _prompt_reply(thread_id):
@@ -528,6 +537,7 @@ def _load(window):
         pr = review.resolve_pr()
         files = review.changed_files()
         threads = review.review_threads()
+        review.load_pending()
     except GHError as err:
         _main(lambda message=str(err): _error(message))
         return
@@ -733,11 +743,23 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             if not subject.strip():
                 return
 
-            SESSION.review.queue_comment(path, payload, prefix + subject)
-            _apply_draft_icons(view, path)
-            _refresh_files_panel(window)
-            _status("comment queued (submit the review to post)")
-            _update_status()
+            def worker():
+                try:
+                    SESSION.review.queue_comment(path, payload, prefix + subject)
+                except GHError as err:
+                    _main(lambda message=str(err): _error(message))
+                    return
+
+                def apply():
+                    _apply_draft_icons(view, path)
+                    _refresh_files_panel(window)
+                    _status("comment queued (submit the review to post)")
+                    _update_status()
+
+                _main(apply)
+
+            _status("queuing comment…")
+            _async(worker)
 
         def ask_subject(prefix):
             tag = prefix[:-2] if prefix else ""  # "suggestion: " -> "suggestion"
@@ -887,11 +909,25 @@ class GithubPullRequestDiscardDraftsCommand(sublime_plugin.WindowCommand):
         return SESSION.active and bool(SESSION.review.drafts())
 
     def run(self):
-        SESSION.review.clear_drafts()
-        _decorate_all_views()
-        _refresh_files_panel(self.window)
-        _status("drafts discarded")
-        _update_status()
+        window = self.window
+
+        def worker():
+            try:
+                SESSION.review.clear_drafts()
+            except GHError as err:
+                _main(lambda message=str(err): _error(message))
+                return
+
+            def apply():
+                _decorate_all_views()
+                _refresh_files_panel(window)
+                _status("drafts discarded")
+                _update_status()
+
+            _main(apply)
+
+        _status("discarding drafts…")
+        _async(worker)
 
 
 def _end_review(message="review ended"):
@@ -910,7 +946,34 @@ class GithubPullRequestEndReviewCommand(sublime_plugin.WindowCommand):
         return SESSION.active
 
     def run(self):
-        _end_review()
+        drafts = SESSION.review.drafts() if SESSION.review else []
+        if not drafts:
+            _end_review()
+            return
+
+        choice = sublime.yes_no_cancel_dialog(
+            "You have {} pending comment(s) saved as a GitHub pending review.".format(
+                len(drafts)
+            ),
+            "Keep on GitHub",
+            "Discard from GitHub",
+        )
+
+        if choice == sublime.DIALOG_YES:
+            # Pending review stays on GitHub; it is restored next time you load the PR.
+            _end_review()
+        elif choice == sublime.DIALOG_NO:
+
+            def worker():
+                try:
+                    SESSION.review.clear_drafts()
+                except GHError as err:
+                    _main(lambda message=str(err): _error(message))
+                    return
+
+                _main(lambda: _end_review("review ended (pending discarded)"))
+
+            _async(worker)
 
 
 # --------------------------------------------------------------------------- #

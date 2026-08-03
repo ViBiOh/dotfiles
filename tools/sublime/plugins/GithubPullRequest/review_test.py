@@ -347,48 +347,192 @@ class BaseBlobTest(unittest.TestCase):
                 self.assertEqual(result, case["expected"])
 
 
+def _wrap(data):
+    return json.dumps({"data": data})
+
+
+_PENDING_EMPTY = _wrap(
+    {
+        "viewer": {"login": "octo"},
+        "repository": {"pullRequest": {"id": "PR1", "reviews": {"nodes": []}}},
+    }
+)
+_ADD_REVIEW = _wrap({"addPullRequestReview": {"pullRequestReview": {"id": "REV1"}}})
+_DELETE_COMMENT = _wrap(
+    {"deletePullRequestReviewComment": {"pullRequestReviewComment": {"id": "C1"}}}
+)
+_DELETE_REVIEW = _wrap(
+    {"deletePullRequestReview": {"pullRequestReview": {"id": "REV1"}}}
+)
+_SUBMIT = _wrap(
+    {
+        "submitPullRequestReview": {
+            "pullRequestReview": {"id": "REV1", "state": "PENDING"}
+        }
+    }
+)
+
+
+def _add_thread(comment_id):
+    return _wrap(
+        {
+            "addPullRequestReviewThread": {
+                "thread": {"comments": {"nodes": [{"id": comment_id}]}}
+            }
+        }
+    )
+
+
+def _graphql_queries(gh_runner):
+    """The `query=` payloads of every graphql call, in order."""
+    out = []
+    for call in gh_runner.calls:
+        if "graphql" not in call["args"]:
+            continue
+        for arg in call["args"]:
+            if arg.startswith("query="):
+                out.append(arg)
+
+    return out
+
+
+def _loaded_review(gh_runner):
+    review = _make_review(gh_runner, ScriptedGit())
+    review.resolve_pr()
+    review.load_pending()
+
+    return review
+
+
+class LoadPendingTest(unittest.TestCase):
+    def test_restores_drafts_from_pending_review(self):
+        pending = _wrap(
+            {
+                "viewer": {"login": "octo"},
+                "repository": {
+                    "pullRequest": {
+                        "id": "PR1",
+                        "reviews": {
+                            "nodes": [
+                                {
+                                    "id": "REV1",
+                                    "viewerDidAuthor": True,
+                                    "comments": {
+                                        "nodes": [
+                                            {
+                                                "id": "C1",
+                                                "path": "foo.py",
+                                                "line": 5,
+                                                "startLine": None,
+                                                "body": "restored one",
+                                            },
+                                            {
+                                                "id": "C2",
+                                                "path": "bar.py",
+                                                "line": 8,
+                                                "startLine": 5,
+                                                "body": "restored range",
+                                            },
+                                        ]
+                                    },
+                                }
+                            ]
+                        },
+                    }
+                },
+            }
+        )
+        gh_runner = ScriptedGH(pr_view=json.dumps(_PR_VIEW), graphql_pages=[pending])
+        review = _loaded_review(gh_runner)
+
+        self.assertEqual(
+            review.drafts(),
+            [
+                {
+                    "comment_id": "C1",
+                    "path": "foo.py",
+                    "body": "restored one",
+                    "side": "RIGHT",
+                    "line": 5,
+                },
+                {
+                    "comment_id": "C2",
+                    "path": "bar.py",
+                    "body": "restored range",
+                    "side": "RIGHT",
+                    "line": 8,
+                    "start_line": 5,
+                    "start_side": "RIGHT",
+                },
+            ],
+        )
+
+    def test_no_pending_review_leaves_empty(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW), graphql_pages=[_PENDING_EMPTY]
+        )
+        review = _loaded_review(gh_runner)
+
+        self.assertEqual(review.drafts(), [])
+
+
 class DraftQueueTest(unittest.TestCase):
-    def test_queue_comment(self):
-        cases = {
-            "single_line": {
-                "payload": {"side": "RIGHT", "line": 5},
-                "expected": {
+    def test_queue_creates_review_then_thread(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _add_thread("C1")],
+        )
+        review = _loaded_review(gh_runner)
+
+        review.queue_comment("foo.py", {"side": "RIGHT", "line": 5}, "hi")
+
+        self.assertEqual(
+            review.drafts(),
+            [
+                {
                     "path": "foo.py",
                     "body": "hi",
                     "side": "RIGHT",
                     "line": 5,
-                },
-            },
-            "multi_line": {
-                "payload": {
-                    "side": "RIGHT",
-                    "line": 8,
-                    "start_line": 5,
-                    "start_side": "RIGHT",
-                },
-                "expected": {
-                    "path": "foo.py",
-                    "body": "range",
-                    "side": "RIGHT",
-                    "line": 8,
-                    "start_line": 5,
-                    "start_side": "RIGHT",
-                },
-            },
-        }
+                    "comment_id": "C1",
+                }
+            ],
+        )
+        queries = _graphql_queries(gh_runner)
+        self.assertTrue(any("addPullRequestReview(" in q for q in queries))
+        self.assertTrue(any("addPullRequestReviewThread(" in q for q in queries))
 
-        for name, case in cases.items():
-            with self.subTest(name=name):
-                review = _make_review(ScriptedGH(), ScriptedGit())
+    def test_second_queue_reuses_review(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _PENDING_EMPTY,
+                _ADD_REVIEW,
+                _add_thread("C1"),
+                _add_thread("C2"),
+            ],
+        )
+        review = _loaded_review(gh_runner)
 
-                review.queue_comment(
-                    "foo.py", case["payload"], case["expected"]["body"]
-                )
+        review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "one")
+        review.queue_comment(
+            "b.py",
+            {"side": "RIGHT", "line": 8, "start_line": 5, "start_side": "RIGHT"},
+            "range",
+        )
 
-                self.assertEqual(review.drafts(), [case["expected"]])
+        self.assertEqual(len(review.drafts()), 2)
+        self.assertEqual(review.drafts()[1]["start_line"], 5)
+        # addPullRequestReview created exactly once.
+        queries = _graphql_queries(gh_runner)
+        self.assertEqual(sum(1 for q in queries if "addPullRequestReview(" in q), 1)
 
     def test_drafts_returns_copy(self):
-        review = _make_review(ScriptedGH(), ScriptedGit())
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _add_thread("C1")],
+        )
+        review = _loaded_review(gh_runner)
         review.queue_comment("foo.py", {"side": "RIGHT", "line": 1}, "b")
 
         got = review.drafts()
@@ -396,45 +540,113 @@ class DraftQueueTest(unittest.TestCase):
 
         self.assertEqual(len(review.drafts()), 1)
 
-    def test_discard_and_clear(self):
-        review = _make_review(ScriptedGH(), ScriptedGit())
+    def test_discard_deletes_comment(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _PENDING_EMPTY,
+                _ADD_REVIEW,
+                _add_thread("C1"),
+                _add_thread("C2"),
+                _DELETE_COMMENT,
+            ],
+        )
+        review = _loaded_review(gh_runner)
         review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "one")
         review.queue_comment("b.py", {"side": "RIGHT", "line": 2}, "two")
 
         review.discard_draft(0)
+
         self.assertEqual(len(review.drafts()), 1)
         self.assertEqual(review.drafts()[0]["path"], "b.py")
+        self.assertTrue(
+            any(
+                "deletePullRequestReviewComment(" in q
+                for q in _graphql_queries(gh_runner)
+            )
+        )
+
+    def test_discard_last_deletes_review(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _PENDING_EMPTY,
+                _ADD_REVIEW,
+                _add_thread("C1"),
+                _DELETE_COMMENT,
+                _DELETE_REVIEW,
+            ],
+        )
+        review = _loaded_review(gh_runner)
+        review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "one")
+
+        review.discard_draft(0)
+
+        self.assertEqual(review.drafts(), [])
+        self.assertTrue(
+            any("deletePullRequestReview(" in q for q in _graphql_queries(gh_runner))
+        )
+
+    def test_clear_deletes_review(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _PENDING_EMPTY,
+                _ADD_REVIEW,
+                _add_thread("C1"),
+                _DELETE_REVIEW,
+            ],
+        )
+        review = _loaded_review(gh_runner)
+        review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "one")
 
         review.clear_drafts()
+
         self.assertEqual(review.drafts(), [])
+        self.assertTrue(
+            any("deletePullRequestReview(" in q for q in _graphql_queries(gh_runner))
+        )
 
 
 class SubmitReviewTest(unittest.TestCase):
-    def test_submit_builds_payload_and_clears(self):
+    def test_submit_pending_review(self):
         gh_runner = ScriptedGH(
             pr_view=json.dumps(_PR_VIEW),
-            api=json.dumps({"id": 999, "state": "PENDING"}),
+            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _add_thread("C1"), _SUBMIT],
         )
-        review = _make_review(gh_runner, ScriptedGit())
-        review.resolve_pr()
-
+        review = _loaded_review(gh_runner)
         review.queue_comment("foo.py", {"side": "RIGHT", "line": 5}, "single")
-        review.queue_comment(
-            "bar.py",
-            {"side": "RIGHT", "line": 8, "start_line": 5, "start_side": "RIGHT"},
-            "range",
-        )
 
         result = review.submit_review("REQUEST_CHANGES", body="please fix")
 
-        self.assertEqual(result, {"id": 999, "state": "PENDING"})
-
-        api_calls = [c for c in gh_runner.calls if c["args"][:2] == ["gh", "api"]]
-        self.assertEqual(len(api_calls), 1)
-
-        args = api_calls[0]["args"]
         self.assertEqual(
-            args,
+            result["submitPullRequestReview"]["pullRequestReview"]["state"], "PENDING"
+        )
+        self.assertEqual(review.drafts(), [])
+        self.assertTrue(
+            any("submitPullRequestReview(" in q for q in _graphql_queries(gh_runner))
+        )
+
+    def test_submit_without_drafts_uses_rest(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[_PENDING_EMPTY],
+            api=json.dumps({"id": 999, "state": "APPROVED"}),
+        )
+        review = _loaded_review(gh_runner)
+
+        result = review.submit_review("APPROVE", body="lgtm")
+
+        self.assertEqual(result, {"id": 999, "state": "APPROVED"})
+
+        api_calls = [
+            c
+            for c in gh_runner.calls
+            if c["args"][:2] == ["gh", "api"] and "graphql" not in c["args"]
+        ]
+        self.assertEqual(len(api_calls), 1)
+        self.assertEqual(
+            api_calls[0]["args"],
             [
                 "gh",
                 "api",
@@ -445,33 +657,9 @@ class SubmitReviewTest(unittest.TestCase):
                 "-",
             ],
         )
-
-        body = json.loads(api_calls[0]["stdin"])
         self.assertEqual(
-            body,
-            {
-                "event": "REQUEST_CHANGES",
-                "body": "please fix",
-                "comments": [
-                    {
-                        "path": "foo.py",
-                        "line": 5,
-                        "side": "RIGHT",
-                        "body": "single",
-                    },
-                    {
-                        "path": "bar.py",
-                        "line": 8,
-                        "side": "RIGHT",
-                        "body": "range",
-                        "start_line": 5,
-                        "start_side": "RIGHT",
-                    },
-                ],
-            },
+            json.loads(api_calls[0]["stdin"]), {"event": "APPROVE", "body": "lgtm"}
         )
-
-        self.assertEqual(review.drafts(), [])
 
     def test_invalid_verdict_asserts(self):
         review = _make_review(ScriptedGH(pr_view=json.dumps(_PR_VIEW)), ScriptedGit())
