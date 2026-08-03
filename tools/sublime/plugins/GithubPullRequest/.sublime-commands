@@ -28,6 +28,10 @@
     "command": "github_pull_request_prev_comment"
   },
   {
+    "caption": "GithubPullRequest: Review with Claude (tmux)",
+    "command": "github_pull_request_review_in_tmux"
+  },
+  {
     "caption": "GithubPullRequest: Submit review",
     "command": "github_pull_request_submit_review"
   },

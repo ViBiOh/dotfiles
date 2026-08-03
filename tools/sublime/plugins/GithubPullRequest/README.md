@@ -37,6 +37,7 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 | **Comment on line or selection** | Queue a review comment on the current line or multi-line selection (also on the right-click menu). First offers a fuzzy Conventional Comments label picker (skippable), then the body. Queued, not posted. |
 | **Show comments on current line** | Show the thread / pending popup for the cursor's line. |
 | **Next comment** / **Previous comment** | Jump between commented lines in the current file. |
+| **Review with Claude (tmux)** | Split your attached tmux session and run `claude` interactively with a review prompt for this branch vs its base (the loaded PR's base, else the repo default). Works with or without a loaded PR; needs a running tmux session. |
 | **Submit review** | Pick a verdict (Comment / Approve / Request changes) and post all queued comments in one review. |
 | **Discard queued comments** | Drop the local draft queue. |
 | **End review** | Clear all decorations, reference documents, and the panel. If you have pending comments, asks whether to keep them on GitHub (restored next load) or discard them. Git is untouched throughout. |
@@ -64,6 +65,7 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 | `gutter_icon` | `"bookmark"` | Icon name (`bookmark`, `dot`, `circle`) or a `Packages/...` png. |
 | `conventional_comments` | `true` | Show the [Conventional Comments](https://conventionalcomments.org) label picker before typing a comment. |
 | `comment_labels` | standard set | The labels offered by the picker (`{emoji, label, description}` list). `emoji` is optional and, when present, shows in the picker and prefixes the posted comment (`💡 suggestion: …`). Replace with your own. |
+| `claude_review_prompt` | (a review prompt) | Prompt for **Review with Claude (tmux)**; `{base}` is replaced with the base branch. |
 
 ## Known limitations
 

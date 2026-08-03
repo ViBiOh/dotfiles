@@ -12,6 +12,7 @@ Nothing here runs until ``PR: Load pull-request`` is invoked. The heavy lifting
 """
 
 import os
+import shlex
 import subprocess
 import webbrowser
 
@@ -66,6 +67,15 @@ def _label_tag(entry):
     return "{} {}".format(emoji, label) if emoji else label
 
 
+# Prompt handed to `claude` in the tmux review pane. `{base}` is the base branch.
+_DEFAULT_REVIEW_PROMPT = (
+    "Do a thorough code review of the changes on the current branch compared to "
+    "origin/{base}. Start by running `git diff origin/{base}...HEAD` to see the full "
+    "diff. Review correctness first, then design and maintainability. Present each "
+    "finding in Conventional Comments style (e.g. 'suggestion:', 'issue:', 'nitpick:')."
+)
+
+
 # --------------------------------------------------------------------------- #
 # small helpers
 # --------------------------------------------------------------------------- #
@@ -103,6 +113,118 @@ def _git_root(path):
     return out.decode("utf-8").strip()
 
 
+def _run_git(root, args):
+    try:
+        proc = subprocess.run(
+            ["git"] + args, cwd=root, capture_output=True, text=True, timeout=5
+        )
+    except (OSError, subprocess.SubprocessError):
+        return 1, ""
+
+    return proc.returncode, proc.stdout
+
+
+def _detect_base_branch(root):
+    """Repo default branch via origin/HEAD (e.g. 'main'); falls back to 'main'."""
+    rc, out = _run_git(root, ["symbolic-ref", "--short", "refs/remotes/origin/HEAD"])
+    if rc == 0 and out.strip():
+        ref = out.strip()  # e.g. "origin/main"
+
+        return ref.split("/", 1)[1] if "/" in ref else ref
+
+    return "main"
+
+
+def _attached_tmux_session():
+    """Name of an attached tmux session (any session if none attached), or None."""
+    try:
+        proc = subprocess.run(
+            ["tmux", "list-sessions", "-F", "#{session_name}\t#{session_attached}"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+    if proc.returncode != 0:
+        return None
+
+    first = None
+    for line in proc.stdout.splitlines():
+        parts = line.split("\t")
+        if len(parts) != 2:
+            continue
+
+        name, attached = parts
+        if first is None:
+            first = name
+        if attached != "0":
+            return name
+
+    return first
+
+
+def _cache_dir():
+    return os.path.join(sublime.cache_path(), "GithubPullRequest")
+
+
+def _launch_claude_review(root):
+    if SESSION.active and SESSION.pr and SESSION.pr.get("base"):
+        base = SESSION.pr["base"]
+    else:
+        base = _detect_base_branch(root)
+
+    session = _attached_tmux_session()
+    if session is None:
+        _main(lambda: _error("no tmux session found — start/attach tmux first"))
+        return
+
+    template = _settings().get("claude_review_prompt", _DEFAULT_REVIEW_PROMPT)
+    prompt = template.format(base=base)
+
+    prompt_path = os.path.join(_cache_dir(), "review-prompt.txt")
+    try:
+        os.makedirs(os.path.dirname(prompt_path), exist_ok=True)
+        with open(prompt_path, "w", encoding="utf-8") as handle:
+            handle.write(prompt)
+    except OSError as err:
+        _main(lambda message=str(err): _error(message))
+        return
+
+    # tmux runs the trailing argv directly (no shell), so we invoke bash -c
+    # ourselves; the prompt is read from the file to avoid any quoting problems.
+    inner = 'claude "$(cat {})"'.format(shlex.quote(prompt_path))
+    args = [
+        "tmux",
+        "split-window",
+        "-h",
+        "-t",
+        session,
+        "-c",
+        root,
+        "bash",
+        "-c",
+        inner,
+    ]
+
+    try:
+        proc = subprocess.run(args, capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError) as err:
+        _main(lambda message=str(err): _error(message))
+        return
+
+    if proc.returncode != 0:
+        _main(lambda message=(proc.stderr.strip() or "tmux failed"): _error(message))
+        return
+
+    _main(
+        lambda: _status(
+            "Claude review launched in tmux ({}) vs origin/{}".format(session, base)
+        )
+    )
+
+
 def _window_cwd(window):
     view = window.active_view()
     if view and view.file_name():
@@ -129,25 +251,39 @@ def _abs_path(rel):
     return os.path.join(SESSION.root, rel.replace("/", os.sep))
 
 
-def _panel_line(path):
-    """Line to jump to when a file is opened from a list: the first unresolved
-    thread, else the first changed line, else line 1."""
+def _first_hunk_line(path):
+    """Head-side start line of the file's first hunk (else line 1)."""
+    entry = SESSION.files_by_path.get(path)
+    if entry:
+        hunks = entry["file_diff"].hunks
+        if hunks:
+            return hunks[0].new_start
+
+    return 1
+
+
+def _first_comment_line(path):
+    """Line of the first comment on the file: the earliest unresolved thread or
+    pending draft, else the earliest thread, else the first hunk."""
     lines = [
         thread.get("line") or thread.get("original_line")
         for thread in SESSION.threads_by_path.get(path, [])
         if not thread.get("is_resolved")
     ]
+    lines += [draft.get("line") for _, draft in _drafts_for_path(path)]
     lines = [line for line in lines if line]
     if lines:
         return min(lines)
 
-    line_map = SESSION.line_maps.get(path)
-    if line_map is not None:
-        rows = line_map.added_rows()
-        if rows:
-            return rows[0] + 1
+    fallback = [
+        thread.get("line") or thread.get("original_line")
+        for thread in SESSION.threads_by_path.get(path, [])
+    ]
+    fallback = [line for line in fallback if line]
+    if fallback:
+        return min(fallback)
 
-    return 1
+    return _first_hunk_line(path)
 
 
 def _thread_row(view, thread):
@@ -560,6 +696,25 @@ class GithubPullRequestLoadCommand(sublime_plugin.WindowCommand):
         _async(lambda: _load(self.window))
 
 
+class GithubPullRequestReviewInTmuxCommand(sublime_plugin.WindowCommand):
+    """Open a tmux pane running `claude` with a review prompt for this branch vs
+    its base. Does not require a loaded PR."""
+
+    def run(self):
+        cwd = _window_cwd(self.window)
+        root = (
+            SESSION.root
+            if SESSION.active and SESSION.root
+            else (_git_root(cwd) if cwd else None)
+        )
+        if root is None:
+            _error("not inside a git repository")
+            return
+
+        _status("launching Claude review…")
+        _async(lambda: _launch_claude_review(root))
+
+
 FILES_PANEL = "githubpullrequest_files"
 
 
@@ -568,15 +723,23 @@ def _files_panel_text():
     if not entries:
         return None
 
-    # Fixed-width stats columns so the table lines up; the clickable "path:line"
-    # trails each row (matched by result_file_regex). The syntax file colors the
-    # +N / -M / (K unresolved) / (P pending) columns.
+    # Two lines per file so each gets its own result_file_regex click target: the
+    # file row jumps to the first hunk; the indented comment sub-line (only when the
+    # file has comments) jumps to the first comment. `path:line` trails both, padded
+    # to a fixed column so they align. The syntax file colors +N / -M / (K…) / (P…).
+    path_col = 34
     lines = []
     total_pending = 0
     for entry in entries:
+        path = entry["path"]
         unresolved = entry.get("unresolved", 0)
         pending = entry.get("pending", 0)
         total_pending += pending
+
+        stats = "+{} -{}".format(entry.get("additions", 0), entry.get("deletions", 0))
+        lines.append(
+            "{}{}:{}".format(stats.ljust(path_col), path, _first_hunk_line(path))
+        )
 
         notes = " ".join(
             note
@@ -586,15 +749,12 @@ def _files_panel_text():
             )
             if note
         )
-        lines.append(
-            "{:<5} {:<6} {:<28} {}:{}".format(
-                "+{}".format(entry.get("additions", 0)),
-                "-{}".format(entry.get("deletions", 0)),
-                notes,
-                entry["path"],
-                _panel_line(entry["path"]),
+        if notes:
+            lines.append(
+                "{}{}:{}".format(
+                    ("    " + notes).ljust(path_col), path, _first_comment_line(path)
+                )
             )
-        )
 
     pr = SESSION.pr
     header = "PR #{} · {} · {} files".format(pr["number"], pr["title"], len(entries))

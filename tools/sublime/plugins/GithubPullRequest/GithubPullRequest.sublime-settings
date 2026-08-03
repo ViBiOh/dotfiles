@@ -28,5 +28,10 @@
     { "emoji": "💭", "label": "thought", "description": "a non-blocking idea" },
     { "emoji": "🧹", "label": "chore", "description": "process / housekeeping task" },
     { "emoji": "📝", "label": "note", "description": "an FYI, non-blocking" }
-  ]
+  ],
+
+  // Prompt for "Review with Claude (tmux)". "{base}" is replaced with the base
+  // branch (the loaded PR's base, else the repo default). The command splits your
+  // attached tmux session and runs `claude` interactively with this prompt.
+  "claude_review_prompt": "Do a thorough code review of the changes on the current branch compared to origin/{base}. Start by running `git diff origin/{base}...HEAD` to see the full diff. Review correctness first, then design and maintainability. Present each finding in Conventional Comments style (e.g. 'suggestion:', 'issue:', 'nitpick:')."
 }
