@@ -1,10 +1,47 @@
 import json
+import subprocess
 import unittest
 
 try:
+    from . import gh as ghmod
     from .gh import GH, GHError
 except ImportError:
+    import gh as ghmod
     from gh import GH, GHError
+
+
+def _raiser(exc):
+    def run(*args, **kwargs):
+        raise exc
+
+    return run
+
+
+class DefaultRunnerTest(unittest.TestCase):
+    """The real subprocess runner must degrade to a non-zero result (-> GHError)
+    on timeout or exec failure instead of raising an uncaught exception."""
+
+    def test_timeout_becomes_nonzero(self):
+        original = ghmod.subprocess.run
+        ghmod.subprocess.run = _raiser(subprocess.TimeoutExpired(cmd="gh", timeout=30))
+        try:
+            rc, out, err = ghmod._default_runner(["gh", "api", "user"], None)
+        finally:
+            ghmod.subprocess.run = original
+
+        self.assertEqual(rc, 124)
+        self.assertIn("timed out", err)
+
+    def test_oserror_becomes_nonzero(self):
+        original = ghmod.subprocess.run
+        ghmod.subprocess.run = _raiser(FileNotFoundError("gh not found"))
+        try:
+            rc, out, err = ghmod._default_runner(["gh"], None)
+        finally:
+            ghmod.subprocess.run = original
+
+        self.assertEqual(rc, 127)
+        self.assertIn("gh not found", err)
 
 
 class FakeRunner:

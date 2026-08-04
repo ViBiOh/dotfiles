@@ -32,14 +32,20 @@ def _default_runner(
     cwd: Optional[str],
     stdin: Optional[str] = None,
 ) -> Tuple[int, str, str]:
-    proc = subprocess.run(
-        args,
-        cwd=cwd,
-        input=stdin,
-        capture_output=True,
-        text=True,
-        timeout=_DEFAULT_TIMEOUT,
-    )
+    try:
+        proc = subprocess.run(
+            args,
+            cwd=cwd,
+            input=stdin,
+            capture_output=True,
+            text=True,
+            timeout=_DEFAULT_TIMEOUT,
+        )
+    except subprocess.TimeoutExpired:
+        return 124, "", "gh timed out after {}s".format(_DEFAULT_TIMEOUT)
+    except OSError as err:
+        # gh missing / not executable / other exec failure.
+        return 127, "", str(err)
 
     return proc.returncode, proc.stdout, proc.stderr
 

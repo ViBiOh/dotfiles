@@ -907,7 +907,15 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
                 try:
                     SESSION.review.queue_comment(path, payload, prefix + subject)
                 except GHError as err:
-                    _main(lambda message=str(err): _error(message))
+                    message = str(err)
+
+                    def failed():
+                        # Keep the typed comment: reopen the panel pre-filled so a
+                        # network/API failure never makes you retype it.
+                        _error("could not queue comment (kept for retry):\n" + message)
+                        ask_subject(prefix, subject)
+
+                    _main(failed)
                     return
 
                 def apply():
@@ -921,11 +929,11 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             _status("queuing comment…")
             _async(worker)
 
-        def ask_subject(prefix):
+        def ask_subject(prefix, initial=""):
             tag = prefix[:-2] if prefix else ""  # "suggestion: " -> "suggestion"
             prompt = "{} on {}:".format(tag or "Comment", where)
             window.show_input_panel(
-                prompt, "", lambda subject: queue(prefix, subject), None, None
+                prompt, initial, lambda subject: queue(prefix, subject), None, None
             )
 
         # Conventional Comments: pick a label (fuzzy), then type the subject. The
