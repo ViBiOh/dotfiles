@@ -230,31 +230,39 @@ class Review:
 
     # --- server-backed draft queue (a real GitHub PENDING review) ---
     # State: _pr_node_id (GraphQL PR id), _pending_review_id (None until created),
-    # and each draft carries a `comment_id` (server node id) for per-item discard.
+    # _drafts (synced; each has a `comment_id`), and _local_comments (queued but not
+    # yet synced because the API was unreachable — no comment_id, lost on crash).
 
     def load_pending(self) -> None:
         """One GraphQL query: viewer.login + pullRequest.id + reviews(states:[PENDING]).
            Sets _pr_node_id; if a viewer-authored PENDING review exists, sets _pending_review_id
-           and rebuilds the draft mirror from its comments. Called once at load."""
+           and rebuilds _drafts from its comments. Resets _local_comments. Called once at load."""
 
     def queue_comment(self, path: str, payload: Dict, body: str) -> None:
-        """NETWORK: _ensure_pending_review() (lazy addPullRequestReview -> id), then
-           addPullRequestReviewThread(reviewId, path, line, side, startLine?, startSide?, body);
-           append {path, side, line, start_line?, start_side?, body, comment_id} to the mirror."""
+        """Try to sync (_sync_draft: lazy addPullRequestReview + addPullRequestReviewThread).
+           On success -> _drafts (with comment_id). On GHError -> kept in _local_comments and
+           GHError re-raised so the caller can notify (the comment is NOT lost)."""
 
-    def drafts(self) -> List[Dict]: ...
+    def drafts(self) -> List[Dict]:
+        """_drafts (synced) + _local_comments (unsynced), in that order."""
+
+    def local_count(self) -> int: ...  # number of unsynced comments
+
+    def flush_local(self) -> None:
+        """Sync every _local_comment to the pending review. On failure the already-synced
+           ones stay in _drafts and the rest stay local; GHError re-raises."""
 
     def discard_draft(self, index: int) -> None:
-        """NETWORK: deletePullRequestReviewComment(comment_id); drop from mirror. If the mirror
-           becomes empty, also deletePullRequestReview and null the id."""
+        """Index into drafts() (synced first, then local). Synced -> deletePullRequestReviewComment
+           (and deletePullRequestReview when _drafts empties); local -> just drop it."""
 
     def clear_drafts(self) -> None:
-        """NETWORK: deletePullRequestReview when one exists; clear mirror + id."""
+        """deletePullRequestReview when one exists; clear _drafts + _local_comments + id."""
 
     def submit_review(self, verdict: str, body: str = "") -> Dict:
-        """verdict in {APPROVE, COMMENT, REQUEST_CHANGES}. With a pending review:
-           submitPullRequestReview(reviewId, event, body). Without one (e.g. a bare APPROVE):
-           REST POST /repos/{o}/{r}/pulls/{n}/reviews {event, body}. Clears mirror + id."""
+        """verdict in {APPROVE, COMMENT, REQUEST_CHANGES}. flush_local() first (so unsent
+           comments join the review; raises if still offline). Then submitPullRequestReview
+           with a pending review, else a bare REST POST review. Clears everything."""
 
     def reply_comment(self, thread_id: str, body: str) -> Dict:
         """GraphQL addPullRequestReviewThreadReply (or REST reply-to-comment)."""
@@ -290,7 +298,7 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
 
 - `state.py` — `SESSION` singleton: `pr` meta, `threads_by_path`, `files` + `files_by_path`, `line_maps: Dict[str, LineMap]`, `review: Review`, `base_blob_cache`, `root`/`cwd`, `active`. Plus `unresolved_count`, `pending_by_path`, and `file_entries_for_panel` (alphabetical, enriched with `unresolved` + `pending` counts).
 - `plugin.py` — commands + `GithubPullRequestListener`. All gh/git calls run through `sublime.set_timeout_async`; UI mutation (regions, popups, panels, status) back on the main thread via `set_timeout`. Decoration = `set_reference_document` diff (empty base for new files → all green)
-  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Popups (hover or command) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are now network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. `End review` with pending drafts prompts `yes_no_cancel` (Keep on GitHub / Discard from GitHub / Cancel).
+  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Popups (hover or command) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are now network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. A queue that can't reach GitHub notifies but keeps the comment locally (no re-prompt). `End review` prompts `yes_no_cancel`: if there are unsent (local) comments, Submit to GitHub / Discard / Cancel (`flush_local` vs `clear_drafts`); otherwise, for the already-synced pending review, Keep on GitHub / Discard from GitHub / Cancel.
 - `Context.sublime-menu` — right-click entry running `github_pull_request_add_comment` (enabled only when a PR is active).
 - `.sublime-commands` — palette entries, captions prefixed `GithubPullRequest:` (match siblings).
 - `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip); the chosen label is prefixed as `"<emoji> <label>: "` (emoji omitted if absent) to the typed subject before queuing. Also `claude_review_prompt` (`{base}` placeholder) for the `github_pull_request_review_in_tmux` command, which `tmux split-window`s the attached session (auto-detected via `tmux list-sessions`) in the repo root running `claude "$(cat <prompt-file>)"` interactively; base = loaded PR base else `git symbolic-ref refs/remotes/origin/HEAD`. No git mutation (tmux + read-only git only).

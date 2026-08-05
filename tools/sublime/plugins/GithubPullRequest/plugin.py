@@ -965,24 +965,26 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
                 return
 
             def worker():
+                local = False
                 try:
                     SESSION.review.queue_comment(path, payload, prefix + subject)
                 except GHError as err:
+                    # queue_comment kept the comment in a local (unsynced) list; it is
+                    # not lost, just not on GitHub yet — it will be sent on submit.
+                    local = True
                     message = str(err)
-
-                    def failed():
-                        # Keep the typed comment: reopen the panel pre-filled so a
-                        # network/API failure never makes you retype it.
-                        _error("could not queue comment (kept for retry):\n" + message)
-                        ask_subject(prefix, subject)
-
-                    _main(failed)
-                    return
+                    _main(
+                        lambda m=message: _error(
+                            "couldn't reach GitHub — comment saved locally and will be "
+                            "sent when you submit the review.\n\n" + m
+                        )
+                    )
 
                 def apply():
                     _apply_draft_icons(view, path)
                     _refresh_files_panel(window)
-                    _status("comment queued (submit the review to post)")
+                    if not local:
+                        _status("comment queued (submit the review to post)")
                     _update_status()
 
                 _main(apply)
@@ -990,11 +992,11 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             _status("queuing comment…")
             _async(worker)
 
-        def ask_subject(prefix, initial=""):
+        def ask_subject(prefix):
             tag = prefix[:-2] if prefix else ""  # "suggestion: " -> "suggestion"
             prompt = "{} on {}:".format(tag or "Comment", where)
             window.show_input_panel(
-                prompt, initial, lambda subject: queue(prefix, subject), None, None
+                prompt, "", lambda subject: queue(prefix, subject), None, None
             )
 
         # Conventional Comments: pick a label (fuzzy), then type the subject. The
@@ -1170,16 +1172,47 @@ def _end_review(message="review ended"):
     _status(message)
 
 
+def _end_after(action, done_message):
+    """Run a review mutation off the UI thread, then end the review on success."""
+
+    def worker():
+        try:
+            action()
+        except GHError as err:
+            _main(lambda message=str(err): _error(message))
+            return
+
+        _main(lambda: _end_review(done_message))
+
+    _async(worker)
+
+
 class GithubPullRequestEndReviewCommand(sublime_plugin.WindowCommand):
     def is_enabled(self):
         return SESSION.active
 
     def run(self):
-        drafts = SESSION.review.drafts() if SESSION.review else []
+        review = SESSION.review
+        drafts = review.drafts() if review else []
         if not drafts:
             _end_review()
             return
 
+        local = review.local_count()
+        if local:
+            # Some comments never reached GitHub; ending would lose them unless sent.
+            choice = sublime.yes_no_cancel_dialog(
+                "You have {} comment(s) not yet sent to GitHub.".format(local),
+                "Submit to GitHub",
+                "Discard",
+            )
+            if choice == sublime.DIALOG_YES:
+                _end_after(review.flush_local, "review ended (comments sent to GitHub)")
+            elif choice == sublime.DIALOG_NO:
+                _end_after(review.clear_drafts, "review ended (comments discarded)")
+            return
+
+        # All queued comments are already on GitHub as a pending review.
         choice = sublime.yes_no_cancel_dialog(
             "You have {} pending comment(s) saved as a GitHub pending review.".format(
                 len(drafts)
@@ -1187,22 +1220,11 @@ class GithubPullRequestEndReviewCommand(sublime_plugin.WindowCommand):
             "Keep on GitHub",
             "Discard from GitHub",
         )
-
         if choice == sublime.DIALOG_YES:
             # Pending review stays on GitHub; it is restored next time you load the PR.
             _end_review()
         elif choice == sublime.DIALOG_NO:
-
-            def worker():
-                try:
-                    SESSION.review.clear_drafts()
-                except GHError as err:
-                    _main(lambda message=str(err): _error(message))
-                    return
-
-                _main(lambda: _end_review("review ended (pending discarded)"))
-
-            _async(worker)
+            _end_after(review.clear_drafts, "review ended (pending discarded)")
 
 
 # --------------------------------------------------------------------------- #

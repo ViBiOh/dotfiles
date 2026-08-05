@@ -40,7 +40,7 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 | **Review with Claude (tmux)** | Split your attached tmux session and run `claude` interactively with a review prompt for this branch vs its base (the loaded PR's base, else the repo default). Works with or without a loaded PR; needs a running tmux session. |
 | **Submit review** | Pick a verdict (Comment / Approve / Request changes) and post all queued comments in one review. |
 | **Discard queued comments** | Drop the local draft queue. |
-| **End review** | Clear all decorations, reference documents, and the panel. If you have pending comments, asks whether to keep them on GitHub (restored next load) or discard them. Git is untouched throughout. |
+| **End review** | Clear all decorations, reference documents, and the panel. If you have unsent (local) comments, asks whether to submit them to GitHub or discard them; otherwise, if you have pending comments, asks whether to keep them on GitHub (restored next load) or discard them. Git is untouched throughout. |
 
 ### In the editor once a PR is loaded
 
@@ -51,7 +51,7 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 ## How it works (and what it will not do)
 
 - **Non-mutating.** No `gh pr checkout`, no branch, no `reset`, no writes of any kind. Only read-only git (`git show`, `git merge-base`, `rev-parse`). Your branch, index, and stash are never touched.
-- **Pending-review batching (server-backed).** Comments queue into a real GitHub pending review, then submit together with a verdict, like github.com. Because they live on GitHub, queued comments survive a Sublime crash/restart (restored when you reload the PR) and are visible on github.com until submitted.
+- **Pending-review batching (server-backed).** Comments queue into a real GitHub pending review, then submit together with a verdict, like github.com. Because they live on GitHub, queued comments survive a Sublime crash/restart (restored when you reload the PR) and are visible on github.com until submitted. If GitHub is unreachable when you queue a comment, it's kept in a local (unsynced) list instead of being lost — you're notified, and it's sent to GitHub automatically when you submit the review (only a crash before submit would lose these local ones).
 - **No sidebar badges.** There is no Sublime API to badge the sidebar file tree, so the changed-files list is the bottom panel (not the sidebar).
 
 ## Settings

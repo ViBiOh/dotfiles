@@ -2,10 +2,10 @@ import json
 import unittest
 
 try:
-    from .gh import GH
+    from .gh import GH, GHError
     from .review import Review
 except ImportError:
-    from gh import GH
+    from gh import GH, GHError
     from review import Review
 
 
@@ -373,6 +373,8 @@ _SUBMIT = _wrap(
         }
     }
 )
+# A GraphQL error payload makes gh.graphql raise GHError (simulates API/network down).
+_GRAPHQL_ERROR = json.dumps({"errors": [{"message": "network unavailable"}]})
 
 
 def _add_thread(comment_id):
@@ -669,6 +671,78 @@ class SubmitReviewTest(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             review.submit_review("MERGE")
+
+
+class LocalFallbackTest(unittest.TestCase):
+    def _queue_one_locally(self, gh_runner):
+        review = _loaded_review(gh_runner)
+        with self.assertRaises(GHError):
+            review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "one")
+
+        return review
+
+    def test_queue_failure_keeps_comment_local(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _GRAPHQL_ERROR],
+        )
+        review = self._queue_one_locally(gh_runner)
+
+        self.assertEqual(review.local_count(), 1)
+        drafts = review.drafts()
+        self.assertEqual(len(drafts), 1)
+        self.assertNotIn("comment_id", drafts[0])  # never synced
+        self.assertEqual(drafts[0]["path"], "a.py")
+
+    def test_submit_flushes_local_first(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _PENDING_EMPTY,
+                _ADD_REVIEW,
+                _GRAPHQL_ERROR,  # queue's addThread fails -> local
+                _add_thread("C1"),  # flush_local re-adds it on submit
+                _SUBMIT,
+            ],
+        )
+        review = self._queue_one_locally(gh_runner)
+
+        review.submit_review("COMMENT", body="done")
+
+        self.assertEqual(review.local_count(), 0)
+        self.assertEqual(review.drafts(), [])
+        queries = _graphql_queries(gh_runner)
+        self.assertTrue(any("addPullRequestReviewThread(" in q for q in queries))
+        self.assertTrue(any("submitPullRequestReview(" in q for q in queries))
+
+    def test_submit_reraises_when_flush_fails(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _PENDING_EMPTY,
+                _ADD_REVIEW,
+                _GRAPHQL_ERROR,  # queue fails -> local
+                _GRAPHQL_ERROR,  # flush during submit still fails
+            ],
+        )
+        review = self._queue_one_locally(gh_runner)
+
+        with self.assertRaises(GHError):
+            review.submit_review("COMMENT")
+
+        self.assertEqual(review.local_count(), 1)  # kept, not lost
+
+    def test_discard_local_comment(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _GRAPHQL_ERROR],
+        )
+        review = self._queue_one_locally(gh_runner)
+
+        review.discard_draft(0)  # index 0 -> the local comment (no synced drafts)
+
+        self.assertEqual(review.drafts(), [])
+        self.assertEqual(review.local_count(), 0)
 
 
 class ReplyAndResolveTest(unittest.TestCase):

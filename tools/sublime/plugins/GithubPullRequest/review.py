@@ -3,9 +3,11 @@ from typing import Callable, Dict, List, Optional, Tuple
 
 try:
     from .diff import parse_unified_diff
+    from .gh import GHError
     from .urls import parse_pr_url
 except ImportError:
     from diff import parse_unified_diff
+    from gh import GHError
     from urls import parse_pr_url
 
 _DEFAULT_TIMEOUT = 30
@@ -132,7 +134,8 @@ class Review:
 
         self._pr = None
         self._merge_base = None
-        self._drafts = []
+        self._drafts = []  # synced to the GitHub pending review (have comment_id)
+        self._local_comments = []  # queued but not yet synced (network/API failure)
         self._pr_node_id = None
         self._pending_review_id = None
 
@@ -280,6 +283,7 @@ class Review:
         self._pr_node_id = pull["id"]
         self._pending_review_id = None
         self._drafts = []
+        self._local_comments = []
 
         for review in pull["reviews"]["nodes"]:
             if not review.get("viewerDidAuthor"):
@@ -314,29 +318,22 @@ class Review:
 
         return self._pending_review_id
 
-    def queue_comment(self, path: str, payload: Dict, body: str) -> None:
+    def _sync_draft(self, draft: Dict) -> None:
+        """Add one draft to the GitHub pending review, stamping its comment_id.
+        Raises GHError if the network/API is unavailable."""
         review_id = self._ensure_pending_review()
 
         variables = {
             "rid": review_id,
-            "path": path,
-            "line": payload["line"],
-            "side": payload["side"],
-            "body": body,
+            "path": draft["path"],
+            "line": draft["line"],
+            "side": draft["side"],
+            "body": draft["body"],
         }
 
-        draft = {
-            "path": path,
-            "body": body,
-            "side": payload["side"],
-            "line": payload["line"],
-        }
-
-        if "start_line" in payload:
-            variables["startLine"] = payload["start_line"]
-            variables["startSide"] = payload["start_side"]
-            draft["start_line"] = payload["start_line"]
-            draft["start_side"] = payload["start_side"]
+        if "start_line" in draft:
+            variables["startLine"] = draft["start_line"]
+            variables["startSide"] = draft["start_side"]
             mutation = _ADD_THREAD_RANGE_MUTATION
         else:
             mutation = _ADD_THREAD_MUTATION
@@ -345,31 +342,78 @@ class Review:
         nodes = data["addPullRequestReviewThread"]["thread"]["comments"]["nodes"]
         draft["comment_id"] = nodes[0]["id"] if nodes else None
 
+    def queue_comment(self, path: str, payload: Dict, body: str) -> None:
+        """Queue a comment. On a network/API failure the comment is kept in a local
+        (unsynced) list instead of being lost, and GHError is re-raised so the caller
+        can notify. Locals are flushed to GitHub on submit (or on end, on request)."""
+        draft = {
+            "path": path,
+            "body": body,
+            "side": payload["side"],
+            "line": payload["line"],
+        }
+        if "start_line" in payload:
+            draft["start_line"] = payload["start_line"]
+            draft["start_side"] = payload["start_side"]
+
+        try:
+            self._sync_draft(draft)
+        except GHError:
+            self._local_comments.append(draft)
+            raise
+
         self._drafts.append(draft)
 
     def drafts(self) -> List[Dict]:
-        return list(self._drafts)
+        """All queued comments, synced first then local (unsynced)."""
+        return list(self._drafts) + list(self._local_comments)
+
+    def local_count(self) -> int:
+        return len(self._local_comments)
+
+    def flush_local(self) -> None:
+        """Sync every local (unsynced) comment to the pending review. On failure the
+        already-synced ones stay synced and the rest remain local; GHError re-raises."""
+        pending = self._local_comments
+        self._local_comments = []
+        for index, draft in enumerate(pending):
+            try:
+                self._sync_draft(draft)
+            except GHError:
+                self._local_comments = pending[index:]
+                raise
+
+            self._drafts.append(draft)
 
     def discard_draft(self, index: int) -> None:
-        draft = self._drafts[index]
+        """Discard by index into drafts() (synced first, then local)."""
+        if index < len(self._drafts):
+            draft = self._drafts[index]
+            if draft.get("comment_id"):
+                self._gh.graphql(_DELETE_COMMENT_MUTATION, {"id": draft["comment_id"]})
 
-        if draft.get("comment_id"):
-            self._gh.graphql(_DELETE_COMMENT_MUTATION, {"id": draft["comment_id"]})
-
-        del self._drafts[index]
-
-        if not self._drafts:
-            self.clear_drafts()
+            del self._drafts[index]
+            if not self._drafts:
+                self._delete_pending_review()
+        else:
+            del self._local_comments[index - len(self._drafts)]
 
     def clear_drafts(self) -> None:
+        self._delete_pending_review()
+        self._drafts = []
+        self._local_comments = []
+
+    def _delete_pending_review(self) -> None:
         if self._pending_review_id is not None:
             self._gh.graphql(_DELETE_REVIEW_MUTATION, {"rid": self._pending_review_id})
-
-        self._drafts = []
-        self._pending_review_id = None
+            self._pending_review_id = None
 
     def submit_review(self, verdict: str, body: str = "") -> Dict:
         assert verdict in _VERDICTS
+
+        # Push any comments that never reached GitHub into the pending review first,
+        # so they are part of the review being submitted (raises if still offline).
+        self.flush_local()
 
         if self._pending_review_id is not None:
             result = self._gh.graphql(
@@ -386,6 +430,7 @@ class Review:
             )
 
         self._drafts = []
+        self._local_comments = []
         self._pending_review_id = None
 
         return result
