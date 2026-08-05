@@ -165,7 +165,7 @@ def decode_action(href: str) -> Optional[Dict]:
     """Inverse. -> {'action': str, **params(str values)} or None if not a githubpullrequest href."""
 ````
 
-The bottom file panel is built in `plugin.py` (fixed-width `+N -M (K unresolved) (P pending) path:line` rows) and colored by `GithubPullRequestFiles.sublime-syntax`, not by `render.py`.
+The bottom file panel is built in `plugin.py`: a file row `+N -M  path:hunkline  <owners>` and, when the file has comments, an indented `(K unresolved) (P pending)  path:commentline` row. Owners come from a single `codeowners -- <all paths>` call at load (`_codeowners_map`, cached in `SESSION.owners_by_path`); they trail the `path:line` nav token so column alignment is preserved and `result_file_regex` (no longer `$`-anchored) still finds the target. Colored by `GithubPullRequestFiles.sublime-syntax`, not by `render.py`.
 
 ### `gh.py` (injectable subprocess client; NO `sublime` import)
 
@@ -294,7 +294,7 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
 - `Context.sublime-menu` — right-click entry running `github_pull_request_add_comment` (enabled only when a PR is active).
 - `.sublime-commands` — palette entries, captions prefixed `GithubPullRequest:` (match siblings).
 - `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip); the chosen label is prefixed as `"<emoji> <label>: "` (emoji omitted if absent) to the typed subject before queuing. Also `claude_review_prompt` (`{base}` placeholder) for the `github_pull_request_review_in_tmux` command, which `tmux split-window`s the attached session (auto-detected via `tmux list-sessions`) in the repo root running `claude "$(cat <prompt-file>)"` interactively; base = loaded PR base else `git symbolic-ref refs/remotes/origin/HEAD`. No git mutation (tmux + read-only git only).
-- `GithubPullRequestFiles.sublime-syntax` — colors the bottom panel (assigned to the output panel): `+N` green / `-M` red (markup.inserted/deleted), `(K unresolved)` yellow (markup.changed), `(P pending)` dimmed (comment). Foreground-only scopes so there is no background fill.
+- `GithubPullRequestFiles.sublime-syntax` — colors the bottom panel (assigned to the output panel): `+N` green / `-M` red (markup.inserted/deleted), `(K unresolved)` yellow (markup.changed), `(P pending)` dimmed (comment), CODEOWNERS blue (entity.name.function, matched as `\S*@\S+`). Foreground-only scopes so there is no background fill.
 
 ## Build waves
 

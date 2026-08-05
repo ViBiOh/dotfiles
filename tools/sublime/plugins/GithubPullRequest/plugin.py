@@ -124,6 +124,42 @@ def _run_git(root, args):
     return proc.returncode, proc.stdout
 
 
+def _codeowners_map(root, paths):
+    """path -> owners string via the `codeowners` binary, in one call. Empty on any
+    failure (binary missing, non-zero exit). '(unowned)' collapses to ''."""
+    if not paths:
+        return {}
+
+    try:
+        proc = subprocess.run(
+            ["codeowners", "--"] + paths,
+            cwd=root,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return {}
+
+    if proc.returncode != 0:
+        return {}
+
+    owners = {}
+    for line in proc.stdout.splitlines():
+        parts = line.split()
+        if not parts:
+            continue
+
+        path = parts[0]
+        names = parts[1:]
+        if names == ["(unowned)"]:
+            names = []
+
+        owners[path] = " ".join(names)
+
+    return owners
+
+
 def _detect_base_branch(root):
     """Repo default branch via origin/HEAD (e.g. 'main'); falls back to 'main'."""
     rc, out = _run_git(root, ["symbolic-ref", "--short", "refs/remotes/origin/HEAD"])
@@ -627,7 +663,7 @@ def _apply_suggestion(view, thread_id, index):
 # --------------------------------------------------------------------------- #
 # load / reload
 # --------------------------------------------------------------------------- #
-def _build_session(cwd, root, pr, review, files, threads):
+def _build_session(cwd, root, pr, review, files, threads, owners):
     SESSION.reset()
     SESSION.active = True
     SESSION.cwd = cwd
@@ -637,6 +673,7 @@ def _build_session(cwd, root, pr, review, files, threads):
     SESSION.files = files
     SESSION.files_by_path = {entry["path"]: entry for entry in files}
     SESSION.line_maps = {entry["path"]: LineMap(entry["file_diff"]) for entry in files}
+    SESSION.owners_by_path = owners
     _index_threads(threads)
 
 
@@ -696,8 +733,10 @@ def _load(window):
         _main(lambda message=str(err): _error(message))
         return
 
+    owners = _codeowners_map(root, [entry["path"] for entry in files])
+
     def apply():
-        _build_session(cwd, root, pr, review, files, threads)
+        _build_session(cwd, root, pr, review, files, threads, owners)
         _decorate_all_views()
         _status("loaded PR #{} ({} files)".format(pr["number"], len(files)))
         window.run_command("github_pull_request_files_panel")
@@ -755,9 +794,13 @@ def _files_panel_text():
         total_pending += pending
 
         stats = "+{} -{}".format(entry.get("additions", 0), entry.get("deletions", 0))
-        lines.append(
-            "{}{}:{}".format(stats.ljust(path_col), path, _first_hunk_line(path))
-        )
+        owners = entry.get("owners", "")
+        file_row = "{}{}:{}".format(stats.ljust(path_col), path, _first_hunk_line(path))
+        if owners:
+            # Owners trail the "path:line" nav token so column alignment is kept and
+            # result_file_regex still finds the target (it is no longer $-anchored).
+            file_row += "  " + owners
+        lines.append(file_row)
 
         notes = " ".join(
             note
@@ -791,7 +834,7 @@ def _show_files_panel(window):
     window.destroy_output_panel(FILES_PANEL)
     panel = window.create_output_panel(FILES_PANEL)
     settings = panel.settings()
-    settings.set("result_file_regex", r"([^ \t]+):(\d+)$")
+    settings.set("result_file_regex", r"([^ \t]+):(\d+)")
     settings.set("result_base_dir", SESSION.root)
     settings.set("line_numbers", False)
     settings.set("gutter", False)

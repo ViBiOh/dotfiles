@@ -1,11 +1,11 @@
 %YAML 1.2
 ---
 # Colors the GithubPullRequest "changed files" bottom panel: additions green, deletions
-# red, unresolved-comment count yellow, pending (queued) count dimmed. Uses the
-# diff markup / comment scopes, which carry a foreground color but no background
-# fill (unlike region.*ish). The +N / -M match is anchored at line start so
-# hyphens inside file paths (trailing "path:line") are never miscolored; the
-# parenthetical rules only match their literal words.
+# red, unresolved-comment count yellow, pending (queued) count dimmed, CODEOWNERS blue.
+# Uses foreground-only scopes (diff markup / comment / entity.name.function) so there is
+# no background fill (unlike region.*ish). The +N / -M match is anchored at line start so
+# hyphens inside file paths (trailing "path:line") are never miscolored; the parenthetical
+# and owner rules only match their own tokens.
 hidden: true
 scope: source.githubpullrequest-files
 contexts:
@@ -20,3 +20,6 @@ contexts:
       scope: markup.changed.githubpullrequest-files
     - match: '\(\d+ pending\)'
       scope: comment.githubpullrequest-files
+    # CODEOWNERS handles / emails (the only @-bearing tokens on a row) -> blue.
+    - match: '\S*@\S+'
+      scope: entity.name.function.githubpullrequest-files

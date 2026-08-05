@@ -32,7 +32,7 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 | --- | --- |
 | **Load pull-request (current branch)** | Infer the PR from the branch, fetch files + threads, open the changed-files panel. Only open/draft PRs load; a closed/merged PR is refused with a dialog (the working-tree-vs-merge-base diff is only meaningful on a live branch). |
 | **Load pull-request from URL** | Same, but paste a PR URL instead of inferring. |
-| **Show changed files** | Bottom panel: aligned table of changed files with `+N` (green) `-M` (red) `(K unresolved)` (yellow) `(P pending)` (gray). Double-click / Enter / F4 opens the file at the relevant line. |
+| **Show changed files** | Bottom panel: aligned table of changed files with `+N` (green) `-M` (red) `(K unresolved)` (yellow) `(P pending)` (gray), plus each file's CODEOWNERS (via the `codeowners` binary, if on PATH). Double-click / Enter / F4 opens the file at the relevant line. |
 | **List all comments** | Cross-file quick-panel navigator of every thread; jumps to the file+line and shows the popup. |
 | **Comment on line or selection** | Queue a review comment on the current line or multi-line selection (also on the right-click menu). First offers a fuzzy Conventional Comments label picker (skippable), then the body. Queued, not posted. |
 | **Show comments on current line** | Show the thread / pending popup for the cursor's line. |

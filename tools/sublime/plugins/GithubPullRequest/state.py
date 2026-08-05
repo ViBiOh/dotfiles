@@ -20,6 +20,7 @@ class Session:
         self.threads_by_path = {}
         self.line_maps = {}
         self.base_blob_cache = {}
+        self.owners_by_path = {}
 
     def unresolved_count(self, path):
         threads = self.threads_by_path.get(path, [])
@@ -45,6 +46,7 @@ class Session:
             enriched = dict(entry)
             enriched["unresolved"] = self.unresolved_count(entry["path"])
             enriched["pending"] = pending.get(entry["path"], 0)
+            enriched["owners"] = self.owners_by_path.get(entry["path"], "")
             entries.append(enriched)
 
         entries.sort(key=lambda item: item["path"])
