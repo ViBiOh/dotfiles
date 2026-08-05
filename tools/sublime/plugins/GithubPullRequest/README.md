@@ -61,6 +61,7 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 | --- | --- | --- |
 | `auto_show_popup` | `true` | Show the thread/draft popup on hover. |
 | `show_gutter_icon` | `true` | Draw gutter icons for threads and drafts. |
+| `hide_outdated` | `true` | Hide outdated threads (code changed since the comment; usually mis-anchored). Set `false` to show them. |
 | `gutter_icon` | `"bookmark"` | Icon name (`bookmark`, `dot`, `circle`) or a `Packages/...` png. |
 | `conventional_comments` | `true` | Show the [Conventional Comments](https://conventionalcomments.org) label picker before typing a comment. |
 | `comment_labels` | standard set | The labels offered by the picker (`{emoji, label, description}` list). `emoji` is optional and, when present, shows in the picker and prefixes the posted comment (`💡 suggestion: …`). Replace with your own. |

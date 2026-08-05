@@ -5,6 +5,10 @@
   // Draw a gutter icon on lines that carry unresolved review threads.
   "show_gutter_icon": true,
 
+  // Hide outdated threads (comments whose code has since changed). They are usually
+  // mis-anchored; set to false to show them like any other thread.
+  "hide_outdated": true,
+
   // Gutter icon: a built-in name ("bookmark", "dot", "circle") or a
   // "Packages/..." png path.
   "gutter_icon": "bookmark",

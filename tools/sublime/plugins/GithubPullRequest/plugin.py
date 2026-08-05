@@ -678,8 +678,16 @@ def _build_session(cwd, root, pr, review, files, threads, owners):
 
 
 def _index_threads(threads):
+    # Outdated threads (their diff hunk no longer matches the code) are usually
+    # mis-anchored noise; drop them here so gutter icons, panel counts, navigation
+    # and the comment list all exclude them consistently. Toggle with hide_outdated.
+    hide_outdated = _settings().get("hide_outdated", True)
+
     by_path = {}
     for thread in threads:
+        if hide_outdated and thread.get("is_outdated"):
+            continue
+
         by_path.setdefault(thread["path"], []).append(thread)
 
     SESSION.threads_by_path = by_path
