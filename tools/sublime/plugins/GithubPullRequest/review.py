@@ -150,6 +150,7 @@ class Review:
             "head": view["headRefName"],
             "head_oid": view["headRefOid"],
             "url": view["url"],
+            "state": view.get("state"),
             "owner": coords.get("owner"),
             "repo": coords.get("repo"),
         }

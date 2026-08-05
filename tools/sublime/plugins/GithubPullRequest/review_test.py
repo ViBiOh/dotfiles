@@ -16,6 +16,7 @@ _PR_VIEW = {
     "headRefName": "feature",
     "headRefOid": "deadbeef",
     "url": "https://github.com/octo/repo/pull/42",
+    "state": "OPEN",
 }
 
 _DIFF = (
@@ -184,6 +185,7 @@ class ResolvePRTest(unittest.TestCase):
                 self.assertEqual(result["head_oid"], "deadbeef")
                 self.assertEqual(result["owner"], "octo")
                 self.assertEqual(result["repo"], "repo")
+                self.assertEqual(result["state"], "OPEN")
 
 
 class MergeBaseTest(unittest.TestCase):

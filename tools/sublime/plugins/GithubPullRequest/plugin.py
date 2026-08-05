@@ -425,10 +425,18 @@ def _clear_view(view):
     view.erase_regions(REGION_KEY)
     view.erase_regions(DRAFT_REGION_KEY)
     view.erase_status(STATUS_KEY)
-    try:
+
+    # Only PR-file views had their reference document overridden. Reloading the
+    # file makes Sublime re-derive its own git diff (reset_reference_document alone
+    # does not make it resume). We never change the buffer, so on a clean view the
+    # revert reloads identical text; skip dirty views to avoid discarding edits.
+    if _rel_path(view) not in SESSION.files_by_path:
+        return
+
+    if view.is_dirty():
         view.reset_reference_document()
-    except Exception:
-        pass
+    else:
+        view.run_command("revert")
 
 
 def _decorate_all_views():
@@ -671,6 +679,16 @@ def _load(window):
 
     try:
         pr = review.resolve_pr()
+
+        if pr.get("state") != "OPEN":
+            state = (pr.get("state") or "unknown").lower()
+            _main(
+                lambda n=pr["number"], s=state: _error(
+                    "PR #{} is {} — only open PRs can be loaded.".format(n, s)
+                )
+            )
+            return
+
         files = review.changed_files()
         threads = review.review_threads()
         review.load_pending()

@@ -211,7 +211,8 @@ class Review:
 
     def resolve_pr(self) -> Dict:
         """Infer the PR from the current branch via gh.pr_view(); derive owner/repo from the
-           returned url. Returns {'number','title','base','head','head_oid','url','owner','repo'}."""
+           returned url. Returns {'number','title','base','head','head_oid','url','state',
+           'owner','repo'}. `_load` refuses to load unless state == 'OPEN' (open/draft)."""
 
     def merge_base(self) -> str:
         """read-only `git merge-base HEAD origin/<base>` (fallback <base>). Cached."""
