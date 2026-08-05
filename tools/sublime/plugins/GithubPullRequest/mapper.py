@@ -1,13 +1,4 @@
-from dataclasses import dataclass
-from typing import Dict, List, Optional
-
-
-@dataclass
-class Anchor:
-    side: str
-    line: int
-    row: int
-    position: Optional[int]
+from typing import Dict, Optional
 
 
 class LineMap:
@@ -20,7 +11,6 @@ class LineMap:
         self._lines = []
         self._commentable = set()
         self._pos_by_new = {}
-        self._added = []
 
         max_new = None
 
@@ -40,9 +30,6 @@ class LineMap:
                     self._commentable.add(new_lineno)
                     self._pos_by_new[new_lineno] = position
 
-                if origin == "+" and new_lineno is not None:
-                    self._added.append(new_lineno)
-
         self._last_head_row = (max_new - 1) if max_new is not None else None
 
     def is_commentable(self, row: int) -> bool:
@@ -50,19 +37,6 @@ class LineMap:
             return False
 
         return (row + 1) in self._commentable
-
-    def row_to_anchor(self, row: int) -> Optional[Anchor]:
-        if not self.is_commentable(row):
-            return None
-
-        line = row + 1
-
-        return Anchor(
-            side="RIGHT",
-            line=line,
-            row=row,
-            position=self._pos_by_new.get(line),
-        )
 
     def anchor_to_row(self, side: str, line: int) -> Optional[int]:
         if side == "RIGHT":
@@ -75,9 +49,6 @@ class LineMap:
             return self._left_row(line)
 
         return None
-
-    def added_rows(self) -> List[int]:
-        return sorted(new_lineno - 1 for new_lineno in self._added)
 
     def comment_range(self, start_row: int, end_row: int) -> Optional[Dict]:
         if start_row > end_row:

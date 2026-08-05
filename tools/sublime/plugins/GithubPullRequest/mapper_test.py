@@ -2,9 +2,9 @@ import unittest
 from types import SimpleNamespace
 
 try:
-    from .mapper import Anchor, LineMap
+    from .mapper import LineMap
 except ImportError:
-    from mapper import Anchor, LineMap
+    from mapper import LineMap
 
 
 def _line(origin, old_lineno, new_lineno, position, content):
@@ -81,25 +81,6 @@ class LineMapTest(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertEqual(self.line_map.is_commentable(row), expected)
 
-    def test_row_to_anchor(self):
-        cases = {
-            "context_first": (0, Anchor(side="RIGHT", line=1, row=0, position=1)),
-            "added": (1, Anchor(side="RIGHT", line=2, row=1, position=2)),
-            "context_boundary": (2, Anchor(side="RIGHT", line=3, row=2, position=5)),
-            "context_hunk2": (8, Anchor(side="RIGHT", line=9, row=8, position=7)),
-            "added_hunk2": (9, Anchor(side="RIGHT", line=10, row=9, position=8)),
-            "trailing_context": (
-                20,
-                Anchor(side="RIGHT", line=21, row=20, position=11),
-            ),
-            "gap_row": (5, None),
-            "negative": (-1, None),
-        }
-
-        for name, (row, expected) in cases.items():
-            with self.subTest(name=name):
-                self.assertEqual(self.line_map.row_to_anchor(row), expected)
-
     def test_anchor_to_row(self):
         cases = {
             "right_first": ("RIGHT", 1, 0),
@@ -115,9 +96,6 @@ class LineMapTest(unittest.TestCase):
         for name, (side, line, expected) in cases.items():
             with self.subTest(name=name):
                 self.assertEqual(self.line_map.anchor_to_row(side, line), expected)
-
-    def test_added_rows(self):
-        self.assertEqual(self.line_map.added_rows(), [1, 9])
 
     def test_comment_range(self):
         cases = {

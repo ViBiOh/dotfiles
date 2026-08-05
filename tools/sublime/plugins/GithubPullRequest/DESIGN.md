@@ -93,28 +93,15 @@ def parse_unified_diff(text: str) -> List[FileDiff]:
 ### `mapper.py`
 
 ```python
-@dataclass
-class Anchor:
-    side: str              # "RIGHT" | "LEFT"
-    line: int              # GitHub line number on that side (1-based)
-    row: int               # 0-based buffer row this anchors to
-    position: Optional[int]
-
 class LineMap:
     def __init__(self, file_diff: FileDiff) -> None: ...
 
     def is_commentable(self, row: int) -> bool:
         """True if buffer row (0-based, RIGHT/head side) is part of a hunk (added or context)."""
 
-    def row_to_anchor(self, row: int) -> Optional[Anchor]:
-        """RIGHT-side buffer row -> Anchor, or None if the row is not in the diff."""
-
     def anchor_to_row(self, side: str, line: int) -> Optional[int]:
         """Thread's (side, line) -> 0-based buffer row to place its gutter icon / popup.
            RIGHT: row = line - 1. LEFT: the buffer row of the hunk boundary the deleted line sits at."""
-
-    def added_rows(self) -> List[int]:
-        """0-based buffer rows that are added ('+') lines."""
 
     def comment_range(self, start_row: int, end_row: int) -> Optional[Dict]:
         """RIGHT-side (multi-line) comment payload for a buffer row span. Returns

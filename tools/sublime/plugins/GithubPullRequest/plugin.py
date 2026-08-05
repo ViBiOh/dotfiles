@@ -748,7 +748,7 @@ def _load(window):
 # commands
 # --------------------------------------------------------------------------- #
 class GithubPullRequestLoadCommand(sublime_plugin.WindowCommand):
-    def run(self, url=None):
+    def run(self):
         _status("loading pull request…")
         _async(lambda: _load(self.window))
 
