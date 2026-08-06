@@ -33,10 +33,10 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 | **Load pull-request (current branch)** | Infer the PR from the branch, fetch files + threads, open the changed-files panel. Only open/draft PRs load; a closed/merged PR is refused with a dialog (the working-tree-vs-merge-base diff is only meaningful on a live branch). |
 | **Show changed files** | Bottom panel: aligned table of changed files with `+N` (green) `-M` (red) `(K unresolved)` (yellow) `(P pending)` (gray), plus each file's CODEOWNERS (via the `codeowners` binary, if on PATH). Double-click / Enter / F4 opens the file at the relevant line. |
 | **List all comments** | Cross-file quick-panel navigator of every thread; jumps to the file+line and shows the popup. |
-| **Comment on line or selection** | Queue a review comment on the current line or multi-line selection (also on the right-click menu). First offers a fuzzy Conventional Comments label picker (skippable), then the body. Queued, not posted. |
+| **Comment on line or selection** | Queue a review comment on the current line or multi-line selection. First offers a fuzzy Conventional Comments label picker (skippable), then the body. Picking the **suggestion** label prefills a GitHub ` ```suggestion ` block with the current text of the line(s), ready to edit. Queued, not posted. |
 | **Show comments on current line** | Show the thread / pending popup for the cursor's line. |
 | **Next comment** / **Previous comment** | Jump between commented lines in the current file. |
-| **Review with Claude (tmux)** | Split your attached tmux session and run `claude` interactively with a review prompt for this branch vs its base (the loaded PR's base, else the repo default). Works with or without a loaded PR; needs a running tmux session. |
+| **Review with agent (tmux)** | Split your attached tmux session and run the configured agent (default `claude`, see `agent_command`) with a review prompt for this branch vs its base (the loaded PR's base, else the repo default) appended as the last argument. Works with or without a loaded PR; needs a running tmux session. |
 | **Submit review** | Pick a verdict (Comment / Approve / Request changes) and post all queued comments in one review. |
 | **Discard queued comments** | Drop the local draft queue. |
 | **End review** | Clear all decorations, reference documents, and the panel. If you have unsent (local) comments, asks whether to submit them to GitHub or discard them; otherwise, if you have pending comments, asks whether to keep them on GitHub (restored next load) or discard them. Git is untouched throughout. |
@@ -65,7 +65,8 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 | `gutter_icon` | `"bookmark"` | Icon name (`bookmark`, `dot`, `circle`) or a `Packages/...` png. |
 | `conventional_comments` | `true` | Show the [Conventional Comments](https://conventionalcomments.org) label picker before typing a comment. |
 | `comment_labels` | standard set | The labels offered by the picker (`{emoji, label, description}` list). `emoji` is optional and, when present, shows in the picker and prefixes the posted comment (`💡 suggestion: …`). Replace with your own. |
-| `claude_review_prompt` | (a review prompt) | Prompt for **Review with Claude (tmux)**; `{base}` is replaced with the base branch. |
+| `agent_command` | `["claude"]` | Command (array) for **Review with agent (tmux)**; the prompt is appended as the last arg. E.g. `["claude", "--model", "opus"]` or `["aider", "--yes"]`. |
+| `agent_review_prompt` | (a review prompt) | Prompt appended to `agent_command`; `{base}` is replaced with the base branch. |
 
 ## Known limitations
 

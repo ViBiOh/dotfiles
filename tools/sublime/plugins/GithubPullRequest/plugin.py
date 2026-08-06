@@ -67,7 +67,7 @@ def _label_tag(entry):
     return "{} {}".format(emoji, label) if emoji else label
 
 
-# Prompt handed to `claude` in the tmux review pane. `{base}` is the base branch.
+# Prompt appended to the agent command in the tmux review pane. `{base}` is the base branch.
 _DEFAULT_REVIEW_PROMPT = (
     "Do a thorough code review of the changes on the current branch compared to "
     "origin/{base}. Start by running `git diff origin/{base}...HEAD` to see the full "
@@ -201,11 +201,7 @@ def _attached_tmux_session():
     return first
 
 
-def _cache_dir():
-    return os.path.join(sublime.cache_path(), "GithubPullRequest")
-
-
-def _launch_claude_review(root):
+def _launch_agent_review(root):
     if SESSION.active and SESSION.pr and SESSION.pr.get("base"):
         base = SESSION.pr["base"]
     else:
@@ -216,33 +212,15 @@ def _launch_claude_review(root):
         _main(lambda: _error("no tmux session found — start/attach tmux first"))
         return
 
-    template = _settings().get("claude_review_prompt", _DEFAULT_REVIEW_PROMPT)
+    agent = _settings().get("agent_command") or ["claude"]
+    template = _settings().get("agent_review_prompt", _DEFAULT_REVIEW_PROMPT)
     prompt = template.format(base=base)
 
-    prompt_path = os.path.join(_cache_dir(), "review-prompt.txt")
-    try:
-        os.makedirs(os.path.dirname(prompt_path), exist_ok=True)
-        with open(prompt_path, "w", encoding="utf-8") as handle:
-            handle.write(prompt)
-    except OSError as err:
-        _main(lambda message=str(err): _error(message))
-        return
-
-    # tmux runs the trailing argv directly (no shell), so we invoke bash -c
-    # ourselves; the prompt is read from the file to avoid any quoting problems.
-    inner = 'claude "$(cat {})"'.format(shlex.quote(prompt_path))
-    args = [
-        "tmux",
-        "split-window",
-        "-h",
-        "-t",
-        session,
-        "-c",
-        root,
-        "bash",
-        "-c",
-        inner,
-    ]
+    # Build "<agent...> <prompt>" as one shell-quoted command string so tmux runs it
+    # via the shell with the prompt as a single last argument (multiline / special
+    # characters are safe). The agent + args are user-configurable.
+    inner = " ".join(shlex.quote(part) for part in (list(agent) + [prompt]))
+    args = ["tmux", "split-window", "-h", "-t", session, "-c", root, inner]
 
     try:
         proc = subprocess.run(args, capture_output=True, text=True, timeout=10)
@@ -256,7 +234,7 @@ def _launch_claude_review(root):
 
     _main(
         lambda: _status(
-            "Claude review launched in tmux ({}) vs origin/{}".format(session, base)
+            "review agent launched in tmux ({}) vs origin/{}".format(session, base)
         )
     )
 
@@ -762,8 +740,8 @@ class GithubPullRequestLoadCommand(sublime_plugin.WindowCommand):
 
 
 class GithubPullRequestReviewInTmuxCommand(sublime_plugin.WindowCommand):
-    """Open a tmux pane running `claude` with a review prompt for this branch vs
-    its base. Does not require a loaded PR."""
+    """Open a tmux pane running the configured review agent (default `claude`) with a
+    review prompt for this branch vs its base. Does not require a loaded PR."""
 
     def run(self):
         cwd = _window_cwd(self.window)
@@ -776,8 +754,8 @@ class GithubPullRequestReviewInTmuxCommand(sublime_plugin.WindowCommand):
             _error("not inside a git repository")
             return
 
-        _status("launching Claude review…")
-        _async(lambda: _launch_claude_review(root))
+        _status("launching review agent…")
+        _async(lambda: _launch_agent_review(root))
 
 
 FILES_PANEL = "githubpullrequest_files"
@@ -968,6 +946,15 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         if "start_line" in payload:
             where = "lines {}-{}".format(payload["start_line"], payload["line"])
 
+        # Current text of the commented line(s), for a GitHub ```suggestion``` block.
+        end_line = payload["line"]
+        start_line = payload.get("start_line", end_line)
+        content = "\n".join(
+            view.substr(view.line(view.text_point(n - 1, 0)))
+            for n in range(start_line, end_line + 1)
+        )
+        suggestion_block = "```suggestion\n{}\n```".format(content)
+
         def queue(prefix, subject):
             if not subject.strip():
                 return
@@ -1000,11 +987,11 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             _status("queuing comment…")
             _async(worker)
 
-        def ask_subject(prefix):
-            tag = prefix[:-2] if prefix else ""  # "suggestion: " -> "suggestion"
+        def ask_subject(prefix, initial=""):
+            tag = prefix[:-2] if prefix else ""  # strips ": " or ":\n"
             prompt = "{} on {}:".format(tag or "Comment", where)
             window.show_input_panel(
-                prompt, "", lambda subject: queue(prefix, subject), None, None
+                prompt, initial, lambda subject: queue(prefix, subject), None, None
             )
 
         # Conventional Comments: pick a label (fuzzy), then type the subject. The
@@ -1029,8 +1016,19 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             if index < 0:
                 return
 
-            prefix = "" if index == 0 else "{}: ".format(_label_tag(labels[index - 1]))
-            _main(lambda: ask_subject(prefix))
+            if index == 0:
+                prefix, initial = "", ""
+            else:
+                entry = labels[index - 1]
+                tag = _label_tag(entry)
+                if entry.get("label", "").lower() == "suggestion":
+                    # Prefill a suggestion of the current line(s); block on its own
+                    # line so the ``` fence is valid after the label.
+                    prefix, initial = "{}:\n".format(tag), suggestion_block
+                else:
+                    prefix, initial = "{}: ".format(tag), ""
+
+            _main(lambda: ask_subject(prefix, initial))
 
         window.show_quick_panel(items, on_label)
 

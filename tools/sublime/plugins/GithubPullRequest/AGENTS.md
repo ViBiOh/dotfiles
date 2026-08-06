@@ -51,7 +51,7 @@ Comments are authored with the modern REST fields, not legacy `position`: `side`
       from diff import parse_unified_diff
   ```
 - **Tests**: `unittest`, files named `*_test.py`, in the same module namespace, dict-keyed table cases (`cases = {"name": (...)}` + `subTest`). Core modules mock `gh`/git via injected runners — never hit the network or real git.
-- **Naming**: command classes are `GithubPullRequest<Verb>Command`; Sublime derives the command id by snake_casing minus `Command` (e.g. `GithubPullRequestLoadCommand` → `github_pull_request_load`). Keep `.sublime-commands`, `Context.sublime-menu`, and `run_command(...)` strings in sync.
+- **Naming**: command classes are `GithubPullRequest<Verb>Command`; Sublime derives the command id by snake_casing minus `Command` (e.g. `GithubPullRequestLoadCommand` → `github_pull_request_load`). Keep `.sublime-commands` and `run_command(...)` strings in sync.
 
 ## Checks (run all before finishing)
 
@@ -74,7 +74,7 @@ The glue (`plugin.py`, `state.py`) cannot be exercised outside Sublime — verif
 
 ## Where things plug in
 
-- New command → add a `GithubPullRequest<Verb>Command` in `plugin.py` and an entry in `.sublime-commands` (and `Context.sublime-menu` if it belongs on right-click).
+- New command → add a `GithubPullRequest<Verb>Command` in `plugin.py` and an entry in `.sublime-commands`.
 - New gh/GraphQL call → add a method to `gh.py` or `review.py` with a mocked-runner test; call it from the glue under `_async`.
 - New popup/panel content → build the string in `render.py` (pure, add a test); render it from `plugin.py`.
 - Registration into the dotfiles installer lives in `tools/sublime/init.sh` (`install_plugin ... GithubPullRequest`).

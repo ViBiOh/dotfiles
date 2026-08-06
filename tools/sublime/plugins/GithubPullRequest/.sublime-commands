@@ -28,7 +28,7 @@
     "command": "github_pull_request_prev_comment"
   },
   {
-    "caption": "GithubPullRequest: Review with Claude (tmux)",
+    "caption": "GithubPullRequest: Review with agent (tmux)",
     "command": "github_pull_request_review_in_tmux"
   },
   {

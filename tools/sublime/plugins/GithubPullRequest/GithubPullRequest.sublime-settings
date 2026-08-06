@@ -34,8 +34,13 @@
     { "emoji": "📝", "label": "note", "description": "an FYI, non-blocking" }
   ],
 
-  // Prompt for "Review with Claude (tmux)". "{base}" is replaced with the base
-  // branch (the loaded PR's base, else the repo default). The command splits your
-  // attached tmux session and runs `claude` interactively with this prompt.
-  "claude_review_prompt": "Do a thorough code review of the changes on the current branch compared to origin/{base}. Start by running `git diff origin/{base}...HEAD` to see the full diff. Review correctness first, then design and maintainability. Present each finding in Conventional Comments style (e.g. 'suggestion:', 'issue:', 'nitpick:')."
+  // "Review with agent (tmux)" splits your attached tmux session and runs this
+  // command with the review prompt appended as the final argument. Change it to
+  // pass extra flags or use a different agent, e.g. ["claude", "--model", "opus"]
+  // or ["aider", "--yes"].
+  "agent_command": ["claude"],
+
+  // Prompt appended to agent_command. "{base}" is replaced with the base branch
+  // (the loaded PR's base, else the repo default).
+  "agent_review_prompt": "Do a thorough code review of the changes on the current branch compared to origin/{base}. Start by running `git diff origin/{base}...HEAD` to see the full diff. Review correctness first, then design and maintainability. Present each finding in Conventional Comments style (e.g. 'suggestion:', 'issue:', 'nitpick:')."
 }
