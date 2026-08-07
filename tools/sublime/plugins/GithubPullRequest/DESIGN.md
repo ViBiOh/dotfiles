@@ -32,7 +32,7 @@ We author review comments with the modern REST fields, NOT the legacy `position`
 - `start_line` + `start_side`: for a multi-line comment, the first line of the range (`line` is the last). Omit both for a single-line comment.
 - `path`: repo-relative file path.
 
-Because the buffer holds the PR head file, a RIGHT-side comment on buffer row `R` (0-based) maps to `line = R + 1`. The diff is needed to know which rows are _commentable_ (part of a hunk). Authoring is RIGHT-side only; LEFT (`side` still appears on incoming threads for anchoring, but we never author on deleted lines). `position` is computed best-effort only as a fallback.
+Because the buffer holds the PR head file, a RIGHT-side comment on buffer row `R` (0-based) maps to `line = R + 1`. The diff is needed to know which rows are _commentable_ (part of a hunk). Authoring is RIGHT-side only; LEFT (`side`) still appears on incoming threads for anchoring, but we never author on deleted lines. (`diff.py` parses each line's legacy `position`, but authoring uses `line`/`side` only.)
 
 ---
 
@@ -105,9 +105,9 @@ class LineMap:
 
     def comment_range(self, start_row: int, end_row: int) -> Optional[Dict]:
         """RIGHT-side (multi-line) comment payload for a buffer row span. Returns
-           {"path"? no, "side": "RIGHT", "line": end_line, "start_line": start_line|omitted,
-            "start_side": "RIGHT"|omitted, "position": int|None}. None if the span has no
-            commentable line. Single-line span -> no start_line/start_side keys."""
+           {"side": "RIGHT", "line": end_line, "start_line": start_line|omitted,
+            "start_side": "RIGHT"|omitted}. None if the span has no commentable line.
+            Single-line span -> no start_line/start_side keys. (`path` added by review.py.)"""
 ```
 
 Note: `path` is added by the caller (review.py), not the mapper.
@@ -138,8 +138,8 @@ def thread_popup_html(thread: Dict) -> str:
        ```suggestion``` block in the raw body, appends an 'Apply' action link."""
 
 def pending_html(drafts: List[Tuple[int, Dict]]) -> str:
-    """Popup for locally-queued (unposted) draft comments. Each item is (index_in_drafts, draft);
-       renders the body and a 'Discard' action link keyed by that index."""
+    """Popup for locally-queued (unposted) draft comments. Each item is (uid, draft) where uid is
+       the draft's stable id; renders the body and 'Edit' / 'Discard' action links keyed by that uid."""
 
 def draft_badge(count: int) -> str:
     """Short status-bar fragment, e.g. '✎ 3 drafts' (plain text, not HTML). '' when count == 0."""
@@ -219,6 +219,8 @@ class Review:
     # State: _pr_node_id (GraphQL PR id), _pending_review_id (None until created),
     # _drafts (synced; each has a `comment_id`), and _local_comments (queued but not
     # yet synced because the API was unreachable — no comment_id, lost on crash).
+    # Every draft carries a stable `uid` (monotonic); edit/discard key on it, not on
+    # list position, so a popup action stays correct even if the queue shifts.
 
     def load_pending(self) -> None:
         """One GraphQL query: viewer.login + pullRequest.id + reviews(states:[PENDING]).
@@ -239,9 +241,13 @@ class Review:
         """Sync every _local_comment to the pending review. On failure the already-synced
            ones stay in _drafts and the rest stay local; GHError re-raises."""
 
-    def discard_draft(self, index: int) -> None:
-        """Index into drafts() (synced first, then local). Synced -> deletePullRequestReviewComment
-           (and deletePullRequestReview when _drafts empties); local -> just drop it."""
+    def discard_draft(self, uid: int) -> None:
+        """Find the draft by uid. Synced -> deletePullRequestReviewComment (and
+           deletePullRequestReview when _drafts empties); local -> just drop it."""
+
+    def edit_draft(self, uid: int, body: str) -> None:
+        """Find the draft by uid and change its body. Synced -> updatePullRequestReviewComment;
+           local -> mirror only."""
 
     def clear_drafts(self) -> None:
         """deletePullRequestReview when one exists; clear _drafts + _local_comments + id."""
@@ -287,7 +293,8 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
 - `plugin.py` — commands + `GithubPullRequestListener`. All gh/git calls run through `sublime.set_timeout_async`; UI mutation (regions, popups, panels, status) back on the main thread via `set_timeout`. Decoration = `set_reference_document` diff (empty base for new files → all green)
   - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Popups (hover or command) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are now network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. A queue that can't reach GitHub notifies but keeps the comment locally (no re-prompt). `End review` prompts `yes_no_cancel`: if there are unsent (local) comments, Submit to GitHub / Discard / Cancel (`flush_local` vs `clear_drafts`); otherwise, for the already-synced pending review, Keep on GitHub / Discard from GitHub / Cancel.
 - `.sublime-commands` — palette entries, captions prefixed `GithubPullRequest:` (match siblings).
-- `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `hide_outdated` (bool; drops outdated threads in `_index_threads` so all surfaces exclude them), `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip); the chosen label is prefixed as `"<emoji> <label>: "` (emoji omitted if absent) to the typed subject before queuing. Picking the `suggestion` label instead prefills the input with `"<emoji> suggestion:\n```suggestion\n<current line(s)>\n```"` (fence on its own line so it stays valid) — the reviewer edits the content to propose a change. Also `agent_command` (array, default `["claude"]`) and `agent_review_prompt` (`{base}` placeholder) for the `github_pull_request_review_in_tmux` command, which `tmux split-window`s the attached session (auto-detected via `tmux list-sessions`) in the repo root running `<agent_command> <prompt>` (joined + `shlex.quote`d into one shell string, prompt last); base = loaded PR base else `git symbolic-ref refs/remotes/origin/HEAD`. No git mutation (tmux + read-only git only).
+- `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `hide_outdated` (bool; drops outdated threads in `_index_threads` so all surfaces exclude them), `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip), then `_open_compose` opens a scratch buffer in a split **below** the file (`_split_below_layout` adds a full-width bottom group; existing groups shrink into the top 70%). The buffer is prefilled with `"<emoji> <label>: "` (or, when the commented line(s) carry the reviewer's own local uncommitted edits — buffer vs `git show HEAD:<path>` via `_locally_changed_rows` — with `"<label>:\n```suggestion\n<edited line(s)>\n```"`, fence on its own line, for ANY label). **Save** runs `github_pull_request_submit_comment` (bound in `Default.sublime-keymap`, context `setting.github_pull_request_compose`) which queues the whole buffer as the body; **closing without saving cancels**. `on_pre_close` restores the saved layout (`_restore_after_compose`) and refocuses the file for either path. The compose view carries `github_pull_request_compose` + a `context` (`{mode:"new", path, payload}`, `{mode:"edit", uid}`, or `{mode:"reply", thread_id}`) + source-id + orig-layout in its settings. The pending-popup **Edit** link reuses the split with `mode:"edit"` (prefilled with the current body; save updates it — server-side for synced drafts, mirror for local ones), and a thread **Reply** uses `mode:"reply"` (save posts via `reply_comment`, then `_reload_threads`). Only the review-summary prompt on submit still uses an input panel. Also `agent_command` (array, default `["claude"]`) and `agent_review_prompt` (`{base}` placeholder) for the `github_pull_request_review_in_tmux` command, which `tmux split-window`s the attached session (auto-detected via `tmux list-sessions`) in the repo root running `<agent_command> <prompt>` (joined + `shlex.quote`d into one shell string, prompt last); base = loaded PR base else `git symbolic-ref refs/remotes/origin/HEAD`. No git mutation (tmux + read-only git only).
+- `Default.sublime-keymap` — binds Save (`super+s` / `ctrl+s`) to `github_pull_request_submit_comment`, scoped by `setting.github_pull_request_compose` so it only affects the compose buffer.
 - `GithubPullRequestFiles.sublime-syntax` — colors the bottom panel (assigned to the output panel): `+N` green / `-M` red (markup.inserted/deleted), `(K unresolved)` yellow (markup.changed), `(P pending)` dimmed (comment), CODEOWNERS blue (entity.name.function, matched as `\S*@\S+`). Foreground-only scopes so there is no background fill.
 
 ## Build waves

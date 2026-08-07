@@ -101,28 +101,26 @@ class LineMapTest(unittest.TestCase):
         cases = {
             "single_row": (
                 (1, 1),
-                {"side": "RIGHT", "line": 2, "position": 2},
+                {"side": "RIGHT", "line": 2},
             ),
             "multi_row_within_hunk": (
                 (0, 2),
                 {
                     "side": "RIGHT",
                     "line": 3,
-                    "position": 5,
                     "start_line": 1,
                     "start_side": "RIGHT",
                 },
             ),
             "snap_to_single_commentable": (
                 (3, 8),
-                {"side": "RIGHT", "line": 9, "position": 7},
+                {"side": "RIGHT", "line": 9},
             ),
             "snap_both_ends_multi": (
                 (5, 10),
                 {
                     "side": "RIGHT",
                     "line": 11,
-                    "position": 9,
                     "start_line": 9,
                     "start_side": "RIGHT",
                 },
@@ -132,7 +130,6 @@ class LineMapTest(unittest.TestCase):
                 {
                     "side": "RIGHT",
                     "line": 9,
-                    "position": 7,
                     "start_line": 3,
                     "start_side": "RIGHT",
                 },
@@ -142,7 +139,6 @@ class LineMapTest(unittest.TestCase):
                 {
                     "side": "RIGHT",
                     "line": 3,
-                    "position": 5,
                     "start_line": 1,
                     "start_side": "RIGHT",
                 },

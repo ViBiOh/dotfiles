@@ -181,8 +181,6 @@ class ResolvePRTest(unittest.TestCase):
                 self.assertEqual(result["number"], 42)
                 self.assertEqual(result["title"], "Add feature")
                 self.assertEqual(result["base"], "main")
-                self.assertEqual(result["head"], "feature")
-                self.assertEqual(result["head_oid"], "deadbeef")
                 self.assertEqual(result["owner"], "octo")
                 self.assertEqual(result["repo"], "repo")
                 self.assertEqual(result["state"], "OPEN")
@@ -453,6 +451,7 @@ class LoadPendingTest(unittest.TestCase):
             review.drafts(),
             [
                 {
+                    "uid": 0,
                     "comment_id": "C1",
                     "path": "foo.py",
                     "body": "restored one",
@@ -460,6 +459,7 @@ class LoadPendingTest(unittest.TestCase):
                     "line": 5,
                 },
                 {
+                    "uid": 1,
                     "comment_id": "C2",
                     "path": "bar.py",
                     "body": "restored range",
@@ -494,6 +494,7 @@ class DraftQueueTest(unittest.TestCase):
             review.drafts(),
             [
                 {
+                    "uid": 0,
                     "path": "foo.py",
                     "body": "hi",
                     "side": "RIGHT",
@@ -559,7 +560,7 @@ class DraftQueueTest(unittest.TestCase):
         review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "one")
         review.queue_comment("b.py", {"side": "RIGHT", "line": 2}, "two")
 
-        review.discard_draft(0)
+        review.discard_draft(review.drafts()[0]["uid"])
 
         self.assertEqual(len(review.drafts()), 1)
         self.assertEqual(review.drafts()[0]["path"], "b.py")
@@ -584,7 +585,7 @@ class DraftQueueTest(unittest.TestCase):
         review = _loaded_review(gh_runner)
         review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "one")
 
-        review.discard_draft(0)
+        review.discard_draft(review.drafts()[0]["uid"])
 
         self.assertEqual(review.drafts(), [])
         self.assertTrue(
@@ -739,10 +740,53 @@ class LocalFallbackTest(unittest.TestCase):
         )
         review = self._queue_one_locally(gh_runner)
 
-        review.discard_draft(0)  # index 0 -> the local comment (no synced drafts)
+        review.discard_draft(review.drafts()[0]["uid"])  # the local comment
 
         self.assertEqual(review.drafts(), [])
         self.assertEqual(review.local_count(), 0)
+
+    def test_edit_local_comment_no_server_call(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _GRAPHQL_ERROR],
+        )
+        review = self._queue_one_locally(gh_runner)
+        before = len(_graphql_queries(gh_runner))
+
+        review.edit_draft(review.drafts()[0]["uid"], "reworded")
+
+        self.assertEqual(review.drafts()[0]["body"], "reworded")
+        # local (unsynced) edit must not hit the API
+        self.assertEqual(len(_graphql_queries(gh_runner)), before)
+
+    def test_edit_synced_comment_updates_on_server(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _PENDING_EMPTY,
+                _ADD_REVIEW,
+                _add_thread("C1"),
+                _wrap(
+                    {
+                        "updatePullRequestReviewComment": {
+                            "pullRequestReviewComment": {"id": "C1"}
+                        }
+                    }
+                ),
+            ],
+        )
+        review = _loaded_review(gh_runner)
+        review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "one")
+
+        review.edit_draft(review.drafts()[0]["uid"], "one, reworded")
+
+        self.assertEqual(review.drafts()[0]["body"], "one, reworded")
+        self.assertTrue(
+            any(
+                "updatePullRequestReviewComment(" in q
+                for q in _graphql_queries(gh_runner)
+            )
+        )
 
 
 class ReplyAndResolveTest(unittest.TestCase):

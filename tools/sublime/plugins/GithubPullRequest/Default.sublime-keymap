@@ -1,0 +1,26 @@
+[
+  // In a PR comment compose buffer, Save submits the comment (like a git commit
+  // editor). The context restricts this to the compose buffer only.
+  {
+    "keys": ["super+s"],
+    "command": "github_pull_request_submit_comment",
+    "context": [
+      {
+        "key": "setting.github_pull_request_compose",
+        "operator": "equal",
+        "operand": true
+      }
+    ]
+  },
+  {
+    "keys": ["ctrl+s"],
+    "command": "github_pull_request_submit_comment",
+    "context": [
+      {
+        "key": "setting.github_pull_request_compose",
+        "operator": "equal",
+        "operand": true
+      }
+    ]
+  }
+]

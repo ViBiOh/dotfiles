@@ -91,6 +91,12 @@ _DELETE_COMMENT_MUTATION = """mutation($id:ID!){
   }
 }"""
 
+_UPDATE_COMMENT_MUTATION = """mutation($id:ID!,$body:String!){
+  updatePullRequestReviewComment(input:{pullRequestReviewCommentId:$id, body:$body}){
+    pullRequestReviewComment{ id }
+  }
+}"""
+
 _DELETE_REVIEW_MUTATION = """mutation($rid:ID!){
   deletePullRequestReview(input:{pullRequestReviewId:$rid}){
     pullRequestReview{ id }
@@ -138,6 +144,7 @@ class Review:
         self._local_comments = []  # queued but not yet synced (network/API failure)
         self._pr_node_id = None
         self._pending_review_id = None
+        self._next_uid = 0  # stable per-draft id (edit/discard key on it, not position)
 
     def _git_run(self, args: List[str]) -> Tuple[int, str, str]:
         return self._git(args, self._cwd)
@@ -150,9 +157,6 @@ class Review:
             "number": view["number"],
             "title": view["title"],
             "base": view["baseRefName"],
-            "head": view["headRefName"],
-            "head_oid": view["headRefOid"],
-            "url": view["url"],
             "state": view.get("state"),
             "owner": coords.get("owner"),
             "repo": coords.get("repo"),
@@ -305,9 +309,16 @@ class Review:
                     draft["start_line"] = comment["startLine"]
                     draft["start_side"] = draft["side"]
 
+                draft["uid"] = self._new_uid()
                 self._drafts.append(draft)
 
             break
+
+    def _new_uid(self) -> int:
+        uid = self._next_uid
+        self._next_uid += 1
+
+        return uid
 
     def _ensure_pending_review(self) -> str:
         if self._pending_review_id is None:
@@ -347,6 +358,7 @@ class Review:
         (unsynced) list instead of being lost, and GHError is re-raised so the caller
         can notify. Locals are flushed to GitHub on submit (or on end, on request)."""
         draft = {
+            "uid": self._new_uid(),
             "path": path,
             "body": body,
             "side": payload["side"],
@@ -385,18 +397,43 @@ class Review:
 
             self._drafts.append(draft)
 
-    def discard_draft(self, index: int) -> None:
-        """Discard by index into drafts() (synced first, then local)."""
-        if index < len(self._drafts):
-            draft = self._drafts[index]
-            if draft.get("comment_id"):
-                self._gh.graphql(_DELETE_COMMENT_MUTATION, {"id": draft["comment_id"]})
+    def _find_draft(self, uid: int):
+        """(list, index, draft) for the draft with this uid, else (None, None, None).
+        Keying on uid (not position) keeps edit/discard correct even if the queue
+        shifts between when a popup is rendered and when its action fires."""
+        for store in (self._drafts, self._local_comments):
+            for index, draft in enumerate(store):
+                if draft.get("uid") == uid:
+                    return store, index, draft
 
-            del self._drafts[index]
-            if not self._drafts:
-                self._delete_pending_review()
-        else:
-            del self._local_comments[index - len(self._drafts)]
+        return None, None, None
+
+    def discard_draft(self, uid: int) -> None:
+        store, index, draft = self._find_draft(uid)
+        if store is None:
+            return
+
+        if store is self._drafts and draft.get("comment_id"):
+            self._gh.graphql(_DELETE_COMMENT_MUTATION, {"id": draft["comment_id"]})
+
+        del store[index]
+        if store is self._drafts and not self._drafts:
+            self._delete_pending_review()
+
+    def edit_draft(self, uid: int, body: str) -> None:
+        """Change a draft's body. Synced drafts are updated on GitHub; local ones
+        just update the mirror."""
+        store, _, draft = self._find_draft(uid)
+        if store is None:
+            return
+
+        if store is self._drafts and draft.get("comment_id"):
+            self._gh.graphql(
+                _UPDATE_COMMENT_MUTATION,
+                {"id": draft["comment_id"], "body": body},
+            )
+
+        draft["body"] = body
 
     def clear_drafts(self) -> None:
         self._delete_pending_review()

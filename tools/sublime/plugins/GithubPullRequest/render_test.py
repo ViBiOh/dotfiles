@@ -273,13 +273,15 @@ class ThreadPopupBodyHtmlTest(unittest.TestCase):
 
 
 class PendingHtmlTest(unittest.TestCase):
-    def test_renders_body_and_discard_link(self):
+    def test_renders_body_edit_and_discard_links(self):
         html_doc = render.pending_html([(2, {"body": "please rename"})])
 
         self.assertIn("pending review comment", html_doc)
         self.assertIn("please rename", html_doc)
         self.assertIn("action=discard", html_doc)
-        self.assertIn("idx=2", html_doc)
+        self.assertIn("action=edit", html_doc)
+        self.assertIn("uid=2", html_doc)
+        self.assertIn(">Edit</a>", html_doc)
 
     def test_escapes_body(self):
         html_doc = render.pending_html([(0, {"body": "<script>x</script>"})])

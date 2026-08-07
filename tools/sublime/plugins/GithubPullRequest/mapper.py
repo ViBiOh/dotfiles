@@ -4,13 +4,12 @@ from typing import Dict, Optional
 class LineMap:
     """Map between Sublime buffer rows (holding the PR head file) and GitHub review
     coordinates. Duck-typed on ``file_diff``: reads ``.hunks``, each hunk's ``.lines``,
-    and each line's ``.origin`` / ``.old_lineno`` / ``.new_lineno`` / ``.position`` /
-    ``.content``. Does NOT import diff.py."""
+    and each line's ``.origin`` / ``.old_lineno`` / ``.new_lineno`` / ``.content``.
+    Does NOT import diff.py."""
 
     def __init__(self, file_diff) -> None:
         self._lines = []
         self._commentable = set()
-        self._pos_by_new = {}
 
         max_new = None
 
@@ -20,7 +19,6 @@ class LineMap:
 
                 origin = getattr(line, "origin", "")
                 new_lineno = getattr(line, "new_lineno", None)
-                position = getattr(line, "position", None)
 
                 if new_lineno is not None:
                     if max_new is None or new_lineno > max_new:
@@ -28,7 +26,6 @@ class LineMap:
 
                 if origin in ("+", " ") and new_lineno is not None:
                     self._commentable.add(new_lineno)
-                    self._pos_by_new[new_lineno] = position
 
         self._last_head_row = (max_new - 1) if max_new is not None else None
 
@@ -67,7 +64,6 @@ class LineMap:
         payload = {
             "side": "RIGHT",
             "line": end_line,
-            "position": self._pos_by_new.get(end_line),
         }
 
         if eff_start != eff_end:

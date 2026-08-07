@@ -11,6 +11,7 @@ Nothing here runs until ``PR: Load pull-request`` is invoked. The heavy lifting
 * queues comments into a local draft and submits them as one review.
 """
 
+import difflib
 import os
 import shlex
 import subprocess
@@ -158,6 +159,27 @@ def _codeowners_map(root, paths):
         owners[path] = " ".join(names)
 
     return owners
+
+
+def _locally_changed_rows(root, rel, view):
+    """0-based buffer rows that differ from the committed (HEAD) version of the file
+    — the reviewer's own local edits. Uses the live buffer (so unsaved edits count)."""
+    rc, committed = _run_git(root, ["show", "HEAD:{}".format(rel)])
+    if rc != 0:
+        return set()
+
+    committed_lines = committed.splitlines()
+    buffer_lines = view.substr(sublime.Region(0, view.size())).splitlines()
+
+    changed = set()
+    matcher = difflib.SequenceMatcher(
+        None, committed_lines, buffer_lines, autojunk=False
+    )
+    for tag, _, _, j1, j2 in matcher.get_opcodes():
+        if tag in ("replace", "insert"):
+            changed.update(range(j1, j2))
+
+    return changed
 
 
 def _detect_base_branch(root):
@@ -423,16 +445,89 @@ def _apply_draft_icons(view, path):
 
 
 def _drafts_for_path(path):
-    """(index, draft) pairs for a path's RIGHT-side queued comments; index is the
-    position in review.drafts() so it can drive per-draft Discard actions."""
+    """(uid, draft) pairs for a path's RIGHT-side queued comments; the uid (stable,
+    not positional) drives per-draft Edit/Discard actions."""
     if not SESSION.review:
         return []
 
     return [
-        (index, draft)
-        for index, draft in enumerate(SESSION.review.drafts())
+        (draft["uid"], draft)
+        for draft in SESSION.review.drafts()
         if draft.get("path") == path and draft.get("side") == "RIGHT"
     ]
+
+
+# --------------------------------------------------------------------------- #
+# comment compose split (write a comment below the file; save to submit)
+# --------------------------------------------------------------------------- #
+def _split_below_layout(layout, fraction=0.7):
+    """Add a full-width group below the current layout (existing groups shrink into
+    the top `fraction`). Works for any starting layout."""
+    rows = layout["rows"]
+    cols = layout["cols"]
+
+    new_rows = [row * fraction for row in rows] + [1.0]
+    bottom = [0, len(rows) - 1, len(cols) - 1, len(new_rows) - 1]
+
+    return {
+        "cols": list(cols),
+        "rows": new_rows,
+        "cells": [list(cell) for cell in layout["cells"]] + [bottom],
+    }
+
+
+def _open_compose(source_view, prefill, context):
+    """Open a scratch compose buffer in a split below the file. Save submits it
+    (see the keymap / GithubPullRequestSubmitCommentCommand); closing cancels.
+    `context` = {"mode": "new", path, payload}, {"mode": "edit", uid}, or
+    {"mode": "reply", thread_id}."""
+    window = source_view.window()
+
+    # One compose at a time: opening a second while one is live would capture the
+    # already-split layout as its "original" and break the restore. Focus the open one.
+    for existing in window.views():
+        if existing.settings().get("github_pull_request_compose"):
+            window.focus_view(existing)
+            _status("finish the open comment first")
+            return
+
+    layout = window.layout()
+    window.set_layout(_split_below_layout(layout))
+    window.focus_group(window.num_groups() - 1)
+
+    verb = {"edit": "Edit PR comment", "reply": "Reply"}.get(
+        context.get("mode"), "PR comment"
+    )
+
+    compose = window.new_file()
+    compose.set_scratch(True)
+    compose.set_name("{} (save to submit, close to cancel)".format(verb))
+    compose.assign_syntax("Packages/Markdown/Markdown.sublime-syntax")
+
+    settings = compose.settings()
+    settings.set("github_pull_request_compose", True)
+    settings.set("github_pull_request_context", context)
+    settings.set("github_pull_request_source_id", source_view.id())
+    settings.set("github_pull_request_orig_layout", layout)
+
+    compose.run_command("append", {"characters": prefill})
+    compose.sel().clear()
+    compose.sel().add(sublime.Region(compose.size()))
+    window.focus_view(compose)
+
+
+def _restore_after_compose(window, orig_layout, source_id):
+    """Remove the compose group (restore the saved layout) and refocus the file."""
+    if window is None:
+        return
+
+    if orig_layout:
+        window.set_layout(orig_layout)
+
+    for view in window.views():
+        if view.id() == source_id:
+            window.focus_view(view)
+            break
 
 
 def _clear_view(view):
@@ -542,21 +637,30 @@ def _handle_action(view, href):
     if kind == "open":
         webbrowser.open(action.get("url", ""))
     elif kind == "reply":
-        _prompt_reply(action["id"])
+        _open_compose(view, "", {"mode": "reply", "thread_id": action["id"]})
     elif kind in ("resolve", "unresolve"):
         _set_resolved(action["id"], kind == "resolve")
     elif kind == "discard":
-        _discard_draft(int(action["idx"]))
+        _discard_draft(int(action["uid"]))
+    elif kind == "edit":
+        _edit_draft(view, int(action["uid"]))
     elif kind == "apply_suggestion":
         _apply_suggestion(view, action["id"], int(action.get("sug", 0)))
 
 
-def _discard_draft(index):
+def _edit_draft(view, uid):
+    drafts = SESSION.review.drafts() if SESSION.review else []
+    draft = next((d for d in drafts if d.get("uid") == uid), None)
+    if draft is None:
+        return
+
+    _open_compose(view, draft.get("body", ""), {"mode": "edit", "uid": uid})
+
+
+def _discard_draft(uid):
     def worker():
         try:
-            SESSION.review.discard_draft(index)
-        except IndexError:
-            return
+            SESSION.review.discard_draft(uid)
         except GHError as err:
             _main(lambda message=str(err): _error(message))
             return
@@ -569,25 +673,6 @@ def _discard_draft(index):
         _main(apply)
 
     _async(worker)
-
-
-def _prompt_reply(thread_id):
-    def on_done(body):
-        if not body.strip():
-            return
-
-        def worker():
-            try:
-                SESSION.review.reply_comment(thread_id, body)
-            except GHError as err:
-                _main(lambda message=str(err): _error(message))
-                return
-
-            _reload_threads()
-
-        _async(worker)
-
-    sublime.active_window().show_input_panel("Reply:", "", on_done, None, None)
 
 
 def _set_resolved(thread_id, resolved):
@@ -940,97 +1025,120 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             return
 
         view = self.view
-        window = view.window()
 
-        where = "line {}".format(payload["line"])
-        if "start_line" in payload:
-            where = "lines {}-{}".format(payload["start_line"], payload["line"])
-
-        # Current text of the commented line(s), for a GitHub ```suggestion``` block.
+        # Prefill a GitHub ```suggestion``` block when the commented line(s) carry your
+        # own local (uncommitted) edits, so any comment can propose that change.
         end_line = payload["line"]
         start_line = payload.get("start_line", end_line)
+        changed_rows = _locally_changed_rows(SESSION.root, path, view)
+        has_diff = any((n - 1) in changed_rows for n in range(start_line, end_line + 1))
         content = "\n".join(
             view.substr(view.line(view.text_point(n - 1, 0)))
             for n in range(start_line, end_line + 1)
         )
         suggestion_block = "```suggestion\n{}\n```".format(content)
 
-        def queue(prefix, subject):
-            if not subject.strip():
-                return
+        def compose(tag):
+            # Full comment body prefill. On a locally-changed line the suggestion block
+            # goes on its own line (so the ``` fence stays valid after the label).
+            if has_diff:
+                head = "{}:\n".format(tag) if tag else ""
 
-            def worker():
-                local = False
-                try:
-                    SESSION.review.queue_comment(path, payload, prefix + subject)
-                except GHError as err:
-                    # queue_comment kept the comment in a local (unsynced) list; it is
-                    # not lost, just not on GitHub yet — it will be sent on submit.
-                    local = True
-                    message = str(err)
-                    _main(
-                        lambda m=message: _error(
-                            "couldn't reach GitHub — comment saved locally and will be "
-                            "sent when you submit the review.\n\n" + m
-                        )
-                    )
+                return head + suggestion_block
 
-                def apply():
-                    _apply_draft_icons(view, path)
-                    _refresh_files_panel(window)
-                    if not local:
-                        _status("comment queued (submit the review to post)")
-                    _update_status()
+            return "{}: ".format(tag) if tag else ""
 
-                _main(apply)
-
-            _status("queuing comment…")
-            _async(worker)
-
-        def ask_subject(prefix, initial=""):
-            tag = prefix[:-2] if prefix else ""  # strips ": " or ":\n"
-            prompt = "{} on {}:".format(tag or "Comment", where)
-            window.show_input_panel(
-                prompt, initial, lambda subject: queue(prefix, subject), None, None
-            )
-
-        # Conventional Comments: pick a label (fuzzy), then type the subject. The
-        # picker is skippable via its first entry and can be disabled in settings.
+        # Conventional Comments: pick a label (fuzzy) then compose. The picker is
+        # skippable via its first entry and can be disabled in settings.
         labels = []
         if _settings().get("conventional_comments", True):
             labels = _settings().get("comment_labels", _DEFAULT_COMMENT_LABELS)
 
+        new_context = {"mode": "new", "path": path, "payload": payload}
+
         if not labels:
-            ask_subject("")
+            _open_compose(view, compose(""), new_context)
             return
 
         items = [sublime.QuickPanelItem("(plain comment)", details="no label")]
         items += [
-            sublime.QuickPanelItem(
-                _label_tag(entry), details=entry.get("description", "")
-            )
-            for entry in labels
+            sublime.QuickPanelItem(_label_tag(e), details=e.get("description", ""))
+            for e in labels
         ]
 
         def on_label(index):
             if index < 0:
                 return
 
-            if index == 0:
-                prefix, initial = "", ""
-            else:
-                entry = labels[index - 1]
-                tag = _label_tag(entry)
-                if entry.get("label", "").lower() == "suggestion":
-                    # Prefill a suggestion of the current line(s); block on its own
-                    # line so the ``` fence is valid after the label.
-                    prefix, initial = "{}:\n".format(tag), suggestion_block
+            tag = "" if index == 0 else _label_tag(labels[index - 1])
+            _main(lambda: _open_compose(view, compose(tag), new_context))
+
+        view.window().show_quick_panel(items, on_label)
+
+
+class GithubPullRequestSubmitCommentCommand(sublime_plugin.TextCommand):
+    """Submit the compose buffer's body — queue a new comment or update an edited
+    one, per its context (bound to save). Closing without saving cancels."""
+
+    def run(self, edit):
+        settings = self.view.settings()
+        context = settings.get("github_pull_request_context")
+        if not context:
+            return
+
+        body = self.view.substr(sublime.Region(0, self.view.size()))
+        if not body.strip() or not SESSION.active or not SESSION.review:
+            self.view.close()  # nothing to submit -> treat as cancel
+            return
+
+        window = self.view.window()
+        mode = context.get("mode")
+
+        def worker():
+            local = False
+            try:
+                if mode == "edit":
+                    SESSION.review.edit_draft(context["uid"], body)
+                elif mode == "reply":
+                    SESSION.review.reply_comment(context["thread_id"], body)
                 else:
-                    prefix, initial = "{}: ".format(tag), ""
+                    SESSION.review.queue_comment(
+                        context["path"], context["payload"], body
+                    )
+            except GHError as err:
+                message = str(err)
+                if mode != "new":
+                    _main(lambda m=message: _error(m))
+                    return
 
-            _main(lambda: ask_subject(prefix, initial))
+                # New comment failed to reach GitHub but is kept locally by
+                # queue_comment; notify and still refresh so its draft icon shows.
+                local = True
+                _main(
+                    lambda m=message: _error(
+                        "couldn't reach GitHub — comment saved locally and will be "
+                        "sent when you submit the review.\n\n" + m
+                    )
+                )
 
-        window.show_quick_panel(items, on_label)
+            if mode == "reply":
+                _reload_threads()  # posted reply -> refresh the thread display
+                _main(lambda: _status("reply posted"))
+                return
+
+            def apply():
+                _decorate_all_views()
+                _refresh_files_panel(window)
+                if mode == "edit":
+                    _status("comment updated")
+                elif not local:
+                    _status("comment queued (submit the review to post)")
+                _update_status()
+
+            _main(apply)
+
+        _async(worker)
+        self.view.close()  # triggers on_pre_close -> layout is restored
 
 
 class GithubPullRequestShowCommentsCommand(sublime_plugin.TextCommand):
@@ -1239,6 +1347,17 @@ class GithubPullRequestEndReviewCommand(sublime_plugin.WindowCommand):
 class GithubPullRequestListener(sublime_plugin.EventListener):
     def on_load_async(self, view):
         _decorate_view(view)
+
+    def on_pre_close(self, view):
+        # A compose buffer closing (via submit or cancel) restores the pre-split
+        # layout and refocuses the file it was written against.
+        if not view.settings().get("github_pull_request_compose"):
+            return
+
+        window = view.window()
+        orig = view.settings().get("github_pull_request_orig_layout")
+        source_id = view.settings().get("github_pull_request_source_id")
+        sublime.set_timeout(lambda: _restore_after_compose(window, orig, source_id), 0)
 
     def on_activated_async(self, view):
         _decorate_view(view)

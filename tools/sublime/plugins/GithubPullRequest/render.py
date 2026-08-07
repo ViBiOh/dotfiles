@@ -263,16 +263,17 @@ def thread_popup_html(thread: Dict) -> str:
 
 
 def pending_html(drafts: List[Tuple[int, Dict]]) -> str:
-    """Popup for locally-queued (not yet posted) review comments. Each item is an
-    ``(index, draft)`` pair; the index drives its Discard action link."""
+    """Popup for locally-queued (not yet posted) review comments. Each item is a
+    ``(uid, draft)`` pair; the stable uid drives its Edit / Discard action links."""
     parts = [build_style(), '<div class="pending-tag">pending review comment</div>']
 
-    for index, draft in drafts:
+    for uid, draft in drafts:
         parts.append(_render_text(draft.get("body") or ""))
-        href = encode_action("discard", idx=index)
+        edit_href = encode_action("edit", uid=uid)
+        discard_href = encode_action("discard", uid=uid)
         parts.append(
-            '<div class="actions"><a href="{}">Discard</a></div>'.format(
-                html.escape(href)
+            '<div class="actions"><a href="{}">Edit</a> <a href="{}">Discard</a></div>'.format(
+                html.escape(edit_href), html.escape(discard_href)
             )
         )
 

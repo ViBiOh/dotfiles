@@ -33,7 +33,7 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 | **Load pull-request (current branch)** | Infer the PR from the branch, fetch files + threads, open the changed-files panel. Only open/draft PRs load; a closed/merged PR is refused with a dialog (the working-tree-vs-merge-base diff is only meaningful on a live branch). |
 | **Show changed files** | Bottom panel: aligned table of changed files with `+N` (green) `-M` (red) `(K unresolved)` (yellow) `(P pending)` (gray), plus each file's CODEOWNERS (via the `codeowners` binary, if on PATH). Double-click / Enter / F4 opens the file at the relevant line. |
 | **List all comments** | Cross-file quick-panel navigator of every thread; jumps to the file+line and shows the popup. |
-| **Comment on line or selection** | Queue a review comment on the current line or multi-line selection. First offers a fuzzy Conventional Comments label picker (skippable), then the body. Picking the **suggestion** label prefills a GitHub ` ```suggestion ` block with the current text of the line(s), ready to edit. Queued, not posted. |
+| **Comment on line or selection** | Queue a review comment on the current line or multi-line selection. First offers a fuzzy Conventional Comments label picker (skippable), then opens a compose buffer in a split **below the file** (the file stays visible). **Save** submits the comment (like a git commit editor); **close without saving** cancels. If the commented line(s) carry your own local (uncommitted) edits, the buffer is prefilled with a GitHub ` ```suggestion ` block of your edited text — ready to propose as a change, including removing lines — regardless of the chosen label. Queued, not posted. |
 | **Show comments on current line** | Show the thread / pending popup for the cursor's line. |
 | **Next comment** / **Previous comment** | Jump between commented lines in the current file. |
 | **Review with agent (tmux)** | Split your attached tmux session and run the configured agent (default `claude`, see `agent_command`) with a review prompt for this branch vs its base (the loaded PR's base, else the repo default) appended as the last argument. Works with or without a loaded PR; needs a running tmux session. |
@@ -44,8 +44,8 @@ Check out the PR branch (with your own git workflow), open the repo in Sublime, 
 ### In the editor once a PR is loaded
 
 - **Diff** — the native gutter diff lights up per file via `set_reference_document` against the merge-base blob (read with read-only `git show`). Added files show all-green.
-- **Threads** — unresolved threads get a blue gutter icon; hover (or _Show comments_) opens an HTML popup with the rendered comment bodies (GitHub's `bodyHTML` down-converted to minihtml), plus **Reply**, **Resolve/Unresolve**, **Open in browser**, and **Apply** for ` ```suggestion ` blocks.
-- **Drafts** — queued comments get a purple gutter icon and a "pending" popup with a **Discard** link; the panel shows per-file and total pending counts. They are restored from GitHub when you reload the PR.
+- **Threads** — unresolved threads get a blue gutter icon; hover (or _Show comments_) opens an HTML popup with the rendered comment bodies (GitHub's `bodyHTML` down-converted to minihtml), plus **Reply** (opens the compose split, save to post), **Resolve/Unresolve**, **Open in browser**, and **Apply** for ` ```suggestion ` blocks.
+- **Drafts** — queued comments get a purple gutter icon and a "pending" popup with **Edit** and **Discard** links (Edit reopens the same compose split, save to update); the panel shows per-file and total pending counts. They are restored from GitHub when you reload the PR.
 
 ## How it works (and what it will not do)
 

@@ -18,7 +18,7 @@ Two layers:
 | --- | --- |
 | `urls.py` | `parse_pr_url(url)` → `{host, owner, repo, number}`. |
 | `diff.py` | `parse_unified_diff(text)` → `[FileDiff]` (hunks, per-line old/new numbers, GitHub legacy `position`). |
-| `mapper.py` | `LineMap(file_diff)`: buffer row ↔ GitHub `(side, line)` coords, `is_commentable`, `anchor_to_row`, `comment_range` (single + multi-line payloads). Duck-typed on `file_diff` (does NOT import `diff`). |
+| `mapper.py` | `LineMap(file_diff)`: buffer row ↔ GitHub `(side, line)` coords, `is_commentable`, `anchor_to_row`, `comment_range` (single + multi-line payloads). Duck-typed on `file_diff` (does NOT import `diff`). (Suggestion prefill is decided in `plugin.py` via `_locally_changed_rows` — buffer vs `git show HEAD` — not by the mapper.) |
 | `render.py` | Pure minihtml builders: thread popup, pending popup, `bodyHTML`→minihtml sanitizer, suggestion extraction, `subl:githubpullrequest?...` action encode/decode. |
 | `gh.py` | Injectable subprocess client: `api` (with JSON `--input -` bodies), `graphql`, `pr_diff`, `pr_view`. |
 | `review.py` | Service composing the above: `resolve_pr`, `changed_files`, `review_threads` (GraphQL, paginated), `base_blob` (read-only `git show`), the server-backed draft queue (a real GitHub PENDING review — `load_pending`/`queue_comment`/`discard_draft`/`clear_drafts`/`flush_local`; `_drafts` are synced with `comment_id`s, `_local_comments` are unsynced fallbacks kept on API failure and flushed on submit), `submit_review`, `reply_comment`, `set_thread_resolved`. |
