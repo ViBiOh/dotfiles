@@ -745,7 +745,7 @@ class SubmitReviewTest(unittest.TestCase):
                 "gh",
                 "api",
                 "repos/octo/repo/pulls/42/reviews",
-                "-X",
+                "--method",
                 "POST",
                 "--input",
                 "-",
@@ -894,7 +894,7 @@ class ReplyAndResolveTest(unittest.TestCase):
         )
 
         args = gh_runner.calls[0]["args"]
-        query = args[args.index("-f") + 1]
+        query = args[args.index("--raw-field") + 1]
         self.assertIn("addPullRequestReviewThreadReply", query)
         self.assertIn("id=T1", args)
         self.assertIn("body=thanks", args)
@@ -923,7 +923,7 @@ class ReplyAndResolveTest(unittest.TestCase):
                 review.set_thread_resolved("T1", case["resolved"])
 
                 args = gh_runner.calls[0]["args"]
-                query = args[args.index("-f") + 1]
+                query = args[args.index("--raw-field") + 1]
                 mutation_body = query.split("mutation($id:ID!){", 1)[1].strip()
                 self.assertTrue(mutation_body.startswith(case["starts_with"]))
                 self.assertIn("id=T1", args)

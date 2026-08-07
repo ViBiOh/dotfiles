@@ -75,7 +75,13 @@ class GHTest(unittest.TestCase):
             "api_get_non_json_returns_raw": {
                 "stdout": "",
                 "call": lambda gh: gh.api("repos/o/r/issues/1/lock", method="PUT"),
-                "expected_args": ["gh", "api", "repos/o/r/issues/1/lock", "-X", "PUT"],
+                "expected_args": [
+                    "gh",
+                    "api",
+                    "repos/o/r/issues/1/lock",
+                    "--method",
+                    "PUT",
+                ],
                 "expected_return": "",
             },
             "api_patch_with_fields": {
@@ -89,11 +95,11 @@ class GHTest(unittest.TestCase):
                     "gh",
                     "api",
                     "repos/o/r/issues/1",
-                    "-X",
+                    "--method",
                     "PATCH",
-                    "-f",
+                    "--raw-field",
                     "state=closed",
-                    "-f",
+                    "--raw-field",
                     "title=hi",
                 ],
                 "expected_return": {"state": "closed"},
@@ -108,13 +114,13 @@ class GHTest(unittest.TestCase):
                     "gh",
                     "api",
                     "graphql",
-                    "-f",
+                    "--raw-field",
                     "query=query { viewer { login } }",
-                    "-F",
+                    "--field",
                     "number=5",
-                    "-F",
+                    "--field",
                     "resolved=True",
-                    "-f",
+                    "--raw-field",
                     "body=@octo hi",
                 ],
                 "expected_return": {"viewer": {"login": "octocat"}},
@@ -178,7 +184,15 @@ class GHTest(unittest.TestCase):
 
         self.assertEqual(
             runner.args,
-            ["gh", "api", "repos/o/r/pulls/1/reviews", "-X", "POST", "--input", "-"],
+            [
+                "gh",
+                "api",
+                "repos/o/r/pulls/1/reviews",
+                "--method",
+                "POST",
+                "--input",
+                "-",
+            ],
         )
         self.assertEqual(json.loads(runner.stdin), body)
         self.assertEqual(result, {"id": 1})

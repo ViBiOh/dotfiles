@@ -16,10 +16,6 @@
     "command": "github_pull_request_add_comment"
   },
   {
-    "caption": "GithubPullRequest: Show comments on current line",
-    "command": "github_pull_request_show_comments"
-  },
-  {
     "caption": "GithubPullRequest: Next comment",
     "command": "github_pull_request_next_comment"
   },

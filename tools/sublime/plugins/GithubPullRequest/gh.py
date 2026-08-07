@@ -79,11 +79,11 @@ class GH:
         args = ["gh", "api", path]
 
         if method != "GET":
-            args += ["-X", method]
+            args += ["--method", method]
 
         if fields:
             for key, value in fields.items():
-                args += ["-f", "{}={}".format(key, value)]
+                args += ["--raw-field", "{}={}".format(key, value)]
 
         stdin = None
         if input_obj is not None:
@@ -102,16 +102,16 @@ class GH:
         query: str,
         variables: Optional[Dict] = None,
     ) -> object:
-        args = ["gh", "api", "graphql", "-f", "query={}".format(query)]
+        args = ["gh", "api", "graphql", "--raw-field", "query={}".format(query)]
 
         if variables:
             for key, value in variables.items():
-                # `-F` gives gh a typed field (needed for Int/Boolean vars), but it
+                # `--field` gives gh a typed field (needed for Int/Boolean vars), but it
                 # also coerces strings: a value starting with "@" is read as a file
                 # and pure-numeric / true / false / null become typed literals. So
                 # string vars (comment bodies with @mentions, owner/repo, node ids,
-                # cursors) must go through `-f`, which is always a raw string.
-                flag = "-F" if isinstance(value, int) else "-f"
+                # cursors) must go through `--raw-field`, which is always a raw string.
+                flag = "--field" if isinstance(value, int) else "--raw-field"
                 args += [flag, "{}={}".format(key, value)]
 
         returncode, stdout, stderr = self._run(args)

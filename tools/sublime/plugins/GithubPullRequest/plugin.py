@@ -1151,7 +1151,7 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             # Full comment body prefill. On a locally-changed line the suggestion block
             # goes on its own line (so the ``` fence stays valid after the label).
             if has_diff:
-                head = "{}:\n".format(tag) if tag else ""
+                head = "{}: \n\n".format(tag) if tag else ""
 
                 return head + suggestion_block
 
@@ -1248,21 +1248,6 @@ class GithubPullRequestSubmitCommentCommand(sublime_plugin.TextCommand):
 
         _async(worker)
         self.view.close()  # triggers on_pre_close -> layout is restored
-
-
-class GithubPullRequestShowCommentsCommand(sublime_plugin.TextCommand):
-    def is_enabled(self):
-        return SESSION.active and _rel_path(self.view) in SESSION.files_by_path
-
-    def run(self, edit):
-        region = self.view.sel()[0]
-        row = self.view.rowcol(region.begin())[0]
-        point = self.view.text_point(row, 0)
-        if not _threads_at_row(self.view, row) and not _drafts_at_row(self.view, row):
-            _status("no comments on this line")
-            return
-
-        _show_threads_popup(self.view, row, point)
 
 
 class GithubPullRequestNextCommentCommand(sublime_plugin.TextCommand):
