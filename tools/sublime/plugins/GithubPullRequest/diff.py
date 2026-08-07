@@ -12,7 +12,6 @@ class DiffLine:
     origin: str
     old_lineno: Optional[int]
     new_lineno: Optional[int]
-    position: int
     content: str
 
 
@@ -98,10 +97,7 @@ def _build_file_diff(state: dict) -> FileDiff:
 def parse_unified_diff(text: str) -> List[FileDiff]:
     """Parse `gh pr diff` / `git diff` unified output into a list of FileDiff.
 
-    `position` counts every line after the file's first `@@` header (subsequent
-    hunk-header lines included), continuing across hunks, matching GitHub's legacy
-    patch-position rule. `\\ No newline at end of file` markers are skipped and do
-    not consume a position."""
+    `\\ No newline at end of file` markers are skipped."""
     if not text:
         return []
 
@@ -113,8 +109,6 @@ def parse_unified_diff(text: str) -> List[FileDiff]:
     state: Optional[dict] = None
     hunk: Optional[Hunk] = None
 
-    position = 0
-    seen_hunk = False
     old_ln = 0
     new_ln = 0
     rem_old = 0
@@ -127,8 +121,6 @@ def parse_unified_diff(text: str) -> List[FileDiff]:
 
             state = _new_file_state()
             hunk = None
-            position = 0
-            seen_hunk = False
             rem_old = 0
             rem_new = 0
 
@@ -150,20 +142,19 @@ def parse_unified_diff(text: str) -> List[FileDiff]:
 
             origin = line[0] if line else " "
             content = line[1:] if line else ""
-            position += 1
 
             if origin == "+":
-                diff_line = DiffLine("+", None, new_ln, position, content)
+                diff_line = DiffLine("+", None, new_ln, content)
                 new_ln += 1
                 rem_new -= 1
                 state["additions"] += 1
             elif origin == "-":
-                diff_line = DiffLine("-", old_ln, None, position, content)
+                diff_line = DiffLine("-", old_ln, None, content)
                 old_ln += 1
                 rem_old -= 1
                 state["deletions"] += 1
             else:
-                diff_line = DiffLine(" ", old_ln, new_ln, position, content)
+                diff_line = DiffLine(" ", old_ln, new_ln, content)
                 old_ln += 1
                 new_ln += 1
                 rem_old -= 1
@@ -178,11 +169,6 @@ def parse_unified_diff(text: str) -> List[FileDiff]:
             old_count = int(hunk_match.group(2)) if hunk_match.group(2) else 1
             new_start = int(hunk_match.group(3))
             new_count = int(hunk_match.group(4)) if hunk_match.group(4) else 1
-
-            if seen_hunk:
-                position += 1
-            else:
-                seen_hunk = True
 
             hunk = Hunk(
                 old_start=old_start,

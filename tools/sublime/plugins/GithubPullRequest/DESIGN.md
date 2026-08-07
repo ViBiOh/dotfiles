@@ -25,14 +25,14 @@ Also removed since the first draft: deleted-line phantoms and LEFT-side (deleted
 
 ## GitHub coordinate model (READ THIS before touching mapper/review)
 
-We author review comments with the modern REST fields, NOT the legacy `position`:
+We author review comments with the modern REST fields (`line`/`side`):
 
 - `side`: `"RIGHT"` (head/added side) or `"LEFT"` (base/deleted side).
 - `line`: the line number on that side (1-based).
 - `start_line` + `start_side`: for a multi-line comment, the first line of the range (`line` is the last). Omit both for a single-line comment.
 - `path`: repo-relative file path.
 
-Because the buffer holds the PR head file, a RIGHT-side comment on buffer row `R` (0-based) maps to `line = R + 1`. The diff is needed to know which rows are _commentable_ (part of a hunk). Authoring is RIGHT-side only; LEFT (`side`) still appears on incoming threads for anchoring, but we never author on deleted lines. (`diff.py` parses each line's legacy `position`, but authoring uses `line`/`side` only.)
+Because the buffer holds the PR head file, a RIGHT-side comment on buffer row `R` (0-based) maps to `line = R + 1`. The diff is needed to know which rows are _commentable_ (part of a hunk). Authoring is RIGHT-side only; LEFT (`side`) still appears on incoming threads for anchoring, but we never author on deleted lines.
 
 ---
 
@@ -57,7 +57,6 @@ class DiffLine:
     origin: str            # " " context | "+" added | "-" removed
     old_lineno: Optional[int]   # base-side line number (None for added lines)
     new_lineno: Optional[int]   # head-side line number (None for removed lines)
-    position: int          # 1-based position within this file's patch (GitHub legacy position)
     content: str           # line text WITHOUT the leading origin char, no trailing newline
 
 @dataclass
@@ -85,9 +84,7 @@ class FileDiff:
 def parse_unified_diff(text: str) -> List[FileDiff]:
     """Parse `gh pr diff` / `git diff` unified output. Handle: multiple files, `diff --git`
        headers, rename lines, `new file mode` / `deleted file mode`, `Binary files ... differ`,
-       `\\ No newline at end of file`, and multiple hunks per file. `position` counts every line
-       after the file's first `@@` (hunk-header lines included), continuing across hunks, per
-       GitHub's rule."""
+       `\\ No newline at end of file`, and multiple hunks per file."""
 ```
 
 ### `mapper.py`
@@ -225,7 +222,7 @@ class Review:
     # list position, so a popup action stays correct even if the queue shifts.
 
     def load_pending(self) -> None:
-        """One GraphQL query: viewer.login + pullRequest.id + reviews(states:[PENDING]).
+        """One GraphQL query: pullRequest.id + reviews(states:[PENDING]).
            Sets _pr_node_id; if a viewer-authored PENDING review exists, sets _pending_review_id
            and rebuilds _drafts from its comments. Resets _local_comments. Called once at load."""
 
@@ -281,7 +278,7 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
   "is_outdated": bool,
   "url": str,
   "comments": [
-    {"author": str, "body": str, "body_html": str, "created_at": str, "url": str, "diff_hunk": str}
+    {"author": str, "body": str, "body_html": str, "created_at": str, "url": str}
   ],
 }
 ```

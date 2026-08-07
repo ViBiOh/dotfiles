@@ -17,7 +17,7 @@ Two layers:
 | Module | Responsibility |
 | --- | --- |
 | `urls.py` | `parse_pr_url(url)` → `{host, owner, repo, number}`. |
-| `diff.py` | `parse_unified_diff(text)` → `[FileDiff]` (hunks, per-line old/new numbers, GitHub legacy `position`). |
+| `diff.py` | `parse_unified_diff(text)` → `[FileDiff]` (hunks, per-line old/new numbers). |
 | `mapper.py` | `LineMap(file_diff)`: buffer row ↔ GitHub `(side, line)` coords, `is_commentable`, `anchor_to_row`, `comment_range` (single + multi-line payloads). Duck-typed on `file_diff` (does NOT import `diff`). (Suggestion prefill and head-row mapping are decided in `plugin.py` via `_head_anchor` — buffer vs `git show HEAD` — not by the mapper; the mapper only knows head-commit rows.) |
 | `render.py` | Pure minihtml builders: thread popup, pending popup, `bodyHTML`→minihtml sanitizer, suggestion extraction, `subl:githubpullrequest?...` action encode/decode. |
 | `gh.py` | Injectable subprocess client: `api` (with JSON `--input -` bodies), `graphql`, `pr_diff`, `pr_view`. |
@@ -34,7 +34,7 @@ Every gh/git call runs under `_async(...)` (`sublime.set_timeout_async`). Every 
 
 ### GitHub coordinate model
 
-Comments are authored with the modern REST fields, not legacy `position`: `side` (`RIGHT`=head, `LEFT`=base), `line`, and `start_line`/`start_side` for multi-line. The buffer holds PR **head**, so head row `R` ↔ line `R+1`; when the reviewer's local edits shift buffer rows, `_head_anchor` maps the selection back onto head rows before this holds. `mapper.comment_range` produces the payload from head rows; `review.queue_comment(path, payload, body)` stores it; `submit_review` posts `comments[]` in one `POST /pulls/{n}/reviews`.
+Comments are authored with the modern REST fields: `side` (`RIGHT`=head, `LEFT`=base), `line`, and `start_line`/`start_side` for multi-line. The buffer holds PR **head**, so head row `R` ↔ line `R+1`; when the reviewer's local edits shift buffer rows, `_head_anchor` maps the selection back onto head rows before this holds. `mapper.comment_range` produces the payload from head rows; `review.queue_comment(path, payload, body)` stores it; `submit_review` posts `comments[]` in one `POST /pulls/{n}/reviews`.
 
 ### gh variable typing (subtle, already bitten once)
 

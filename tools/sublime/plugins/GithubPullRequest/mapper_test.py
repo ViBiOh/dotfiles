@@ -7,12 +7,11 @@ except ImportError:
     from mapper import LineMap
 
 
-def _line(origin, old_lineno, new_lineno, position, content):
+def _line(origin, old_lineno, new_lineno, content):
     return SimpleNamespace(
         origin=origin,
         old_lineno=old_lineno,
         new_lineno=new_lineno,
-        position=position,
         content=content,
     )
 
@@ -33,24 +32,24 @@ def _make_map():
     """
     hunk1 = SimpleNamespace(
         lines=[
-            _line(" ", 1, 1, 1, "alpha"),
-            _line("+", None, 2, 2, "beta-added"),
-            _line("-", 2, None, 3, "gamma-removed"),
-            _line("-", 3, None, 4, "delta-removed"),
-            _line(" ", 4, 3, 5, "epsilon"),
+            _line(" ", 1, 1, "alpha"),
+            _line("+", None, 2, "beta-added"),
+            _line("-", 2, None, "gamma-removed"),
+            _line("-", 3, None, "delta-removed"),
+            _line(" ", 4, 3, "epsilon"),
         ]
     )
     hunk2 = SimpleNamespace(
         lines=[
-            _line(" ", 10, 9, 7, "zeta"),
-            _line("+", None, 10, 8, "eta-added"),
-            _line(" ", 11, 11, 9, "theta"),
+            _line(" ", 10, 9, "zeta"),
+            _line("+", None, 10, "eta-added"),
+            _line(" ", 11, 11, "theta"),
         ]
     )
     hunk3 = SimpleNamespace(
         lines=[
-            _line(" ", 20, 21, 11, "iota"),
-            _line("-", 21, None, 12, "kappa-removed"),
+            _line(" ", 20, 21, "iota"),
+            _line("-", 21, None, "kappa-removed"),
         ]
     )
 

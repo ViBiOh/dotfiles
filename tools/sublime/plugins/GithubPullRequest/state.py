@@ -11,7 +11,6 @@ class Session:
 
     def reset(self):
         self.active = False
-        self.cwd = None
         self.root = None
         self.pr = None
         self.review = None

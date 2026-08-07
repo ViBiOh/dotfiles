@@ -115,7 +115,7 @@ index 1111111..2222222 100644
 #   num_files: expected number of FileDiff results
 #   files:     per-file expectations. Each entry is a dict of FileDiff scalar
 #              fields to assert plus "lines": a list of
-#              (hunk_idx, line_idx, origin, old_lineno, new_lineno, position, content)
+#              (hunk_idx, line_idx, origin, old_lineno, new_lineno, content)
 cases = {
     "single_file_single_hunk": {
         "text": SINGLE,
@@ -133,10 +133,10 @@ cases = {
                 "deletions": 0,
                 "num_hunks": 1,
                 "lines": [
-                    (0, 0, " ", 1, 1, 1, "line1"),
-                    (0, 1, " ", 2, 2, 2, "line2"),
-                    (0, 2, "+", None, 3, 3, "added"),
-                    (0, 3, " ", 3, 4, 4, "line3"),
+                    (0, 0, " ", 1, 1, "line1"),
+                    (0, 1, " ", 2, 2, "line2"),
+                    (0, 2, "+", None, 3, "added"),
+                    (0, 3, " ", 3, 4, "line3"),
                 ],
             }
         ],
@@ -151,8 +151,8 @@ cases = {
                 "deletions": 1,
                 "num_hunks": 1,
                 "lines": [
-                    (0, 1, "-", 2, None, 2, "old"),
-                    (0, 2, "+", None, 2, 3, "new"),
+                    (0, 1, "-", 2, None, "old"),
+                    (0, 2, "+", None, 2, "new"),
                 ],
             },
             {
@@ -161,8 +161,8 @@ cases = {
                 "deletions": 0,
                 "num_hunks": 1,
                 "lines": [
-                    (0, 0, " ", 1, 1, 1, "base"),
-                    (0, 1, "+", None, 2, 2, "extra"),
+                    (0, 0, " ", 1, 1, "base"),
+                    (0, 1, "+", None, 2, "extra"),
                 ],
             },
         ],
@@ -181,8 +181,8 @@ cases = {
                 "deletions": 0,
                 "num_hunks": 1,
                 "lines": [
-                    (0, 0, "+", None, 1, 1, "hello"),
-                    (0, 1, "+", None, 2, 2, "world"),
+                    (0, 0, "+", None, 1, "hello"),
+                    (0, 1, "+", None, 2, "world"),
                 ],
             }
         ],
@@ -201,8 +201,8 @@ cases = {
                 "deletions": 2,
                 "num_hunks": 1,
                 "lines": [
-                    (0, 0, "-", 1, None, 1, "gone1"),
-                    (0, 1, "-", 2, None, 2, "gone2"),
+                    (0, 0, "-", 1, None, "gone1"),
+                    (0, 1, "-", 2, None, "gone2"),
                 ],
             }
         ],
@@ -220,9 +220,9 @@ cases = {
                 "deletions": 1,
                 "num_hunks": 1,
                 "lines": [
-                    (0, 0, " ", 1, 1, 1, "keep"),
-                    (0, 1, "-", 2, None, 2, "old line"),
-                    (0, 2, "+", None, 2, 3, "new line"),
+                    (0, 0, " ", 1, 1, "keep"),
+                    (0, 1, "-", 2, None, "old line"),
+                    (0, 2, "+", None, 2, "new line"),
                 ],
             }
         ],
@@ -252,15 +252,15 @@ cases = {
                 "num_hunks": 2,
                 "lines": [
                     # first hunk
-                    (0, 0, " ", 1, 1, 1, "a"),
-                    (0, 1, "-", 2, None, 2, "b"),
-                    (0, 2, "+", None, 2, 3, "B"),
-                    (0, 3, " ", 3, 3, 4, "c"),
-                    # second hunk: position continues past the counted @@ header (pos 5)
-                    (1, 0, " ", 10, 10, 6, "j"),
-                    (1, 1, "+", None, 11, 7, "K"),
-                    (1, 2, " ", 11, 12, 8, "k"),
-                    (1, 3, " ", 12, 13, 9, "l"),
+                    (0, 0, " ", 1, 1, "a"),
+                    (0, 1, "-", 2, None, "b"),
+                    (0, 2, "+", None, 2, "B"),
+                    (0, 3, " ", 3, 3, "c"),
+                    # second hunk
+                    (1, 0, " ", 10, 10, "j"),
+                    (1, 1, "+", None, 11, "K"),
+                    (1, 2, " ", 11, 12, "k"),
+                    (1, 3, " ", 12, 13, "l"),
                 ],
             }
         ],
@@ -276,9 +276,9 @@ cases = {
                 "num_hunks": 1,
                 "num_lines": [3],
                 "lines": [
-                    (0, 0, " ", 1, 1, 1, "first"),
-                    (0, 1, "-", 2, None, 2, "second"),
-                    (0, 2, "+", None, 2, 3, "second changed"),
+                    (0, 0, " ", 1, 1, "first"),
+                    (0, 1, "-", 2, None, "second"),
+                    (0, 2, "+", None, 2, "second changed"),
                 ],
             }
         ],
@@ -293,8 +293,8 @@ cases = {
                 "deletions": 1,
                 "num_hunks": 1,
                 "lines": [
-                    (0, 0, "-", 5, None, 1, "x"),
-                    (0, 1, "+", None, 5, 2, "y"),
+                    (0, 0, "-", 5, None, "x"),
+                    (0, 1, "+", None, 5, "y"),
                 ],
             }
         ],
@@ -345,7 +345,7 @@ class ParseUnifiedDiffTest(unittest.TestCase):
                             )
 
                     for check in expected["lines"]:
-                        hunk_idx, line_idx, origin, old, new, position, content = check
+                        hunk_idx, line_idx, origin, old, new, content = check
                         line = file_diff.hunks[hunk_idx].lines[line_idx]
 
                         label = "{}: file[{}].hunk[{}].line[{}]".format(
@@ -354,7 +354,6 @@ class ParseUnifiedDiffTest(unittest.TestCase):
                         self.assertEqual(line.origin, origin, label + " origin")
                         self.assertEqual(line.old_lineno, old, label + " old_lineno")
                         self.assertEqual(line.new_lineno, new, label + " new_lineno")
-                        self.assertEqual(line.position, position, label + " position")
                         self.assertEqual(line.content, content, label + " content")
 
 

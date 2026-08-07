@@ -8,11 +8,7 @@ _PR_VIEW_FIELDS = [
     "number",
     "title",
     "baseRefName",
-    "headRefName",
-    "headRefOid",
     "url",
-    "author",
-    "body",
     "state",
 ]
 

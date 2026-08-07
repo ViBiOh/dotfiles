@@ -25,7 +25,7 @@ _THREADS_QUERY = """query($owner:String!,$repo:String!,$number:Int!,$cursor:Stri
         pageInfo{ hasNextPage endCursor }
         nodes{
           id isResolved isOutdated path line originalLine startLine diffSide
-          comments(first:100){ nodes{ author{login} body bodyHTML createdAt url diffHunk state } }
+          comments(first:100){ nodes{ author{login} body bodyHTML createdAt url state } }
         }
       }
     }
@@ -53,7 +53,6 @@ _UNRESOLVE_MUTATION = """mutation($id:ID!){
 # The local draft queue is backed by a real GitHub PENDING review, so queued
 # comments survive crashes/restarts and are visible on github.com until submitted.
 _PENDING_QUERY = """query($owner:String!,$repo:String!,$number:Int!){
-  viewer{ login }
   repository(owner:$owner,name:$repo){
     pullRequest(number:$number){
       id
@@ -249,7 +248,6 @@ class Review:
                     "body_html": comment.get("bodyHTML", ""),
                     "created_at": comment.get("createdAt"),
                     "url": comment.get("url", ""),
-                    "diff_hunk": comment.get("diffHunk"),
                 }
             )
 

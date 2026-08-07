@@ -178,17 +178,19 @@ def _head_opcodes(root, rel, view):
     return matcher.get_opcodes()
 
 
-def _head_anchor(root, rel, view, start_row, end_row):
+def _head_anchor(view, start_row, end_row):
     """Translate a 0-based buffer-row selection to the 0-based head-commit rows GitHub
     anchors comments to, plus whether the selection carries the reviewer's own local
     (uncommitted) edits.
 
     The buffer holds the PR head file, but local edits that insert/remove lines shift
-    buffer rows away from the head-commit line numbers. Walking the diff maps them back:
-    an ``equal`` run maps row-for-row; a ``replace`` run maps to its whole committed
-    block. Returns the buffer rows unchanged when HEAD is unavailable or the selection
-    maps to no head line (e.g. a purely local insertion)."""
-    opcodes = _head_opcodes(root, rel, view)
+    buffer rows away from the head-commit line numbers. Walking the diff (via the cached
+    opcodes shared with `_remap_head_row`) maps them back: an ``equal`` run maps
+    row-for-row; a ``replace`` run maps to its whole committed block. Returns the buffer
+    rows unchanged when HEAD is unavailable, or ``(None, None, has_edit)`` when the
+    selection maps to no head line at all (e.g. a purely local insertion, which GitHub
+    cannot anchor a comment to)."""
+    opcodes = _view_head_opcodes(view)
     if opcodes is None:
         return start_row, end_row, False
 
@@ -214,7 +216,7 @@ def _head_anchor(root, rel, view, start_row, end_row):
             head_rows.append(i2 - 1)
 
     if not head_rows:
-        return start_row, end_row, has_edit
+        return None, None, has_edit
 
     return min(head_rows), max(head_rows), has_edit
 
@@ -374,6 +376,11 @@ def _abs_path(rel):
     return os.path.join(SESSION.root, rel.replace("/", os.sep))
 
 
+def _thread_line(thread):
+    """Head-side line a thread is anchored to: its current line, else its original."""
+    return thread.get("line") or thread.get("original_line")
+
+
 def _first_hunk_line(path):
     """Head-side start line of the file's first hunk (else line 1)."""
     entry = SESSION.files_by_path.get(path)
@@ -389,7 +396,7 @@ def _first_comment_line(path):
     """Line of the first comment on the file: the earliest unresolved thread or
     pending draft, else the earliest thread, else the first hunk."""
     lines = [
-        thread.get("line") or thread.get("original_line")
+        _thread_line(thread)
         for thread in SESSION.threads_by_path.get(path, [])
         if not thread.get("is_resolved")
     ]
@@ -399,8 +406,7 @@ def _first_comment_line(path):
         return min(lines)
 
     fallback = [
-        thread.get("line") or thread.get("original_line")
-        for thread in SESSION.threads_by_path.get(path, [])
+        _thread_line(thread) for thread in SESSION.threads_by_path.get(path, [])
     ]
     fallback = [line for line in fallback if line]
     if fallback:
@@ -416,7 +422,7 @@ def _thread_row(view, thread):
         return None
 
     side = thread.get("side") or "RIGHT"
-    line = thread.get("line") or thread.get("original_line")
+    line = _thread_line(thread)
     if line is None:
         return None
 
@@ -804,7 +810,7 @@ def _apply_suggestion(view, thread_id, index):
     if index >= len(suggestions):
         return
 
-    line = thread.get("line") or thread.get("original_line")
+    line = _thread_line(thread)
     start_line = thread.get("start_line") or line
 
     start_row = _remap_head_row(view, start_line - 1)
@@ -827,10 +833,9 @@ def _apply_suggestion(view, thread_id, index):
 # --------------------------------------------------------------------------- #
 # load / reload
 # --------------------------------------------------------------------------- #
-def _build_session(cwd, root, pr, review, files, threads, owners):
+def _build_session(root, pr, review, files, threads, owners):
     SESSION.reset()
     SESSION.active = True
-    SESSION.cwd = cwd
     SESSION.root = root
     SESSION.pr = pr
     SESSION.review = review
@@ -908,7 +913,7 @@ def _load(window):
     owners = _codeowners_map(root, [entry["path"] for entry in files])
 
     def apply():
-        _build_session(cwd, root, pr, review, files, threads, owners)
+        _build_session(root, pr, review, files, threads, owners)
         _decorate_all_views()
         _status("loaded PR #{} ({} files)".format(pr["number"], len(files)))
         window.run_command("github_pull_request_files_panel")
@@ -1062,9 +1067,7 @@ class GithubPullRequestListCommentsCommand(sublime_plugin.WindowCommand):
             if thread.get("is_outdated"):
                 tags.append("outdated")
 
-            trigger = "{}:{}".format(
-                thread["path"], thread.get("line") or thread.get("original_line")
-            )
+            trigger = "{}:{}".format(thread["path"], _thread_line(thread))
             detail = "{} · {} comment(s){} — {}".format(
                 first.get("author", "?"),
                 len(thread["comments"]),
@@ -1081,7 +1084,7 @@ class GithubPullRequestListCommentsCommand(sublime_plugin.WindowCommand):
             view = self.window.open_file(
                 "{}:{}".format(
                     _abs_path(thread["path"]),
-                    thread.get("line") or thread.get("original_line") or 1,
+                    _thread_line(thread) or 1,
                 ),
                 sublime.ENCODED_POSITION,
             )
@@ -1127,11 +1130,11 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         # selection back onto head rows so the comment (and any ```suggestion``` it
         # carries) targets the right lines and can be applied as-is. has_diff tells us
         # whether the selection is locally edited (so a suggestion is worth prefilling).
-        head_start, head_end, has_diff = _head_anchor(
-            SESSION.root, path, view, start_row, end_row
-        )
+        head_start, head_end, has_diff = _head_anchor(view, start_row, end_row)
 
-        payload = line_map.comment_range(head_start, head_end)
+        payload = None
+        if head_start is not None:
+            payload = line_map.comment_range(head_start, head_end)
         if payload is None:
             _status("no commentable line in the selection")
             return

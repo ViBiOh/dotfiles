@@ -279,7 +279,6 @@ class ReviewThreadsTest(unittest.TestCase):
         self.assertFalse(first["is_resolved"])
         self.assertEqual(first["url"], "https://github.com/octo/repo/pull/42#c1")
         self.assertEqual(first["comments"][0]["author"], "alice")
-        self.assertEqual(first["comments"][0]["diff_hunk"], "@@ -1,2 +1,3 @@")
 
         second = threads[1]
         self.assertEqual(second["id"], "T2")
