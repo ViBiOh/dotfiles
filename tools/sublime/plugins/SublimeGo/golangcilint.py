@@ -34,7 +34,7 @@ class GolangCILint(Linter):
         folder = variables.get("folder")
         file = variables.get("file")
 
-        if not file.startswith(folder):
+        if not file or not file.startswith(folder):
             return "true ${file_path}"
 
         cmd = ["golangci-lint", "run", "--show-stats=false", "--allow-parallel-runners"]

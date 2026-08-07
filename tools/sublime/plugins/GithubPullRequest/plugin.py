@@ -161,25 +161,62 @@ def _codeowners_map(root, paths):
     return owners
 
 
-def _locally_changed_rows(root, rel, view):
-    """0-based buffer rows that differ from the committed (HEAD) version of the file
-    — the reviewer's own local edits. Uses the live buffer (so unsaved edits count)."""
+def _head_opcodes(root, rel, view):
+    """difflib opcodes (committed HEAD as ``a``, live buffer as ``b``) for the file, or
+    None when HEAD has no such path. The buffer is read live, so unsaved edits count."""
     rc, committed = _run_git(root, ["show", "HEAD:{}".format(rel)])
     if rc != 0:
-        return set()
+        return None
 
     committed_lines = committed.splitlines()
     buffer_lines = view.substr(sublime.Region(0, view.size())).splitlines()
 
-    changed = set()
     matcher = difflib.SequenceMatcher(
         None, committed_lines, buffer_lines, autojunk=False
     )
-    for tag, _, _, j1, j2 in matcher.get_opcodes():
-        if tag in ("replace", "insert"):
-            changed.update(range(j1, j2))
 
-    return changed
+    return matcher.get_opcodes()
+
+
+def _head_anchor(root, rel, view, start_row, end_row):
+    """Translate a 0-based buffer-row selection to the 0-based head-commit rows GitHub
+    anchors comments to, plus whether the selection carries the reviewer's own local
+    (uncommitted) edits.
+
+    The buffer holds the PR head file, but local edits that insert/remove lines shift
+    buffer rows away from the head-commit line numbers. Walking the diff maps them back:
+    an ``equal`` run maps row-for-row; a ``replace`` run maps to its whole committed
+    block. Returns the buffer rows unchanged when HEAD is unavailable or the selection
+    maps to no head line (e.g. a purely local insertion)."""
+    opcodes = _head_opcodes(root, rel, view)
+    if opcodes is None:
+        return start_row, end_row, False
+
+    head_rows = []
+    has_edit = False
+
+    for tag, i1, i2, j1, j2 in opcodes:
+        lo = max(j1, start_row)
+        hi = min(j2, end_row + 1)
+        overlaps = lo < hi
+
+        if overlaps and tag in ("replace", "insert"):
+            has_edit = True
+
+        if not overlaps or tag == "insert":
+            continue
+
+        if tag == "equal":
+            head_rows.append(i1 + (lo - j1))
+            head_rows.append(i1 + (hi - 1 - j1))
+        else:  # replace: the whole committed block maps to this local block
+            head_rows.append(i1)
+            head_rows.append(i2 - 1)
+
+    if not head_rows:
+        return start_row, end_row, has_edit
+
+    return min(head_rows), max(head_rows), has_edit
 
 
 def _detect_base_branch(root):
@@ -505,6 +542,10 @@ def _open_compose(source_view, prefill, context):
     compose.assign_syntax("Packages/Markdown/Markdown.sublime-syntax")
 
     settings = compose.settings()
+    # Keep the prefilled suggestion byte-for-byte: a ```suggestion``` must match the
+    # head line's leading whitespace exactly, so tabs must not be expanded to spaces.
+    settings.set("translate_tabs_to_spaces", False)
+    settings.set("detect_indentation", False)
     settings.set("github_pull_request_compose", True)
     settings.set("github_pull_request_context", context)
     settings.set("github_pull_request_source_id", source_view.id())
@@ -1019,22 +1060,27 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         if region.end() > region.begin() and self.view.rowcol(region.end())[1] == 0:
             end_row -= 1
 
-        payload = line_map.comment_range(start_row, end_row)
+        view = self.view
+
+        # The buffer may carry the reviewer's own local edits, which shift buffer rows
+        # away from the PR head-commit line numbers GitHub anchors comments to. Map the
+        # selection back onto head rows so the comment (and any ```suggestion``` it
+        # carries) targets the right lines and can be applied as-is. has_diff tells us
+        # whether the selection is locally edited (so a suggestion is worth prefilling).
+        head_start, head_end, has_diff = _head_anchor(
+            SESSION.root, path, view, start_row, end_row
+        )
+
+        payload = line_map.comment_range(head_start, head_end)
         if payload is None:
             _status("no commentable line in the selection")
             return
 
-        view = self.view
-
-        # Prefill a GitHub ```suggestion``` block when the commented line(s) carry your
-        # own local (uncommitted) edits, so any comment can propose that change.
-        end_line = payload["line"]
-        start_line = payload.get("start_line", end_line)
-        changed_rows = _locally_changed_rows(SESSION.root, path, view)
-        has_diff = any((n - 1) in changed_rows for n in range(start_line, end_line + 1))
+        # Suggestion content is the reviewer's LOCAL version of the selected lines
+        # (from the buffer), which GitHub applies over the head lines above.
         content = "\n".join(
-            view.substr(view.line(view.text_point(n - 1, 0)))
-            for n in range(start_line, end_line + 1)
+            view.substr(view.line(view.text_point(row, 0)))
+            for row in range(start_row, end_row + 1)
         )
         suggestion_block = "```suggestion\n{}\n```".format(content)
 
