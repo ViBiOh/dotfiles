@@ -100,8 +100,9 @@ class LineMap:
         """True if buffer row (0-based, RIGHT/head side) is part of a hunk (added or context)."""
 
     def anchor_to_row(self, side: str, line: int) -> Optional[int]:
-        """Thread's (side, line) -> 0-based buffer row to place its gutter icon / popup.
-           RIGHT: row = line - 1. LEFT: the buffer row of the hunk boundary the deleted line sits at."""
+        """Thread's (side, line) -> 0-based HEAD-commit row. RIGHT: row = line - 1.
+           LEFT: the head row of the hunk boundary the deleted line sits at.
+           (plugin.py's `_remap_head_row` then shifts this to the live buffer row.)"""
 
     def comment_range(self, start_row: int, end_row: int) -> Optional[Dict]:
         """RIGHT-side (multi-line) comment payload for a buffer row span. Returns
@@ -209,8 +210,9 @@ class Review:
 
     def review_threads(self) -> List[Dict]:
         """GraphQL pullRequest.reviewThreads (paginated). Each thread dict per the shape below.
-           Fetched once at load; the caller keys them by path. (Submitted threads only — pending
-           review comments are NOT here; they come from load_pending.)"""
+           Fetched once at load; the caller keys them by path. reviewThreads DOES return the
+           viewer's own pending draft threads, so any thread whose root comment state is PENDING
+           is skipped here (it comes from load_pending instead, else it would show twice)."""
 
     def base_blob(self, path: str) -> Optional[str]:
         """read-only `git show <merge_base>:<path>` -> text, or None (added file / not found)."""
@@ -243,7 +245,8 @@ class Review:
 
     def discard_draft(self, uid: int) -> None:
         """Find the draft by uid. Synced -> deletePullRequestReviewComment (and
-           deletePullRequestReview when _drafts empties); local -> just drop it."""
+           deletePullRequestReview when _drafts empties; that delete is best-effort since
+           removing the last comment already auto-removes the empty review); local -> drop."""
 
     def edit_draft(self, uid: int, body: str) -> None:
         """Find the draft by uid and change its body. Synced -> updatePullRequestReviewComment;
@@ -291,7 +294,7 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
 
 - `state.py` — `SESSION` singleton: `pr` meta, `threads_by_path`, `files` + `files_by_path`, `line_maps: Dict[str, LineMap]`, `review: Review`, `base_blob_cache`, `root`/`cwd`, `active`. Plus `unresolved_count`, `pending_by_path`, and `file_entries_for_panel` (alphabetical, enriched with `unresolved` + `pending` counts).
 - `plugin.py` — commands + `GithubPullRequestListener`. All gh/git calls run through `sublime.set_timeout_async`; UI mutation (regions, popups, panels, status) back on the main thread via `set_timeout`. Decoration = `set_reference_document` diff (empty base for new files → all green)
-  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Popups (hover or command) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are now network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. A queue that can't reach GitHub notifies but keeps the comment locally (no re-prompt). `End review` prompts `yes_no_cancel`: if there are unsent (local) comments, Submit to GitHub / Discard / Cancel (`flush_local` vs `clear_drafts`); otherwise, for the already-synced pending review, Keep on GitHub / Discard from GitHub / Cancel.
+  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Every placement (icons, popups, navigation, suggestion-apply) resolves the stored head-commit line to the live buffer row via `_remap_head_row`, which walks the buffer-vs-`git show HEAD` diff (opcodes cached per view by `change_count`) so icons track the right line even after local edits shift the buffer. Popups (hover or command) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are now network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. A queue that can't reach GitHub notifies but keeps the comment locally (no re-prompt). `End review` prompts `yes_no_cancel`: if there are unsent (local) comments, Submit to GitHub / Discard / Cancel (`flush_local` vs `clear_drafts`); otherwise, for the already-synced pending review, Keep on GitHub / Discard from GitHub / Cancel.
 - `.sublime-commands` — palette entries, captions prefixed `GithubPullRequest:` (match siblings).
 - `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `hide_outdated` (bool; drops outdated threads in `_index_threads` so all surfaces exclude them), `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip), then `_open_compose` opens a scratch buffer in a split **below** the file (`_split_below_layout` adds a full-width bottom group; existing groups shrink into the top 70%). The buffer is prefilled with `"<emoji> <label>: "` (or, when the commented line(s) carry the reviewer's own local uncommitted edits — buffer vs `git show HEAD:<path>` via `_head_anchor` — with `"<label>:\n```suggestion\n<edited line(s)>\n```"`, fence on its own line, for ANY label). `_head_anchor` also maps the selected buffer rows onto the PR head-commit rows (walking the same diff) so the comment's `line`/`start_line` point at the head lines even when local edits shifted the buffer, keeping the suggestion applicable as-is. **Save** runs `github_pull_request_submit_comment` (bound in `Default.sublime-keymap`, context `setting.github_pull_request_compose`) which queues the whole buffer as the body; **closing without saving cancels**. `on_pre_close` restores the saved layout (`_restore_after_compose`) and refocuses the file for either path. The compose view carries `github_pull_request_compose` + a `context` (`{mode:"new", path, payload}`, `{mode:"edit", uid}`, or `{mode:"reply", thread_id}`) + source-id + orig-layout in its settings. The pending-popup **Edit** link reuses the split with `mode:"edit"` (prefilled with the current body; save updates it — server-side for synced drafts, mirror for local ones), and a thread **Reply** uses `mode:"reply"` (save posts via `reply_comment`, then `_reload_threads`). Only the review-summary prompt on submit still uses an input panel. Also `agent_command` (array, default `["claude"]`) and `agent_review_prompt` (`{base}` placeholder) for the `github_pull_request_review_in_tmux` command, which `tmux split-window`s the attached session (auto-detected via `tmux list-sessions`) in the repo root running `<agent_command> <prompt>` (joined + `shlex.quote`d into one shell string, prompt last); base = loaded PR base else `git symbolic-ref refs/remotes/origin/HEAD`. No git mutation (tmux + read-only git only).
 - `Default.sublime-keymap` — binds Save (`super+s` / `ctrl+s`) to `github_pull_request_submit_comment`, scoped by `setting.github_pull_request_compose` so it only affects the compose buffer.

@@ -69,7 +69,7 @@ The glue (`plugin.py`, `state.py`) cannot be exercised outside Sublime — verif
 
 - **Markdown fallback suggestion indexing** (`render._render_body`): the non-`body_html` popup path counts suggestions with `_FENCE_RE` while the Apply handler uses `_SUGGESTION_RE`, so indices could diverge. Real GitHub data always has `body_html` (both sides then use `suggestions_in`), so this is effectively test-only. Unify the two if you touch it.
 - **base-blob caching**: a transient `git show` failure caches `None` for the file for the session, so its gutter diff won't retry until reload. Intentional (avoids re-spawning git on every activate); revisit if it bites.
-- **Pending vs published threads assumption**: the draft queue is a server-side PENDING review; `review_threads()` (published `reviewThreads`) is assumed NOT to include pending comments, so drafts and posted threads stay distinct. If GitHub ever returns pending comments there, filter them out by author + pending state.
+- **Pending vs published threads**: the draft queue is a server-side PENDING review. `reviewThreads` DOES return the viewer's own pending draft threads, so `review_threads()` skips any thread whose root comment has `state == "PENDING"` (they are surfaced through the pending-review mirror instead); otherwise a draft would show twice — once as a blue thread and once as a purple draft. Deleting a pending review's last comment auto-removes the now-empty review, so `_delete_pending_review` tolerates a `deletePullRequestReview` that no longer resolves.
 - Deferred features: outdated-comment re-anchoring, reactions, viewed-file state, CI-checks display, multiple concurrent PRs.
 
 ## Where things plug in

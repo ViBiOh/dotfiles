@@ -290,6 +290,75 @@ class ReviewThreadsTest(unittest.TestCase):
         self.assertTrue(second["is_outdated"])
         self.assertEqual(second["comments"][0]["author"], "ghost")
 
+    def test_skips_viewer_pending_draft_threads(self):
+        # A not-yet-submitted draft comes back from reviewThreads with state PENDING;
+        # it must be skipped here (it is shown via the pending-review mirror instead).
+        page = {
+            "repository": {
+                "pullRequest": {
+                    "reviewThreads": {
+                        "pageInfo": {"hasNextPage": False, "endCursor": None},
+                        "nodes": [
+                            {
+                                "id": "T1",
+                                "isResolved": False,
+                                "isOutdated": False,
+                                "path": "foo.py",
+                                "line": 3,
+                                "originalLine": 3,
+                                "startLine": None,
+                                "diffSide": "RIGHT",
+                                "comments": {
+                                    "nodes": [
+                                        {
+                                            "author": {"login": "octo"},
+                                            "body": "draft",
+                                            "createdAt": "2026-01-01T00:00:00Z",
+                                            "url": "",
+                                            "diffHunk": "",
+                                            "state": "PENDING",
+                                        }
+                                    ]
+                                },
+                            },
+                            {
+                                "id": "T2",
+                                "isResolved": False,
+                                "isOutdated": False,
+                                "path": "foo.py",
+                                "line": 4,
+                                "originalLine": 4,
+                                "startLine": None,
+                                "diffSide": "RIGHT",
+                                "comments": {
+                                    "nodes": [
+                                        {
+                                            "author": {"login": "alice"},
+                                            "body": "posted",
+                                            "createdAt": "2026-01-01T00:00:00Z",
+                                            "url": "",
+                                            "diffHunk": "",
+                                            "state": "SUBMITTED",
+                                        }
+                                    ]
+                                },
+                            },
+                        ],
+                    }
+                }
+            }
+        }
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[json.dumps({"data": page})],
+        )
+        review = _make_review(gh_runner, ScriptedGit())
+        review.resolve_pr()
+
+        threads = review.review_threads()
+
+        self.assertEqual([t["id"] for t in threads], ["T2"])
+
     def test_pagination_passes_cursor(self):
         gh_runner = ScriptedGH(
             pr_view=json.dumps(_PR_VIEW),
@@ -591,6 +660,27 @@ class DraftQueueTest(unittest.TestCase):
         self.assertTrue(
             any("deletePullRequestReview(" in q for q in _graphql_queries(gh_runner))
         )
+
+    def test_discard_last_tolerates_missing_review(self):
+        # Deleting the last pending comment auto-removes the empty review on GitHub, so
+        # the follow-up deletePullRequestReview may fail to resolve. Discard must still
+        # succeed (no raise, mirror cleared) rather than surfacing that as an error.
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _PENDING_EMPTY,
+                _ADD_REVIEW,
+                _add_thread("C1"),
+                _DELETE_COMMENT,
+                _GRAPHQL_ERROR,  # deletePullRequestReview: review already gone
+            ],
+        )
+        review = _loaded_review(gh_runner)
+        review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "one")
+
+        review.discard_draft(review.drafts()[0]["uid"])
+
+        self.assertEqual(review.drafts(), [])
 
     def test_clear_deletes_review(self):
         gh_runner = ScriptedGH(

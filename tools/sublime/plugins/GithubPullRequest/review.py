@@ -25,7 +25,7 @@ _THREADS_QUERY = """query($owner:String!,$repo:String!,$number:Int!,$cursor:Stri
         pageInfo{ hasNextPage endCursor }
         nodes{
           id isResolved isOutdated path line originalLine startLine diffSide
-          comments(first:100){ nodes{ author{login} body bodyHTML createdAt url diffHunk } }
+          comments(first:100){ nodes{ author{login} body bodyHTML createdAt url diffHunk state } }
         }
       }
     }
@@ -219,6 +219,13 @@ class Review:
             connection = data["repository"]["pullRequest"]["reviewThreads"]
 
             for node in connection["nodes"]:
+                comments = node["comments"]["nodes"]
+                if comments and comments[0].get("state") == "PENDING":
+                    # The viewer's own not-yet-submitted draft. It is surfaced through
+                    # the pending-review mirror (load_pending); skip it here so it does
+                    # not also show up as a posted thread (which would double it).
+                    continue
+
                 threads.append(self._map_thread(node))
 
             page_info = connection["pageInfo"]
@@ -441,9 +448,18 @@ class Review:
         self._local_comments = []
 
     def _delete_pending_review(self) -> None:
-        if self._pending_review_id is not None:
+        if self._pending_review_id is None:
+            return
+
+        try:
             self._gh.graphql(_DELETE_REVIEW_MUTATION, {"rid": self._pending_review_id})
-            self._pending_review_id = None
+        except GHError:
+            # Deleting a pending review's last comment already removes the now-empty
+            # review, so its id may no longer resolve. Either way the desired end state
+            # (no pending review) is reached, so treat this as done.
+            pass
+
+        self._pending_review_id = None
 
     def submit_review(self, verdict: str, body: str = "") -> Dict:
         assert verdict in _VERDICTS

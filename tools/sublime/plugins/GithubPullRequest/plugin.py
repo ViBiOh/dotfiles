@@ -219,6 +219,56 @@ def _head_anchor(root, rel, view, start_row, end_row):
     return min(head_rows), max(head_rows), has_edit
 
 
+# Cache of difflib opcodes (committed HEAD vs live buffer) per view, keyed by the
+# view's change_count so a `git show HEAD` is paid only when the buffer changed.
+_OPCODE_CACHE = {}
+
+
+def _view_head_opcodes(view):
+    path = _rel_path(view)
+    if path is None or not SESSION.root:
+        return None
+
+    change = view.change_count()
+    cached = _OPCODE_CACHE.get(view.id())
+    if cached and cached[0] == change:
+        return cached[1]
+
+    opcodes = _head_opcodes(SESSION.root, path, view)
+    _OPCODE_CACHE[view.id()] = (change, opcodes)
+
+    return opcodes
+
+
+def _head_row_to_buffer_row(opcodes, head_row):
+    """Where a 0-based head-commit row currently sits in the buffer, following the
+    reviewer's local edits. A changed/removed head line anchors to its block start."""
+    for tag, i1, i2, j1, j2 in opcodes:
+        if i1 <= head_row < i2:
+            if tag == "equal":
+                return j1 + (head_row - i1)
+
+            return j1
+
+    return None
+
+
+def _remap_head_row(view, head_row):
+    """Head-commit row -> current buffer row (identity when the buffer matches HEAD or
+    HEAD is unavailable). Keeps gutter icons, popups and navigation on the right line
+    even after local edits shift the buffer away from the PR head."""
+    if head_row is None:
+        return None
+
+    opcodes = _view_head_opcodes(view)
+    if not opcodes:
+        return head_row
+
+    mapped = _head_row_to_buffer_row(opcodes, head_row)
+
+    return head_row if mapped is None else mapped
+
+
 def _detect_base_branch(root):
     """Repo default branch via origin/HEAD (e.g. 'main'); falls back to 'main'."""
     rc, out = _run_git(root, ["symbolic-ref", "--short", "refs/remotes/origin/HEAD"])
@@ -370,7 +420,7 @@ def _thread_row(view, thread):
     if line is None:
         return None
 
-    return line_map.anchor_to_row(side, line)
+    return _remap_head_row(view, line_map.anchor_to_row(side, line))
 
 
 # --------------------------------------------------------------------------- #
@@ -467,7 +517,11 @@ def _apply_draft_icons(view, path):
         if not line:
             continue
 
-        point = view.text_point(line - 1, 0)
+        row = _remap_head_row(view, line - 1)
+        if row is None:
+            continue
+
+        point = view.text_point(row, 0)
         regions.append(sublime.Region(point, point))
 
     view.erase_regions(DRAFT_REGION_KEY)
@@ -641,9 +695,9 @@ def _drafts_at_row(view, row):
         return []
 
     return [
-        (index, draft)
-        for index, draft in _drafts_for_path(path)
-        if draft.get("line") == row + 1
+        (uid, draft)
+        for uid, draft in _drafts_for_path(path)
+        if draft.get("line") and _remap_head_row(view, draft["line"] - 1) == row
     ]
 
 
@@ -753,11 +807,17 @@ def _apply_suggestion(view, thread_id, index):
     line = thread.get("line") or thread.get("original_line")
     start_line = thread.get("start_line") or line
 
+    start_row = _remap_head_row(view, start_line - 1)
+    end_row = _remap_head_row(view, line - 1)
+    if start_row is None or end_row is None:
+        _status("cannot locate the suggestion's lines in this buffer")
+        return
+
     view.run_command(
         "github_pull_request_replace_lines",
         {
-            "start_row": start_line - 1,
-            "end_row": line - 1,
+            "start_row": start_row,
+            "end_row": end_row,
             "text": suggestions[index].rstrip("\n"),
         },
     )
@@ -1395,6 +1455,8 @@ class GithubPullRequestListener(sublime_plugin.EventListener):
         _decorate_view(view)
 
     def on_pre_close(self, view):
+        _OPCODE_CACHE.pop(view.id(), None)
+
         # A compose buffer closing (via submit or cancel) restores the pre-split
         # layout and refocuses the file it was written against.
         if not view.settings().get("github_pull_request_compose"):
