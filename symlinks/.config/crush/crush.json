@@ -7,7 +7,7 @@
   },
   "models": {
     "large": {
-      "model": "claude-opus-4-7",
+      "model": "claude-opus-5",
       "provider": "anthropic",
       "reasoning_effort": "high",
       "max_tokens": 128000
