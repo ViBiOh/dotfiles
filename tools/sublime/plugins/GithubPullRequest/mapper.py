@@ -47,6 +47,14 @@ class LineMap:
         return None
 
     def comment_range(self, start_row: int, end_row: int) -> Optional[Dict]:
+        """RIGHT-side comment payload for a buffer row span, narrowed to the rows the
+        PR diff actually carries (GitHub refuses to anchor anywhere else). None when
+        the span holds no commentable row.
+
+        NOTE: the narrowing can shrink a multi-row span down to a single row, which
+        yields a single-line payload (no ``start_line``) and therefore a single-line
+        comment on GitHub. Callers must surface that, or the reviewer sees a one-line
+        comment where they selected many."""
         if start_row > end_row:
             start_row, end_row = end_row, start_row
 

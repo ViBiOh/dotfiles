@@ -21,7 +21,7 @@ Two layers:
 | `mapper.py` | `LineMap(file_diff)`: buffer row ↔ GitHub `(side, line)` coords, `is_commentable`, `anchor_to_row`, `comment_range` (single + multi-line payloads). Duck-typed on `file_diff` (does NOT import `diff`). (Suggestion prefill and head-row mapping are decided in `plugin.py` via `_head_anchor` — buffer vs `git show HEAD` — not by the mapper; the mapper only knows head-commit rows.) |
 | `render.py` | Pure minihtml builders: thread popup, pending popup, `bodyHTML`→minihtml sanitizer, suggestion extraction, `subl:githubpullrequest?...` action encode/decode. |
 | `gh.py` | Injectable subprocess client: `api` (with JSON `--input -` bodies), `graphql`, `pr_diff`, `pr_view`. |
-| `review.py` | Service composing the above: `resolve_pr`, `changed_files`, `review_threads` (GraphQL, paginated), `base_blob` (read-only `git show`), the server-backed draft queue (a real GitHub PENDING review — `load_pending`/`queue_comment`/`discard_draft`/`clear_drafts`/`flush_local`; `_drafts` are synced with `comment_id`s, `_local_comments` are unsynced fallbacks kept on API failure and flushed on submit), `submit_review`, `reply_comment`, `set_thread_resolved`. |
+| `review.py` | Service composing the above: `resolve_pr`, `changed_files`, `review_threads` (GraphQL, paginated), `base_blob` (read-only `git show`), the server-backed draft queue (a real GitHub PENDING review — `load_pending`/`queue_comment`/`discard_draft`/`clear_drafts`/`flush_local`; `_drafts` are synced with `comment_id`s, `_local_comments` are unsynced fallbacks kept on API failure and flushed on submit), `submit_review`, `reply_comment`, `set_thread_resolved`. Raises `CommentRejected` (a `GHError`) when GitHub refuses to anchor a comment. |
 
 **Sublime glue** (`plugin.py` + `state.py`, imports `sublime`, only `py_compile` + `ruff` checkable headlessly):
 
@@ -51,6 +51,7 @@ Comments are authored with the modern REST fields: `side` (`RIGHT`=head, `LEFT`=
       from diff import parse_unified_diff
   ```
 - **Tests**: `unittest`, files named `*_test.py`, in the same module namespace, dict-keyed table cases (`cases = {"name": (...)}` + `subTest`). Core modules mock `gh`/git via injected runners — never hit the network or real git.
+- **GitHub can refuse a comment silently.** `addPullRequestReviewThread` answers HTTP 200 with `thread: null` and NO `errors` array when it will not anchor the comment (verified against the live API). Always check for the null; `review._sync_draft` turns it into `CommentRejected` so the comment cannot vanish into a `TypeError`.
 - **Untrusted input.** Comment bodies and their rendered HTML come from anyone who can comment on the PR. `render.html_to_minihtml` whitelists tags and escapes all text; `plugin._open_external` refuses to hand any non-`http(s)` link to the browser. Keep both gates in place when adding popup content.
 - **Naming**: command classes are `GithubPullRequest<Verb>Command`; Sublime derives the command id by snake_casing minus `Command` (e.g. `GithubPullRequestLoadCommand` → `github_pull_request_load`). Keep `.sublime-commands` and `run_command(...)` strings in sync.
 
@@ -68,6 +69,7 @@ The glue (`plugin.py`, `state.py`) cannot be exercised outside Sublime — verif
 
 ## Known minor issues / deferred (good first tasks)
 
+- **Comments are limited to the diff's 3 lines of context.** GitHub only anchors a comment to a line the PR diff carries, so a buffer selection reaching into unchanged code is narrowed by `mapper.comment_range` (down to a single line if only one row qualifies). `plugin.py` reports the effective range in the compose tab title and a status message. Fetching a wider-context diff would not help: the API rejects out-of-hunk lines regardless.
 - **base-blob caching**: a transient `git show` failure caches `None` for the file for the session, so its gutter diff won't retry until reload. Intentional (avoids re-spawning git on every activate); revisit if it bites.
 - **Pending vs published threads**: the draft queue is a server-side PENDING review. `reviewThreads` DOES return the viewer's own pending draft threads, so `review_threads()` skips any thread whose root comment has `state == "PENDING"` (they are surfaced through the pending-review mirror instead); otherwise a draft would show twice — once as a blue thread and once as a purple draft. Deleting a pending review's last comment auto-removes the now-empty review, so `_delete_pending_review` tolerates a `deletePullRequestReview` that no longer resolves.
 - Deferred features: outdated-comment re-anchoring, reactions, viewed-file state, CI-checks display, multiple concurrent PRs.
