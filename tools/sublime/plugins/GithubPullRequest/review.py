@@ -184,7 +184,6 @@ class Review:
         base = self._pr["base"]
 
         rc, out, _ = self._git_run(["git", "merge-base", "HEAD", f"origin/{base}"])
-
         if rc != 0:
             rc, out, _ = self._git_run(["git", "merge-base", "HEAD", base])
 
