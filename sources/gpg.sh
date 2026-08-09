@@ -32,3 +32,18 @@ fi
 gpg_eject_card() {
   gpg-connect-agent "scd serialno" "learn --force" /bye
 }
+
+gpg_temp() {
+  export GNUPGHOME
+  GNUPGHOME=$(mktemp -d "${TMPDIR:-/tmp}/$(date +%Y.%m.%d)-XXXXXXXX")
+  printf "\nTemporary directory:\t%s\n\n" "$GNUPGHOME"
+
+  curl https://raw.githubusercontent.com/drduh/YubiKey-Guide/main/config/gpg.conf --output "${GNUPGHOME}/gpg.conf"
+}
+
+gpg_temp_clean() {
+  if var_confirm "Delete ${GNUPGHOME}"; then
+    rm -rf "${GNUPGHOME}"
+    unset GNUPGHOME
+  fi
+}

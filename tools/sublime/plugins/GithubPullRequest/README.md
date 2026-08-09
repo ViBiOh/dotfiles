@@ -2,6 +2,8 @@
 
 **Review GitHub pull requests without leaving Sublime Text.** 🔍
 
+![](capture.png)
+
 Threads render on the lines they belong to, the gutter shows the PR diff, and you can write, batch, and submit review comments from the editor. All of it on demand, and none of it touches your git state.
 
 ```
