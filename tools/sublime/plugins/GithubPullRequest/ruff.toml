@@ -1,0 +1,13 @@
+target-version = "py38"
+
+extend-exclude = ["*.md"]
+
+[lint]
+extend-ignore = [
+    # Every subprocess call here inspects the return code by hand (a non-zero exit is
+    # a normal, recoverable outcome), so an implicit check=False is intentional.
+    "PLW1510",
+    # `from __future__ import annotations` would allow builtin generics, but the
+    # explicit typing.List/Optional style is the documented convention here.
+    "FA100",
+]

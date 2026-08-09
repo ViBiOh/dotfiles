@@ -169,9 +169,7 @@ class Review:
 
         base = self._pr["base"]
 
-        rc, out, _ = self._git_run(
-            ["git", "merge-base", "HEAD", "origin/{}".format(base)]
-        )
+        rc, out, _ = self._git_run(["git", "merge-base", "HEAD", f"origin/{base}"])
 
         if rc != 0:
             rc, out, _ = self._git_run(["git", "merge-base", "HEAD", base])
@@ -269,7 +267,7 @@ class Review:
     def base_blob(self, path: str) -> Optional[str]:
         merge_base = self.merge_base()
 
-        rc, out, _ = self._git_run(["git", "show", "{}:{}".format(merge_base, path)])
+        rc, out, _ = self._git_run(["git", "show", f"{merge_base}:{path}"])
 
         if rc != 0:
             return None
@@ -460,7 +458,8 @@ class Review:
         self._pending_review_id = None
 
     def submit_review(self, verdict: str, body: str = "") -> Dict:
-        assert verdict in _VERDICTS
+        if verdict not in _VERDICTS:
+            raise ValueError(f"unknown review verdict: {verdict}")
 
         # Push any comments that never reached GitHub into the pending review first,
         # so they are part of the review being submitted (raises if still offline).

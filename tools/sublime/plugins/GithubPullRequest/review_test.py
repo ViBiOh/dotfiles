@@ -126,7 +126,7 @@ class ScriptedGH:
         if args[:2] == ["gh", "api"]:
             return 0, self._canned.get("api", "{}"), ""
 
-        return 1, "", "unexpected gh call: {}".format(args)
+        return 1, "", f"unexpected gh call: {args}"
 
 
 class ScriptedGit:
@@ -141,16 +141,16 @@ class ScriptedGit:
 
         if "merge-base" in args:
             ref = args[-1]
-            key = "merge-base:{}".format(ref)
+            key = f"merge-base:{ref}"
             if key in self._responses:
                 return self._responses[key]
 
         if "show" in args:
-            key = "show:{}".format(args[-1])
+            key = f"show:{args[-1]}"
             if key in self._responses:
                 return self._responses[key]
 
-        return 1, "", "unexpected git call: {}".format(args)
+        return 1, "", f"unexpected git call: {args}"
 
 
 def _make_review(gh_runner, git_runner):
@@ -755,11 +755,11 @@ class SubmitReviewTest(unittest.TestCase):
             json.loads(api_calls[0]["stdin"]), {"event": "APPROVE", "body": "lgtm"}
         )
 
-    def test_invalid_verdict_asserts(self):
+    def test_invalid_verdict_raises(self):
         review = _make_review(ScriptedGH(pr_view=json.dumps(_PR_VIEW)), ScriptedGit())
         review.resolve_pr()
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             review.submit_review("MERGE")
 
 

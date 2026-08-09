@@ -1,14 +1,14 @@
 # GithubPullRequest — Design & Interface Contracts
 
-GitHub pull-request review inside Sublime Text 4. Transparent on startup; everything on-demand. Nothing happens until `PR: Load pull-request` runs.
+GitHub pull-request review inside Sublime Text 4. Transparent on startup; everything on-demand. Nothing happens until `GithubPullRequest: Load pull-request` runs.
 
-## Superseding decisions (this session)
+## Core decisions
 
 1. **Non-mutating diff.** The plugin NEVER mutates git. No `gh pr checkout`, no branch, no `reset`. The user is already on the PR branch (that is how the PR is inferred). The gutter diff is drawn with `view.set_reference_document(base_text)` against the merge-base blob, fetched with read-only `git show`. Only read-only git is ever used (`git show`, `git merge-base`, `git rev-parse`).
 2. **Pending-review batching (server-backed).** Comments queue into a real GitHub PENDING review (via GraphQL), then submit together with a verdict (APPROVE / COMMENT / REQUEST_CHANGES). Because the queue lives on GitHub, drafts survive crashes/restarts (restored by `load_pending` on reload) and show on github.com until submitted. The local `_drafts` list is just a display mirror.
 3. **Plugin-owned PR panel.** No Sublime API can badge the sidebar file tree, so a dedicated bottom output panel lists changed files with `+N -M` stats plus unresolved- and pending-comment counts, colored by a bundled syntax and navigable via `result_file_regex` (double-click / Enter / F4).
 
-Also removed since the first draft: deleted-line phantoms and LEFT-side (deleted-line) comment authoring (disliked in practice); the standalone quick-panel file list (folded into the bottom panel). Added: local **draft** comments shown with a distinct purple gutter icon and a pending popup.
+Deliberately out of scope: deleted-line phantoms and LEFT-side (deleted-line) comment authoring (tried, disliked in practice); a standalone quick-panel file list (folded into the bottom panel).
 
 ## Runtime constraints (BINDING for all modules)
 
@@ -21,7 +21,7 @@ Also removed since the first draft: deleted-line phantoms and LEFT-side (deleted
       from diff import parse_unified_diff
   ```
 - **`sublime` / `sublime_plugin` may be imported ONLY by the glue layer** (`plugin.py`, `state.py`). The core (`urls`, `diff`, `mapper`, `render`, `gh`, `review`) must import neither, so it is testable with plain `python3 -m unittest`.
-- Tests: `unittest`, files named `*_test.py`, **dict-keyed table cases** (`cases = {"name": (...)}`), in the SAME module namespace (no separate test package). Run `python3 -m unittest discover -p '*_test.py'`, `ruff check .`, `ruff format .` in the package dir.
+- Tests: `unittest`, files named `*_test.py`, **dict-keyed table cases** (`cases = {"name": (...)}`), in the SAME module namespace (no separate test package). Run `python3 -m unittest discover -p '*_test.py'`, `ruff check .`, `ruff format .` in the package dir. `ruff.toml` pins `target-version = "py38"` so the linter never suggests syntax the plugin host cannot run.
 
 ## GitHub coordinate model (READ THIS before touching mapper/review)
 
@@ -181,7 +181,7 @@ class GH:
 
     def pr_view(self, number: Optional[int] = None, fields: Optional[List[str]] = None) -> Dict:
         """`gh pr view [<number>] --json <fields>` -> parsed dict. Default fields:
-           number,title,baseRefName,headRefName,headRefOid,url,author,body,state."""
+           number,title,baseRefName,url,state."""
 ```
 
 `gh` NEVER runs `gh auth token`; it relies on gh's own credential store.
@@ -196,8 +196,8 @@ class Review:
 
     def resolve_pr(self) -> Dict:
         """Infer the PR from the current branch via gh.pr_view(); derive owner/repo from the
-           returned url. Returns {'number','title','base','head','head_oid','url','state',
-           'owner','repo'}. `_load` refuses to load unless state == 'OPEN' (open/draft)."""
+           returned url. Returns {'number','title','base','state','owner','repo'}.
+           `_load` refuses to load unless state == 'OPEN' (open/draft)."""
 
     def merge_base(self) -> str:
         """read-only `git merge-base HEAD origin/<base>` (fallback <base>). Cached."""
@@ -287,19 +287,14 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
 
 ---
 
-## Glue layer (Wave 3, imports `sublime`)
+## Glue layer (imports `sublime`)
 
 - `state.py` — `SESSION` singleton: `pr` meta, `threads_by_path`, `files` + `files_by_path`, `line_maps: Dict[str, LineMap]`, `review: Review`, `base_blob_cache`, `root`/`cwd`, `active`. Plus `unresolved_count`, `pending_by_path`, and `file_entries_for_panel` (alphabetical, enriched with `unresolved` + `pending` counts).
 - `plugin.py` — commands + `GithubPullRequestListener`. All gh/git calls run through `sublime.set_timeout_async`; UI mutation (regions, popups, panels, status) back on the main thread via `set_timeout`. Decoration = `set_reference_document` diff (empty base for new files → all green)
-  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Every placement (icons, popups, navigation, suggestion-apply) resolves the stored head-commit line to the live buffer row via `_remap_head_row`, which walks the buffer-vs-`git show HEAD` diff (opcodes cached per view by `change_count`) so icons track the right line even after local edits shift the buffer. Popups (hover or command) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are now network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. A queue that can't reach GitHub notifies but keeps the comment locally (no re-prompt). `End review` prompts `yes_no_cancel`: if there are unsent (local) comments, Submit to GitHub / Discard / Cancel (`flush_local` vs `clear_drafts`); otherwise, for the already-synced pending review, Keep on GitHub / Discard from GitHub / Cancel.
+  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Every placement (icons, popups, navigation, suggestion-apply) resolves the stored head-commit line to the live buffer row via `_remap_head_row`, which walks the buffer-vs-`git show HEAD` diff (opcodes cached per view by `change_count`) so icons track the right line even after local edits shift the buffer. Popups (on hover, or when comment navigation lands on a commented line) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. A queue that can't reach GitHub notifies but keeps the comment locally (no re-prompt). `End review` prompts `yes_no_cancel`: if there are unsent (local) comments, Submit to GitHub / Discard / Cancel (`flush_local` vs `clear_drafts`); otherwise, for the already-synced pending review, Keep on GitHub / Discard from GitHub / Cancel. Action links that are not plugin actions (or an `open` action) are handed to the browser only when they are `http(s)` — popup bodies come from comment HTML any PR participant can write.
 - `.sublime-commands` — palette entries, captions prefixed `GithubPullRequest:` (match siblings).
 - `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `hide_outdated` (bool; drops outdated threads in `_index_threads` so all surfaces exclude them), `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip), then `_open_compose` opens a scratch buffer in a split **below** the file (`_split_below_layout` adds a full-width bottom group; existing groups shrink into the top 70%). The buffer is prefilled with `"<emoji> <label>: "` (or, when the commented line(s) carry the reviewer's own local uncommitted edits — buffer vs `git show HEAD:<path>` via `_head_anchor` — with `"<label>:\n```suggestion\n<edited line(s)>\n```"`, fence on its own line, for ANY label). `_head_anchor` also maps the selected buffer rows onto the PR head-commit rows (walking the same diff) so the comment's `line`/`start_line` point at the head lines even when local edits shifted the buffer, keeping the suggestion applicable as-is. **Save** runs `github_pull_request_submit_comment` (bound in `Default.sublime-keymap`, context `setting.github_pull_request_compose`) which queues the whole buffer as the body; **closing without saving cancels**. `on_pre_close` restores the saved layout (`_restore_after_compose`) and refocuses the file for either path. The compose view carries `github_pull_request_compose` + a `context` (`{mode:"new", path, payload}`, `{mode:"edit", uid}`, or `{mode:"reply", thread_id}`) + source-id + orig-layout in its settings. The pending-popup **Edit** link reuses the split with `mode:"edit"` (prefilled with the current body; save updates it — server-side for synced drafts, mirror for local ones), and a thread **Reply** uses `mode:"reply"` (save posts via `reply_comment`, then `_reload_threads`). Only the review-summary prompt on submit still uses an input panel. Also `agent_command` (array, default `["claude"]`) and `agent_review_prompt` (`{base}` placeholder) for the `github_pull_request_review_in_tmux` command, which `tmux split-window`s the attached session (auto-detected via `tmux list-sessions`) in the repo root running `<agent_command> <prompt>` (joined + `shlex.quote`d into one shell string, prompt last); base = loaded PR base else `git symbolic-ref refs/remotes/origin/HEAD`. No git mutation (tmux + read-only git only).
 - `Default.sublime-keymap` — binds Save (`super+s` / `ctrl+s`) to `github_pull_request_submit_comment`, scoped by `setting.github_pull_request_compose` so it only affects the compose buffer.
 - `GithubPullRequestFiles.sublime-syntax` — colors the bottom panel (assigned to the output panel): `+N` green / `-M` red (markup.inserted/deleted), `(K unresolved)` yellow (markup.changed), `(P pending)` dimmed (comment), CODEOWNERS blue (entity.name.function, matched as `\S*@\S+`). Foreground-only scopes so there is no background fill.
-
-## Build waves
-
-1. Parallel: `urls`, `diff`, `mapper`, `render`, `gh` (+ `*_test.py`). Headless-verifiable.
-2. `review` (+ tests) composing Wave 1.
-3. Glue (`state`, `plugin`, menus, commands, settings). `py_compile` + `ruff` only.
-4. Wire `install_plugin "${TEXT_PKG}" "GithubPullRequest"` into `tools/sublime/init.sh`; final lint sweep.
+- `ruff.toml` — pins the lint target to Python 3.8 and mutes the rules that fight the constraints above (`FA100`, `PLW1510`).
+- Installation into this dotfiles repo: `install_plugin "${TEXT_PKG}" "GithubPullRequest"` in `tools/sublime/init.sh`.

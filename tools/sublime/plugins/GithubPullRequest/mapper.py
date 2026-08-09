@@ -20,9 +20,8 @@ class LineMap:
                 origin = getattr(line, "origin", "")
                 new_lineno = getattr(line, "new_lineno", None)
 
-                if new_lineno is not None:
-                    if max_new is None or new_lineno > max_new:
-                        max_new = new_lineno
+                if new_lineno is not None and (max_new is None or new_lineno > max_new):
+                    max_new = new_lineno
 
                 if origin in ("+", " ") and new_lineno is not None:
                     self._commentable.add(new_lineno)

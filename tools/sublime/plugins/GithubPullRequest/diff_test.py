@@ -324,14 +324,14 @@ class ParseUnifiedDiffTest(unittest.TestCase):
                         self.assertEqual(
                             getattr(file_diff, key),
                             value,
-                            "{}: file[{}].{}".format(name, file_idx, key),
+                            f"{name}: file[{file_idx}].{key}",
                         )
 
                     if "num_hunks" in expected:
                         self.assertEqual(
                             len(file_diff.hunks),
                             expected["num_hunks"],
-                            "{}: file[{}] hunk count".format(name, file_idx),
+                            f"{name}: file[{file_idx}] hunk count",
                         )
 
                     if "num_lines" in expected:
@@ -339,18 +339,14 @@ class ParseUnifiedDiffTest(unittest.TestCase):
                             self.assertEqual(
                                 len(file_diff.hunks[hunk_idx].lines),
                                 count,
-                                "{}: file[{}].hunk[{}] line count".format(
-                                    name, file_idx, hunk_idx
-                                ),
+                                f"{name}: file[{file_idx}].hunk[{hunk_idx}] line count",
                             )
 
                     for check in expected["lines"]:
                         hunk_idx, line_idx, origin, old, new, content = check
                         line = file_diff.hunks[hunk_idx].lines[line_idx]
 
-                        label = "{}: file[{}].hunk[{}].line[{}]".format(
-                            name, file_idx, hunk_idx, line_idx
-                        )
+                        label = f"{name}: file[{file_idx}].hunk[{hunk_idx}].line[{line_idx}]"
                         self.assertEqual(line.origin, origin, label + " origin")
                         self.assertEqual(line.old_lineno, old, label + " old_lineno")
                         self.assertEqual(line.new_lineno, new, label + " new_lineno")

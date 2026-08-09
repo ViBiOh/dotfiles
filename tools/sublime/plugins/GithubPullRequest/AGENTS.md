@@ -42,7 +42,7 @@ Comments are authored with the modern REST fields: `side` (`RIGHT`=head, `LEFT`=
 
 ## Conventions
 
-- **Python 3.8-safe, stdlib only.** No `X | Y` unions, no builtin generics in annotations (`typing.List/Optional/Dict/Tuple`), no `match`. The Sublime plugin host is 3.8.
+- **Python 3.8-safe, stdlib only.** No `X | Y` unions, no builtin generics in annotations (`typing.List/Optional/Dict/Tuple`), no `match`, no `str.removeprefix`. The Sublime plugin host is 3.8, and `ruff.toml` pins `target-version = "py38"` so the linter enforces it (the repo-wide `.python-version` would otherwise make ruff suggest syntax the host cannot run).
 - **Dual-import** in every module so tests run standalone and inside Sublime:
   ```python
   try:
@@ -51,6 +51,7 @@ Comments are authored with the modern REST fields: `side` (`RIGHT`=head, `LEFT`=
       from diff import parse_unified_diff
   ```
 - **Tests**: `unittest`, files named `*_test.py`, in the same module namespace, dict-keyed table cases (`cases = {"name": (...)}` + `subTest`). Core modules mock `gh`/git via injected runners — never hit the network or real git.
+- **Untrusted input.** Comment bodies and their rendered HTML come from anyone who can comment on the PR. `render.html_to_minihtml` whitelists tags and escapes all text; `plugin._open_external` refuses to hand any non-`http(s)` link to the browser. Keep both gates in place when adding popup content.
 - **Naming**: command classes are `GithubPullRequest<Verb>Command`; Sublime derives the command id by snake_casing minus `Command` (e.g. `GithubPullRequestLoadCommand` → `github_pull_request_load`). Keep `.sublime-commands` and `run_command(...)` strings in sync.
 
 ## Checks (run all before finishing)
@@ -67,7 +68,6 @@ The glue (`plugin.py`, `state.py`) cannot be exercised outside Sublime — verif
 
 ## Known minor issues / deferred (good first tasks)
 
-- **Markdown fallback suggestion indexing** (`render._render_body`): the non-`body_html` popup path counts suggestions with `_FENCE_RE` while the Apply handler uses `_SUGGESTION_RE`, so indices could diverge. Real GitHub data always has `body_html` (both sides then use `suggestions_in`), so this is effectively test-only. Unify the two if you touch it.
 - **base-blob caching**: a transient `git show` failure caches `None` for the file for the session, so its gutter diff won't retry until reload. Intentional (avoids re-spawning git on every activate); revisit if it bites.
 - **Pending vs published threads**: the draft queue is a server-side PENDING review. `reviewThreads` DOES return the viewer's own pending draft threads, so `review_threads()` skips any thread whose root comment has `state == "PENDING"` (they are surfaced through the pending-review mirror instead); otherwise a draft would show twice — once as a blue thread and once as a purple draft. Deleting a pending review's last comment auto-removes the now-empty review, so `_delete_pending_review` tolerates a `deletePullRequestReview` that no longer resolves.
 - Deferred features: outdated-comment re-anchoring, reactions, viewed-file state, CI-checks display, multiple concurrent PRs.
