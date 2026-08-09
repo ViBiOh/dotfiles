@@ -18,15 +18,22 @@ Two layers:
 | --- | --- |
 | `urls.py` | `parse_pr_url(url)` → `{host, owner, repo, number}`. |
 | `diff.py` | `parse_unified_diff(text)` → `[FileDiff]` (hunks, per-line old/new numbers). |
-| `mapper.py` | `LineMap(file_diff)`: buffer row ↔ GitHub `(side, line)` coords, `is_commentable`, `anchor_to_row`, `comment_range` (single + multi-line payloads). Duck-typed on `file_diff` (does NOT import `diff`). Plus the pure local-edit helpers `head_anchor` / `head_row_to_buffer_row`, which walk difflib opcodes (committed file vs live buffer); `plugin.py` owns the git/view I/O that produces those opcodes and decides suggestion prefill from the `has_edit` they return. |
+| `mapper.py` | `LineMap(file_diff)`: buffer row ↔ GitHub `(side, line)` coords, `is_commentable`, `anchor_to_row`, `comment_range` (single + multi-line payloads). Duck-typed on `file_diff` (does NOT import `diff`). Plus the pure local-edit helpers `head_anchor` / `head_row_to_buffer_row`, which walk difflib opcodes (committed file vs live buffer), and the head-side span normalizers `thread_line` / `thread_start_line` / `thread_span` / `draft_span` / `payload_span` / `payload_range_label`. `anchors.py` owns the git/view I/O that produces the opcodes. |
+| `repo.py` | Read-only git (`git_root`, `run_git`) + repo-relative path mapping (`rel_path`, `abs_path`). |
+| `owners.py` | `codeowners_map(root, paths, runner=None)`: one `codeowners --` call for every path; degrades to `{}` on any failure. |
+| `layout.py` | `split_below_layout(layout, fraction)`: the compose split's window-layout arithmetic. |
+| `labels.py` | `DEFAULT_COMMENT_LABELS` + `label_tag(entry)` for the Conventional Comments picker. |
+| `panel.py` | Text model for the changed-files panel: `files_panel_text`, `first_hunk_line`, `first_comment_line`, `drafts_for_path`. Reads `SESSION`; builds text only (colouring is the syntax file's job). |
 | `render.py` | Pure minihtml builders: thread popup, pending popup, `bodyHTML`→minihtml sanitizer, suggestion extraction, `subl:githubpullrequest?...` action encode/decode. |
 | `gh.py` | Injectable subprocess client: `api` (with JSON `--input -` bodies), `graphql`, `pr_diff`, `pr_view`. |
-| `review.py` | Service composing the above: `resolve_pr`, `changed_files`, `review_threads` (GraphQL, paginated), `base_blob` (read-only `git show`), the server-backed draft queue (a real GitHub PENDING review — `load_pending`/`queue_comment`/`discard_draft`/`clear_drafts`/`flush_local`; `_drafts` are synced with `comment_id`s, `_local_comments` are unsynced fallbacks kept on API failure and flushed on submit), `submit_review`, `reply_comment`, `set_thread_resolved`. Raises `CommentRejected` (a `GHError`) when GitHub refuses to anchor a comment. |
+| `review.py` | Service composing the above: `resolve_pr`, `changed_files`, `review_threads` (GraphQL, paginated), `base_blob` (read-only `git show`), the server-backed draft queue (a real GitHub PENDING review — `load_pending`/`queue_comment`/`discard_draft`/`clear_drafts`/`flush_local`; `_drafts` are synced with `comment_id`s, `_local_comments` are unsynced fallbacks kept on API failure and flushed on submit), `submit_review`, `reply_comment`, `set_thread_resolved`. Raises `CommentRejected` (a `GHError`) when GitHub refuses to anchor a comment; such a comment is dropped rather than queued, by BOTH `queue_comment` and `flush_local` (re-queuing it would fail identically and wedge every later submit). |
 
-**Sublime glue** (`plugin.py` + `state.py`, imports `sublime`, only `py_compile` + `ruff` checkable headlessly):
+`state.py` imports no `sublime` either: the `SESSION` singleton (loaded PR, threads by path, line maps, base-blob cache, `Review` instance) + panel-entry enrichment (unresolved/pending counts).
 
-- `state.py` — the `SESSION` singleton (loaded PR, threads by path, line maps, base-blob cache, `Review` instance) + panel-entry enrichment (unresolved/pending counts).
-- `plugin.py` — commands (`GithubPullRequest*Command`), the `GithubPullRequestListener`, decoration (reference-doc diff, thread + draft gutter icons), popups + action-link dispatch, the changed-files output panel, the async→main threading split.
+**Sublime glue** (imports `sublime`, only `py_compile` + `ruff` checkable headlessly):
+
+- `anchors.py` — where a comment lives in the buffer RIGHT NOW. Owns the buffer↔head coordinate translation (`selection_to_head` for authoring, `remap_head_row` for placement), the covered-row helpers (`thread_rows` / `draft_rows` / `thread_row`), and both caches (`view_opcodes` keyed on `change_count`; thread rows also keyed on `_THREADS_STAMP`, invalidated via `bump_threads_stamp`, `forget_view`, `clear_caches` since `global` cannot cross modules). The pure arithmetic lives in `mapper.py` and is tested there.
+- `plugin.py` — commands (`GithubPullRequest*Command`), the `GithubPullRequestListener`, decoration (reference-doc diff, thread + draft gutter icons), popups + action-link dispatch, the compose split, output-panel wiring, and the async→main threading split.
 
 ### Threading
 
@@ -34,7 +41,7 @@ Every gh/git call runs under `_async(...)` (`sublime.set_timeout_async`). Every 
 
 ### GitHub coordinate model
 
-Comments are authored with the modern REST fields: `side` (`RIGHT`=head, `LEFT`=base), `line`, and `start_line`/`start_side` for multi-line. The buffer holds PR **head**, so head row `R` ↔ line `R+1`; when the reviewer's local edits shift buffer rows, `_head_anchor` maps the selection back onto head rows before this holds. `mapper.comment_range` produces the payload from head rows; `review.queue_comment(path, payload, body)` stores it; `submit_review` posts `comments[]` in one `POST /pulls/{n}/reviews`.
+Comments are authored with the modern REST fields: `side` (`RIGHT`=head, `LEFT`=base), `line`, and `start_line`/`start_side` for multi-line. The buffer holds PR **head**, so head row `R` ↔ line `R+1`; when the reviewer's local edits shift buffer rows, `anchors.selection_to_head` maps the selection back onto head rows before this holds. `mapper.comment_range` produces the payload from head rows; `review.queue_comment(path, payload, body)` stores it; `submit_review` posts `comments[]` in one `POST /pulls/{n}/reviews`.
 
 ### gh variable typing (subtle, already bitten once)
 

@@ -376,9 +376,8 @@ class Review:
             # local diff went stale). Without this the null would blow up below as a
             # TypeError, which is not a GHError, so the comment would vanish silently.
             raise CommentRejected(
-                "GitHub would not anchor a comment on {} {}".format(
-                    draft["path"], _span_label(draft)
-                )
+                f"GitHub would not anchor a comment on {draft['path']} "
+                f"{_span_label(draft)}"
             )
 
         nodes = thread["comments"]["nodes"]
@@ -419,18 +418,37 @@ class Review:
         return len(self._local_comments)
 
     def flush_local(self) -> None:
-        """Sync every local (unsynced) comment to the pending review. On failure the
-        already-synced ones stay synced and the rest remain local; GHError re-raises."""
+        """Sync every local (unsynced) comment to the pending review.
+
+        A comment GitHub refuses outright is DROPPED (never put back) and reported via
+        CommentRejected once the rest have been flushed: keeping it local would fail
+        identically on every later submit and wedge the review for good. A transient
+        failure keeps the already-synced ones synced, leaves the rest local, and
+        re-raises, so a retry resumes where it stopped."""
         pending = self._local_comments
         self._local_comments = []
+        rejected = []
+
         for index, draft in enumerate(pending):
             try:
                 self._sync_draft(draft)
+            except CommentRejected as err:
+                rejected.append(str(err))
+                continue
             except GHError:
+                # Transient: the current draft and everything after it stay local.
+                # Earlier rejections stay dropped (they are before `index`).
                 self._local_comments = pending[index:]
                 raise
 
             self._drafts.append(draft)
+
+        if rejected:
+            details = "\n".join(rejected)
+
+            raise CommentRejected(
+                f"dropped {len(rejected)} comment(s) GitHub would not anchor:\n{details}"
+            )
 
     def _find_draft(self, uid: int):
         """(list, index, draft) for the draft with this uid, else (None, None, None).
@@ -504,9 +522,8 @@ class Review:
             )
         else:
             # No queued comments: post a bare review (e.g. a plain APPROVE) via REST.
-            path = "repos/{}/{}/pulls/{}/reviews".format(
-                self._pr["owner"], self._pr["repo"], self._pr["number"]
-            )
+            owner, repo = self._pr["owner"], self._pr["repo"]
+            path = f"repos/{owner}/{repo}/pulls/{self._pr['number']}/reviews"
             result = self._gh.api(
                 path, method="POST", input_obj={"event": verdict, "body": body}
             )

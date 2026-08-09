@@ -3,8 +3,10 @@ import unittest
 from types import SimpleNamespace
 
 try:
+    from . import mapper
     from .mapper import LineMap, head_anchor, head_row_to_buffer_row
 except ImportError:
+    import mapper
     from mapper import LineMap, head_anchor, head_row_to_buffer_row
 
 
@@ -267,3 +269,69 @@ class HeadRowToBufferRowTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SpansTest(unittest.TestCase):
+    def test_thread_span(self):
+        cases = {
+            "single_line": ({"line": 7}, (7, 7)),
+            "multi_line": ({"line": 11, "start_line": 7}, (7, 11)),
+            "falls_back_to_original_line": ({"original_line": 4}, (4, 4)),
+            "falls_back_to_original_start": (
+                {"line": 11, "original_start_line": 7},
+                (7, 11),
+            ),
+            "current_start_wins_over_original": (
+                {"line": 11, "start_line": 9, "original_start_line": 2},
+                (9, 11),
+            ),
+            "reversed_range_is_normalized": (
+                {"line": 7, "start_line": 11},
+                (7, 7),
+            ),
+            "unanchored": ({}, None),
+            "unanchored_with_start_only": ({"start_line": 5}, None),
+        }
+
+        for name, (thread, expected) in cases.items():
+            with self.subTest(name):
+                self.assertEqual(mapper.thread_span(thread), expected)
+
+    def test_draft_span(self):
+        cases = {
+            "single_line": ({"line": 3}, (3, 3)),
+            "multi_line": ({"line": 9, "start_line": 5}, (5, 9)),
+            "reversed_is_normalized": ({"line": 5, "start_line": 9}, (5, 5)),
+            "unanchored": ({}, None),
+            "line_zero_is_unanchored": ({"line": 0}, None),
+        }
+
+        for name, (draft, expected) in cases.items():
+            with self.subTest(name):
+                self.assertEqual(mapper.draft_span(draft), expected)
+
+    def test_payload_span_and_label(self):
+        cases = {
+            "single_line": ({"side": "RIGHT", "line": 7}, (7, 7), "L7"),
+            "multi_line": (
+                {"side": "RIGHT", "line": 11, "start_line": 7},
+                (7, 11),
+                "L7-L11",
+            ),
+            "explicit_equal_start": (
+                {"side": "RIGHT", "line": 7, "start_line": 7},
+                (7, 7),
+                "L7",
+            ),
+        }
+
+        for name, (payload, span, label) in cases.items():
+            with self.subTest(name):
+                self.assertEqual(mapper.payload_span(payload), span)
+                self.assertEqual(mapper.payload_range_label(payload), label)
+
+    def test_thread_line_helpers(self):
+        thread = {"line": 11, "start_line": 7}
+
+        self.assertEqual(mapper.thread_line(thread), 11)
+        self.assertEqual(mapper.thread_start_line(thread), 7)

@@ -1,6 +1,65 @@
 from typing import Dict, Optional, Tuple
 
 # --------------------------------------------------------------------------- #
+# Head-side spans.
+#
+# A thread, a queued draft and a comment payload each describe an inclusive range of
+# head-side lines, but spell it differently (`line`/`startLine`, with `original*`
+# fallbacks for threads whose current position GitHub no longer reports). These
+# normalize that to one shape so callers never re-derive it.
+# --------------------------------------------------------------------------- #
+
+
+def thread_line(thread: Dict) -> Optional[int]:
+    """Last head-side line a thread covers: its current line, else its original."""
+    return thread.get("line") or thread.get("original_line")
+
+
+def thread_start_line(thread: Dict) -> Optional[int]:
+    """First head-side line a thread covers. Equals ``thread_line`` on a single-line
+    thread; on a multi-line one it is where GitHub starts the highlighted range."""
+    return (
+        thread.get("start_line")
+        or thread.get("original_start_line")
+        or thread_line(thread)
+    )
+
+
+def thread_span(thread: Dict) -> Optional[Tuple[int, int]]:
+    """(first, last) head-side lines a thread covers, or None when unanchored."""
+    end = thread_line(thread)
+    if end is None:
+        return None
+
+    return min(thread_start_line(thread), end), end
+
+
+def draft_span(draft: Dict) -> Optional[Tuple[int, int]]:
+    """(first, last) head-side lines a queued draft covers, or None when unanchored.
+    Drafts are authored RIGHT-side only."""
+    end = draft.get("line")
+    if not end:
+        return None
+
+    return min(draft.get("start_line") or end, end), end
+
+
+def payload_span(payload: Dict) -> Tuple[int, int]:
+    """(first, last) head-side lines a comment payload will cover. A payload with no
+    `start_line` is single-line, which is exactly what GitHub renders."""
+    end = payload["line"]
+
+    return payload.get("start_line", end), end
+
+
+def payload_range_label(payload: Dict) -> str:
+    """'L7' / 'L7-L11' for the compose tab title."""
+    start, end = payload_span(payload)
+
+    return f"L{end}" if start == end else f"L{start}-L{end}"
+
+
+# --------------------------------------------------------------------------- #
 # Local-edit mapping (buffer vs the committed head file).
 #
 # These walk difflib opcodes produced with the COMMITTED file as `a` and the LIVE
@@ -10,7 +69,9 @@ from typing import Dict, Optional, Tuple
 # --------------------------------------------------------------------------- #
 
 
-def head_anchor(opcodes, start_row: int, end_row: int) -> Tuple:
+def head_anchor(
+    opcodes, start_row: int, end_row: int
+) -> Tuple[Optional[int], Optional[int], bool]:
     """Map a 0-based buffer-row selection onto the head-commit rows it covers, plus
     whether it carries the reviewer's local (uncommitted) edits.
 

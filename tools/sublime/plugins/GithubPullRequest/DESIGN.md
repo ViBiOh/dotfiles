@@ -20,7 +20,7 @@ Deliberately out of scope: deleted-line phantoms and LEFT-side (deleted-line) co
   except ImportError:
       from diff import parse_unified_diff
   ```
-- **`sublime` / `sublime_plugin` may be imported ONLY by the glue layer** (`plugin.py`, `state.py`). The core (`urls`, `diff`, `mapper`, `render`, `gh`, `review`) must import neither, so it is testable with plain `python3 -m unittest`.
+- **`sublime` / `sublime_plugin` may be imported ONLY by the glue layer** (`plugin.py`, `anchors.py`). Every other module (`urls`, `diff`, `mapper`, `render`, `gh`, `review`, `state`, `repo`, `owners`, `layout`, `labels`, `panel`) must import neither, so it is testable with plain `python3 -m unittest`. When something needs a view, prefer duck-typing it (`repo.rel_path` only calls `view.file_name()`) over reaching for `sublime`.
 - Tests: `unittest`, files named `*_test.py`, **dict-keyed table cases** (`cases = {"name": (...)}`), in the SAME module namespace (no separate test package). Run `python3 -m unittest discover -p '*_test.py'`, `ruff check .`, `ruff format .` in the package dir. `ruff.toml` pins `target-version = "py38"` so the linter never suggests syntax the plugin host cannot run.
 
 ## GitHub coordinate model (READ THIS before touching mapper/review)
@@ -87,10 +87,42 @@ def parse_unified_diff(text: str) -> List[FileDiff]:
        `\\ No newline at end of file`, and multiple hunks per file."""
 ```
 
+### `repo.py` / `owners.py` / `layout.py` / `labels.py` / `panel.py` (NO `sublime` import)
+
+```python
+# repo.py     read-only git + repo-relative paths
+def git_root(path: str) -> Optional[str]: ...          # None outside a repo
+def run_git(root: str, args: List[str]) -> Tuple[int, str]:
+    """(returncode, stdout); (1, "") on any failure so callers only branch on the code."""
+def rel_path(view) -> Optional[str]: ...               # duck-typed on view.file_name()
+def abs_path(rel: str) -> str: ...
+
+# owners.py   CODEOWNERS, best effort
+def codeowners_map(root, paths, runner=None) -> Dict[str, str]:
+    """ONE `codeowners -- <paths>` call. {} on any failure; '(unowned)' -> ''."""
+
+# layout.py   compose-split geometry
+def split_below_layout(layout: Dict, fraction: float = 0.7) -> Dict:
+    """Add a full-width group below, existing groups scaled into the top `fraction`.
+       Does not mutate the input."""
+
+# labels.py   Conventional Comments picker data
+DEFAULT_COMMENT_LABELS: List[Dict]                     # {emoji?, label, description}
+def label_tag(entry: Dict) -> str: ...                 # '💡 suggestion' | 'suggestion'
+
+# panel.py    changed-files panel TEXT (colouring is the syntax file's job)
+def drafts_for_path(path) -> List[Tuple[int, Dict]]: ...   # (uid, draft), RIGHT side only
+def first_hunk_line(path) -> int: ...                      # else 1
+def first_comment_line(path) -> int:
+    """Earliest unresolved thread or pending draft (multi-line counts from its START),
+       else earliest thread, else first hunk."""
+def files_panel_text() -> Optional[str]: ...               # None when no files changed
+```
+
 ### `mapper.py`
 
 ```python
-def head_anchor(opcodes, start_row: int, end_row: int) -> Tuple:
+def head_anchor(opcodes, start_row, end_row) -> Tuple[Optional[int], Optional[int], bool]:
     """Pure. difflib opcodes (committed file as `a`, live buffer as `b`) + a buffer row span
        -> (first_head_row, last_head_row, has_edit), or (None, None, has_edit) when the span
        covers no head line (a purely local insertion). `has_edit` drives suggestion prefill.
@@ -99,7 +131,7 @@ def head_anchor(opcodes, start_row: int, end_row: int) -> Tuple:
 
 def head_row_to_buffer_row(opcodes, head_row: int) -> Optional[int]:
     """Pure. Where a head-commit row currently sits in the buffer; changed/removed head rows
-       anchor to their block start. plugin._remap_head_row wraps this with the opcode cache."""
+       anchor to their block start. anchors.remap_head_row wraps this with the opcode cache."""
 
 class LineMap:
     def __init__(self, file_diff: FileDiff) -> None: ...
@@ -110,7 +142,7 @@ class LineMap:
     def anchor_to_row(self, side: str, line: int) -> Optional[int]:
         """Thread's (side, line) -> 0-based HEAD-commit row. RIGHT: row = line - 1.
            LEFT: the head row of the hunk boundary the deleted line sits at.
-           (plugin.py's `_remap_head_row` then shifts this to the live buffer row.)"""
+           (`anchors.remap_head_row` then shifts this to the live buffer row.)"""
 
     def comment_range(self, start_row: int, end_row: int) -> Optional[Dict]:
         """RIGHT-side (multi-line) comment payload for a buffer row span. Returns
@@ -163,17 +195,12 @@ def decode_action(href: str) -> Optional[Dict]:
     """Inverse. -> {'action': str, **params(str values)} or None if not a githubpullrequest href."""
 ````
 
-The bottom file panel is built in `plugin.py`: a file row `+N -M  path:hunkline  <owners>` and, when the file has comments, an indented `(K unresolved) (P pending)  path:commentline` row. Owners come from a single `codeowners -- <all paths>` call at load (`_codeowners_map`, cached in `SESSION.owners_by_path`); they trail the `path:line` nav token so column alignment is preserved and `result_file_regex` (no longer `$`-anchored) still finds the target. Colored by `GithubPullRequestFiles.sublime-syntax`, not by `render.py`.
+The bottom file panel's text is built in `panel.py` (`plugin.py` only creates the output panel and its settings): a file row `+N -M  path:hunkline  <owners>` and, when the file has comments, an indented `(K unresolved) (P pending)  path:commentline` row. Owners come from a single `codeowners -- <all paths>` call at load (`owners.codeowners_map`, cached in `SESSION.owners_by_path`); they trail the `path:line` nav token so column alignment is preserved and `result_file_regex` (no longer `$`-anchored) still finds the target. Colored by `GithubPullRequestFiles.sublime-syntax`, not by `render.py`.
 
 ### `gh.py` (injectable subprocess client; NO `sublime` import)
 
 ```python
 class GHError(Exception): ...
-
-class CommentRejected(GHError):
-    """GitHub answered 200 with `thread: null` and no `errors` array, meaning it refuses to
-       anchor the comment (lines the PR diff does not carry). Permanent, unlike a plain
-       GHError, so the comment is never kept in the local queue."""
 
 Runner = Callable[..., Tuple[int, str, str]]
 # runner(args, cwd, stdin=None) -> (returncode, stdout, stderr). Default uses subprocess with a
@@ -207,6 +234,12 @@ class GH:
 ### `review.py` (service; NO `sublime` import)
 
 ```python
+class CommentRejected(GHError):
+    """GitHub answered 200 with `thread: null` and no `errors` array, meaning it refuses to
+       anchor the comment (lines the PR diff does not carry). Permanent, unlike a plain
+       GHError, so the comment is never kept in the local queue (see queue_comment /
+       flush_local)."""
+
 class Review:
     def __init__(self, gh: GH, cwd: str,
                  git_runner: Optional[Runner] = None) -> None:
@@ -257,8 +290,11 @@ class Review:
     def local_count(self) -> int: ...  # number of unsynced comments
 
     def flush_local(self) -> None:
-        """Sync every _local_comment to the pending review. On failure the already-synced
-           ones stay in _drafts and the rest stay local; GHError re-raises."""
+        """Sync every _local_comment to the pending review. A CommentRejected one is DROPPED
+           (never put back) and reported by raising CommentRejected after the rest flushed:
+           re-queuing it would fail identically and wedge every later submit. On a transient
+           GHError the already-synced ones stay in _drafts, the current one and those after it
+           stay local, and it re-raises so a retry resumes where it stopped."""
 
     def discard_draft(self, uid: int) -> None:
         """Find the draft by uid. Synced -> deletePullRequestReviewComment (and
@@ -309,11 +345,12 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
 
 ## Glue layer (imports `sublime`)
 
-- `state.py` — `SESSION` singleton: `pr` meta, `threads_by_path`, `files` + `files_by_path`, `line_maps: Dict[str, LineMap]`, `review: Review`, `base_blob_cache`, `root`/`cwd`, `active`. Plus `unresolved_count`, `pending_by_path`, and `file_entries_for_panel` (alphabetical, enriched with `unresolved` + `pending` counts).
+- `state.py` — `SESSION` singleton (no `sublime` import): `pr` meta, `threads_by_path`, `files` + `files_by_path`, `line_maps: Dict[str, LineMap]`, `review: Review`, `base_blob_cache`, `root`, `active`. Plus `unresolved_count`, `pending_by_path`, and `file_entries_for_panel` (alphabetical, enriched with `unresolved` + `pending` counts).
+- `anchors.py` — the only module that knows where a comment sits in the buffer right now. `selection_to_head(view, start_row, end_row)` maps a selection buffer→head when authoring; `remap_head_row(view, head_row)` maps head→buffer for every placement (icons, popups, navigation, suggestion-apply), so icons track the right line even after local edits shift the buffer. `thread_rows` / `draft_rows` give a comment's whole covered span (github.com highlights the full range) while `thread_row` (its first row) stays the single navigation stop. Two caches: `view_opcodes` keyed on `change_count`, and thread rows additionally keyed on `_THREADS_STAMP` because `on_hover` hit-tests every thread on each mouse move. Invalidation is exposed as `bump_threads_stamp()` (called after the thread index is rebuilt), `forget_view(view_id)` and `clear_caches()`, since `global` cannot cross modules. The pure arithmetic it drives lives in `mapper.py`.
 - `plugin.py` — commands + `GithubPullRequestListener`. All gh/git calls run through `sublime.set_timeout_async`; UI mutation (regions, popups, panels, status) back on the main thread via `set_timeout`. Decoration = `set_reference_document` diff (empty base for new files → all green)
-  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`). Every placement (icons, popups, navigation, suggestion-apply) resolves the stored head-commit line to the live buffer row via `_remap_head_row`, which walks the buffer-vs-`git show HEAD` diff (opcodes cached per view by `change_count`) so icons track the right line even after local edits shift the buffer. Popups (on hover, or when comment navigation lands on a commented line) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. A queue that can't reach GitHub notifies but keeps the comment locally (no re-prompt). `End review` prompts `yes_no_cancel`: if there are unsent (local) comments, Submit to GitHub / Discard / Cancel (`flush_local` vs `clear_drafts`); otherwise, for the already-synced pending review, Keep on GitHub / Discard from GitHub / Cancel. Action links that are not plugin actions (or an `open` action) are handed to the browser only when they are `http(s)` — popup bodies come from comment HTML any PR participant can write.
+  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`), placed through `anchors`. Popups (on hover, or when comment navigation lands on a commented line) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. A queue that can't reach GitHub notifies but keeps the comment locally (no re-prompt). `End review` prompts `yes_no_cancel`: if there are unsent (local) comments, Submit to GitHub / Discard / Cancel (`flush_local` vs `clear_drafts`); otherwise, for the already-synced pending review, Keep on GitHub / Discard from GitHub / Cancel. Action links that are not plugin actions (or an `open` action) are handed to the browser only when they are `http(s)` — popup bodies come from comment HTML any PR participant can write.
 - `.sublime-commands` — palette entries, captions prefixed `GithubPullRequest:` (match siblings).
-- `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `hide_outdated` (bool; drops outdated threads in `_index_threads` so all surfaces exclude them), `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip), then `_open_compose` opens a scratch buffer in a split **below** the file (`_split_below_layout` adds a full-width bottom group; existing groups shrink into the top 70%). The buffer is prefilled with `"<emoji> <label>: "` (or, when the commented line(s) carry the reviewer's own local uncommitted edits — buffer vs `git show HEAD:<path>` via `_head_anchor` — with `"<label>:\n```suggestion\n<edited line(s)>\n```"`, fence on its own line, for ANY label). `_head_anchor` also maps the selected buffer rows onto the PR head-commit rows (walking the same diff, via the pure `mapper.head_anchor`) so the comment's `line`/`start_line` point at the head lines even when local edits shifted the buffer, keeping the suggestion applicable as-is. Locally DELETED lines count as edits too and pull their head lines into the range, which is what makes a "remove these lines" suggestion possible (they are zero-width in the buffer, so they are matched as a position between rows, not by row overlap). **Save** runs `github_pull_request_submit_comment` (bound in `Default.sublime-keymap`, context `setting.github_pull_request_compose`) which queues the whole buffer as the body; **closing without saving cancels**. `on_pre_close` restores the saved layout (`_restore_after_compose`) and refocuses the file for either path. The compose view carries `github_pull_request_compose` + a `context` (`{mode:"new", path, payload}`, `{mode:"edit", uid}`, or `{mode:"reply", thread_id}`) + source-id + orig-layout in its settings. The pending-popup **Edit** link reuses the split with `mode:"edit"` (prefilled with the current body; save updates it — server-side for synced drafts, mirror for local ones), and a thread **Reply** uses `mode:"reply"` (save posts via `reply_comment`, then `_reload_threads`). Only the review-summary prompt on submit still uses an input panel. Also `agent_command` (array, default `["claude"]`) and `agent_review_prompt` (`{base}` placeholder) for the `github_pull_request_review_in_tmux` command, which `tmux split-window`s the attached session (auto-detected via `tmux list-sessions`) in the repo root running `<agent_command> <prompt>` (joined + `shlex.quote`d into one shell string, prompt last); base = loaded PR base else `git symbolic-ref refs/remotes/origin/HEAD`. No git mutation (tmux + read-only git only).
+- `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `hide_outdated` (bool; drops outdated threads in `_index_threads` so all surfaces exclude them), `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip), then `_open_compose` opens a scratch buffer in a split **below** the file (`layout.split_below_layout` adds a full-width bottom group; existing groups shrink into the top 70%). The buffer is prefilled with `"<emoji> <label>: "` (or, when the commented line(s) carry the reviewer's own local uncommitted edits — buffer vs `git show HEAD:<path>` via `anchors.selection_to_head` — with `"<label>:\n```suggestion\n<edited line(s)>\n```"`, fence on its own line, for ANY label). `anchors.selection_to_head` also maps the selected buffer rows onto the PR head-commit rows (walking the same diff, via the pure `mapper.head_anchor`) so the comment's `line`/`start_line` point at the head lines even when local edits shifted the buffer, keeping the suggestion applicable as-is. Locally DELETED lines count as edits too and pull their head lines into the range, which is what makes a "remove these lines" suggestion possible (they are zero-width in the buffer, so they are matched as a position between rows, not by row overlap). **Save** runs `github_pull_request_submit_comment` (bound in `Default.sublime-keymap`, context `setting.github_pull_request_compose`) which queues the whole buffer as the body; **closing without saving cancels**. `on_pre_close` restores the saved layout (`_restore_after_compose`) and refocuses the file for either path. The compose view carries `github_pull_request_compose` + a `context` (`{mode:"new", path, payload}`, `{mode:"edit", uid}`, or `{mode:"reply", thread_id}`) + source-id + orig-layout in its settings. The pending-popup **Edit** link reuses the split with `mode:"edit"` (prefilled with the current body; save updates it — server-side for synced drafts, mirror for local ones), and a thread **Reply** uses `mode:"reply"` (save posts via `reply_comment`, then `_reload_threads`). Only the review-summary prompt on submit still uses an input panel. Also `agent_command` (array, default `["claude"]`) and `agent_review_prompt` (`{base}` placeholder) for the `github_pull_request_review_in_tmux` command, which `tmux split-window`s the attached session (auto-detected via `tmux list-sessions`) in the repo root running `<agent_command> <prompt>` (joined + `shlex.quote`d into one shell string, prompt last); base = loaded PR base else `git symbolic-ref refs/remotes/origin/HEAD`. No git mutation (tmux + read-only git only).
 - `Default.sublime-keymap` — binds Save (`super+s` / `ctrl+s`) to `github_pull_request_submit_comment`, scoped by `setting.github_pull_request_compose` so it only affects the compose buffer.
 - `GithubPullRequestFiles.sublime-syntax` — colors the bottom panel (assigned to the output panel): `+N` green / `-M` red (markup.inserted/deleted), `(K unresolved)` yellow (markup.changed), `(P pending)` dimmed (comment), CODEOWNERS blue (entity.name.function, matched as `\S*@\S+`). Foreground-only scopes so there is no background fill.
 - `ruff.toml` — pins the lint target to Python 3.8 and mutes the rules that fight the constraints above (`FA100`, `PLW1510`).

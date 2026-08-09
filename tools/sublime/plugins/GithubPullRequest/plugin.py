@@ -11,7 +11,6 @@ lifting (gh / git subprocess calls) lives in the pure-Python core; this module o
 * queues comments into a local draft and submits them as one review.
 """
 
-import difflib
 import os
 import shlex
 import subprocess
@@ -22,14 +21,56 @@ import sublime_plugin
 
 try:
     from . import render
+    from .anchors import (
+        bump_threads_stamp,
+        clear_caches,
+        draft_rows,
+        forget_view,
+        remap_head_row,
+        selection_to_head,
+        thread_row,
+        thread_rows,
+    )
     from .gh import GH, GHError
-    from .mapper import LineMap, head_anchor, head_row_to_buffer_row
+    from .labels import DEFAULT_COMMENT_LABELS, label_tag
+    from .layout import split_below_layout
+    from .mapper import (
+        LineMap,
+        payload_range_label,
+        payload_span,
+        thread_span,
+        thread_start_line,
+    )
+    from .owners import codeowners_map
+    from .panel import drafts_for_path, files_panel_text
+    from .repo import abs_path, git_root, rel_path, run_git
     from .review import CommentRejected, Review
     from .state import SESSION
 except ImportError:
     import render
+    from anchors import (
+        bump_threads_stamp,
+        clear_caches,
+        draft_rows,
+        forget_view,
+        remap_head_row,
+        selection_to_head,
+        thread_row,
+        thread_rows,
+    )
     from gh import GH, GHError
-    from mapper import LineMap, head_anchor, head_row_to_buffer_row
+    from labels import DEFAULT_COMMENT_LABELS, label_tag
+    from layout import split_below_layout
+    from mapper import (
+        LineMap,
+        payload_range_label,
+        payload_span,
+        thread_span,
+        thread_start_line,
+    )
+    from owners import codeowners_map
+    from panel import drafts_for_path, files_panel_text
+    from repo import abs_path, git_root, rel_path, run_git
     from review import CommentRejected, Review
     from state import SESSION
 
@@ -38,34 +79,6 @@ SETTINGS_FILE = "GithubPullRequest.sublime-settings"
 REGION_KEY = "githubpullrequest.threads"
 DRAFT_REGION_KEY = "githubpullrequest.drafts"
 STATUS_KEY = "githubpullrequest.status"
-
-# Conventional Comments (https://conventionalcomments.org) labels, used by the
-# add-comment picker. Overridable via the `comment_labels` setting. The optional
-# `emoji` shows in the picker and is prefixed to the posted comment; drop it to get
-# a plain `label: subject`.
-_DEFAULT_COMMENT_LABELS = [
-    {"emoji": "👏", "label": "praise", "description": "highlight something positive"},
-    {
-        "emoji": "💅",
-        "label": "nitpick",
-        "description": "trivial, non-blocking preference",
-    },
-    {"emoji": "💡", "label": "suggestion", "description": "propose a specific change"},
-    {"emoji": "⚠️", "label": "issue", "description": "a problem that needs addressing"},
-    {"emoji": "📌", "label": "todo", "description": "small, necessary change"},
-    {"emoji": "❓", "label": "question", "description": "asking for clarification"},
-    {"emoji": "💭", "label": "thought", "description": "a non-blocking idea"},
-    {"emoji": "🧹", "label": "chore", "description": "process / housekeeping task"},
-    {"emoji": "📝", "label": "note", "description": "an FYI, non-blocking"},
-]
-
-
-def _label_tag(entry):
-    """'💡 suggestion' when the label has an emoji, else 'suggestion'."""
-    emoji = entry.get("emoji", "")
-    label = entry["label"]
-
-    return f"{emoji} {label}" if emoji else label
 
 
 # Prompt appended to the agent command in the tmux review pane. `{base}` is the base branch.
@@ -100,140 +113,9 @@ def _error(message):
     sublime.error_message(f"GithubPullRequest: {message}")
 
 
-def _git_root(path):
-    try:
-        out = subprocess.check_output(
-            ["git", "rev-parse", "--show-toplevel"],
-            cwd=path,
-            stderr=subprocess.STDOUT,
-            timeout=5,
-        )
-    except (OSError, subprocess.SubprocessError):
-        return None
-
-    return out.decode("utf-8").strip()
-
-
-def _run_git(root, args):
-    try:
-        proc = subprocess.run(
-            ["git"] + args, cwd=root, capture_output=True, text=True, timeout=5
-        )
-    except (OSError, subprocess.SubprocessError):
-        return 1, ""
-
-    return proc.returncode, proc.stdout
-
-
-def _codeowners_map(root, paths):
-    """path -> owners string via the `codeowners` binary, in one call. Empty on any
-    failure (binary missing, non-zero exit). '(unowned)' collapses to ''."""
-    if not paths:
-        return {}
-
-    try:
-        proc = subprocess.run(
-            ["codeowners", "--"] + paths,
-            cwd=root,
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-    except (OSError, subprocess.SubprocessError):
-        return {}
-
-    if proc.returncode != 0:
-        return {}
-
-    owners = {}
-    for line in proc.stdout.splitlines():
-        parts = line.split()
-        if not parts:
-            continue
-
-        path = parts[0]
-        names = parts[1:]
-        if names == ["(unowned)"]:
-            names = []
-
-        owners[path] = " ".join(names)
-
-    return owners
-
-
-def _head_opcodes(root, rel, view):
-    """difflib opcodes (committed HEAD as ``a``, live buffer as ``b``) for the file, or
-    None when HEAD has no such path. The buffer is read live, so unsaved edits count."""
-    rc, committed = _run_git(root, ["show", f"HEAD:{rel}"])
-    if rc != 0:
-        return None
-
-    committed_lines = committed.splitlines()
-    buffer_lines = view.substr(sublime.Region(0, view.size())).splitlines()
-
-    matcher = difflib.SequenceMatcher(
-        None, committed_lines, buffer_lines, autojunk=False
-    )
-
-    return matcher.get_opcodes()
-
-
-def _head_anchor(view, start_row, end_row):
-    """Translate a 0-based buffer-row selection to the 0-based head-commit rows GitHub
-    anchors comments to, plus whether the selection carries the reviewer's own local
-    (uncommitted) edits.
-
-    The buffer holds the PR head file, but local edits that insert/remove lines shift
-    buffer rows away from the head-commit line numbers; walking the buffer-vs-HEAD diff
-    maps them back (see `mapper.head_anchor`). Returns the buffer rows unchanged when
-    HEAD is unavailable."""
-    opcodes = _view_head_opcodes(view)
-    if opcodes is None:
-        return start_row, end_row, False
-
-    return head_anchor(opcodes, start_row, end_row)
-
-
-# Cache of difflib opcodes (committed HEAD vs live buffer) per view, keyed by the
-# view's change_count so a `git show HEAD` is paid only when the buffer changed.
-_OPCODE_CACHE = {}
-
-
-def _view_head_opcodes(view):
-    path = _rel_path(view)
-    if path is None or not SESSION.root:
-        return None
-
-    change = view.change_count()
-    cached = _OPCODE_CACHE.get(view.id())
-    if cached and cached[0] == change:
-        return cached[1]
-
-    opcodes = _head_opcodes(SESSION.root, path, view)
-    _OPCODE_CACHE[view.id()] = (change, opcodes)
-
-    return opcodes
-
-
-def _remap_head_row(view, head_row):
-    """Head-commit row -> current buffer row (identity when the buffer matches HEAD or
-    HEAD is unavailable). Keeps gutter icons, popups and navigation on the right line
-    even after local edits shift the buffer away from the PR head."""
-    if head_row is None:
-        return None
-
-    opcodes = _view_head_opcodes(view)
-    if not opcodes:
-        return head_row
-
-    mapped = head_row_to_buffer_row(opcodes, head_row)
-
-    return head_row if mapped is None else mapped
-
-
 def _detect_base_branch(root):
     """Repo default branch via origin/HEAD (e.g. 'main'); falls back to 'main'."""
-    rc, out = _run_git(root, ["symbolic-ref", "--short", "refs/remotes/origin/HEAD"])
+    rc, out = run_git(root, ["symbolic-ref", "--short", "refs/remotes/origin/HEAD"])
     if rc == 0 and out.strip():
         ref = out.strip()  # e.g. "origin/main"
 
@@ -319,147 +201,6 @@ def _window_cwd(window):
     return folders[0] if folders else None
 
 
-def _rel_path(view):
-    file_name = view.file_name()
-    if not file_name or not SESSION.root:
-        return None
-
-    rel = os.path.relpath(file_name, SESSION.root)
-    if rel.startswith(".."):
-        return None
-
-    return rel.replace(os.sep, "/")
-
-
-def _abs_path(rel):
-    return os.path.join(SESSION.root, rel.replace("/", os.sep))
-
-
-def _thread_line(thread):
-    """Last head-side line a thread covers: its current line, else its original."""
-    return thread.get("line") or thread.get("original_line")
-
-
-def _thread_start_line(thread):
-    """First head-side line a thread covers. Equals `_thread_line` for a single-line
-    thread; on a multi-line one it is where GitHub starts the highlighted range."""
-    return (
-        thread.get("start_line")
-        or thread.get("original_start_line")
-        or _thread_line(thread)
-    )
-
-
-def _draft_span(draft):
-    """(first, last) head-side lines a queued draft covers, or None when unanchored.
-    Drafts are authored RIGHT-side only."""
-    end = draft.get("line")
-    if not end:
-        return None
-
-    return min(draft.get("start_line") or end, end), end
-
-
-def _payload_span(payload):
-    """(first, last) head-side lines a comment payload will cover. A payload with no
-    `start_line` is single-line, which is exactly what GitHub renders."""
-    end = payload["line"]
-
-    return payload.get("start_line", end), end
-
-
-def _payload_range_label(payload):
-    start, end = _payload_span(payload)
-    return f"L{end}" if start == end else f"L{start}-L{end}"
-
-
-def _first_hunk_line(path):
-    """Head-side start line of the file's first hunk (else line 1)."""
-    entry = SESSION.files_by_path.get(path)
-    if entry:
-        hunks = entry["file_diff"].hunks
-        if hunks:
-            return hunks[0].new_start
-
-    return 1
-
-
-def _first_comment_line(path):
-    """Line of the first comment on the file: the earliest unresolved thread or
-    pending draft, else the earliest thread, else the first hunk. Multi-line comments
-    count from where their range starts, which is where GitHub scrolls to."""
-    lines = [
-        _thread_start_line(thread)
-        for thread in SESSION.threads_by_path.get(path, [])
-        if not thread.get("is_resolved")
-    ]
-    lines += [
-        span[0]
-        for span in (_draft_span(draft) for _, draft in _drafts_for_path(path))
-        if span
-    ]
-    lines = [line for line in lines if line]
-    if lines:
-        return min(lines)
-
-    fallback = [
-        _thread_start_line(thread) for thread in SESSION.threads_by_path.get(path, [])
-    ]
-    fallback = [line for line in fallback if line]
-    if fallback:
-        return min(fallback)
-
-    return _first_hunk_line(path)
-
-
-def _rows_for_lines(view, to_row, start_line, end_line):
-    """Sorted, de-duplicated buffer rows for an inclusive head-side line range.
-    `to_row` turns one head line into a head row (side-aware for threads)."""
-    rows = set()
-    for line in range(start_line, end_line + 1):
-        row = _remap_head_row(view, to_row(line))
-        if row is not None:
-            rows.add(row)
-
-    return sorted(rows)
-
-
-def _thread_rows(view, thread):
-    """Every buffer row a thread covers. github.com highlights a multi-line comment
-    across its whole range, so mark and hit-test all of it, not just the anchor."""
-    line_map = SESSION.line_maps.get(thread["path"])
-    if line_map is None:
-        return []
-
-    end = _thread_line(thread)
-    if end is None:
-        return []
-
-    side = thread.get("side") or "RIGHT"
-    start = min(_thread_start_line(thread), end)
-
-    return _rows_for_lines(
-        view, lambda line: line_map.anchor_to_row(side, line), start, end
-    )
-
-
-def _draft_rows(view, draft):
-    """Every buffer row a queued draft covers (RIGHT side, so row = line - 1)."""
-    span = _draft_span(draft)
-    if span is None:
-        return []
-
-    return _rows_for_lines(view, lambda line: line - 1, span[0], span[1])
-
-
-def _thread_row(view, thread):
-    """First buffer row of a thread's range, or None. This is its navigation anchor,
-    so a multi-line thread is a single stop rather than one per covered row."""
-    rows = _thread_rows(view, thread)
-
-    return rows[0] if rows else None
-
-
 # --------------------------------------------------------------------------- #
 # decoration (diff reference doc, thread + draft gutter icons)
 # --------------------------------------------------------------------------- #
@@ -467,7 +208,7 @@ def _decorate_view(view):
     if not SESSION.active:
         return
 
-    path = _rel_path(view)
+    path = rel_path(view)
     if path is None or path not in SESSION.files_by_path:
         return
 
@@ -533,7 +274,7 @@ def _apply_thread_icons(view, path):
         if thread.get("is_resolved"):
             continue
 
-        rows.update(_thread_rows(view, thread))
+        rows.update(thread_rows(view, thread))
 
     regions = _row_regions(view, sorted(rows))
 
@@ -557,8 +298,8 @@ def _apply_draft_icons(view, path):
     icon = _settings().get("gutter_icon", "bookmark")
 
     rows = set()
-    for _, draft in _drafts_for_path(path):
-        rows.update(_draft_rows(view, draft))
+    for _, draft in drafts_for_path(path):
+        rows.update(draft_rows(view, draft))
 
     regions = _row_regions(view, sorted(rows))
 
@@ -573,36 +314,9 @@ def _apply_draft_icons(view, path):
         )
 
 
-def _drafts_for_path(path):
-    """(uid, draft) pairs for a path's RIGHT-side queued comments; the uid (stable,
-    not positional) drives per-draft Edit/Discard actions."""
-    if not SESSION.review:
-        return []
-
-    return [
-        (draft["uid"], draft)
-        for draft in SESSION.review.drafts()
-        if draft.get("path") == path and draft.get("side") == "RIGHT"
-    ]
-
-
 # --------------------------------------------------------------------------- #
 # comment compose split (write a comment below the file; save to submit)
 # --------------------------------------------------------------------------- #
-def _split_below_layout(layout, fraction=0.7):
-    """Add a full-width group below the current layout (existing groups shrink into
-    the top `fraction`). Works for any starting layout."""
-    rows = layout["rows"]
-    cols = layout["cols"]
-
-    new_rows = [row * fraction for row in rows] + [1.0]
-    bottom = [0, len(rows) - 1, len(cols) - 1, len(new_rows) - 1]
-
-    return {
-        "cols": list(cols),
-        "rows": new_rows,
-        "cells": [list(cell) for cell in layout["cells"]] + [bottom],
-    }
 
 
 def _open_compose(source_view, prefill, context, target=""):
@@ -622,7 +336,7 @@ def _open_compose(source_view, prefill, context, target=""):
             return
 
     layout = window.layout()
-    window.set_layout(_split_below_layout(layout))
+    window.set_layout(split_below_layout(layout))
     window.focus_group(window.num_groups() - 1)
 
     verb = {"edit": "Edit PR comment", "reply": "Reply"}.get(
@@ -675,7 +389,7 @@ def _clear_view(view):
     # file makes Sublime re-derive its own git diff (reset_reference_document alone
     # does not make it resume). We never change the buffer, so on a clean view the
     # revert reloads identical text; skip dirty views to avoid discarding edits.
-    if _rel_path(view) not in SESSION.files_by_path:
+    if rel_path(view) not in SESSION.files_by_path:
         return
 
     if view.is_dirty():
@@ -705,8 +419,8 @@ def _update_status():
     unresolved = sum(SESSION.unresolved_count(path) for path in SESSION.threads_by_path)
     badge = render.draft_badge(len(SESSION.review.drafts()))
 
-    status = "PR #{} · {} files · {} unresolved".format(
-        pr["number"], len(SESSION.files), unresolved
+    status = (
+        f"PR #{pr['number']} · {len(SESSION.files)} files · {unresolved} unresolved"
     )
     if badge:
         status += " · " + badge
@@ -720,27 +434,27 @@ def _update_status():
 def _threads_at_row(view, row):
     """Threads covering this row. Any row of a multi-line range counts, so hovering
     anywhere in the range opens the thread, as on github.com."""
-    path = _rel_path(view)
+    path = rel_path(view)
     if path is None:
         return []
 
     found = []
     for thread in SESSION.threads_by_path.get(path, []):
-        if row in _thread_rows(view, thread):
+        if row in thread_rows(view, thread):
             found.append(thread)
 
     return found
 
 
 def _drafts_at_row(view, row):
-    path = _rel_path(view)
+    path = rel_path(view)
     if path is None:
         return []
 
     return [
         (uid, draft)
-        for uid, draft in _drafts_for_path(path)
-        if row in _draft_rows(view, draft)
+        for uid, draft in drafts_for_path(path)
+        if row in draft_rows(view, draft)
     ]
 
 
@@ -806,22 +520,30 @@ def _edit_draft(view, uid):
     _open_compose(view, draft.get("body", ""), {"mode": "edit", "uid": uid})
 
 
-def _discard_draft(uid):
+def _mutate_then_refresh(action, done_message, window=None):
+    """Run a review mutation off the UI thread, then redraw everything that shows draft
+    state (gutter icons, files panel, status) back on the main thread."""
+
     def worker():
         try:
-            SESSION.review.discard_draft(uid)
+            action()
         except GHError as err:
             _main(lambda message=str(err): _error(message))
             return
 
         def apply():
             _decorate_all_views()
-            _refresh_files_panel(sublime.active_window())
-            _status("draft discarded")
+            _refresh_files_panel(window or sublime.active_window())
+            _status(done_message)
+            _update_status()
 
         _main(apply)
 
     _async(worker)
+
+
+def _discard_draft(uid):
+    _mutate_then_refresh(lambda: SESSION.review.discard_draft(uid), "draft discarded")
 
 
 def _set_resolved(thread_id, resolved):
@@ -858,17 +580,15 @@ def _apply_suggestion(view, thread_id, index):
     if index >= len(suggestions):
         return
 
-    line = _thread_line(thread)
-    if line is None:
-        # An outdated thread can lose both its current and original line, so there is
-        # no head row to write the suggestion over.
+    # An outdated thread can lose both its current and original line, leaving no head
+    # row to write the suggestion over.
+    span = thread_span(thread)
+    if span is None:
         _status("cannot locate the suggestion's lines in this buffer")
         return
 
-    start_line = min(_thread_start_line(thread), line)
-
-    start_row = _remap_head_row(view, start_line - 1)
-    end_row = _remap_head_row(view, line - 1)
+    start_row = remap_head_row(view, span[0] - 1)
+    end_row = remap_head_row(view, span[1] - 1)
     if start_row is None or end_row is None:
         _status("cannot locate the suggestion's lines in this buffer")
         return
@@ -915,6 +635,8 @@ def _index_threads(threads):
 
     SESSION.threads_by_path = by_path
 
+    bump_threads_stamp()
+
 
 def _reload_threads():
     try:
@@ -937,7 +659,7 @@ def _load(window):
         _main(lambda: _error("open a folder from the repository first"))
         return
 
-    root = _git_root(cwd)
+    root = git_root(cwd)
     if root is None:
         _main(lambda: _error("not inside a git repository"))
         return
@@ -964,12 +686,12 @@ def _load(window):
         _main(lambda message=str(err): _error(message))
         return
 
-    owners = _codeowners_map(root, [entry["path"] for entry in files])
+    owners = codeowners_map(root, [entry["path"] for entry in files])
 
     def apply():
         _build_session(root, pr, review, files, threads, owners)
         _decorate_all_views()
-        _status("loaded PR #{} ({} files)".format(pr["number"], len(files)))
+        _status(f"loaded PR #{pr['number']} ({len(files)} files)")
         window.run_command("github_pull_request_files_panel")
 
     _main(apply)
@@ -993,7 +715,7 @@ class GithubPullRequestReviewInTmuxCommand(sublime_plugin.WindowCommand):
         root = (
             SESSION.root
             if SESSION.active and SESSION.root
-            else (_git_root(cwd) if cwd else None)
+            else (git_root(cwd) if cwd else None)
         )
         if root is None:
             _error("not inside a git repository")
@@ -1006,58 +728,8 @@ class GithubPullRequestReviewInTmuxCommand(sublime_plugin.WindowCommand):
 FILES_PANEL = "githubpullrequest_files"
 
 
-def _files_panel_text():
-    entries = SESSION.file_entries_for_panel()
-    if not entries:
-        return None
-
-    # Two lines per file so each gets its own result_file_regex click target: the
-    # file row jumps to the first hunk; the indented comment sub-line (only when the
-    # file has comments) jumps to the first comment. `path:line` trails both, padded
-    # to a fixed column so they align. The syntax file colors +N / -M / (K…) / (P…).
-    path_col = 34
-    lines = []
-    total_pending = 0
-    for entry in entries:
-        path = entry["path"]
-        unresolved = entry.get("unresolved", 0)
-        pending = entry.get("pending", 0)
-        total_pending += pending
-
-        stats = "+{} -{}".format(entry.get("additions", 0), entry.get("deletions", 0))
-        owners = entry.get("owners", "")
-        file_row = f"{stats.ljust(path_col)}{path}:{_first_hunk_line(path)}"
-        if owners:
-            # Owners trail the "path:line" nav token so column alignment is kept and
-            # result_file_regex still finds the target (it is no longer $-anchored).
-            file_row += "  " + owners
-        lines.append(file_row)
-
-        notes = " ".join(
-            note
-            for note in (
-                f"({unresolved} unresolved)" if unresolved else "",
-                f"({pending} pending)" if pending else "",
-            )
-            if note
-        )
-        if notes:
-            lines.append(
-                "{}{}:{}".format(
-                    ("    " + notes).ljust(path_col), path, _first_comment_line(path)
-                )
-            )
-
-    pr = SESSION.pr
-    header = "PR #{} · {} · {} files".format(pr["number"], pr["title"], len(entries))
-    if total_pending:
-        header += f" · {total_pending} pending"
-
-    return header + "\n" + "\n".join(lines) + "\n"
-
-
 def _show_files_panel(window):
-    text = _files_panel_text()
+    text = files_panel_text()
     if text is None:
         _status("no changed files")
         return
@@ -1121,12 +793,12 @@ class GithubPullRequestListCommentsCommand(sublime_plugin.WindowCommand):
             if thread.get("is_outdated"):
                 tags.append("outdated")
 
-            trigger = "{}:{}".format(thread["path"], _thread_start_line(thread) or 1)
-            detail = "{} · {} comment(s){} — {}".format(
-                first.get("author", "?"),
-                len(thread["comments"]),
-                " [{}]".format(", ".join(tags)) if tags else "",
-                snippet[0] if snippet else "",
+            trigger = f"{thread['path']}:{thread_start_line(thread) or 1}"
+            tag_note = f" [{', '.join(tags)}]" if tags else ""
+            author = first.get("author", "?")
+            body = snippet[0] if snippet else ""
+            detail = (
+                f"{author} · {len(thread['comments'])} comment(s){tag_note} — {body}"
             )
             items.append(sublime.QuickPanelItem(trigger, details=detail))
 
@@ -1136,10 +808,7 @@ class GithubPullRequestListCommentsCommand(sublime_plugin.WindowCommand):
 
             thread = threads[index]
             view = self.window.open_file(
-                "{}:{}".format(
-                    _abs_path(thread["path"]),
-                    _thread_start_line(thread) or 1,
-                ),
+                f"{abs_path(thread['path'])}:{thread_start_line(thread) or 1}",
                 sublime.ENCODED_POSITION,
             )
             _async(lambda: _show_when_ready(view, thread))
@@ -1152,7 +821,7 @@ def _show_when_ready(view, thread, attempts=20):
         sublime.set_timeout(lambda: _show_when_ready(view, thread, attempts - 1), 50)
         return
 
-    row = _thread_row(view, thread)
+    row = thread_row(view, thread)
     if row is None:
         return
 
@@ -1162,10 +831,10 @@ def _show_when_ready(view, thread, attempts=20):
 
 class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
     def is_enabled(self):
-        return SESSION.active and _rel_path(self.view) in SESSION.files_by_path
+        return SESSION.active and rel_path(self.view) in SESSION.files_by_path
 
     def run(self, edit):
-        path = _rel_path(self.view)
+        path = rel_path(self.view)
         line_map = SESSION.line_maps.get(path)
         if line_map is None:
             _status("file is not part of the PR")
@@ -1184,7 +853,7 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         # selection back onto head rows so the comment (and any ```suggestion``` it
         # carries) targets the right lines and can be applied as-is. has_diff tells us
         # whether the selection is locally edited (so a suggestion is worth prefilling).
-        head_start, head_end, has_diff = _head_anchor(view, start_row, end_row)
+        head_start, head_end, has_diff = selection_to_head(view, start_row, end_row)
 
         payload = None
         if head_start is not None:
@@ -1197,8 +866,8 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         # selection reaching into unchanged code is narrowed to its commentable part.
         # Say so, and put the final range in the compose tab title: silently posting a
         # single-line comment for a multi-line selection is the surprise we avoid here.
-        target = _payload_range_label(payload)
-        if _payload_span(payload) != (head_start + 1, head_end + 1):
+        target = payload_range_label(payload)
+        if payload_span(payload) != (head_start + 1, head_end + 1):
             _status(f"selection narrowed to {target} (the rest is outside the PR diff)")
 
         # Suggestion content is the reviewer's LOCAL version of the selected lines
@@ -1223,7 +892,7 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         # skippable via its first entry and can be disabled in settings.
         labels = []
         if _settings().get("conventional_comments", True):
-            labels = _settings().get("comment_labels", _DEFAULT_COMMENT_LABELS)
+            labels = _settings().get("comment_labels", DEFAULT_COMMENT_LABELS)
 
         new_context = {"mode": "new", "path": path, "payload": payload}
 
@@ -1233,7 +902,7 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
 
         items = [sublime.QuickPanelItem("(plain comment)", details="no label")]
         items += [
-            sublime.QuickPanelItem(_label_tag(e), details=e.get("description", ""))
+            sublime.QuickPanelItem(label_tag(e), details=e.get("description", ""))
             for e in labels
         ]
 
@@ -1241,7 +910,7 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             if index < 0:
                 return
 
-            tag = "" if index == 0 else _label_tag(labels[index - 1])
+            tag = "" if index == 0 else label_tag(labels[index - 1])
             _main(lambda: _open_compose(view, compose(tag), new_context, target))
 
         view.window().show_quick_panel(items, on_label)
@@ -1326,16 +995,16 @@ class GithubPullRequestNextCommentCommand(sublime_plugin.TextCommand):
     forward = True
 
     def is_enabled(self):
-        return SESSION.active and _rel_path(self.view) in SESSION.files_by_path
+        return SESSION.active and rel_path(self.view) in SESSION.files_by_path
 
     def run(self, edit):
-        path = _rel_path(self.view)
+        path = rel_path(self.view)
         rows = sorted(
             {
                 row
                 for thread in SESSION.threads_by_path.get(path, [])
                 if not thread.get("is_resolved")
-                for row in [_thread_row(self.view, thread)]
+                for row in [thread_row(self.view, thread)]
                 if row is not None
             }
         )
@@ -1405,6 +1074,15 @@ class GithubPullRequestSubmitReviewCommand(sublime_plugin.WindowCommand):
         def worker():
             try:
                 SESSION.review.submit_review(verdict, body)
+            except CommentRejected as err:
+                # Unsent comments were flushed first and GitHub refused some of them.
+                # They are dropped (not re-queued), so submitting again goes through.
+                _main(
+                    lambda message=str(err): _error(
+                        message + "\n\nSubmit the review again to finish."
+                    )
+                )
+                return
             except GHError as err:
                 _main(lambda message=str(err): _error(message))
                 return
@@ -1420,25 +1098,10 @@ class GithubPullRequestDiscardDraftsCommand(sublime_plugin.WindowCommand):
         return SESSION.active and bool(SESSION.review.drafts())
 
     def run(self):
-        window = self.window
-
-        def worker():
-            try:
-                SESSION.review.clear_drafts()
-            except GHError as err:
-                _main(lambda message=str(err): _error(message))
-                return
-
-            def apply():
-                _decorate_all_views()
-                _refresh_files_panel(window)
-                _status("drafts discarded")
-                _update_status()
-
-            _main(apply)
-
         _status("discarding drafts…")
-        _async(worker)
+        _mutate_then_refresh(
+            SESSION.review.clear_drafts, "drafts discarded", self.window
+        )
 
 
 def _end_review(message="review ended"):
@@ -1449,7 +1112,7 @@ def _end_review(message="review ended"):
         window.destroy_output_panel(FILES_PANEL)
 
     SESSION.reset()
-    _OPCODE_CACHE.clear()
+    clear_caches()
     _status(message)
 
 
@@ -1514,7 +1177,7 @@ class GithubPullRequestListener(sublime_plugin.EventListener):
         _decorate_view(view)
 
     def on_pre_close(self, view):
-        _OPCODE_CACHE.pop(view.id(), None)
+        forget_view(view.id())
 
         # A compose buffer closing (via submit or cancel) restores the pre-split
         # layout and refocuses the file it was written against.

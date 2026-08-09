@@ -71,9 +71,7 @@ class _MiniHTMLSanitizer(HTMLParser):
 
         attributes = dict(attrs)
         if tag == "img":
-            self._out.append(
-                html.escape("[{}]".format(attributes.get("alt") or "image"))
-            )
+            self._out.append(html.escape(f"[{attributes.get('alt') or 'image'}]"))
             return
         if tag == "input":
             if attributes.get("type") == "checkbox":

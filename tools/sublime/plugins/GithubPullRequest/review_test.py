@@ -826,6 +826,95 @@ class RefusedCommentTest(unittest.TestCase):
     def test_is_a_gherror_so_existing_handlers_still_catch_it(self):
         self.assertTrue(issubclass(CommentRejected, GHError))
 
+    def _review_with_one_local_comment(self, *later_pages):
+        """A review holding one local (unsynced) comment: the queue attempt failed
+        transiently, so it waits to be flushed on submit."""
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _GRAPHQL_ERROR]
+            + list(later_pages),
+        )
+        review = _loaded_review(gh_runner)
+
+        with self.assertRaises(GHError):
+            review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "one")
+
+        self.assertEqual(review.local_count(), 1)
+
+        return review
+
+    def test_flush_drops_rejected_comment_instead_of_requeueing_it(self):
+        # Regression: CommentRejected is a GHError, so a bare `except GHError` in
+        # flush_local put the refused comment back in the local queue. Every later
+        # submit then hit the same refusal and the review could never be submitted.
+        review = self._review_with_one_local_comment(_ADD_THREAD_REFUSED)
+
+        with self.assertRaises(CommentRejected):
+            review.flush_local()
+
+        self.assertEqual(review.local_count(), 0)
+        self.assertEqual(review.drafts(), [])
+
+    def test_submit_succeeds_on_retry_after_a_rejection(self):
+        review = self._review_with_one_local_comment(_ADD_THREAD_REFUSED, _SUBMIT)
+
+        with self.assertRaises(CommentRejected):
+            review.submit_review("COMMENT", body="done")
+
+        # The poison is gone, so the next submit goes through.
+        review.submit_review("COMMENT", body="done")
+
+        self.assertEqual(review.local_count(), 0)
+
+    def test_flush_keeps_good_comments_and_drops_only_the_refused_one(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _PENDING_EMPTY,
+                _ADD_REVIEW,
+                _GRAPHQL_ERROR,  # first queue -> local
+                _GRAPHQL_ERROR,  # second queue -> local
+                _ADD_THREAD_REFUSED,  # flush: first is refused
+                _add_thread("C2"),  # flush: second is accepted
+            ],
+        )
+        review = _loaded_review(gh_runner)
+
+        for line, body in ((1, "refused"), (2, "kept")):
+            with self.assertRaises(GHError):
+                review.queue_comment("a.py", {"side": "RIGHT", "line": line}, body)
+
+        with self.assertRaises(CommentRejected):
+            review.flush_local()
+
+        self.assertEqual(review.local_count(), 0)
+        self.assertEqual([draft["body"] for draft in review.drafts()], ["kept"])
+
+    def test_transient_failure_after_a_rejection_keeps_the_rest_local(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _PENDING_EMPTY,
+                _ADD_REVIEW,
+                _GRAPHQL_ERROR,  # first queue -> local
+                _GRAPHQL_ERROR,  # second queue -> local
+                _ADD_THREAD_REFUSED,  # flush: first refused (dropped)
+                _GRAPHQL_ERROR,  # flush: second fails transiently (stays local)
+            ],
+        )
+        review = _loaded_review(gh_runner)
+
+        for line, body in ((1, "refused"), (2, "retry me")):
+            with self.assertRaises(GHError):
+                review.queue_comment("a.py", {"side": "RIGHT", "line": line}, body)
+
+        with self.assertRaises(GHError):
+            review.flush_local()
+
+        # Only the transient one is retained; the refused one is not resurrected.
+        self.assertEqual(review.local_count(), 1)
+        self.assertEqual([draft["body"] for draft in review.drafts()], ["retry me"])
+
 
 class LocalFallbackTest(unittest.TestCase):
     def _queue_one_locally(self, gh_runner):
