@@ -25,7 +25,7 @@ class DefaultRunnerTest(unittest.TestCase):
         original = ghmod.subprocess.run
         ghmod.subprocess.run = _raiser(subprocess.TimeoutExpired(cmd="gh", timeout=30))
         try:
-            rc, out, err = ghmod._default_runner(["gh", "api", "user"], None)
+            rc, _, err = ghmod._default_runner(["gh", "api", "user"], None)
         finally:
             ghmod.subprocess.run = original
 
@@ -36,7 +36,7 @@ class DefaultRunnerTest(unittest.TestCase):
         original = ghmod.subprocess.run
         ghmod.subprocess.run = _raiser(FileNotFoundError("gh not found"))
         try:
-            rc, out, err = ghmod._default_runner(["gh"], None)
+            rc, _, err = ghmod._default_runner(["gh"], None)
         finally:
             ghmod.subprocess.run = original
 

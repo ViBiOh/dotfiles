@@ -38,7 +38,7 @@ def _default_runner(
             timeout=_DEFAULT_TIMEOUT,
         )
     except subprocess.TimeoutExpired:
-        return 124, "", "gh timed out after {}s".format(_DEFAULT_TIMEOUT)
+        return 124, "", f"gh timed out after {_DEFAULT_TIMEOUT}s"
     except OSError as err:
         # gh missing / not executable / other exec failure.
         return 127, "", str(err)
@@ -83,7 +83,7 @@ class GH:
 
         if fields:
             for key, value in fields.items():
-                args += ["--raw-field", "{}={}".format(key, value)]
+                args += ["--raw-field", f"{key}={value}"]
 
         stdin = None
         if input_obj is not None:
@@ -102,7 +102,7 @@ class GH:
         query: str,
         variables: Optional[Dict] = None,
     ) -> object:
-        args = ["gh", "api", "graphql", "--raw-field", "query={}".format(query)]
+        args = ["gh", "api", "graphql", "--raw-field", f"query={query}"]
 
         if variables:
             for key, value in variables.items():
@@ -112,7 +112,7 @@ class GH:
                 # string vars (comment bodies with @mentions, owner/repo, node ids,
                 # cursors) must go through `--raw-field`, which is always a raw string.
                 flag = "--field" if isinstance(value, int) else "--raw-field"
-                args += [flag, "{}={}".format(key, value)]
+                args += [flag, f"{key}={value}"]
 
         returncode, stdout, stderr = self._run(args)
 

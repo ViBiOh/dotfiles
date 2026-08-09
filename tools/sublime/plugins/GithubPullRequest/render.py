@@ -8,7 +8,11 @@ ACTION_PREFIX = "subl:githubpullrequest?"
 
 _FENCE_RE = re.compile(r"```([^\n`]*)\n?(.*?)```", re.DOTALL)
 _INLINE_CODE_RE = re.compile(r"`([^`]+)`")
-_SUGGESTION_RE = re.compile(r"```suggestion\n(.*?)```", re.DOTALL)
+# Deliberately as permissive as the `lang == "suggestion"` branch of _FENCE_RE (same
+# optional newline, same tolerance for trailing spaces on the fence line). The two must
+# agree on how many suggestions a body holds, or the Nth Apply link would apply the
+# wrong block.
+_SUGGESTION_RE = re.compile(r"```suggestion[^\S\n]*\n?(.*?)```", re.DOTALL)
 
 # GitHub returns comment bodies as rendered HTML (bodyHTML). minihtml only speaks a
 # small subset of HTML, so we down-convert: keep the tags below (remapping a few to
@@ -86,10 +90,10 @@ class _MiniHTMLSanitizer(HTMLParser):
             self._pre += 1
         if mapped == "a":
             href = html.escape(attributes.get("href", ""), quote=True)
-            self._out.append('<a href="{}">'.format(href))
+            self._out.append(f'<a href="{href}">')
             return
 
-        self._out.append("<{}>".format(mapped))
+        self._out.append(f"<{mapped}>")
 
     def handle_startendtag(self, tag, attrs):
         self.handle_starttag(tag, attrs)
@@ -108,7 +112,7 @@ class _MiniHTMLSanitizer(HTMLParser):
         if mapped == "pre" and self._pre:
             self._pre -= 1
 
-        self._out.append("</{}>".format(mapped))
+        self._out.append(f"</{mapped}>")
 
     def handle_data(self, data):
         if self._skip:
@@ -154,19 +158,20 @@ def _escape_pre(code: str) -> str:
 def _render_text(text: str) -> str:
     escaped = html.escape(text)
     escaped = _INLINE_CODE_RE.sub(
-        lambda match: "<code>{}</code>".format(match.group(1)), escaped
+        lambda match: f"<code>{match.group(1)}</code>", escaped
     )
     escaped = escaped.replace("\n", "<br>")
 
-    return '<div class="body">{}</div>'.format(escaped)
+    return f'<div class="body">{escaped}</div>'
 
 
 def _render_suggestion(code: str, thread_id: str, index: int) -> str:
-    href = encode_action("apply_suggestion", id=thread_id, sug=index)
+    href = html.escape(encode_action("apply_suggestion", id=thread_id, sug=index))
 
     return (
-        '<div class="suggestion">{}<br><a class="actions" href="{}">Apply</a></div>'
-    ).format(_escape_pre(code), html.escape(href))
+        f'<div class="suggestion">{_escape_pre(code)}<br>'
+        f'<a class="actions" href="{href}">Apply</a></div>'
+    )
 
 
 def _render_body(body: str, thread_id: str, sug_counter: List[int]) -> str:
@@ -187,9 +192,7 @@ def _render_body(body: str, thread_id: str, sug_counter: List[int]) -> str:
             segments.append(_render_suggestion(code, thread_id, sug_counter[0]))
             sug_counter[0] += 1
         else:
-            segments.append(
-                '<div class="body"><code>{}</code></div>'.format(_escape_pre(code))
-            )
+            segments.append(f'<div class="body"><code>{_escape_pre(code)}</code></div>')
 
         pos = match.end()
 
@@ -215,18 +218,14 @@ def thread_popup_html(thread: Dict) -> str:
         author = html.escape(comment.get("author") or "")
         created = html.escape(comment.get("created_at") or "")
         parts.append(
-            '<span class="author">{}</span> <span class="time">{}</span>'.format(
-                author, created
-            )
+            f'<span class="author">{author}</span> <span class="time">{created}</span>'
         )
 
         body_html = comment.get("body_html")
         if body_html:
             # Real GitHub data: render the server-rendered HTML, then attach an Apply
             # link per suggestion (extracted from the raw markdown, kept in order).
-            parts.append(
-                '<div class="body">{}</div>'.format(html_to_minihtml(body_html))
-            )
+            parts.append(f'<div class="body">{html_to_minihtml(body_html)}</div>')
             for code in suggestions_in(comment.get("body") or ""):
                 parts.append(_render_suggestion(code, thread_id, sug_counter[0]))
                 sug_counter[0] += 1
@@ -245,18 +244,11 @@ def thread_popup_html(thread: Dict) -> str:
     open_href = encode_action("open", url=thread.get("url") or "")
 
     parts.append(
-        (
-            '<div class="actions">'
-            '<a href="{}">Reply</a> '
-            '<a href="{}">{}</a> '
-            '<a href="{}">Open</a>'
-            "</div>"
-        ).format(
-            html.escape(reply_href),
-            html.escape(toggle_href),
-            toggle_label,
-            html.escape(open_href),
-        )
+        '<div class="actions">'
+        f'<a href="{html.escape(reply_href)}">Reply</a> '
+        f'<a href="{html.escape(toggle_href)}">{toggle_label}</a> '
+        f'<a href="{html.escape(open_href)}">Open</a>'
+        "</div>"
     )
 
     return "".join(parts)
@@ -269,12 +261,13 @@ def pending_html(drafts: List[Tuple[int, Dict]]) -> str:
 
     for uid, draft in drafts:
         parts.append(_render_text(draft.get("body") or ""))
-        edit_href = encode_action("edit", uid=uid)
-        discard_href = encode_action("discard", uid=uid)
+        edit_href = html.escape(encode_action("edit", uid=uid))
+        discard_href = html.escape(encode_action("discard", uid=uid))
         parts.append(
-            '<div class="actions"><a href="{}">Edit</a> <a href="{}">Discard</a></div>'.format(
-                html.escape(edit_href), html.escape(discard_href)
-            )
+            '<div class="actions">'
+            f'<a href="{edit_href}">Edit</a> '
+            f'<a href="{discard_href}">Discard</a>'
+            "</div>"
         )
 
     return "".join(parts)
@@ -286,14 +279,14 @@ def draft_badge(count: int) -> str:
 
     noun = "draft" if count == 1 else "drafts"
 
-    return "✎ {} {}".format(count, noun)
+    return f"✎ {count} {noun}"
 
 
 def encode_action(action: str, **params) -> str:
-    parts = ["action={}".format(urllib.parse.quote(str(action)))]
+    parts = [f"action={urllib.parse.quote(str(action))}"]
 
     for key in sorted(params):
-        parts.append("{}={}".format(key, urllib.parse.quote(str(params[key]))))
+        parts.append(f"{key}={urllib.parse.quote(str(params[key]))}")
 
     return ACTION_PREFIX + "&".join(parts)
 

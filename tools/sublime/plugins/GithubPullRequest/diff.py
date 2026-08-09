@@ -63,7 +63,7 @@ def _strip_prefix(raw: str) -> Optional[str]:
     if value == "/dev/null":
         return None
 
-    if value.startswith("a/") or value.startswith("b/"):
+    if value.startswith(("a/", "b/")):
         value = value[2:]
 
     return value

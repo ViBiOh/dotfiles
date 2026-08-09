@@ -1,77 +1,151 @@
 # GithubPullRequest
 
-Review GitHub pull requests without leaving Sublime Text 4. Transparent on startup, everything on demand: nothing happens until you run **GithubPullRequest: Load pull-request**, at which point the PR is inferred from your current git branch, its review threads are drawn on the files, changed files are listed in a panel, and you can add, batch, and submit review comments from the editor.
+**Review GitHub pull requests without leaving Sublime Text.** 🔍
 
-> [!NOTE] This plugin is **100% vibe-coded** — designed and written end to end through conversation with an AI agent (Claude). Every module has unit tests and the whole non-UI stack is exercised headlessly, but it has had little mileage in the wild. Treat it accordingly.
+Threads render on the lines they belong to, the gutter shows the PR diff, and you can write, batch, and submit review comments from the editor. All of it on demand, and none of it touches your git state.
 
-## Why it exists
+```
+Command Palette → GithubPullRequest: Load pull-request
+```
 
-The github.com review UI is fine, but jumping to the browser loses your editor: LSP, go-to-definition, syntax, your keybindings. This keeps the review where the code already is, and — deliberately — **never touches your git state**.
+That is the whole ceremony. The PR is inferred from the branch you are on.
 
-## Requirements
+## ✨ Why
 
-- Sublime Text 4 (uses `minihtml`, `set_reference_document`, phantomless popups).
-- [`gh`](https://cli.github.com/) installed and authenticated (`gh auth login`). The plugin shells out to `gh`; it never reads your token. `gh` handles credentials and multi-org SAML SSO.
-- You are **on the PR branch** when you load it. That is how the PR is inferred, and it is what makes the non-mutating diff work.
+The github.com review UI is fine until you want to actually read the code. Then you lose your editor: LSP, go-to-definition, syntax highlighting, your keybindings, your muscle memory. This keeps the review where the code already lives.
 
-## Install
+And it stays out of your way: the plugin is completely inert until you load a PR, and it never runs a mutating git command.
 
-This plugin lives in a dotfiles repo and is symlinked into Sublime's `Packages/` by the repo's installer:
+## 🚀 Features
+
+### 🧵 Threads on the code
+
+Unresolved review threads get a blue gutter icon on the line they were written against. Hover one and the whole conversation opens in a popup, rendered from GitHub's own HTML: formatting, links, code blocks, task lists.
+
+From the popup you can **Reply**, **Resolve** / **Unresolve**, **Open on github.com**, or **Apply** a `suggestion` block straight into your buffer.
+
+### 🎨 Real diff in the gutter
+
+Sublime's native diff gutter is repointed at the PR merge base, so you see exactly what the PR changed, per file, with zero checkout dance. Files added by the PR light up entirely green.
+
+### 💬 Comments written like code
+
+Select a line or a range, hit _Comment on line or selection_, and a compose buffer opens in a split **below** the file, so the code stays on screen. Markdown syntax, full editor power.
+
+**Save submits. Close cancels.** Just like a git commit editor.
+
+- 🏷️ **Conventional Comments built in.** A fuzzy label picker (`💡 suggestion`, `⚠️ issue`, `💅 nitpick`, `❓ question`, …) prefills the body. Fully configurable, or skippable, or off.
+- ✍️ **Automatic suggestions.** If the lines you are commenting on carry your own uncommitted edits, the compose buffer is prefilled with a ready-to-post ` ```suggestion ` block containing your version. Fix it, then propose the fix, in one gesture. Removing lines works too.
+- 📍 **Edit-proof anchoring.** Your local edits shift buffer rows; the plugin maps them back to the PR's head lines, so comments, icons, and suggestions all land on the right code even after you have been typing.
+
+### 📦 Batched reviews, stored on GitHub
+
+Queued comments become a real GitHub **pending review**, exactly like the web UI's "Start a review".
+
+- 💜 Drafts get a purple gutter icon and an Edit / Discard popup.
+- 🔄 They survive a crash, a restart, or a reboot: reload the PR and they come back.
+- 👀 They are visible on github.com as pending until you submit.
+- 🛟 If GitHub is unreachable when you queue one, it is kept locally instead of lost, and sent along when you submit.
+
+Then submit everything in one shot with a verdict: **Comment**, **Approve**, or **Request changes**.
+
+### 📋 Changed-files panel
+
+A bottom panel lists every changed file with aligned, colorized stats:
+
+```
++42 -7                            src/server/handler.go:118  @backend-team
+    (2 unresolved) (1 pending)    src/server/handler.go:145
+```
+
+Double-click, Enter, or F4 jumps to the file at the right line. If the [`codeowners`](https://github.com/hmarr/codeowners) binary is on your `PATH`, each file also shows who owns it.
+
+### 🧭 Navigation
+
+- **Next / Previous comment** to walk the threads in a file.
+- **List all comments** for a cross-file quick-panel of every thread, jumping straight to file and line.
+
+### 🤖 Review with an agent
+
+_Review with agent (tmux)_ splits your tmux session and launches your coding agent (`claude` by default, configurable) with a review prompt for this branch against its base. Read its findings, then write the ones you agree with as real review comments.
+
+### 🔒 It never touches git
+
+No `gh pr checkout`. No branch, no `reset`, no `stash`, no writes of any kind. Only read-only git (`show`, `merge-base`, `rev-parse`). Your working tree, index, and stash are exactly where you left them.
+
+Everything that talks to GitHub goes through the [`gh`](https://cli.github.com/) CLI, so the plugin never reads or stores your token, and multi-org SAML SSO just works.
+
+## 📥 Requirements
+
+- **Sublime Text 4** (uses `minihtml`, `set_reference_document`).
+- **[`gh`](https://cli.github.com/)**, installed and authenticated (`gh auth login`).
+- You are **on the PR branch**. That is how the PR is inferred, and what makes the non-mutating diff possible.
+- _Optional:_ [`codeowners`](https://github.com/hmarr/codeowners) on `PATH` for owner annotations, and `tmux` for the agent command.
+
+## ⚙️ Install
+
+Copy or symlink this directory into your Sublime `Packages/` folder as `GithubPullRequest`:
+
+```sh
+git clone https://github.com/ViBiOh/dotfiles.git
+ln -s "$PWD/dotfiles/tools/sublime/plugins/GithubPullRequest" \
+      "$HOME/Library/Application Support/Sublime Text/Packages/GithubPullRequest"
+```
+
+On Linux the target is `~/.config/sublime-text/Packages/`, on Windows `%APPDATA%\Sublime Text\Packages\`.
+
+If you use this dotfiles repo, the installer does it for you:
 
 ```sh
 tools/sublime/init.sh
 ```
 
-That runs `install_plugin "${TEXT_PKG}" "GithubPullRequest"`. To install manually, symlink or copy this directory into your Sublime `Packages/` folder as `GithubPullRequest`.
+## 🎮 Commands
 
-## Usage
-
-Check out the PR branch (with your own git workflow), open the repo in Sublime, then from the command palette:
+All entries are prefixed `GithubPullRequest:` in the command palette.
 
 | Command | What it does |
 | --- | --- |
-| **Load pull-request (current branch)** | Infer the PR from the branch, fetch files + threads, open the changed-files panel. Only open/draft PRs load; a closed/merged PR is refused with a dialog (the working-tree-vs-merge-base diff is only meaningful on a live branch). |
-| **Show changed files** | Bottom panel: aligned table of changed files with `+N` (green) `-M` (red) `(K unresolved)` (yellow) `(P pending)` (gray), plus each file's CODEOWNERS (via the `codeowners` binary, if on PATH). Double-click / Enter / F4 opens the file at the relevant line. |
-| **List all comments** | Cross-file quick-panel navigator of every thread; jumps to the file+line and shows the popup. |
-| **Comment on line or selection** | Queue a review comment on the current line or multi-line selection. First offers a fuzzy Conventional Comments label picker (skippable), then opens a compose buffer in a split **below the file** (the file stays visible). **Save** submits the comment (like a git commit editor); **close without saving** cancels. If the commented line(s) carry your own local (uncommitted) edits, the buffer is prefilled with a GitHub ` ```suggestion ` block of your edited text — ready to propose as a change, including removing lines — regardless of the chosen label. Queued, not posted. |
-| **Show comments on current line** | Show the thread / pending popup for the cursor's line. |
-| **Next comment** / **Previous comment** | Jump between commented lines in the current file. |
-| **Review with agent (tmux)** | Split your attached tmux session and run the configured agent (default `claude`, see `agent_command`) with a review prompt for this branch vs its base (the loaded PR's base, else the repo default) appended as the last argument. Works with or without a loaded PR; needs a running tmux session. |
-| **Submit review** | Pick a verdict (Comment / Approve / Request changes) and post all queued comments in one review. |
-| **Discard queued comments** | Drop the local draft queue. |
-| **End review** | Clear all decorations, reference documents, and the panel. If you have unsent (local) comments, asks whether to submit them to GitHub or discard them; otherwise, if you have pending comments, asks whether to keep them on GitHub (restored next load) or discard them. Git is untouched throughout. |
+| **Load pull-request** | Infer the PR from the current branch, fetch files and threads, open the changed-files panel. Only open/draft PRs load. |
+| **Show changed files** | The bottom panel of changed files, stats, comment counts, and owners. |
+| **List all comments** | Quick-panel of every thread across the PR; jumps to file and line. |
+| **Comment on line or selection** | Queue a review comment on the cursor line or the selected range. |
+| **Next comment** / **Previous comment** | Walk the commented lines in the current file. |
+| **Review with agent (tmux)** | Run your configured agent on this branch versus its base, in a tmux split. |
+| **Submit review** | Pick a verdict and post every queued comment as one review. |
+| **Discard queued comments** | Drop the whole draft queue, on GitHub too. |
+| **End review** | Clear all decorations and state. Asks what to do with anything still queued. |
 
-### In the editor once a PR is loaded
+## 🔧 Settings
 
-- **Diff** — the native gutter diff lights up per file via `set_reference_document` against the merge-base blob (read with read-only `git show`). Added files show all-green.
-- **Threads** — unresolved threads get a blue gutter icon; hover (or _Show comments_) opens an HTML popup with the rendered comment bodies (GitHub's `bodyHTML` down-converted to minihtml), plus **Reply** (opens the compose split, save to post), **Resolve/Unresolve**, **Open in browser**, and **Apply** for ` ```suggestion ` blocks.
-- **Drafts** — queued comments get a purple gutter icon and a "pending" popup with **Edit** and **Discard** links (Edit reopens the same compose split, save to update); the panel shows per-file and total pending counts. They are restored from GitHub when you reload the PR.
-
-## How it works (and what it will not do)
-
-- **Non-mutating.** No `gh pr checkout`, no branch, no `reset`, no writes of any kind. Only read-only git (`git show`, `git merge-base`, `rev-parse`). Your branch, index, and stash are never touched.
-- **Pending-review batching (server-backed).** Comments queue into a real GitHub pending review, then submit together with a verdict, like github.com. Because they live on GitHub, queued comments survive a Sublime crash/restart (restored when you reload the PR) and are visible on github.com until submitted. If GitHub is unreachable when you queue a comment, it's kept in a local (unsynced) list instead of being lost — you're notified, and it's sent to GitHub automatically when you submit the review (only a crash before submit would lose these local ones).
-- **No sidebar badges.** There is no Sublime API to badge the sidebar file tree, so the changed-files list is the bottom panel (not the sidebar).
-
-## Settings
-
-`GithubPullRequest.sublime-settings`:
+Override any of these in `Packages/User/GithubPullRequest.sublime-settings`.
 
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `auto_show_popup` | `true` | Show the thread/draft popup on hover. |
 | `show_gutter_icon` | `true` | Draw gutter icons for threads and drafts. |
-| `hide_outdated` | `true` | Hide outdated threads (code changed since the comment; usually mis-anchored). Set `false` to show them. |
-| `gutter_icon` | `"bookmark"` | Icon name (`bookmark`, `dot`, `circle`) or a `Packages/...` png. |
-| `conventional_comments` | `true` | Show the [Conventional Comments](https://conventionalcomments.org) label picker before typing a comment. |
-| `comment_labels` | standard set | The labels offered by the picker (`{emoji, label, description}` list). `emoji` is optional and, when present, shows in the picker and prefixes the posted comment (`💡 suggestion: …`). Replace with your own. |
-| `agent_command` | `["claude"]` | Command (array) for **Review with agent (tmux)**; the prompt is appended as the last arg. E.g. `["claude", "--model", "opus"]` or `["aider", "--yes"]`. |
-| `agent_review_prompt` | (a review prompt) | Prompt appended to `agent_command`; `{base}` is replaced with the base branch. |
+| `hide_outdated` | `true` | Hide outdated threads (their code changed, so they are usually mis-anchored). |
+| `gutter_icon` | `"bookmark"` | `bookmark`, `dot`, `circle`, or a `Packages/...` png. |
+| `conventional_comments` | `true` | Offer the [Conventional Comments](https://conventionalcomments.org) label picker before composing. |
+| `comment_labels` | standard set | The labels the picker offers (`{emoji, label, description}`). `emoji` is optional and, when set, prefixes the posted comment. |
+| `agent_command` | `["claude"]` | Agent to launch for **Review with agent**, e.g. `["claude", "--model", "opus"]` or `["aider", "--yes"]`. |
+| `agent_review_prompt` | a review prompt | Appended to `agent_command`; `{base}` is replaced with the base branch. |
 
-## Known limitations
+## 🧱 Known limitations
 
-- Assumes one PR at a time and that you are on its head branch.
-- Large-PR API caps apply (`/pulls/{n}/files` caps at 3000 files; very large / binary files omit patches).
-- Outdated-comment re-anchoring, reactions, viewed-file state, and CI-checks display are not implemented.
+- One PR at a time, and you must be on its head branch.
+- GitHub API caps apply on huge PRs (`/pulls/{n}/files` stops at 3000 files; very large and binary files ship no patch).
+- No sidebar badges: Sublime exposes no API for it, hence the bottom panel.
+- Not implemented: re-anchoring outdated comments, reactions, viewed-file state, CI checks.
 
-See `AGENTS.md` for architecture and how to work on it, and `DESIGN.md` for the locked interface contracts.
+## 🛠️ Hacking
+
+The core (`urls`, `diff`, `mapper`, `render`, `gh`, `review`) never imports `sublime`, so it is unit-tested headlessly. Only `plugin.py` and `state.py` touch the editor API.
+
+```sh
+python3 -m unittest discover -p '*_test.py'
+ruff check . && ruff format .
+python3 -m py_compile plugin.py state.py
+```
+
+See `AGENTS.md` for the architecture tour and `DESIGN.md` for the interface contracts.

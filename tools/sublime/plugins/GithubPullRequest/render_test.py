@@ -149,6 +149,30 @@ class ThreadPopupTest(unittest.TestCase):
         self.assertIn("sug=0", html_doc)
         self.assertIn("return 42", html_doc)
 
+    def test_suggestion_count_matches_apply_links(self):
+        """The markdown fallback numbers its Apply links with one regex while the
+        handler resolves them with `suggestions_in`. If the two ever disagree on what
+        counts as a suggestion, the Nth Apply link applies the wrong block."""
+        cases = {
+            "canonical": "```suggestion\na\n```",
+            "no newline after fence": "```suggestion```",
+            "trailing space on fence": "```suggestion \nb\n```",
+            "two blocks": "```suggestion\na\n```\ntext\n```suggestion\nb\n```",
+            "mixed with a plain fence": "```py\nx\n```\n```suggestion\na\n```",
+        }
+
+        for name, body in cases.items():
+            with self.subTest(name):
+                thread = self._thread(
+                    comments=[{"author": "a", "created_at": "t", "body": body}]
+                )
+                html_doc = render.thread_popup_html(thread)
+
+                self.assertEqual(
+                    html_doc.count("action=apply_suggestion"),
+                    len(render.suggestions_in(body)),
+                )
+
     def test_tags_only_when_flagged(self):
         cases = {
             "none": (False, False, False, False),

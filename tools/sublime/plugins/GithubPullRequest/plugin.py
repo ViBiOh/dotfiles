@@ -1,7 +1,7 @@
 """Sublime Text glue for GithubPullRequest — on-demand GitHub PR review.
 
-Nothing here runs until ``PR: Load pull-request`` is invoked. The heavy lifting
-(gh / git subprocess calls) lives in the pure-Python core; this module only:
+Nothing here runs until ``GithubPullRequest: Load pull-request`` is invoked. The heavy
+lifting (gh / git subprocess calls) lives in the pure-Python core; this module only:
 
 * drives those calls off the UI thread (``set_timeout_async``) and mutates the
   view back on the main thread,
@@ -65,7 +65,7 @@ def _label_tag(entry):
     emoji = entry.get("emoji", "")
     label = entry["label"]
 
-    return "{} {}".format(emoji, label) if emoji else label
+    return f"{emoji} {label}" if emoji else label
 
 
 # Prompt appended to the agent command in the tmux review pane. `{base}` is the base branch.
@@ -93,11 +93,11 @@ def _main(fn):
 
 
 def _status(message):
-    sublime.status_message("GithubPullRequest: {}".format(message))
+    sublime.status_message(f"GithubPullRequest: {message}")
 
 
 def _error(message):
-    sublime.error_message("GithubPullRequest: {}".format(message))
+    sublime.error_message(f"GithubPullRequest: {message}")
 
 
 def _git_root(path):
@@ -164,7 +164,7 @@ def _codeowners_map(root, paths):
 def _head_opcodes(root, rel, view):
     """difflib opcodes (committed HEAD as ``a``, live buffer as ``b``) for the file, or
     None when HEAD has no such path. The buffer is read live, so unsaved edits count."""
-    rc, committed = _run_git(root, ["show", "HEAD:{}".format(rel)])
+    rc, committed = _run_git(root, ["show", f"HEAD:{rel}"])
     if rc != 0:
         return None
 
@@ -340,13 +340,12 @@ def _launch_agent_review(root):
         return
 
     if proc.returncode != 0:
-        _main(lambda message=(proc.stderr.strip() or "tmux failed"): _error(message))
+        failure = proc.stderr.strip() or "tmux failed"
+        _main(lambda message=failure: _error(message))
         return
 
     _main(
-        lambda: _status(
-            "review agent launched in tmux ({}) vs origin/{}".format(session, base)
-        )
+        lambda: _status(f"review agent launched in tmux ({session}) vs origin/{base}")
     )
 
 
@@ -598,7 +597,7 @@ def _open_compose(source_view, prefill, context):
 
     compose = window.new_file()
     compose.set_scratch(True)
-    compose.set_name("{} (save to submit, close to cancel)".format(verb))
+    compose.set_name(f"{verb} (save to submit, close to cancel)")
     compose.assign_syntax("Packages/Markdown/Markdown.sublime-syntax")
 
     settings = compose.settings()
@@ -727,16 +726,27 @@ def _show_threads_popup(view, row, point):
     )
 
 
+def _open_external(url):
+    """Hand a link to the browser, but only http(s). Popup bodies are rendered from
+    comment HTML written by anyone who can comment on the PR, so an unfiltered href
+    would let a comment hand an arbitrary scheme (file:, javascript:, ...) to the OS."""
+    if not url.startswith(("http://", "https://")):
+        _status("refused to open a non-http link")
+        return
+
+    webbrowser.open(url)
+
+
 def _handle_action(view, href):
     action = render.decode_action(href)
     if action is None:
-        webbrowser.open(href)
+        _open_external(href)
         return
 
     kind = action.get("action")
 
     if kind == "open":
-        webbrowser.open(action.get("url", ""))
+        _open_external(action.get("url", ""))
     elif kind == "reply":
         _open_compose(view, "", {"mode": "reply", "thread_id": action["id"]})
     elif kind in ("resolve", "unresolve"):
@@ -811,6 +821,12 @@ def _apply_suggestion(view, thread_id, index):
         return
 
     line = _thread_line(thread)
+    if line is None:
+        # An outdated thread can lose both its current and original line, so there is
+        # no head row to write the suggestion over.
+        _status("cannot locate the suggestion's lines in this buffer")
+        return
+
     start_line = thread.get("start_line") or line
 
     start_row = _remap_head_row(view, start_line - 1)
@@ -898,7 +914,7 @@ def _load(window):
             state = (pr.get("state") or "unknown").lower()
             _main(
                 lambda n=pr["number"], s=state: _error(
-                    "PR #{} is {} — only open PRs can be loaded.".format(n, s)
+                    f"PR #{n} is {s} — only open PRs can be loaded."
                 )
             )
             return
@@ -972,7 +988,7 @@ def _files_panel_text():
 
         stats = "+{} -{}".format(entry.get("additions", 0), entry.get("deletions", 0))
         owners = entry.get("owners", "")
-        file_row = "{}{}:{}".format(stats.ljust(path_col), path, _first_hunk_line(path))
+        file_row = f"{stats.ljust(path_col)}{path}:{_first_hunk_line(path)}"
         if owners:
             # Owners trail the "path:line" nav token so column alignment is kept and
             # result_file_regex still finds the target (it is no longer $-anchored).
@@ -982,8 +998,8 @@ def _files_panel_text():
         notes = " ".join(
             note
             for note in (
-                "({} unresolved)".format(unresolved) if unresolved else "",
-                "({} pending)".format(pending) if pending else "",
+                f"({unresolved} unresolved)" if unresolved else "",
+                f"({pending} pending)" if pending else "",
             )
             if note
         )
@@ -997,7 +1013,7 @@ def _files_panel_text():
     pr = SESSION.pr
     header = "PR #{} · {} · {} files".format(pr["number"], pr["title"], len(entries))
     if total_pending:
-        header += " · {} pending".format(total_pending)
+        header += f" · {total_pending} pending"
 
     return header + "\n" + "\n".join(lines) + "\n"
 
@@ -1023,13 +1039,13 @@ def _show_files_panel(window):
     panel.run_command("append", {"characters": text})
     panel.set_read_only(True)
 
-    window.run_command("show_panel", {"panel": "output.{}".format(FILES_PANEL)})
+    window.run_command("show_panel", {"panel": f"output.{FILES_PANEL}"})
 
 
 def _refresh_files_panel(window):
     """Rebuild the panel in place when it is already visible (e.g. after a draft
     is queued or discarded) so its counts stay current, without stealing focus."""
-    if window and window.active_panel() == "output.{}".format(FILES_PANEL):
+    if window and window.active_panel() == f"output.{FILES_PANEL}":
         _show_files_panel(window)
 
 
@@ -1067,7 +1083,7 @@ class GithubPullRequestListCommentsCommand(sublime_plugin.WindowCommand):
             if thread.get("is_outdated"):
                 tags.append("outdated")
 
-            trigger = "{}:{}".format(thread["path"], _thread_line(thread))
+            trigger = "{}:{}".format(thread["path"], _thread_line(thread) or 1)
             detail = "{} · {} comment(s){} — {}".format(
                 first.get("author", "?"),
                 len(thread["comments"]),
@@ -1145,17 +1161,17 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             view.substr(view.line(view.text_point(row, 0)))
             for row in range(start_row, end_row + 1)
         )
-        suggestion_block = "```suggestion\n{}\n```".format(content)
+        suggestion_block = f"```suggestion\n{content}\n```"
 
         def compose(tag):
             # Full comment body prefill. On a locally-changed line the suggestion block
             # goes on its own line (so the ``` fence stays valid after the label).
             if has_diff:
-                head = "{}: \n\n".format(tag) if tag else ""
+                head = f"{tag}: \n\n" if tag else ""
 
                 return head + suggestion_block
 
-            return "{}: ".format(tag) if tag else ""
+            return f"{tag}: " if tag else ""
 
         # Conventional Comments: pick a label (fuzzy) then compose. The picker is
         # skippable via its first entry and can be disabled in settings.
@@ -1310,7 +1326,7 @@ class GithubPullRequestSubmitReviewCommand(sublime_plugin.WindowCommand):
         ]
         drafts = len(SESSION.review.drafts())
         items = [
-            sublime.QuickPanelItem(label, details="{} queued comment(s)".format(drafts))
+            sublime.QuickPanelItem(label, details=f"{drafts} queued comment(s)")
             for label, _ in verdicts
         ]
 
@@ -1338,7 +1354,7 @@ class GithubPullRequestSubmitReviewCommand(sublime_plugin.WindowCommand):
                 return
 
             # Submitting is the end of the review: tear everything down.
-            _main(lambda: _end_review("review submitted ({}) — ended".format(verdict)))
+            _main(lambda: _end_review(f"review submitted ({verdict}) — ended"))
 
         _async(worker)
 
@@ -1377,6 +1393,7 @@ def _end_review(message="review ended"):
         window.destroy_output_panel(FILES_PANEL)
 
     SESSION.reset()
+    _OPCODE_CACHE.clear()
     _status(message)
 
 
@@ -1410,7 +1427,7 @@ class GithubPullRequestEndReviewCommand(sublime_plugin.WindowCommand):
         if local:
             # Some comments never reached GitHub; ending would lose them unless sent.
             choice = sublime.yes_no_cancel_dialog(
-                "You have {} comment(s) not yet sent to GitHub.".format(local),
+                f"You have {local} comment(s) not yet sent to GitHub.",
                 "Submit to GitHub",
                 "Discard",
             )
@@ -1422,9 +1439,7 @@ class GithubPullRequestEndReviewCommand(sublime_plugin.WindowCommand):
 
         # All queued comments are already on GitHub as a pending review.
         choice = sublime.yes_no_cancel_dialog(
-            "You have {} pending comment(s) saved as a GitHub pending review.".format(
-                len(drafts)
-            ),
+            f"You have {len(drafts)} pending comment(s) saved as a GitHub pending review.",
             "Keep on GitHub",
             "Discard from GitHub",
         )
