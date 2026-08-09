@@ -24,13 +24,13 @@ try:
     from . import render
     from .gh import GH, GHError
     from .mapper import LineMap
-    from .review import Review
+    from .review import CommentRejected, Review
     from .state import SESSION
 except ImportError:
     import render
     from gh import GH, GHError
     from mapper import LineMap
-    from review import Review
+    from review import CommentRejected, Review
     from state import SESSION
 
 SETTINGS_FILE = "GithubPullRequest.sublime-settings"
@@ -376,8 +376,43 @@ def _abs_path(rel):
 
 
 def _thread_line(thread):
-    """Head-side line a thread is anchored to: its current line, else its original."""
+    """Last head-side line a thread covers: its current line, else its original."""
     return thread.get("line") or thread.get("original_line")
+
+
+def _thread_start_line(thread):
+    """First head-side line a thread covers. Equals `_thread_line` for a single-line
+    thread; on a multi-line one it is where GitHub starts the highlighted range."""
+    return (
+        thread.get("start_line")
+        or thread.get("original_start_line")
+        or _thread_line(thread)
+    )
+
+
+def _draft_span(draft):
+    """(first, last) head-side lines a queued draft covers, or None when unanchored.
+    Drafts are authored RIGHT-side only."""
+    end = draft.get("line")
+    if not end:
+        return None
+
+    return min(draft.get("start_line") or end, end), end
+
+
+def _payload_span(payload):
+    """(first, last) head-side lines a comment payload will cover. A payload with no
+    `start_line` is single-line, which is exactly what GitHub renders."""
+    end = payload["line"]
+
+    return payload.get("start_line", end), end
+
+
+def _payload_range_label(payload):
+    """'L7' / 'L7-L11' for the compose tab title."""
+    start, end = _payload_span(payload)
+
+    return f"L{end}" if start == end else f"L{start}-L{end}"
 
 
 def _first_hunk_line(path):
@@ -393,19 +428,24 @@ def _first_hunk_line(path):
 
 def _first_comment_line(path):
     """Line of the first comment on the file: the earliest unresolved thread or
-    pending draft, else the earliest thread, else the first hunk."""
+    pending draft, else the earliest thread, else the first hunk. Multi-line comments
+    count from where their range starts, which is where GitHub scrolls to."""
     lines = [
-        _thread_line(thread)
+        _thread_start_line(thread)
         for thread in SESSION.threads_by_path.get(path, [])
         if not thread.get("is_resolved")
     ]
-    lines += [draft.get("line") for _, draft in _drafts_for_path(path)]
+    lines += [
+        span[0]
+        for span in (_draft_span(draft) for _, draft in _drafts_for_path(path))
+        if span
+    ]
     lines = [line for line in lines if line]
     if lines:
         return min(lines)
 
     fallback = [
-        _thread_line(thread) for thread in SESSION.threads_by_path.get(path, [])
+        _thread_start_line(thread) for thread in SESSION.threads_by_path.get(path, [])
     ]
     fallback = [line for line in fallback if line]
     if fallback:
@@ -414,18 +454,52 @@ def _first_comment_line(path):
     return _first_hunk_line(path)
 
 
-def _thread_row(view, thread):
-    """0-based buffer row a thread anchors to, or None."""
+def _rows_for_lines(view, to_row, start_line, end_line):
+    """Sorted, de-duplicated buffer rows for an inclusive head-side line range.
+    `to_row` turns one head line into a head row (side-aware for threads)."""
+    rows = set()
+    for line in range(start_line, end_line + 1):
+        row = _remap_head_row(view, to_row(line))
+        if row is not None:
+            rows.add(row)
+
+    return sorted(rows)
+
+
+def _thread_rows(view, thread):
+    """Every buffer row a thread covers. github.com highlights a multi-line comment
+    across its whole range, so mark and hit-test all of it, not just the anchor."""
     line_map = SESSION.line_maps.get(thread["path"])
     if line_map is None:
-        return None
+        return []
+
+    end = _thread_line(thread)
+    if end is None:
+        return []
 
     side = thread.get("side") or "RIGHT"
-    line = _thread_line(thread)
-    if line is None:
-        return None
+    start = min(_thread_start_line(thread), end)
 
-    return _remap_head_row(view, line_map.anchor_to_row(side, line))
+    return _rows_for_lines(
+        view, lambda line: line_map.anchor_to_row(side, line), start, end
+    )
+
+
+def _draft_rows(view, draft):
+    """Every buffer row a queued draft covers (RIGHT side, so row = line - 1)."""
+    span = _draft_span(draft)
+    if span is None:
+        return []
+
+    return _rows_for_lines(view, lambda line: line - 1, span[0], span[1])
+
+
+def _thread_row(view, thread):
+    """First buffer row of a thread's range, or None. This is its navigation anchor,
+    so a multi-line thread is a single stop rather than one per covered row."""
+    rows = _thread_rows(view, thread)
+
+    return rows[0] if rows else None
 
 
 # --------------------------------------------------------------------------- #
@@ -479,23 +553,31 @@ def _apply_reference_document(view, path):
     _async(worker)
 
 
+def _row_regions(view, rows):
+    """One empty region per row, so a gutter icon lands on every one of them (a
+    single multi-line region would only mark its first row)."""
+    regions = []
+    for row in rows:
+        point = view.text_point(row, 0)
+        regions.append(sublime.Region(point, point))
+
+    return regions
+
+
 def _apply_thread_icons(view, path):
     if not _settings().get("show_gutter_icon", True):
         return
 
     icon = _settings().get("gutter_icon", "bookmark")
 
-    regions = []
+    rows = set()
     for thread in SESSION.threads_by_path.get(path, []):
         if thread.get("is_resolved"):
             continue
 
-        row = _thread_row(view, thread)
-        if row is None:
-            continue
+        rows.update(_thread_rows(view, thread))
 
-        point = view.text_point(row, 0)
-        regions.append(sublime.Region(point, point))
+    regions = _row_regions(view, sorted(rows))
 
     view.erase_regions(REGION_KEY)
     if regions:
@@ -516,18 +598,11 @@ def _apply_draft_icons(view, path):
 
     icon = _settings().get("gutter_icon", "bookmark")
 
-    regions = []
+    rows = set()
     for _, draft in _drafts_for_path(path):
-        line = draft.get("line")
-        if not line:
-            continue
+        rows.update(_draft_rows(view, draft))
 
-        row = _remap_head_row(view, line - 1)
-        if row is None:
-            continue
-
-        point = view.text_point(row, 0)
-        regions.append(sublime.Region(point, point))
+    regions = _row_regions(view, sorted(rows))
 
     view.erase_regions(DRAFT_REGION_KEY)
     if regions:
@@ -572,11 +647,12 @@ def _split_below_layout(layout, fraction=0.7):
     }
 
 
-def _open_compose(source_view, prefill, context):
+def _open_compose(source_view, prefill, context, target=""):
     """Open a scratch compose buffer in a split below the file. Save submits it
     (see the keymap / GithubPullRequestSubmitCommentCommand); closing cancels.
     `context` = {"mode": "new", path, payload}, {"mode": "edit", uid}, or
-    {"mode": "reply", thread_id}."""
+    {"mode": "reply", thread_id}. `target` labels the lines the comment will land on
+    and is shown in the tab title, so the posted range is visible while writing."""
     window = source_view.window()
 
     # One compose at a time: opening a second while one is live would capture the
@@ -594,6 +670,8 @@ def _open_compose(source_view, prefill, context):
     verb = {"edit": "Edit PR comment", "reply": "Reply"}.get(
         context.get("mode"), "PR comment"
     )
+    if target:
+        verb = f"{verb} {target}"
 
     compose = window.new_file()
     compose.set_scratch(True)
@@ -682,13 +760,15 @@ def _update_status():
 # thread popups + action links
 # --------------------------------------------------------------------------- #
 def _threads_at_row(view, row):
+    """Threads covering this row. Any row of a multi-line range counts, so hovering
+    anywhere in the range opens the thread, as on github.com."""
     path = _rel_path(view)
     if path is None:
         return []
 
     found = []
     for thread in SESSION.threads_by_path.get(path, []):
-        if _thread_row(view, thread) == row:
+        if row in _thread_rows(view, thread):
             found.append(thread)
 
     return found
@@ -702,7 +782,7 @@ def _drafts_at_row(view, row):
     return [
         (uid, draft)
         for uid, draft in _drafts_for_path(path)
-        if draft.get("line") and _remap_head_row(view, draft["line"] - 1) == row
+        if row in _draft_rows(view, draft)
     ]
 
 
@@ -827,7 +907,7 @@ def _apply_suggestion(view, thread_id, index):
         _status("cannot locate the suggestion's lines in this buffer")
         return
 
-    start_line = thread.get("start_line") or line
+    start_line = min(_thread_start_line(thread), line)
 
     start_row = _remap_head_row(view, start_line - 1)
     end_row = _remap_head_row(view, line - 1)
@@ -1083,7 +1163,7 @@ class GithubPullRequestListCommentsCommand(sublime_plugin.WindowCommand):
             if thread.get("is_outdated"):
                 tags.append("outdated")
 
-            trigger = "{}:{}".format(thread["path"], _thread_line(thread) or 1)
+            trigger = "{}:{}".format(thread["path"], _thread_start_line(thread) or 1)
             detail = "{} · {} comment(s){} — {}".format(
                 first.get("author", "?"),
                 len(thread["comments"]),
@@ -1100,7 +1180,7 @@ class GithubPullRequestListCommentsCommand(sublime_plugin.WindowCommand):
             view = self.window.open_file(
                 "{}:{}".format(
                     _abs_path(thread["path"]),
-                    _thread_line(thread) or 1,
+                    _thread_start_line(thread) or 1,
                 ),
                 sublime.ENCODED_POSITION,
             )
@@ -1155,6 +1235,14 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             _status("no commentable line in the selection")
             return
 
+        # GitHub only anchors comments to lines the PR diff actually carries, so a
+        # selection reaching into unchanged code is narrowed to its commentable part.
+        # Say so, and put the final range in the compose tab title: silently posting a
+        # single-line comment for a multi-line selection is the surprise we avoid here.
+        target = _payload_range_label(payload)
+        if _payload_span(payload) != (head_start + 1, head_end + 1):
+            _status(f"selection narrowed to {target} (the rest is outside the PR diff)")
+
         # Suggestion content is the reviewer's LOCAL version of the selected lines
         # (from the buffer), which GitHub applies over the head lines above.
         content = "\n".join(
@@ -1182,7 +1270,7 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         new_context = {"mode": "new", "path": path, "payload": payload}
 
         if not labels:
-            _open_compose(view, compose(""), new_context)
+            _open_compose(view, compose(""), new_context, target)
             return
 
         items = [sublime.QuickPanelItem("(plain comment)", details="no label")]
@@ -1196,7 +1284,7 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
                 return
 
             tag = "" if index == 0 else _label_tag(labels[index - 1])
-            _main(lambda: _open_compose(view, compose(tag), new_context))
+            _main(lambda: _open_compose(view, compose(tag), new_context, target))
 
         view.window().show_quick_panel(items, on_label)
 
@@ -1230,6 +1318,16 @@ class GithubPullRequestSubmitCommentCommand(sublime_plugin.TextCommand):
                     SESSION.review.queue_comment(
                         context["path"], context["payload"], body
                     )
+            except CommentRejected as err:
+                # Permanent: GitHub will not anchor this comment (its lines are not in
+                # the PR diff, usually because the loaded diff went stale). It is not
+                # queued, so say so plainly instead of promising a later retry.
+                _main(
+                    lambda m=str(err): _error(
+                        m + "\n\nReload the pull request and comment again."
+                    )
+                )
+                return
             except GHError as err:
                 message = str(err)
                 if mode != "new":

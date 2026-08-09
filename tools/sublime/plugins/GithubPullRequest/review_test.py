@@ -3,10 +3,10 @@ import unittest
 
 try:
     from .gh import GH, GHError
-    from .review import Review
+    from .review import CommentRejected, Review
 except ImportError:
     from gh import GH, GHError
-    from review import Review
+    from review import CommentRejected, Review
 
 
 _PR_VIEW = {
@@ -44,6 +44,7 @@ _THREADS_PAGE_1 = {
                         "line": 3,
                         "originalLine": 3,
                         "startLine": None,
+                        "originalStartLine": None,
                         "diffSide": "RIGHT",
                         "comments": {
                             "nodes": [
@@ -76,7 +77,8 @@ _THREADS_PAGE_2 = {
                         "path": "bar.py",
                         "line": None,
                         "originalLine": 10,
-                        "startLine": 8,
+                        "startLine": None,
+                        "originalStartLine": 8,
                         "diffSide": "LEFT",
                         "comments": {
                             "nodes": [
@@ -276,6 +278,7 @@ class ReviewThreadsTest(unittest.TestCase):
         self.assertEqual(first["id"], "T1")
         self.assertEqual(first["side"], "RIGHT")
         self.assertEqual(first["line"], 3)
+        self.assertIsNone(first["start_line"])
         self.assertFalse(first["is_resolved"])
         self.assertEqual(first["url"], "https://github.com/octo/repo/pull/42#c1")
         self.assertEqual(first["comments"][0]["author"], "alice")
@@ -284,7 +287,11 @@ class ReviewThreadsTest(unittest.TestCase):
         self.assertEqual(second["id"], "T2")
         self.assertEqual(second["side"], "LEFT")
         self.assertIsNone(second["line"])
-        self.assertEqual(second["start_line"], 8)
+        self.assertEqual(second["original_line"], 10)
+        # An outdated multi-line thread keeps its range only on the original_* fields;
+        # both ends must survive the mapping or the range collapses to a single line.
+        self.assertIsNone(second["start_line"])
+        self.assertEqual(second["original_start_line"], 8)
         self.assertTrue(second["is_resolved"])
         self.assertTrue(second["is_outdated"])
         self.assertEqual(second["comments"][0]["author"], "ghost")
@@ -441,6 +448,9 @@ _SUBMIT = _wrap(
 )
 # A GraphQL error payload makes gh.graphql raise GHError (simulates API/network down).
 _GRAPHQL_ERROR = json.dumps({"errors": [{"message": "network unavailable"}]})
+# GitHub answers 200 with a null thread and no errors when it refuses to anchor a
+# comment (a line the PR diff does not carry). Verified against the real API.
+_ADD_THREAD_REFUSED = _wrap({"addPullRequestReviewThread": {"thread": None}})
 
 
 def _add_thread(comment_id):
@@ -761,6 +771,60 @@ class SubmitReviewTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             review.submit_review("MERGE")
+
+
+class RefusedCommentTest(unittest.TestCase):
+    """GitHub returns a null thread (200, no errors) when it will not anchor a
+    comment. That must surface as CommentRejected, not crash on the null, and must
+    NOT join the local queue: retrying it would fail identically and block submit."""
+
+    def _refused_review(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _ADD_THREAD_REFUSED],
+        )
+
+        return _loaded_review(gh_runner)
+
+    def test_null_thread_raises_comment_rejected(self):
+        review = self._refused_review()
+
+        with self.assertRaises(CommentRejected):
+            review.queue_comment(
+                "a.py",
+                {"side": "RIGHT", "line": 11, "start_line": 7, "start_side": "RIGHT"},
+                "body",
+            )
+
+    def test_rejected_comment_is_not_queued(self):
+        review = self._refused_review()
+
+        with self.assertRaises(CommentRejected):
+            review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "body")
+
+        self.assertEqual(review.drafts(), [])
+        self.assertEqual(review.local_count(), 0)
+
+    def test_rejection_message_names_the_lines(self):
+        cases = {
+            "single line": ({"side": "RIGHT", "line": 4}, "line 4"),
+            "range": (
+                {"side": "RIGHT", "line": 11, "start_line": 7, "start_side": "RIGHT"},
+                "lines 7-11",
+            ),
+        }
+
+        for name, (payload, expected) in cases.items():
+            with self.subTest(name):
+                review = self._refused_review()
+                with self.assertRaises(CommentRejected) as caught:
+                    review.queue_comment("a.py", payload, "body")
+
+                self.assertIn(expected, str(caught.exception))
+                self.assertIn("a.py", str(caught.exception))
+
+    def test_is_a_gherror_so_existing_handlers_still_catch_it(self):
+        self.assertTrue(issubclass(CommentRejected, GHError))
 
 
 class LocalFallbackTest(unittest.TestCase):

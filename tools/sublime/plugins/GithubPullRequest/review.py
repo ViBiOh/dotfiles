@@ -14,6 +14,20 @@ _DEFAULT_TIMEOUT = 30
 
 _VERDICTS = ("APPROVE", "COMMENT", "REQUEST_CHANGES")
 
+
+class CommentRejected(GHError):
+    """GitHub answered successfully but refused to create the thread. Unlike a
+    transient GHError this will never succeed on retry, so the comment must not be
+    kept in the local queue where it would fail every later submit."""
+
+
+def _span_label(draft: Dict) -> str:
+    end = draft.get("line")
+    start = draft.get("start_line", end)
+
+    return f"line {end}" if start == end else f"lines {start}-{end}"
+
+
 Runner = Callable[..., Tuple[int, str, str]]
 # runner(args, cwd, stdin=None) -> (returncode, stdout, stderr). Same shape as gh's
 # Runner. Only read-only git is ever invoked here (show / merge-base / rev-parse).
@@ -24,7 +38,7 @@ _THREADS_QUERY = """query($owner:String!,$repo:String!,$number:Int!,$cursor:Stri
       reviewThreads(first:100, after:$cursor){
         pageInfo{ hasNextPage endCursor }
         nodes{
-          id isResolved isOutdated path line originalLine startLine diffSide
+          id isResolved isOutdated path line originalLine startLine originalStartLine diffSide
           comments(first:100){ nodes{ author{login} body bodyHTML createdAt url state } }
         }
       }
@@ -258,6 +272,7 @@ class Review:
             "original_line": node.get("originalLine"),
             "side": node.get("diffSide"),
             "start_line": node.get("startLine"),
+            "original_start_line": node.get("originalStartLine"),
             "is_resolved": node["isResolved"],
             "is_outdated": node["isOutdated"],
             "url": url,
@@ -334,7 +349,8 @@ class Review:
 
     def _sync_draft(self, draft: Dict) -> None:
         """Add one draft to the GitHub pending review, stamping its comment_id.
-        Raises GHError if the network/API is unavailable."""
+        Raises GHError if the network/API is unavailable, CommentRejected if GitHub
+        declines to anchor the comment."""
         review_id = self._ensure_pending_review()
 
         variables = {
@@ -353,13 +369,28 @@ class Review:
             mutation = _ADD_THREAD_MUTATION
 
         data = self._gh.graphql(mutation, variables)
-        nodes = data["addPullRequestReviewThread"]["thread"]["comments"]["nodes"]
+        thread = data["addPullRequestReviewThread"]["thread"]
+
+        if thread is None:
+            # GitHub answers 200 with a null thread and NO errors array when it will
+            # not anchor the comment (typically a line outside the PR diff, e.g. the
+            # local diff went stale). Without this the null would blow up below as a
+            # TypeError, which is not a GHError, so the comment would vanish silently.
+            raise CommentRejected(
+                "GitHub would not anchor a comment on {} {}".format(
+                    draft["path"], _span_label(draft)
+                )
+            )
+
+        nodes = thread["comments"]["nodes"]
         draft["comment_id"] = nodes[0]["id"] if nodes else None
 
     def queue_comment(self, path: str, payload: Dict, body: str) -> None:
         """Queue a comment. On a network/API failure the comment is kept in a local
         (unsynced) list instead of being lost, and GHError is re-raised so the caller
-        can notify. Locals are flushed to GitHub on submit (or on end, on request)."""
+        can notify. Locals are flushed to GitHub on submit (or on end, on request).
+        A comment GitHub refuses outright is not kept: retrying it would fail the same
+        way and block every later submit."""
         draft = {
             "uid": self._new_uid(),
             "path": path,
@@ -373,6 +404,8 @@ class Review:
 
         try:
             self._sync_draft(draft)
+        except CommentRejected:
+            raise
         except GHError:
             self._local_comments.append(draft)
             raise

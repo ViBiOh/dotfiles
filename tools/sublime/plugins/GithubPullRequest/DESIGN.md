@@ -105,7 +105,9 @@ class LineMap:
         """RIGHT-side (multi-line) comment payload for a buffer row span. Returns
            {"side": "RIGHT", "line": end_line, "start_line": start_line|omitted,
             "start_side": "RIGHT"|omitted}. None if the span has no commentable line.
-            Single-line span -> no start_line/start_side keys. (`path` added by review.py.)"""
+            Single-line span -> no start_line/start_side keys. (`path` added by review.py.)
+            The span is narrowed to commentable rows, so a multi-row selection can
+            collapse to a single-line payload; plugin.py surfaces the effective range."""
 ```
 
 Note: `path` is added by the caller (review.py), not the mapper.
@@ -156,6 +158,11 @@ The bottom file panel is built in `plugin.py`: a file row `+N -M  path:hunkline 
 
 ```python
 class GHError(Exception): ...
+
+class CommentRejected(GHError):
+    """GitHub answered 200 with `thread: null` and no `errors` array, meaning it refuses to
+       anchor the comment (lines the PR diff does not carry). Permanent, unlike a plain
+       GHError, so the comment is never kept in the local queue."""
 
 Runner = Callable[..., Tuple[int, str, str]]
 # runner(args, cwd, stdin=None) -> (returncode, stdout, stderr). Default uses subprocess with a
@@ -229,7 +236,9 @@ class Review:
     def queue_comment(self, path: str, payload: Dict, body: str) -> None:
         """Try to sync (_sync_draft: lazy addPullRequestReview + addPullRequestReviewThread).
            On success -> _drafts (with comment_id). On GHError -> kept in _local_comments and
-           GHError re-raised so the caller can notify (the comment is NOT lost)."""
+           GHError re-raised so the caller can notify (the comment is NOT lost). On
+           CommentRejected (GitHub returned a null thread: it will not anchor these lines)
+           -> NOT kept, re-raised: a retry would fail identically and block every submit."""
 
     def drafts(self) -> List[Dict]:
         """_drafts (synced) + _local_comments (unsynced), in that order."""
