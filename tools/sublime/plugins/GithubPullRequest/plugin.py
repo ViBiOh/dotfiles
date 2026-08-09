@@ -23,13 +23,13 @@ import sublime_plugin
 try:
     from . import render
     from .gh import GH, GHError
-    from .mapper import LineMap
+    from .mapper import LineMap, head_anchor, head_row_to_buffer_row
     from .review import CommentRejected, Review
     from .state import SESSION
 except ImportError:
     import render
     from gh import GH, GHError
-    from mapper import LineMap
+    from mapper import LineMap, head_anchor, head_row_to_buffer_row
     from review import CommentRejected, Review
     from state import SESSION
 
@@ -184,41 +184,14 @@ def _head_anchor(view, start_row, end_row):
     (uncommitted) edits.
 
     The buffer holds the PR head file, but local edits that insert/remove lines shift
-    buffer rows away from the head-commit line numbers. Walking the diff (via the cached
-    opcodes shared with `_remap_head_row`) maps them back: an ``equal`` run maps
-    row-for-row; a ``replace`` run maps to its whole committed block. Returns the buffer
-    rows unchanged when HEAD is unavailable, or ``(None, None, has_edit)`` when the
-    selection maps to no head line at all (e.g. a purely local insertion, which GitHub
-    cannot anchor a comment to)."""
+    buffer rows away from the head-commit line numbers; walking the buffer-vs-HEAD diff
+    maps them back (see `mapper.head_anchor`). Returns the buffer rows unchanged when
+    HEAD is unavailable."""
     opcodes = _view_head_opcodes(view)
     if opcodes is None:
         return start_row, end_row, False
 
-    head_rows = []
-    has_edit = False
-
-    for tag, i1, i2, j1, j2 in opcodes:
-        lo = max(j1, start_row)
-        hi = min(j2, end_row + 1)
-        overlaps = lo < hi
-
-        if overlaps and tag in ("replace", "insert"):
-            has_edit = True
-
-        if not overlaps or tag == "insert":
-            continue
-
-        if tag == "equal":
-            head_rows.append(i1 + (lo - j1))
-            head_rows.append(i1 + (hi - 1 - j1))
-        else:  # replace: the whole committed block maps to this local block
-            head_rows.append(i1)
-            head_rows.append(i2 - 1)
-
-    if not head_rows:
-        return None, None, has_edit
-
-    return min(head_rows), max(head_rows), has_edit
+    return head_anchor(opcodes, start_row, end_row)
 
 
 # Cache of difflib opcodes (committed HEAD vs live buffer) per view, keyed by the
@@ -242,19 +215,6 @@ def _view_head_opcodes(view):
     return opcodes
 
 
-def _head_row_to_buffer_row(opcodes, head_row):
-    """Where a 0-based head-commit row currently sits in the buffer, following the
-    reviewer's local edits. A changed/removed head line anchors to its block start."""
-    for tag, i1, i2, j1, j2 in opcodes:
-        if i1 <= head_row < i2:
-            if tag == "equal":
-                return j1 + (head_row - i1)
-
-            return j1
-
-    return None
-
-
 def _remap_head_row(view, head_row):
     """Head-commit row -> current buffer row (identity when the buffer matches HEAD or
     HEAD is unavailable). Keeps gutter icons, popups and navigation on the right line
@@ -266,7 +226,7 @@ def _remap_head_row(view, head_row):
     if not opcodes:
         return head_row
 
-    mapped = _head_row_to_buffer_row(opcodes, head_row)
+    mapped = head_row_to_buffer_row(opcodes, head_row)
 
     return head_row if mapped is None else mapped
 
@@ -409,9 +369,7 @@ def _payload_span(payload):
 
 
 def _payload_range_label(payload):
-    """'L7' / 'L7-L11' for the compose tab title."""
     start, end = _payload_span(payload)
-
     return f"L{end}" if start == end else f"L{start}-L{end}"
 
 

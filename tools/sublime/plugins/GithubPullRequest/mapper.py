@@ -1,4 +1,74 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
+
+# --------------------------------------------------------------------------- #
+# Local-edit mapping (buffer vs the committed head file).
+#
+# These walk difflib opcodes produced with the COMMITTED file as `a` and the LIVE
+# buffer as `b`. They are pure so they can be tested headlessly; plugin.py owns the
+# git/view I/O that produces the opcodes. Keeping them out of LineMap preserves its
+# contract: LineMap only knows head-commit rows and the PR diff.
+# --------------------------------------------------------------------------- #
+
+
+def head_anchor(opcodes, start_row: int, end_row: int) -> Tuple:
+    """Map a 0-based buffer-row selection onto the head-commit rows it covers, plus
+    whether it carries the reviewer's local (uncommitted) edits.
+
+    Returns ``(first_head_row, last_head_row, has_edit)``, or ``(None, None, has_edit)``
+    when the selection covers no head line at all (a purely local insertion, which
+    GitHub cannot anchor a comment to)."""
+    head_rows = []
+    has_edit = False
+
+    for tag, i1, i2, j1, j2 in opcodes:
+        lo = max(j1, start_row)
+        hi = min(j2, end_row + 1)
+        overlaps = lo < hi
+
+        if tag == "delete":
+            # Locally removed lines occupy NO buffer rows (j1 == j2), so the `lo < hi`
+            # test can never hold for them. A deletion has to be treated as a position
+            # BETWEEN rows: it belongs to the selection when that position falls in the
+            # selected span. Without this a deletion is invisible, so no suggestion is
+            # offered and its head lines stay out of the comment range, i.e. proposing
+            # "remove these lines" never works.
+            if start_row <= j1 <= end_row + 1:
+                has_edit = True
+                head_rows.append(i1)
+                head_rows.append(i2 - 1)
+
+            continue
+
+        if overlaps and tag in ("replace", "insert"):
+            has_edit = True
+
+        if not overlaps or tag == "insert":
+            continue
+
+        if tag == "equal":
+            head_rows.append(i1 + (lo - j1))
+            head_rows.append(i1 + (hi - 1 - j1))
+        else:  # replace: the whole committed block maps to this local block
+            head_rows.append(i1)
+            head_rows.append(i2 - 1)
+
+    if not head_rows:
+        return None, None, has_edit
+
+    return min(head_rows), max(head_rows), has_edit
+
+
+def head_row_to_buffer_row(opcodes, head_row: int) -> Optional[int]:
+    """Where a 0-based head-commit row currently sits in the buffer, following the
+    reviewer's local edits. A changed/removed head line anchors to its block start."""
+    for tag, i1, i2, j1, j2 in opcodes:
+        if i1 <= head_row < i2:
+            if tag == "equal":
+                return j1 + (head_row - i1)
+
+            return j1
+
+    return None
 
 
 class LineMap:
