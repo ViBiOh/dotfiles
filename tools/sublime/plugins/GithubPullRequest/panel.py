@@ -75,10 +75,15 @@ def first_comment_line(path: str) -> int:
     return first_hunk_line(path)
 
 
-def _file_row(entry: Dict, marker: str) -> str:
+def _identity_line(path: str, head_line: int) -> int:
+    return head_line
+
+
+def _file_row(entry: Dict, marker: str, to_buffer_line) -> str:
     path = entry["path"]
+    line = to_buffer_line(path, first_hunk_line(path))
     stats = f"+{entry.get('additions', 0)} -{entry.get('deletions', 0)}"
-    row = f"{marker}{stats.ljust(_PATH_COL)}{path}:{first_hunk_line(path)}"
+    row = f"{marker}{stats.ljust(_PATH_COL)}{path}:{line}"
 
     owners = entry.get("owners", "")
     if owners:
@@ -89,7 +94,7 @@ def _file_row(entry: Dict, marker: str) -> str:
     return row
 
 
-def _notes_row(entry: Dict, marker: str) -> Optional[str]:
+def _notes_row(entry: Dict, marker: str, to_buffer_line) -> Optional[str]:
     """Indented sub-row naming the file's comment counts, or None when it has none.
     It navigates to the first comment rather than the first hunk."""
     path = entry["path"]
@@ -107,18 +112,28 @@ def _notes_row(entry: Dict, marker: str) -> Optional[str]:
         return None
 
     indented = ("    " + notes).ljust(_PATH_COL)
+    line = to_buffer_line(path, first_comment_line(path))
 
-    return f"{marker}{indented}{path}:{first_comment_line(path)}"
+    return f"{marker}{indented}{path}:{line}"
 
 
-def files_panel_text(open_paths: FrozenSet[str] = frozenset()) -> Optional[str]:
+def files_panel_text(
+    open_paths: FrozenSet[str] = frozenset(),
+    to_buffer_line=_identity_line,
+) -> Optional[str]:
     """Full panel body, or None when the PR changes no files.
 
     Two lines per file so each gets its own result_file_regex click target: the file
     row jumps to the first hunk, the comment sub-row (only when the file has comments)
     jumps to the first comment. A blank line separates the header from the rows.
     `open_paths` are the repo-relative paths currently open as a tab; their rows get the
-    `_OPEN_MARKER` the syntax file greys."""
+    `_OPEN_MARKER` the syntax file greys.
+
+    Every line this emits is a GitHub (head-commit) line. `to_buffer_line(path, line)`
+    translates it to where that line currently sits in the editor, so a click lands on
+    the same row as the gutter icon even after local edits shifted the file. It defaults
+    to identity, which is what a caller without views (and every test) wants; the real
+    one needs a view, so plugin.py injects it rather than this module importing sublime."""
     entries = SESSION.file_entries_for_panel()
     if not entries:
         return None
@@ -127,9 +142,9 @@ def files_panel_text(open_paths: FrozenSet[str] = frozenset()) -> Optional[str]:
     for entry in entries:
         marker = _OPEN_MARKER if entry["path"] in open_paths else _CLOSED_MARKER
 
-        lines.append(_file_row(entry, marker))
+        lines.append(_file_row(entry, marker, to_buffer_line))
 
-        notes = _notes_row(entry, marker)
+        notes = _notes_row(entry, marker, to_buffer_line)
         if notes:
             lines.append(notes)
 

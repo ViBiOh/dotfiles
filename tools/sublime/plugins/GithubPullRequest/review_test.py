@@ -186,6 +186,8 @@ class ResolvePRTest(unittest.TestCase):
                 self.assertEqual(result["owner"], "octo")
                 self.assertEqual(result["repo"], "repo")
                 self.assertEqual(result["state"], "OPEN")
+                # kept verbatim so the host survives (GitHub Enterprise)
+                self.assertEqual(result["url"], "https://github.com/octo/repo/pull/42")
 
 
 class MergeBaseTest(unittest.TestCase):

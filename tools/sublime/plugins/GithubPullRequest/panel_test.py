@@ -212,6 +212,66 @@ class OpenTabMarkerTest(unittest.TestCase):
         self.assertEqual(match.group(2), "1")
 
 
+class NavLineTranslationTest(unittest.TestCase):
+    """The panel stores GitHub (head-commit) lines, but a click must land where the
+    gutter icon is, which local edits may have moved. plugin.py injects the translation
+    because it needs a view; the default is identity."""
+
+    def tearDown(self):
+        SESSION.reset()
+
+    def test_defaults_to_the_head_line(self):
+        _load_session(
+            [_entry("a.py", hunk_start=383)],
+            {"a.py": [{"id": "T1", "line": 383, "is_resolved": False}]},
+        )
+
+        rows = _rows(panel.files_panel_text())
+
+        self.assertIn("a.py:383", rows[0])
+        self.assertIn("a.py:383", rows[1])
+
+    def test_translates_both_nav_targets(self):
+        # The reported case: a pending comment on head line 383 sits on buffer line 411.
+        _load_session(
+            [_entry("a.py", hunk_start=383)],
+            drafts=[{"uid": 0, "path": "a.py", "side": "RIGHT", "line": 383}],
+        )
+
+        shifted = {}
+
+        def to_buffer_line(path, head_line):
+            shifted[path] = head_line
+
+            return head_line + 28
+
+        rows = _rows(panel.files_panel_text(frozenset(), to_buffer_line))
+
+        self.assertIn("a.py:411", rows[0])  # file row -> first hunk
+        self.assertIn("a.py:411", rows[1])  # comment row -> the draft
+        self.assertEqual(shifted, {"a.py": 383}, "head line must be passed through")
+
+    def test_translation_is_per_path(self):
+        _load_session([_entry("a.py", hunk_start=10), _entry("b.py", hunk_start=20)])
+
+        def to_buffer_line(path, head_line):
+            return head_line + (100 if path == "b.py" else 0)
+
+        rows = _rows(panel.files_panel_text(frozenset(), to_buffer_line))
+
+        self.assertIn("a.py:10", rows[0])
+        self.assertIn("b.py:120", rows[1])
+
+    def test_marker_and_alignment_survive_translation(self):
+        _load_session([_entry("a.py", hunk_start=1)])
+
+        row = _rows(panel.files_panel_text(frozenset({"a.py"}), lambda p, n: 4321))[0]
+
+        self.assertTrue(row.startswith(MARKER))
+        match = re.search(r"([^ \t]+):(\d+)", row)
+        self.assertEqual((match.group(1), match.group(2)), ("a.py", "4321"))
+
+
 class FirstCommentLineTest(unittest.TestCase):
     def tearDown(self):
         SESSION.reset()

@@ -173,6 +173,9 @@ class Review:
             "state": view.get("state"),
             "owner": coords.get("owner"),
             "repo": coords.get("repo"),
+            # Kept verbatim rather than rebuilt from owner/repo/number: only this carries
+            # the host, so it stays correct on GitHub Enterprise.
+            "url": view["url"],
         }
 
         return self._pr

@@ -201,6 +201,17 @@ def _window_cwd(window):
     return folders[0] if folders else None
 
 
+def _window_root(window):
+    """Repository root to act on: the loaded session's, else derived from the window.
+    Lets the commands that work WITHOUT a loaded review share one resolution."""
+    if SESSION.active and SESSION.root:
+        return SESSION.root
+
+    cwd = _window_cwd(window)
+
+    return git_root(cwd) if cwd else None
+
+
 # --------------------------------------------------------------------------- #
 # decoration (diff reference doc, thread + draft gutter icons)
 # --------------------------------------------------------------------------- #
@@ -404,6 +415,28 @@ def _decorate_all_views():
             _decorate_view(view)
 
     _update_status()
+
+
+# Editing shifts every head-commit line relative to the buffer, so both the gutter icons
+# and the panel's nav lines go stale as you type. Recomputing costs a `git show HEAD` plus
+# a full diff of the buffer, so redraws wait for a pause instead of running per keystroke.
+_REDRAW_DELAY_MS = 400
+
+
+def _redraw_when_settled(view):
+    """Re-place a view's icons and the panel's nav lines once edits stop arriving. Every
+    keystroke schedules a check; only the last one still matches `change_count`, so the
+    expensive part runs once per pause rather than once per character."""
+    stamp = view.change_count()
+
+    def settled():
+        if not view.is_valid() or view.change_count() != stamp:
+            return  # more edits landed (or the view is gone); a later timer will run
+
+        _decorate_view(view)
+        _refresh_files_panel(view.window())
+
+    sublime.set_timeout(settled, _REDRAW_DELAY_MS)
 
 
 def _update_status():
@@ -711,12 +744,7 @@ class GithubPullRequestReviewInTmuxCommand(sublime_plugin.WindowCommand):
     review prompt for this branch vs its base. Does not require a loaded PR."""
 
     def run(self):
-        cwd = _window_cwd(self.window)
-        root = (
-            SESSION.root
-            if SESSION.active and SESSION.root
-            else (git_root(cwd) if cwd else None)
-        )
+        root = _window_root(self.window)
         if root is None:
             _error("not inside a git repository")
             return
@@ -725,24 +753,79 @@ class GithubPullRequestReviewInTmuxCommand(sublime_plugin.WindowCommand):
         _async(lambda: _launch_agent_review(root))
 
 
+def _open_pr_url(root):
+    """Resolve the branch's pull-request url with gh and open it. Worker thread."""
+    try:
+        pr = GH(cwd=root).pr_view(fields=["url"])
+    except GHError as err:
+        _main(lambda message=str(err): _error(message))
+        return
+
+    url = pr.get("url")
+    if not url:
+        _main(lambda: _error("no pull request found for this branch"))
+        return
+
+    _main(lambda: _open_external(url))
+
+
+class GithubPullRequestOpenInBrowserCommand(sublime_plugin.WindowCommand):
+    """Open this branch's pull request on GitHub. Does not require a loaded review: the
+    url comes from the session when one is loaded, else from a `gh pr view` lookup."""
+
+    def run(self):
+        # A loaded session already holds the url, so no round-trip is needed.
+        if SESSION.active and SESSION.pr and SESSION.pr.get("url"):
+            _open_external(SESSION.pr["url"])
+            return
+
+        root = _window_root(self.window)
+        if root is None:
+            _error("not inside a git repository")
+            return
+
+        _status("resolving pull request…")
+        _async(lambda: _open_pr_url(root))
+
+
 FILES_PANEL = "githubpullrequest_files"
 
 
-def _open_paths(window):
-    """Repo-relative paths of the PR's changed files that are open as a tab in this
-    window, which drives the panel's "already open" marker. Walks the window's tabs
-    rather than probing every changed file, so the cost follows the number of open tabs,
-    not the size of the PR. Output panels are not tabs, so this never matches itself."""
-    open_paths = set()
+def _open_views(window):
+    """path -> view for the PR's changed files open as a tab in this window. Drives both
+    the panel's "already open" marker and its head-to-buffer line translation. Walks the
+    window's tabs rather than probing every changed file, so the cost follows the number
+    of open tabs, not the size of the PR. Output panels are not tabs, so the files panel
+    never matches itself."""
+    views = {}
 
     for view in window.views():
         # rel_path is None for unsaved buffers, files outside the repo, and whenever no
         # review is loaded, none of which can be in files_by_path.
         path = rel_path(view)
         if path in SESSION.files_by_path:
-            open_paths.add(path)
+            views[path] = view
 
-    return frozenset(open_paths)
+    return views
+
+
+def _files_panel_body(window):
+    """The panel text for this window, with every nav line translated out of GitHub's
+    head-commit numbering into the open buffer, so clicking a row lands on the same line
+    the gutter icon is on even after local edits shifted the file."""
+    views = _open_views(window)
+
+    def to_buffer_line(path, head_line):
+        view = views.get(path)
+        if view is None or not head_line:
+            # Not open, so there is no buffer to have drifted from the head commit.
+            return head_line
+
+        row = remap_head_row(view, head_line - 1)
+
+        return head_line if row is None else row + 1
+
+    return files_panel_text(frozenset(views), to_buffer_line)
 
 
 def _files_panel(window):
@@ -786,7 +869,7 @@ def _write_files_panel(panel, text):
 
 
 def _show_files_panel(window):
-    text = files_panel_text(_open_paths(window))
+    text = _files_panel_body(window)
     if text is None:
         _status("no changed files")
         return
@@ -806,7 +889,7 @@ def _refresh_files_panel(window):
     if panel is None:
         return
 
-    text = files_panel_text(_open_paths(window))
+    text = _files_panel_body(window)
     if text is not None:
         _write_files_panel(panel, text)
 
@@ -1256,6 +1339,18 @@ class GithubPullRequestListener(sublime_plugin.EventListener):
         orig = view.settings().get("github_pull_request_orig_layout")
         source_id = view.settings().get("github_pull_request_source_id")
         sublime.set_timeout(lambda: _restore_after_compose(window, orig, source_id), 0)
+
+    def on_modified_async(self, view):
+        # Only PR files matter, which also skips the compose buffer and the files panel
+        # itself (neither has a file name), so rewriting the panel cannot re-enter here.
+        if not SESSION.active:
+            return
+
+        path = rel_path(view)
+        if path is None or path not in SESSION.files_by_path:
+            return
+
+        _redraw_when_settled(view)
 
     def on_activated_async(self, view):
         _decorate_view(view)

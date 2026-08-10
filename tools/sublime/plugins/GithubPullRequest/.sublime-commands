@@ -4,6 +4,10 @@
     "command": "github_pull_request_load"
   },
   {
+    "caption": "GithubPullRequest: Open pull-request in browser",
+    "command": "github_pull_request_open_in_browser"
+  },
+  {
     "caption": "GithubPullRequest: Show changed files",
     "command": "github_pull_request_files_panel"
   },
