@@ -6,7 +6,7 @@ Guidance for an AI agent (or human) extending this Sublime Text 4 plugin. Read `
 
 - **Never mutate git.** The whole point of this plugin is that it touches zero git state. Only read-only git is allowed: `git show`, `git merge-base`, `git rev-parse`. No checkout / branch / reset / add / commit — not at runtime, not in tests.
 - **All network/git I/O goes through `gh`** (subprocess). Never read the token, never use `requests`/`urllib` for GitHub.
-- **Keep the core `sublime`-free.** `urls.py`, `diff.py`, `mapper.py`, `render.py`, `gh.py`, `review.py`, `state.py` must not `import sublime`. Only `plugin.py` may. This keeps the core unit-testable headlessly.
+- **Keep the core `sublime`-free.** Only `plugin.py` and `anchors.py` may `import sublime`. Everything else (`urls`, `diff`, `mapper`, `render`, `gh`, `review`, `state`, `repo`, `owners`, `layout`, `labels`, `panel`) must not, which keeps it unit-testable headlessly. When a helper needs a view, duck-type it (`repo.rel_path` only calls `view.file_name()`) instead of importing `sublime`.
 
 ## Architecture
 
@@ -23,7 +23,7 @@ Two layers:
 | `owners.py` | `codeowners_map(root, paths, runner=None)`: one `codeowners --` call for every path; degrades to `{}` on any failure. |
 | `layout.py` | `split_below_layout(layout, fraction)`: the compose split's window-layout arithmetic. |
 | `labels.py` | `DEFAULT_COMMENT_LABELS` + `label_tag(entry)` for the Conventional Comments picker. |
-| `panel.py` | Text model for the changed-files panel: `files_panel_text`, `first_hunk_line`, `first_comment_line`, `drafts_for_path`. Reads `SESSION`; builds text only (colouring is the syntax file's job). |
+| `panel.py` | Text model for the changed-files panel: `files_panel_text(open_paths)`, `first_hunk_line`, `first_comment_line`, `drafts_for_path`. Reads `SESSION`; builds text only (colouring is the syntax file's job). Rows carry a fixed-width marker slot (`● ` when the file is open as a tab) so the path column stays aligned. |
 | `render.py` | Pure minihtml builders: thread popup, pending popup, `bodyHTML`→minihtml sanitizer, suggestion extraction, `subl:githubpullrequest?...` action encode/decode. |
 | `gh.py` | Injectable subprocess client: `api` (with JSON `--input -` bodies), `graphql`, `pr_diff`, `pr_view`. |
 | `review.py` | Service composing the above: `resolve_pr`, `changed_files`, `review_threads` (GraphQL, paginated), `base_blob` (read-only `git show`), the server-backed draft queue (a real GitHub PENDING review — `load_pending`/`queue_comment`/`discard_draft`/`clear_drafts`/`flush_local`; `_drafts` are synced with `comment_id`s, `_local_comments` are unsynced fallbacks kept on API failure and flushed on submit), `submit_review`, `reply_comment`, `set_thread_resolved`. Raises `CommentRejected` (a `GHError`) when GitHub refuses to anchor a comment; such a comment is dropped rather than queued, by BOTH `queue_comment` and `flush_local` (re-queuing it would fail identically and wedge every later submit). |
@@ -58,6 +58,7 @@ Comments are authored with the modern REST fields: `side` (`RIGHT`=head, `LEFT`=
       from diff import parse_unified_diff
   ```
 - **Tests**: `unittest`, files named `*_test.py`, in the same module namespace, dict-keyed table cases (`cases = {"name": (...)}` + `subTest`). Core modules mock `gh`/git via injected runners — never hit the network or real git.
+- **Panel styling spans two files.** `panel.py` prefixes open-file rows with a `● ` marker (a syntax can only assign scopes by matching TEXT, so a real character is required; a zero-width one does NOT work, Sublime draws format characters as their codepoint), and the `.sublime-syntax` matches `^●` to grey that row's marker and path via `comment.open-file.*`. They reference each other only by string, so `syntax_test.py` asserts they agree; a rename in one alone loses the colour with NO error. The grey relies on the scope staying under `comment.`. Do not reach for `font_style` (italic/bold): it cannot come from a syntax, only from a colour scheme, and colour-scheme overrides merge by the ACTIVE scheme's name, so they break the moment the user switches schemes.
 - **Deletions are zero-width in the buffer.** A difflib `delete` opcode has `j1 == j2`, so any `lo < hi` overlap test silently misses it. `mapper.head_anchor` treats a deletion as a position BETWEEN rows instead. Get this wrong and "propose removing these lines" stops working with no error at all.
 - **GitHub can refuse a comment silently.** `addPullRequestReviewThread` answers HTTP 200 with `thread: null` and NO `errors` array when it will not anchor the comment (verified against the live API). Always check for the null; `review._sync_draft` turns it into `CommentRejected` so the comment cannot vanish into a `TypeError`.
 - **Untrusted input.** Comment bodies and their rendered HTML come from anyone who can comment on the PR. `render.html_to_minihtml` whitelists tags and escapes all text; `plugin._open_external` refuses to hand any non-`http(s)` link to the browser. Keep both gates in place when adding popup content.

@@ -116,7 +116,10 @@ def first_hunk_line(path) -> int: ...                      # else 1
 def first_comment_line(path) -> int:
     """Earliest unresolved thread or pending draft (multi-line counts from its START),
        else earliest thread, else first hunk."""
-def files_panel_text() -> Optional[str]: ...               # None when no files changed
+def files_panel_text(open_paths=frozenset()) -> Optional[str]:
+    """None when no files changed. Rows begin with a fixed-width marker slot: '● ' when the
+       path is in `open_paths` (open as a tab), two spaces otherwise, so the path column
+       stays aligned and the marker never joins the `path:line` nav token."""
 ```
 
 ### `mapper.py`
@@ -195,7 +198,7 @@ def decode_action(href: str) -> Optional[Dict]:
     """Inverse. -> {'action': str, **params(str values)} or None if not a githubpullrequest href."""
 ````
 
-The bottom file panel's text is built in `panel.py` (`plugin.py` only creates the output panel and its settings): a file row `+N -M  path:hunkline  <owners>` and, when the file has comments, an indented `(K unresolved) (P pending)  path:commentline` row. Owners come from a single `codeowners -- <all paths>` call at load (`owners.codeowners_map`, cached in `SESSION.owners_by_path`); they trail the `path:line` nav token so column alignment is preserved and `result_file_regex` (no longer `$`-anchored) still finds the target. Colored by `GithubPullRequestFiles.sublime-syntax`, not by `render.py`.
+The bottom file panel's text is built in `panel.py` (`plugin.py` only creates the output panel and its settings): a file row `<marker>+N -M  path:hunkline  <owners>` and, when the file has comments, an indented `<marker>(K unresolved) (P pending)  path:commentline` row. The marker slot is `● ` when the file is open as a tab in that window (`plugin._open_paths` walks `window.views()`, so the cost follows the number of open tabs rather than the size of the PR) and two blanks otherwise, both the same width so the path column never shifts. The syntax pushes a context on `^●`, scoping the marker and that row's `path:line` token `comment.open-file.*`, which every colour scheme renders grey through its own `comment` rule, so a visited file recedes. A real character is unavoidable because a `.sublime-syntax` can only assign scopes by matching text; a zero-width one was tried and rejected because Sublime renders format characters as their codepoint. No `.sublime-color-scheme` is shipped: `font_style` (italic/bold) is the only thing a syntax cannot express, and colour-scheme overrides merge by the ACTIVE scheme's name, so they silently stop applying when the user switches schemes. The PR header is yellow (`entity.name.class`, #fac863 in Mariana), distinct from the greyed rows and the blue CODEOWNERS handles, and a blank line separates it from the rows. `syntax_test.py` guards the marker character, the grey-by-inheritance scope, the absence of a colour-scheme override, and the un-anchored `+N -M` rule against silent drift. `_refresh_files_panel` REWRITES the panel in place (`github_pull_request_set_text` + restored `viewport_position`) instead of destroying and recreating it, so refreshing never resets the scroll position nor re-runs `show_panel`. Because the panel now outlives a load (only End review destroys it), `_files_panel` re-applies `result_base_dir` on every call: it depends on `SESSION.root`, so a second Load in the same window would otherwise keep resolving clicks against the previous repository. the listener refreshes on `on_load_async` and (deferred one tick) `on_pre_close` so the markers track the tab set. Owners come from a single `codeowners -- <all paths>` call at load (`owners.codeowners_map`, cached in `SESSION.owners_by_path`); they trail the `path:line` nav token so column alignment is preserved and `result_file_regex` (no longer `$`-anchored) still finds the target. Colored by `GithubPullRequestFiles.sublime-syntax`, not by `render.py`.
 
 ### `gh.py` (injectable subprocess client; NO `sublime` import)
 

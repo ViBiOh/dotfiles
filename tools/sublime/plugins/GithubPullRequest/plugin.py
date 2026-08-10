@@ -728,35 +728,87 @@ class GithubPullRequestReviewInTmuxCommand(sublime_plugin.WindowCommand):
 FILES_PANEL = "githubpullrequest_files"
 
 
+def _open_paths(window):
+    """Repo-relative paths of the PR's changed files that are open as a tab in this
+    window, which drives the panel's "already open" marker. Walks the window's tabs
+    rather than probing every changed file, so the cost follows the number of open tabs,
+    not the size of the PR. Output panels are not tabs, so this never matches itself."""
+    open_paths = set()
+
+    for view in window.views():
+        # rel_path is None for unsaved buffers, files outside the repo, and whenever no
+        # review is loaded, none of which can be in files_by_path.
+        path = rel_path(view)
+        if path in SESSION.files_by_path:
+            open_paths.add(path)
+
+    return frozenset(open_paths)
+
+
+def _files_panel(window):
+    """The files panel, created on first use and reused afterwards.
+
+    `result_base_dir` is re-applied on every call because it depends on SESSION.root,
+    which changes when another PR is loaded into the same window; the panel now outlives
+    a load (it is only destroyed by End review), so it would otherwise keep resolving
+    clicks against the previous repository."""
+    panel = window.find_output_panel(FILES_PANEL)
+
+    if panel is None:
+        panel = window.create_output_panel(FILES_PANEL)
+
+        settings = panel.settings()
+        settings.set("result_file_regex", r"([^ \t]+):(\d+)")
+        settings.set("line_numbers", False)
+        settings.set("gutter", False)
+        settings.set("scroll_past_end", False)
+
+        panel.assign_syntax(
+            "Packages/GithubPullRequest/GithubPullRequestFiles.sublime-syntax"
+        )
+
+    panel.settings().set("result_base_dir", SESSION.root)
+
+    return panel
+
+
+def _write_files_panel(panel, text):
+    """Replace the panel body in place, keeping the scroll position. Rewriting beats
+    destroy-and-recreate: the panel keeps its identity, so refreshing it cannot reset
+    the viewport or re-run show_panel."""
+    viewport = panel.viewport_position()
+
+    panel.set_read_only(False)
+    panel.run_command("github_pull_request_set_text", {"text": text})
+    panel.set_read_only(True)
+
+    panel.set_viewport_position(viewport, False)
+
+
 def _show_files_panel(window):
-    text = files_panel_text()
+    text = files_panel_text(_open_paths(window))
     if text is None:
         _status("no changed files")
         return
 
-    window.destroy_output_panel(FILES_PANEL)
-    panel = window.create_output_panel(FILES_PANEL)
-    settings = panel.settings()
-    settings.set("result_file_regex", r"([^ \t]+):(\d+)")
-    settings.set("result_base_dir", SESSION.root)
-    settings.set("line_numbers", False)
-    settings.set("gutter", False)
-    settings.set("scroll_past_end", False)
-    panel.assign_syntax(
-        "Packages/GithubPullRequest/GithubPullRequestFiles.sublime-syntax"
-    )
-    panel.set_read_only(False)
-    panel.run_command("append", {"characters": text})
-    panel.set_read_only(True)
+    _write_files_panel(_files_panel(window), text)
 
     window.run_command("show_panel", {"panel": f"output.{FILES_PANEL}"})
 
 
 def _refresh_files_panel(window):
-    """Rebuild the panel in place when it is already visible (e.g. after a draft
-    is queued or discarded) so its counts stay current, without stealing focus."""
-    if window and window.active_panel() == f"output.{FILES_PANEL}":
-        _show_files_panel(window)
+    """Update the visible panel's text in place so its counts and open-tab markers stay
+    current. Does not create or show the panel, and does not steal focus."""
+    if not window or window.active_panel() != f"output.{FILES_PANEL}":
+        return
+
+    panel = window.find_output_panel(FILES_PANEL)
+    if panel is None:
+        return
+
+    text = files_panel_text(_open_paths(window))
+    if text is not None:
+        _write_files_panel(panel, text)
 
 
 class GithubPullRequestFilesPanelCommand(sublime_plugin.WindowCommand):
@@ -1030,6 +1082,14 @@ class GithubPullRequestPrevCommentCommand(GithubPullRequestNextCommentCommand):
     forward = False
 
 
+class GithubPullRequestSetTextCommand(sublime_plugin.TextCommand):
+    """Internal: replace a view's whole body (used to rewrite the files panel in
+    place). The caller owns the read-only flag."""
+
+    def run(self, edit, text):
+        self.view.replace(edit, sublime.Region(0, self.view.size()), text)
+
+
 class GithubPullRequestReplaceLinesCommand(sublime_plugin.TextCommand):
     """Internal: replace a row range with text (used to apply a suggestion)."""
 
@@ -1176,15 +1236,23 @@ class GithubPullRequestListener(sublime_plugin.EventListener):
     def on_load_async(self, view):
         _decorate_view(view)
 
+        # The tab set changed, so the panel's "already open" markers are stale.
+        _refresh_files_panel(view.window())
+
     def on_pre_close(self, view):
         forget_view(view.id())
+
+        window = view.window()
+
+        # Fires BEFORE the view goes away, so it is still in window.views().
+        # Refresh on the next tick, once the tab is really gone.
+        sublime.set_timeout(lambda: _refresh_files_panel(window), 0)
 
         # A compose buffer closing (via submit or cancel) restores the pre-split
         # layout and refocuses the file it was written against.
         if not view.settings().get("github_pull_request_compose"):
             return
 
-        window = view.window()
         orig = view.settings().get("github_pull_request_orig_layout")
         source_id = view.settings().get("github_pull_request_source_id")
         sublime.set_timeout(lambda: _restore_after_compose(window, orig, source_id), 0)

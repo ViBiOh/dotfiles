@@ -1,18 +1,44 @@
 %YAML 1.2
 ---
-# Colors the GithubPullRequest "changed files" bottom panel: additions green, deletions
-# red, unresolved-comment count yellow, pending (queued) count dimmed, CODEOWNERS blue.
-# Uses foreground-only scopes (diff markup / comment / entity.name.function) so there is
-# no background fill (unlike region.*ish). The +N / -M match is anchored at line start so
-# hyphens inside file paths (trailing "path:line") are never miscolored; the parenthetical
-# and owner rules only match their own tokens.
+# Colors the GithubPullRequest "changed files" bottom panel: the PR header yellow, additions
+# green, deletions red, unresolved-comment count yellow, pending (queued) count dimmed,
+# CODEOWNERS blue, and both the marker and path of a file already open as a tab greyed out.
+# Uses foreground-only scopes (diff markup / comment / entity.name.*) so there is no
+# background fill (unlike region.*ish). Every row begins with a fixed-width marker slot
+# ("● " when open, two spaces when not; see panel._OPEN_MARKER) — a syntax can only assign
+# scopes by matching TEXT, so a real character is needed. The `+N -M` rule is therefore not
+# `^`-anchored and instead requires the whole pair plus a trailing space, so hyphens inside
+# file paths (in the trailing "path:line") are never miscolored.
 hidden: true
 scope: source.githubpullrequest-files
 contexts:
   main:
+    # The PR header. Yellow (`entity.name.class` is #fac863 in Mariana), which is distinct
+    # from the greyed rows below it and from the blue CODEOWNERS handles.
     - match: '^PR #.*$'
-      scope: comment.line.githubpullrequest-files
-    - match: '^(\+\d+)\s+(-\d+)'
+      scope: entity.name.class.githubpullrequest-files
+    # Rows for a file that is open as a tab, detected by the leading marker. Pushing a
+    # context is what lets the row's `path:line` token go grey too, while the shared token
+    # rules still color stats, counts and owners. The grey comes from staying under
+    # `comment.` — every color scheme renders that dimmed — so a file already visited
+    # recedes instead of competing with the colors that carry the real signal. No
+    # color-scheme override is needed.
+    - match: '^●'
+      scope: comment.open-file.githubpullrequest-files
+      push: open_row
+    - include: row_tokens
+
+  open_row:
+    - match: $\n?
+      pop: true
+    - match: '\S+:\d+'
+      scope: comment.open-file.githubpullrequest-files
+    - include: row_tokens
+
+  row_tokens:
+    # The pair (and the space after it) only ever occurs as a file row's leading token,
+    # so this cannot match a hyphen inside a path.
+    - match: '(\+\d+)\s+(-\d+)(?=\s)'
       captures:
         1: markup.inserted.githubpullrequest-files
         2: markup.deleted.githubpullrequest-files
