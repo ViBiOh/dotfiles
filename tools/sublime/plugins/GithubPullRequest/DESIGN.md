@@ -21,7 +21,7 @@ Deliberately out of scope: deleted-line phantoms and LEFT-side (deleted-line) co
       from diff import parse_unified_diff
   ```
 - **`sublime` / `sublime_plugin` may be imported ONLY by the glue layer** (`plugin.py`, `anchors.py`). Every other module (`urls`, `diff`, `mapper`, `render`, `gh`, `review`, `state`, `repo`, `owners`, `layout`, `labels`, `panel`) must import neither, so it is testable with plain `python3 -m unittest`. When something needs a view, prefer duck-typing it (`repo.rel_path` only calls `view.file_name()`) over reaching for `sublime`.
-- Tests: `unittest`, files named `*_test.py`, **dict-keyed table cases** (`cases = {"name": (...)}`), in the SAME module namespace (no separate test package). Run `python3 -m unittest discover -p '*_test.py'`, `ruff check .`, `ruff format .` in the package dir. `ruff.toml` pins `target-version = "py38"` so the linter never suggests syntax the plugin host cannot run.
+- Tests: `unittest`, files named `*_test.py`, **dict-keyed table cases** (`cases = {"name": (...)}`), in the SAME module namespace (no separate test package). Run `python3 -m unittest discover -p '*_test.py'`, `ruff check .`, `ruff format .`, and `python3 -m py_compile plugin.py anchors.py` (the two `sublime` importers) in the package dir. `ruff.toml` pins `target-version = "py38"` so the linter never suggests syntax the plugin host cannot run — it is the ONLY thing enforcing that, since `.python-version` is 3.14 so the tests run on a current interpreter.
 
 ## GitHub coordinate model (READ THIS before touching mapper/review)
 
@@ -45,11 +45,15 @@ Dataclasses are fine (3.7+). Use `typing.Optional/List/Dict`. Keep every module 
 ```python
 def parse_pr_url(url: str) -> Optional[Dict]:
     """https://github.com/OWNER/REPO/pull/NUMBER[/...] ->
-       {"host": "github.com", "owner": str, "repo": str, "number": int}, else None.
-       Tolerates trailing slashes, /files, #discussion fragments, and enterprise hosts."""
+       {"owner": str, "repo": str, "number": int}, else None.
+       Tolerates trailing slashes, /files, #discussion fragments, and enterprise hosts.
+       The host is VALIDATED but not returned: nothing rebuilds a url from these parts,
+       because resolve_pr keeps the PR's own url verbatim so the host survives."""
 ```
 
 ### `diff.py`
+
+Every field below has a reader. Deliberately ABSENT, having been parsed and stored but read by nothing: `FileDiff.is_deleted` / `is_rename` (a deleted file is already `new_path is None`, and a rename is already `old_path != new_path`), plus `Hunk.old_start` / `old_count` / `new_count` / `header`, which cost memory per hunk for the whole session. The parser still needs all of them as locals to walk the body; it just does not retain them.
 
 ```python
 @dataclass
@@ -61,11 +65,7 @@ class DiffLine:
 
 @dataclass
 class Hunk:
-    old_start: int
-    old_count: int
-    new_start: int
-    new_count: int
-    header: str            # full "@@ -a,b +c,d @@ ctx" line
+    new_start: int         # head-side start line (panel.first_hunk_line navigates to it)
     lines: List[DiffLine]
 
 @dataclass
@@ -73,17 +73,15 @@ class FileDiff:
     path: str              # canonical path (new_path if present else old_path)
     old_path: Optional[str]
     new_path: Optional[str]
-    is_new: bool
-    is_deleted: bool
-    is_rename: bool
-    is_binary: bool
+    is_new: bool           # empty base blob -> all-green gutter
+    is_binary: bool        # no reference document at all
     additions: int
     deletions: int
     hunks: List[Hunk]
 
 def parse_unified_diff(text: str) -> List[FileDiff]:
     """Parse `gh pr diff` / `git diff` unified output. Handle: multiple files, `diff --git`
-       headers, rename lines, `new file mode` / `deleted file mode`, `Binary files ... differ`,
+       headers, rename lines, `new file mode`, `Binary files ... differ`,
        `\\ No newline at end of file`, and multiple hunks per file."""
 ```
 
@@ -106,9 +104,12 @@ def split_below_layout(layout: Dict, fraction: float = 0.7) -> Dict:
     """Add a full-width group below, existing groups scaled into the top `fraction`.
        Does not mutate the input."""
 
-# labels.py   Conventional Comments picker data
-DEFAULT_COMMENT_LABELS: List[Dict]                     # {emoji?, label, description}
+# labels.py   Conventional Comments picker
 def label_tag(entry: Dict) -> str: ...                 # '💡 suggestion' | 'suggestion'
+# The label SET is not here. GithubPullRequest.sublime-settings (`comment_labels`) is its
+# only copy, since load_settings merges it under any User override; a Python default would
+# just be a second one to keep in sync. Same for agent_command / agent_review_prompt, which
+# plugin.py reads with no fallback. labels_test.py validates the packaged file.
 
 # panel.py    changed-files panel TEXT (colouring is the syntax file's job)
 def drafts_for_path(path) -> List[Tuple[int, Dict]]: ...   # (uid, draft), RIGHT side only
@@ -149,7 +150,11 @@ class LineMap:
     def anchor_to_row(self, side: str, line: int) -> Optional[int]:
         """Thread's (side, line) -> 0-based HEAD-commit row. RIGHT: row = line - 1.
            LEFT: the head row of the hunk boundary the deleted line sits at.
-           (`anchors.remap_head_row` then shifts this to the live buffer row.)"""
+           (`anchors.remap_head_row` then shifts this to the live buffer row.)
+           EVERY caller must come through here, never `line - 1` directly: a thread's
+           line is numbered on its OWN side, so the identity holds for RIGHT only. For
+           some LEFT lines the two agree by coincidence, which is why the guard test
+           picks the base line where they do not."""
 
     def comment_range(self, start_row: int, end_row: int) -> Optional[Dict]:
         """RIGHT-side (multi-line) comment payload for a buffer row span. Returns
@@ -175,11 +180,16 @@ def html_to_minihtml(body_html: str) -> str:
        tags (p, strong/b, em/i, code, pre, a[href], ul/ol/li, blockquote, h1-6, span, div, del/s,
        kbd, sub/sup), drop the rest keeping their text, strip <script>/<style>, <img> -> [alt],
        task-list <input type=checkbox> -> checkbox glyph, preserve <pre> newlines as <br>, escape
-       all text. Implemented via an html.parser.HTMLParser subclass."""
+       all text. An <a> keeps its href ONLY when http(s) (_safe_anchor); anything else becomes a
+       bare <a>, text intact. That is a SECURITY gate, not cosmetics: a `subl:githubpullrequest?`
+       href in a body is dispatched by plugin._handle_action before any browser check, so a click
+       would fire a real discard/resolve/edit. Implemented via an html.parser.HTMLParser subclass."""
 
 def suggestions_in(body: str) -> List[str]:
     """Ordered ```suggestion``` blocks in a RAW markdown body. Shared with plugin._apply_suggestion
-       so the Nth Apply link maps to the Nth applied suggestion."""
+       so the Nth Apply link maps to the Nth applied suggestion. MUST agree in count with the
+       fence scan in _render_body; a fence's info string ends at the newline, so both require
+       that newline and both rstrip (never strip) the lang. render_test compares the two counts."""
 
 def thread_popup_html(thread: Dict) -> str:
     """Full minihtml doc for one review thread. Each comment: author, timestamp, and body — rendered
@@ -213,9 +223,49 @@ def encode_action(action: str, **params) -> str:
 
 def decode_action(href: str) -> Optional[Dict]:
     """Inverse. -> {'action': str, **params(str values)} or None if not a githubpullrequest href."""
+
+def action_int(action: Dict, key: str, default: Optional[int] = None) -> Optional[int]:
+    """A decoded param as an int; None when absent (without a default) or not a number. Actions
+       are read out of popup HTML, so a forged link can put anything in a uid: a bare int() on it
+       raises inside Sublime's link callback. plugin._handle_action treats None as a no-op."""
 ````
 
-The bottom file panel's text is built in `panel.py` (`plugin.py` only creates the output panel and its settings): a file row `<marker>+N -M  path:hunkline  <owners>` and, when the file has comments, an indented `<marker>(K unresolved) (P pending)  path:commentline` row. The marker slot is `● ` when the file is open as a tab in that window (`plugin._open_paths` walks `window.views()`, so the cost follows the number of open tabs rather than the size of the PR) and two blanks otherwise, both the same width so the path column never shifts. The syntax pushes a context on `^●`, scoping the marker and that row's `path:line` token `comment.open-file.*`, which every colour scheme renders grey through its own `comment` rule, so a visited file recedes. A real character is unavoidable because a `.sublime-syntax` can only assign scopes by matching text; a zero-width one was tried and rejected because Sublime renders format characters as their codepoint. No `.sublime-color-scheme` is shipped: `font_style` (italic/bold) is the only thing a syntax cannot express, and colour-scheme overrides merge by the ACTIVE scheme's name, so they silently stop applying when the user switches schemes. Colours are picked so no two elements share a hue in Mariana: header orange (`entity.name.class`), `+N` green (`markup.inserted`), `-M` red (`markup.deleted`), unresolved-count blue (`support.type`), pending-count and visited rows grey (`comment.*`), CODEOWNERS mauve (`support.constant`). Mariana has no further distinct hue reachable by a scope (`orange3` is a true yellow but no rule maps to it), and `invalid` / `markup.raw` / `diff.inserted` must be avoided because they set a BACKGROUND. A blank line separates the header from the rows, and the PR description (`pr["body"]`, CRLF- and trailing-blank normalised by `panel._description_lines`) trails the rows after another blank line so it never pushes them out of view. That description is free text sharing the row rules, so an `@mention` in it is tinted mauve and a `host:port` in it is a (harmless) `result_file_regex` target; the header and marker rules are anchored tightly (`^PR #\d+ ·`, `^●(?= [+ ])`) so prose cannot be mistaken for a row. `syntax_test.py` guards the marker character, the grey-by-inheritance scope, the absence of a colour-scheme override, and the un-anchored `+N -M` rule against silent drift. Both nav targets (the file row's first hunk and the sub-row's first comment) are translated out of head-commit numbering by `plugin._files_panel_body`, which builds a path→view map once (`_open_views`, shared with the marker) and runs each line through `anchors.remap_head_row`; a file that is not open keeps its head line, since without a buffer nothing can have drifted. `_refresh_files_panel` REWRITES the panel in place (`github_pull_request_set_text` + restored `viewport_position`) instead of destroying and recreating it, so refreshing never resets the scroll position nor re-runs `show_panel`. Because the panel now outlives a load (only End review destroys it), `_files_panel` re-applies `result_base_dir` on every call: it depends on `SESSION.root`, so a second Load in the same window would otherwise keep resolving clicks against the previous repository. the listener refreshes on `on_load_async` and (deferred one tick) `on_pre_close` so the markers track the tab set, and on `on_modified_async` (debounced via `_redraw_when_settled`) so the nav lines track local edits. That debounce schedules a `set_timeout(_REDRAW_DELAY_MS)` per keystroke but only acts if `change_count` has not moved since, so a burst of typing costs ONE redraw instead of one per character — it matters because each redraw re-derives the head-to-buffer mapping, i.e. a `git show HEAD:<path>` plus a full diff. It also redraws the gutter icons, which before it only refreshed on save or on switching tabs. It fires only for a loaded review and a path in `files_by_path`, which excludes the compose buffer and the panel itself (neither has a file name), so rewriting the panel cannot re-enter the handler. Owners come from a single `codeowners -- <all paths>` call at load (`owners.codeowners_map`, cached in `SESSION.owners_by_path`); they trail the `path:line` nav token so column alignment is preserved and `result_file_regex` (no longer `$`-anchored) still finds the target. Colored by `GithubPullRequestFiles.sublime-syntax`, not by `render.py`.
+#### The changed-files panel
+
+`panel.py` builds the TEXT; `plugin.py` only creates the output panel and its settings; the colouring is `GithubPullRequestFiles.sublime-syntax`'s job. Two rows per file, each its own `result_file_regex` click target:
+
+```
+<marker>+N -M                       path:hunkline  <owners>
+<marker>    (K unresolved) (P pending)  path:commentline
+```
+
+**The marker slot.** `● ` when the file is open as a tab in that window, two blanks otherwise, both the same width so the path column never shifts, and outside the `path:line` token so navigation still matches. `plugin._open_views` walks `window.views()`, so the cost follows the number of open tabs rather than the size of the PR. A real character is unavoidable: a `.sublime-syntax` can only assign scopes by matching TEXT. A zero-width one was tried and rejected, because Sublime renders format characters as their codepoint.
+
+**Greying an open row** works by inheritance, not by a colour scheme. The syntax pushes a context on `^●` and scopes both the marker and that row's `path:line` token `comment.open-file.*`; every scheme dims anything under `comment.`, so a visited file recedes. Keep those scopes under `comment.` or they silently take the default foreground. No `.sublime-color-scheme` is shipped, deliberately: `font_style` (italic/bold) is the only thing a syntax cannot express, and scheme overrides merge by the ACTIVE scheme's NAME, so they stop applying the moment the user switches schemes.
+
+**Colours** are picked so no two elements share a hue in Mariana, and are all foreground-only:
+
+| Element                | Scope               | Hue              |
+| ---------------------- | ------------------- | ---------------- |
+| PR header              | `entity.name.class` | orange           |
+| `+N`                   | `markup.inserted`   | green            |
+| `-M`                   | `markup.deleted`    | red              |
+| `(K unresolved)`       | `support.type`      | blue             |
+| `(P pending)`          | `comment`           | grey             |
+| CODEOWNERS (`\S*@\S+`) | `support.constant`  | mauve            |
+| open row               | `comment.open-file` | grey (inherited) |
+
+Mariana has no further distinct hue reachable by a scope (`orange3` is a true yellow, but no rule maps to it). Never use `invalid`, `markup.raw` or `diff.inserted` here: they set a BACKGROUND.
+
+**Layout.** A blank line separates the header from the rows; the PR description (`pr["body"]`, CRLF- and trailing-blank normalised by `panel._description_lines`) trails them after another blank line, so it never pushes the rows out of view of a panel a few lines tall. That description is free text sharing the row rules, so an `@mention` in it is tinted mauve and a `host:port` in it is a (harmless) `result_file_regex` target; the header and marker rules are anchored tightly (`^PR #\d+ ·`, `^●(?= [+ ])`) so prose cannot be mistaken for a row. Owners come from a single `codeowners -- <all paths>` call at load (`owners.codeowners_map`, cached in `SESSION.owners_by_path`) and trail the `path:line` token, so alignment is kept and the no-longer-`$`-anchored `result_file_regex` still finds its target.
+
+**`syntax_test.py` guards the drift** between the two files, which reference each other only by string and would fail with NO error: the marker character, the grey-by-inheritance scopes, the absence of a colour-scheme override, the un-anchored `+N -M` rule (it must not repaint a hyphen inside a path), and that every token rule still matches a row `panel.py` actually emits.
+
+**Nav lines are head-commit lines.** Both targets (the file row's first hunk, the sub-row's first comment) are translated by `plugin._files_panel_body`, which builds the path→view map once (`_open_views`, shared with the marker) and runs each line through `anchors.remap_head_row`. A file that is not open keeps its head line: with no buffer, nothing can have drifted.
+
+**Refreshing rewrites in place** (`github_pull_request_set_text` + restored `viewport_position`) rather than destroying and recreating, so a refresh never resets the scroll position nor re-runs `show_panel`. Because the panel outlives a load (only End review destroys it), `_files_panel` re-applies `result_base_dir` on every call: it depends on `SESSION.root`, so a second Load in the same window would otherwise keep resolving clicks against the previous repository.
+
+**When it refreshes.** `on_load_async` and (deferred one tick) `on_pre_close`, so the markers track the tab set; and `on_modified_async` through the `_redraw_when_settled` debounce, so the nav lines and the gutter icons track local edits (before that debounce existed, icons only refreshed on save or on a tab switch). The debounce schedules one async timer per keystroke but acts only if `change_count` has not moved since, so a burst of typing costs ONE redraw rather than one per character. That matters because each redraw re-derives the head-to-buffer mapping, i.e. a `git show <head_oid>:<path>` plus a full diff — which is also why the timer is `set_timeout_async` and the redraw goes through `_redraw_all`; see the threading rule in AGENTS.md. It fires only for a loaded review and a path in `files_by_path`, which excludes the compose buffer and the panel itself (neither has a file name), so rewriting the panel cannot re-enter the handler.
 
 ### `gh.py` (injectable subprocess client; NO `sublime` import)
 
@@ -245,8 +295,10 @@ class GH:
         """`gh pr diff [<number>]` -> raw unified diff text."""
 
     def pr_view(self, number: Optional[int] = None, fields: Optional[List[str]] = None) -> Dict:
-        """`gh pr view [<number>] --json <fields>` -> parsed dict. Default fields:
-           number,title,baseRefName,url,state."""
+        """`gh pr view [<number>] --json <fields>` -> parsed dict. Default fields (_PR_VIEW_FIELDS):
+           number,title,baseRefName,url,state,headRefOid,body. headRefOid is NOT optional — every
+           buffer<->PR line mapping is computed against it (see anchors._base_rev) — and body is
+           what the files panel shows under the rows."""
 ```
 
 `gh` NEVER runs `gh auth token`; it relies on gh's own credential store.
@@ -269,7 +321,10 @@ class Review:
     # buffer<->PR mapping in anchors.py is computed against it, not local HEAD.
     def resolve_pr(self) -> Dict:
         """Infer the PR from the current branch via gh.pr_view(); derive owner/repo from the
-           returned url. Returns {'number','title','base','state','owner','repo'}.
+           returned url. Returns
+           {'number','title','base','state','owner','repo','url','head_oid','body'}.
+           `url` is stored VERBATIM (not rebuilt from owner/repo/number) because only it
+           carries the host, which is what keeps GitHub Enterprise working.
            `_load` refuses to load unless state == 'OPEN' (open/draft)."""
 
     def merge_base(self) -> str:
@@ -282,7 +337,11 @@ class Review:
         """GraphQL pullRequest.reviewThreads (paginated). Each thread dict per the shape below.
            Fetched once at load; the caller keys them by path. reviewThreads DOES return the
            viewer's own pending draft threads, so any thread whose root comment state is PENDING
-           is skipped here (it comes from load_pending instead, else it would show twice)."""
+           is skipped here (it comes from load_pending instead, else it would show twice); that
+           root comment is always on the first page, so the skip is pagination-independent.
+           BOTH levels paginate: a nested connection is capped at 100 rows whatever the outer
+           page asks for, so each thread's comments are completed by a follow-up query on the
+           thread node (_THREAD_COMMENTS_QUERY via _all_comments)."""
 
     def base_blob(self, path: str) -> Optional[str]:
         """read-only `git show <merge_base>:<path>` -> text, or None (added file / not found)."""
@@ -295,9 +354,13 @@ class Review:
     # list position, so a popup action stays correct even if the queue shifts.
 
     def load_pending(self) -> None:
-        """One GraphQL query: pullRequest.id + reviews(states:[PENDING]).
+        """GraphQL: pullRequest.id + reviews(states:[PENDING]).
            Sets _pr_node_id; if a viewer-authored PENDING review exists, sets _pending_review_id
-           and rebuilds _drafts from its comments. Resets _local_comments. Called once at load."""
+           and rebuilds _drafts from its comments. Resets _local_comments. Called once at load.
+           Paginates BOTH the reviews connection (the viewer's can sit past page one) and that
+           review's comments (_REVIEW_COMMENTS_QUERY): overflow drafts missing from the mirror
+           stay live on GitHub with nothing able to edit or discard them. Stops at the first
+           viewer-authored review, since there is only ever one."""
 
     def queue_comment(self, path: str, payload: Dict, body: str) -> None:
         """Try to sync (_sync_draft: lazy addPullRequestReview + addPullRequestReviewThread).
@@ -348,10 +411,11 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
 {
   "id": str,                 # GraphQL thread node id (for resolve/reply)
   "path": str,
-  "line": Optional[int],     # head-side line (RIGHT); may be None if outdated
+  "line": Optional[int],     # line on `side` (NOT always head); may be None if outdated
   "original_line": Optional[int],
-  "side": str,               # "RIGHT" | "LEFT"
+  "side": str,               # "RIGHT" | "LEFT" -- resolve through LineMap.anchor_to_row
   "start_line": Optional[int],
+  "original_start_line": Optional[int],   # an outdated range keeps BOTH ends only here
   "is_resolved": bool,
   "is_outdated": bool,
   "url": str,
@@ -367,13 +431,19 @@ Thread dict shape (produced by `review_threads`, consumed by `render.thread_popu
 
 ## Glue layer (imports `sublime`)
 
-- `state.py` — `SESSION` singleton (no `sublime` import): `pr` meta, `threads_by_path`, `files` + `files_by_path`, `line_maps: Dict[str, LineMap]`, `review: Review`, `base_blob_cache`, `root`, `active`. Plus `unresolved_count`, `pending_by_path`, and `file_entries_for_panel` (alphabetical, enriched with `unresolved` + `pending` counts).
-- `anchors.py` — the only module that knows where a comment sits in the buffer right now. `selection_to_head(view, start_row, end_row)` maps a selection buffer→head when authoring; `remap_head_row(view, head_row)` maps head→buffer for every placement (icons, popups, navigation, suggestion-apply), so icons track the right line even after local edits shift the buffer. `thread_rows` / `draft_rows` give a comment's whole covered span (github.com highlights the full range) while `thread_row` (its first row) stays the single navigation stop. Two caches: `view_opcodes` keyed on `change_count`, and thread rows additionally keyed on `_THREADS_STAMP` because `on_hover` hit-tests every thread on each mouse move. Invalidation is exposed as `bump_threads_stamp()` (called after the thread index is rebuilt), `forget_view(view_id)` and `clear_caches()`, since `global` cannot cross modules. The pure arithmetic it drives lives in `mapper.py`.
-- `plugin.py` — commands + `GithubPullRequestListener`. All gh/git calls run through `sublime.set_timeout_async`; UI mutation (regions, popups, panels, status) back on the main thread via `set_timeout`. Decoration = `set_reference_document` diff (empty base for new files → all green)
-  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`), placed through `anchors`. Popups (on hover, or when comment navigation lands on a commented line) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. A queue that can't reach GitHub notifies but keeps the comment locally (no re-prompt). `End review` prompts `yes_no_cancel`: if there are unsent (local) comments, Submit to GitHub / Discard / Cancel (`flush_local` vs `clear_drafts`); otherwise, for the already-synced pending review, Keep on GitHub / Discard from GitHub / Cancel. Action links that are not plugin actions (or an `open` action) are handed to the browser only when they are `http(s)` — popup bodies come from comment HTML any PR participant can write.
+- `state.py` — `SESSION` singleton (no `sublime` import, so it is unit-tested in `state_test.py` and is NOT part of the glue): `pr` meta, `threads_by_path`, `files` + `files_by_path`, `line_maps: Dict[str, LineMap]`, `review: Review`, `base_blob_cache` + `base_blob_pending` (paths a worker is already fetching, so two views on one file cannot each spawn a `git show`), `owners_by_path`, `root`, `active`. Plus `unresolved_count`, `pending_by_path`, and `file_entries_for_panel` (alphabetical, enriched with `unresolved` + `pending` + `owners` on COPIES, never writing through to `files`). `reset()` must leave every field empty: it is all `End review` relies on.
+- `anchors.py` — the only module that knows where a comment sits in the buffer right now. `selection_to_head(view, start_row, end_row)` maps a selection buffer→head when authoring; `remap_head_row(view, head_row)` maps head→buffer for every placement (icons, popups, navigation, suggestion-apply), so icons track the right line even after local edits shift the buffer. `thread_rows` / `draft_rows` give a comment's whole covered span (github.com highlights the full range) while `thread_row` (its first row) stays the single navigation stop. Two caches: `view_opcodes` keyed on `change_count`, and thread rows additionally keyed on `_THREADS_STAMP` because `on_hover` hit-tests every thread on each mouse move. Invalidation is exposed as `bump_threads_stamp()` (called after the thread index is rebuilt), `forget_view(view_id)` and `clear_caches()`, since `global` cannot cross modules. `warm_opcodes(views)` fills the opcode cache and is WORKER-THREAD ONLY, for the reason below. The pure arithmetic it drives lives in `mapper.py`.
+- `plugin.py` — commands + `GithubPullRequestListener`. All gh/git calls run through `sublime.set_timeout_async`; UI mutation (regions, popups, panels, status) back on the main thread via `set_timeout`.
+
+  **The head-to-buffer mapping counts as I/O.** `anchors.view_opcodes` is a `git show` plus a full diff PER FILE, and every placement reads it, so a redraw spanning all open PR files must never start on the main thread. `_redraw_all(window, done_message)` is the single entry point: it warms the cache on the worker, then draws through `_main`. `_load` builds the session on the worker for the same reason (it is pure state, and `_build_session` has just cleared the caches, so drawing first would pay for every file). Deferred recomputation uses `set_timeout_async` (`_redraw_when_settled`, `_show_when_ready`). The full rule is in AGENTS.md.
+
+  Decoration = `set_reference_document` diff (empty base for new files → all green)
+
+  - blue thread gutter icons (`githubpullrequest.threads`) + purple draft gutter icons (`githubpullrequest.drafts`), placed through `anchors`, added with `sublime.HIDDEN` and deliberately NOT `PERSISTENT` (persistent regions are saved into the workspace, so quitting mid-review would restore icons with no session behind them and `End review` disabled). Popups (on hover, or when comment navigation lands on a commented line) render threads and pending drafts; action links dispatched through `render.decode_action`. Suggestion-apply edits the buffer via the internal `github_pull_request_replace_lines` TextCommand. The changed-files bottom panel is built here. Queue/discard/submit are network round-trips (server-backed drafts), so they run in `_async` workers with `GHError` handling. A queue that can't reach GitHub notifies but keeps the comment locally (no re-prompt). `End review` prompts `yes_no_cancel`: if there are unsent (local) comments, Submit to GitHub / Discard / Cancel (`flush_local` vs `clear_drafts`); otherwise, for the already-synced pending review, Keep on GitHub / Discard from GitHub / Cancel. Action links that are not plugin actions (or an `open` action) are handed to the browser only when they are `http(s)` — popup bodies come from comment HTML any PR participant can write. That is the LAST of three gates, not the only one: the sanitizer strips a non-`http(s)` href before it can ever look like an action (a `subl:githubpullrequest?` one in a body would be dispatched ahead of this check), and `_handle_action` validates each parameter (`render.action_int`, a required `id`) so a forged link is a no-op instead of an exception in the link callback.
+
 - `.sublime-commands` — palette entries, captions prefixed `GithubPullRequest:` (match siblings). Two commands work WITHOUT a loaded review (`github_pull_request_review_in_tmux`, `github_pull_request_open_in_browser`); both resolve the repo through `_window_root` (session root, else `git_root` of the window's cwd). Open-in-browser prefers `SESSION.pr["url"]` (no round-trip) and otherwise falls back to `gh pr view --json url`; the url is stored verbatim by `resolve_pr` rather than rebuilt from owner/repo/number, because only it carries the host (GitHub Enterprise). It goes through `_open_external`, so a non-`http(s)` url is refused like any comment link.
-- `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `hide_outdated` (bool; drops outdated threads in `_index_threads` so all surfaces exclude them), `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip), then `_open_compose` opens a scratch buffer in a split **below** the file (`layout.split_below_layout` adds a full-width bottom group; existing groups shrink into the top 70%). The buffer is prefilled with `"<emoji> <label>: "` (or, when the commented line(s) carry the reviewer's own local uncommitted edits — buffer vs `git show HEAD:<path>` via `anchors.selection_to_head` — with `"<label>:\n```suggestion\n<edited line(s)>\n```"`, fence on its own line, for ANY label). `anchors.selection_to_head` also maps the selected buffer rows onto the PR head-commit rows (walking the same diff, via the pure `mapper.head_anchor`) so the comment's `line`/`start_line` point at the head lines even when local edits shifted the buffer, keeping the suggestion applicable as-is. Locally DELETED lines count as edits too and pull their head lines into the range, which is what makes a "remove these lines" suggestion possible (they are zero-width in the buffer, so they are matched as a position between rows, not by row overlap). **Save** runs `github_pull_request_submit_comment` (bound in `Default.sublime-keymap`, context `setting.github_pull_request_compose`) which queues the whole buffer as the body; **closing without saving cancels**. `on_pre_close` restores the saved layout (`_restore_after_compose`) and refocuses the file for either path. The compose view carries `github_pull_request_compose` + a `context` (`{mode:"new", path, payload}`, `{mode:"edit", uid}`, or `{mode:"reply", thread_id}`) + source-id + orig-layout in its settings. The pending-popup **Edit** link reuses the split with `mode:"edit"` (prefilled with the current body; save updates it — server-side for synced drafts, mirror for local ones), and a thread **Reply** uses `mode:"reply"` (save posts via `reply_comment`, then `_reload_threads`). Only the review-summary prompt on submit still uses an input panel. Also `agent_command` (array, default `["claude"]`) and `agent_review_prompt` (`{base}` placeholder) for the `github_pull_request_review_in_tmux` command, which `tmux split-window`s the attached session (auto-detected via `tmux list-sessions`) in the repo root running `<agent_command> <prompt>` (joined + `shlex.quote`d into one shell string, prompt last); base = loaded PR base else `git symbolic-ref refs/remotes/origin/HEAD`. No git mutation (tmux + read-only git only).
+- `GithubPullRequest.sublime-settings` — `auto_show_popup`, `show_gutter_icon`, `hide_outdated` (bool; drops outdated threads in `_index_threads` so all surfaces exclude them), `gutter_icon`, `conventional_comments` (bool), `comment_labels` (list of `{emoji?, label, description}`). When `conventional_comments` is on, `github_pull_request_add_comment` first shows a fuzzy quick panel of labels (plus a "(plain comment)" skip), then `_open_compose` opens a scratch buffer in a split **below** the file (`layout.split_below_layout` adds a full-width bottom group; existing groups shrink into the top 70%). The buffer is prefilled with `"<emoji> <label>: "` (or, when the commented line(s) carry the reviewer's own local uncommitted edits — buffer vs `git show <head_oid>:<path>` via `anchors.selection_to_head` — with `"<label>:\n```suggestion\n<edited line(s)>\n```"`, fence on its own line, for ANY label). The suggestion is SKIPPED when `comment_range` narrowed the payload: the block holds the whole selection, so GitHub would apply it over fewer lines than it covers and change code the comment is not anchored to. `anchors.selection_to_head` also maps the selected buffer rows onto the PR head-commit rows (walking the same diff, via the pure `mapper.head_anchor`) so the comment's `line`/`start_line` point at the head lines even when local edits shifted the buffer, keeping the suggestion applicable as-is. Locally DELETED lines count as edits too and pull their head lines into the range, which is what makes a "remove these lines" suggestion possible (they are zero-width in the buffer, so they are matched as a position between rows, not by row overlap). **Save** runs `github_pull_request_submit_comment` (bound in `Default.sublime-keymap`, context `setting.github_pull_request_compose`) which queues the whole buffer as the body; **closing without saving cancels**. `on_pre_close` restores the saved layout (`_restore_after_compose`) and refocuses the file for either path. The compose view carries `github_pull_request_compose` + a `context` (`{mode:"new", path, payload}`, `{mode:"edit", uid}`, or `{mode:"reply", thread_id}`) + source-id + orig-layout in its settings. The pending-popup **Edit** link reuses the split with `mode:"edit"` (prefilled with the current body; save updates it — server-side for synced drafts, mirror for local ones), and a thread **Reply** uses `mode:"reply"` (save posts via `reply_comment`, then `_reload_threads`). Only the review-summary prompt on submit still uses an input panel. Also `agent_command` (array, `["claude"]`) and `agent_review_prompt` (`{base}` placeholder) for the `github_pull_request_review_in_tmux` command, which `tmux split-window`s the attached session (auto-detected via `tmux list-sessions`) in the repo root running `<agent_command> <prompt>` (joined + `shlex.quote`d into one shell string, prompt last); base = loaded PR base else `git symbolic-ref refs/remotes/origin/HEAD`. No git mutation (tmux + read-only git only). This file is the ONLY copy of every default listed here: `plugin.py` reads them with no Python fallback, tolerating a string `agent_command` (`shlex.split`) and reporting a stray brace in the prompt rather than letting `str.format` raise in the worker.
 - `Default.sublime-keymap` — binds Save (`super+s` / `ctrl+s`) to `github_pull_request_submit_comment`, scoped by `setting.github_pull_request_compose` so it only affects the compose buffer.
-- `GithubPullRequestFiles.sublime-syntax` — colors the bottom panel (assigned to the output panel): `+N` green / `-M` red (markup.inserted/deleted), `(K unresolved)` yellow (markup.changed), `(P pending)` dimmed (comment), CODEOWNERS blue (entity.name.function, matched as `\S*@\S+`). Foreground-only scopes so there is no background fill.
-- `ruff.toml` — pins the lint target to Python 3.8 and mutes the rules that fight the constraints above (`FA100`, `PLW1510`).
+- `GithubPullRequestFiles.sublime-syntax` — colors the bottom panel (assigned to the output panel). Scope table and rationale in **The changed-files panel** above; that is the single description, do not restate it here.
+- `ruff.toml` — pins the lint target to Python 3.8, selects its rule families EXPLICITLY (ruff's default is only `E4`/`E7`/`E9`/`F`, so an `extend-ignore` for anything outside that was muting a rule that had never run), and ignores what fights the constraints above, each with its reason.
 - Installation into this dotfiles repo: `install_plugin "${TEXT_PKG}" "GithubPullRequest"` in `tools/sublime/init.sh`.

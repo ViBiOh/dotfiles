@@ -34,7 +34,7 @@ def codeowners_map(
     run = runner if runner is not None else _default_runner
 
     try:
-        returncode, stdout, _ = run(["codeowners", "--"] + list(paths), root)
+        returncode, stdout, _ = run(["codeowners", "--", *paths], root)
     except (OSError, subprocess.SubprocessError):
         return {}
 

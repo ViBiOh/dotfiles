@@ -19,6 +19,9 @@ class Session:
         self.threads_by_path = {}
         self.line_maps = {}
         self.base_blob_cache = {}
+        # Paths whose base blob a worker is already fetching, so a second view activating
+        # on the same file does not spawn a duplicate `git show`.
+        self.base_blob_pending = set()
         self.owners_by_path = {}
 
     def unresolved_count(self, path):

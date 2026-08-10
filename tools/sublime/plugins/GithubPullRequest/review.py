@@ -1,3 +1,4 @@
+import contextlib
 import subprocess
 from typing import Callable, Dict, List, Optional, Tuple
 
@@ -39,8 +40,35 @@ _THREADS_QUERY = """query($owner:String!,$repo:String!,$number:Int!,$cursor:Stri
         pageInfo{ hasNextPage endCursor }
         nodes{
           id isResolved isOutdated path line originalLine startLine originalStartLine diffSide
-          comments(first:100){ nodes{ author{login} body bodyHTML createdAt url state } }
+          comments(first:100){
+            pageInfo{ hasNextPage endCursor }
+            nodes{ author{login} body bodyHTML createdAt url state }
+          }
         }
+      }
+    }
+  }
+}"""
+
+# GitHub caps a nested connection at 100 rows, so a long conversation needs a follow-up
+# query addressed at the thread node itself. Same for a big pending review below.
+_THREAD_COMMENTS_QUERY = """query($id:ID!,$cursor:String){
+  node(id:$id){
+    ... on PullRequestReviewThread {
+      comments(first:100, after:$cursor){
+        pageInfo{ hasNextPage endCursor }
+        nodes{ author{login} body bodyHTML createdAt url state }
+      }
+    }
+  }
+}"""
+
+_REVIEW_COMMENTS_QUERY = """query($id:ID!,$cursor:String){
+  node(id:$id){
+    ... on PullRequestReview {
+      comments(first:100, after:$cursor){
+        pageInfo{ hasNextPage endCursor }
+        nodes{ id path line startLine body }
       }
     }
   }
@@ -66,14 +94,18 @@ _UNRESOLVE_MUTATION = """mutation($id:ID!){
 
 # The local draft queue is backed by a real GitHub PENDING review, so queued
 # comments survive crashes/restarts and are visible on github.com until submitted.
-_PENDING_QUERY = """query($owner:String!,$repo:String!,$number:Int!){
+_PENDING_QUERY = """query($owner:String!,$repo:String!,$number:Int!,$cursor:String){
   repository(owner:$owner,name:$repo){
     pullRequest(number:$number){
       id
-      reviews(first:50, states:[PENDING]){
+      reviews(first:50, states:[PENDING], after:$cursor){
+        pageInfo{ hasNextPage endCursor }
         nodes{
           id viewerDidAuthor
-          comments(first:100){ nodes{ id path line startLine body } }
+          comments(first:100){
+            pageInfo{ hasNextPage endCursor }
+            nodes{ id path line startLine body }
+          }
         }
       }
     }
@@ -254,9 +286,28 @@ class Review:
 
         return threads
 
+    def _all_comments(self, query: str, node_id: str, first_page: Dict) -> List[Dict]:
+        """Every comment node of a connection whose first page is already in hand,
+        following ``pageInfo`` with follow-up queries against the owning node."""
+        nodes = list(first_page["nodes"])
+        page_info = first_page.get("pageInfo") or {}
+
+        while page_info.get("hasNextPage"):
+            data = self._gh.graphql(
+                query, {"id": node_id, "cursor": page_info["endCursor"]}
+            )
+            connection = data["node"]["comments"]
+
+            nodes.extend(connection["nodes"])
+            page_info = connection["pageInfo"]
+
+        return nodes
+
     def _map_thread(self, node: Dict) -> Dict:
         comments = []
-        for comment in node["comments"]["nodes"]:
+        for comment in self._all_comments(
+            _THREAD_COMMENTS_QUERY, node["id"], node["comments"]
+        ):
             author = comment.get("author")
             login = author["login"] if author else "ghost"
 
@@ -299,45 +350,61 @@ class Review:
     def load_pending(self) -> None:
         """Fetch the PR node id and restore any existing PENDING review authored by
         the current user into the local draft mirror. Called once at load."""
-        data = self._gh.graphql(
-            _PENDING_QUERY,
-            {
-                "owner": self._pr["owner"],
-                "repo": self._pr["repo"],
-                "number": self._pr["number"],
-            },
-        )
-
-        pull = data["repository"]["pullRequest"]
-        self._pr_node_id = pull["id"]
         self._pending_review_id = None
         self._drafts = []
         self._local_comments = []
 
-        for review in pull["reviews"]["nodes"]:
-            if not review.get("viewerDidAuthor"):
-                continue
+        cursor = None
+        while True:
+            variables = {
+                "owner": self._pr["owner"],
+                "repo": self._pr["repo"],
+                "number": self._pr["number"],
+            }
+            if cursor is not None:
+                variables["cursor"] = cursor
 
-            self._pending_review_id = review["id"]
-            for comment in review["comments"]["nodes"]:
-                # PullRequestReviewComment has no side field (it lives on the thread);
-                # the plugin only authors RIGHT-side drafts, so restore them as RIGHT.
-                draft = {
-                    "comment_id": comment["id"],
-                    "path": comment["path"],
-                    "body": comment["body"],
-                    "side": "RIGHT",
-                    "line": comment.get("line"),
-                }
+            data = self._gh.graphql(_PENDING_QUERY, variables)
 
-                if comment.get("startLine"):
-                    draft["start_line"] = comment["startLine"]
-                    draft["start_side"] = draft["side"]
+            pull = data["repository"]["pullRequest"]
+            self._pr_node_id = pull["id"]
+            connection = pull["reviews"]
 
-                draft["uid"] = self._new_uid()
-                self._drafts.append(draft)
+            for review in connection["nodes"]:
+                if not review.get("viewerDidAuthor"):
+                    continue
 
-            break
+                self._pending_review_id = review["id"]
+                self._restore_drafts(review)
+
+                return
+
+            page_info = connection.get("pageInfo") or {}
+            if not page_info.get("hasNextPage"):
+                return
+
+            cursor = page_info["endCursor"]
+
+    def _restore_drafts(self, review: Dict) -> None:
+        for comment in self._all_comments(
+            _REVIEW_COMMENTS_QUERY, review["id"], review["comments"]
+        ):
+            # PullRequestReviewComment has no side field (it lives on the thread);
+            # the plugin only authors RIGHT-side drafts, so restore them as RIGHT.
+            draft = {
+                "comment_id": comment["id"],
+                "path": comment["path"],
+                "body": comment["body"],
+                "side": "RIGHT",
+                "line": comment.get("line"),
+            }
+
+            if comment.get("startLine"):
+                draft["start_line"] = comment["startLine"]
+                draft["start_side"] = draft["side"]
+
+            draft["uid"] = self._new_uid()
+            self._drafts.append(draft)
 
     def _new_uid(self) -> int:
         uid = self._next_uid
@@ -505,13 +572,11 @@ class Review:
         if self._pending_review_id is None:
             return
 
-        try:
+        # Deleting a pending review's last comment already removes the now-empty review,
+        # so its id may no longer resolve. Either way the desired end state (no pending
+        # review) is reached, so treat a failure here as done.
+        with contextlib.suppress(GHError):
             self._gh.graphql(_DELETE_REVIEW_MUTATION, {"rid": self._pending_review_id})
-        except GHError:
-            # Deleting a pending review's last comment already removes the now-empty
-            # review, so its id may no longer resolve. Either way the desired end state
-            # (no pending review) is reached, so treat this as done.
-            pass
 
         self._pending_review_id = None
 

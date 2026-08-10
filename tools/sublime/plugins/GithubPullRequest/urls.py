@@ -7,10 +7,13 @@ _PR_PATH_RE = re.compile(r"^/([^/]+)/([^/]+)/pull/(\d+)(?:/.*)?$")
 
 def parse_pr_url(url: str) -> Optional[Dict]:
     """https://github.com/OWNER/REPO/pull/NUMBER[/...] ->
-    {"host": "github.com", "owner": str, "repo": str, "number": int}, else None.
+    {"owner": str, "repo": str, "number": int}, else None.
     Tolerates trailing slashes, /files, #discussion fragments, query strings, and
     GitHub Enterprise hosts (e.g. github.mycorp.com). Returns None for non-PR URLs
-    (issues, tree, blob), malformed input, and empty strings."""
+    (issues, tree, blob), malformed input, and empty strings.
+
+    The host is validated but not returned: nothing rebuilds a URL from these parts (the
+    PR's own url is kept verbatim by review.resolve_pr precisely so the host survives)."""
     if not url or not isinstance(url, str):
         return None
 
@@ -22,8 +25,7 @@ def parse_pr_url(url: str) -> Optional[Dict]:
     if parsed.scheme not in ("http", "https"):
         return None
 
-    host = parsed.hostname
-    if not host:
+    if not parsed.hostname:
         return None
 
     match = _PR_PATH_RE.match(parsed.path)
@@ -33,7 +35,6 @@ def parse_pr_url(url: str) -> Optional[Dict]:
     owner, repo, number = match.groups()
 
     return {
-        "host": host,
         "owner": owner,
         "repo": repo,
         "number": int(number),

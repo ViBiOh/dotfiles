@@ -31,9 +31,8 @@ def _patterns(text):
     """Every `- match:` pattern, unquoted."""
     out = []
     for raw in _MATCH_RE.findall(text):
-        if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in "'\"":
-            raw = raw[1:-1]
-        out.append(raw)
+        quoted = len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in "'\""
+        out.append(raw[1:-1] if quoted else raw)
 
     return out
 
@@ -94,6 +93,44 @@ class SyntaxTest(unittest.TestCase):
                 self.assertIn(len(found), (0, 1), found)
                 for plus, minus in found:
                     self.assertEqual((plus, minus), ("+2", "-0"), row)
+
+    def test_every_row_token_matches_a_row_panel_actually_emits(self):
+        """The marker and the stats pair were guarded, but the other three token rules
+        were not, so renaming a count or an owners token in panel.py would silently lose
+        its colour. These rows are the shapes `panel.files_panel_text` builds."""
+        patterns = _patterns(self.syntax)
+
+        def rule(fragment):
+            return re.compile(next(p for p in patterns if fragment in p))
+
+        file_row = f"{panel._CLOSED_MARKER}{'+42 -7'.ljust(panel._PATH_COL)}src/a.go:118  @team"
+        notes_row = (
+            f"{panel._OPEN_MARKER}"
+            f"{'    (2 unresolved) (1 pending)'.ljust(panel._PATH_COL)}src/a.go:145"
+        )
+
+        cases = {
+            "stats": (r"\+\d+", file_row, ["+42"]),
+            "unresolved": ("unresolved", notes_row, ["(2 unresolved)"]),
+            "pending": ("pending", notes_row, ["(1 pending)"]),
+            "owners": ("@", file_row, ["@team"]),
+        }
+
+        for name, (fragment, row, expected) in cases.items():
+            with self.subTest(name):
+                found = rule(fragment).findall(row)
+                flat = [f[0] if isinstance(f, tuple) else f for f in found]
+
+                self.assertEqual(flat, expected, row)
+
+    def test_header_rule_matches_the_header_panel_emits(self):
+        header = "PR #42 · Add feature · 3 files · 1 pending"
+        rule = re.compile(next(p for p in _patterns(self.syntax) if "PR #" in p))
+
+        self.assertTrue(rule.match(header), header)
+        # A description line merely mentioning a PR must not be painted as the header.
+        self.assertIsNone(rule.match("see PR #7 for context"))
+        self.assertIsNone(rule.match("PR #7 without the separator"))
 
     def test_open_row_is_grey_by_inheritance(self):
         # Greying an already-visited row relies ENTIRELY on its scopes living under

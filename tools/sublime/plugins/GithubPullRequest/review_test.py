@@ -395,6 +395,121 @@ class ReviewThreadsTest(unittest.TestCase):
         self.assertIn("cursor=CURSOR1", second_args)
 
 
+class ThreadCommentPaginationTest(unittest.TestCase):
+    """GitHub caps a nested connection at 100 rows, so a long conversation needs a
+    follow-up query on the thread node. Without it a thread silently lost comments."""
+
+    def _threads_page(self, has_next):
+        return {
+            "repository": {
+                "pullRequest": {
+                    "reviewThreads": {
+                        "pageInfo": {"hasNextPage": False, "endCursor": None},
+                        "nodes": [
+                            {
+                                "id": "T1",
+                                "isResolved": False,
+                                "isOutdated": False,
+                                "path": "foo.py",
+                                "line": 3,
+                                "originalLine": 3,
+                                "startLine": None,
+                                "originalStartLine": None,
+                                "diffSide": "RIGHT",
+                                "comments": {
+                                    "pageInfo": {
+                                        "hasNextPage": has_next,
+                                        "endCursor": "CC1",
+                                    },
+                                    "nodes": [
+                                        {
+                                            "author": {"login": "alice"},
+                                            "body": "first",
+                                            "createdAt": "2026-01-01T00:00:00Z",
+                                            "url": "u1",
+                                        }
+                                    ],
+                                },
+                            }
+                        ],
+                    }
+                }
+            }
+        }
+
+    def _comment_page(self, login, body, has_next, cursor=None):
+        return _wrap(
+            {
+                "node": {
+                    "comments": {
+                        "pageInfo": {"hasNextPage": has_next, "endCursor": cursor},
+                        "nodes": [
+                            {
+                                "author": {"login": login},
+                                "body": body,
+                                "createdAt": "2026-01-02T00:00:00Z",
+                                "url": "u2",
+                            }
+                        ],
+                    }
+                }
+            }
+        )
+
+    def test_follows_the_comment_cursor(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _wrap(self._threads_page(has_next=True)),
+                self._comment_page("bob", "second", True, "CC2"),
+                self._comment_page("carol", "third", False),
+            ],
+        )
+        review = _make_review(gh_runner, ScriptedGit())
+        review.resolve_pr()
+
+        threads = review.review_threads()
+
+        self.assertEqual(len(threads), 1)
+        self.assertEqual(
+            [c["body"] for c in threads[0]["comments"]], ["first", "second", "third"]
+        )
+        # The first page's cursor must be sent, then the second page's.
+        cursors = [
+            arg
+            for call in gh_runner.calls
+            for arg in call["args"]
+            if arg.startswith("cursor=")
+        ]
+        self.assertEqual(cursors, ["cursor=CC1", "cursor=CC2"])
+
+    def test_single_page_costs_no_extra_query(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[_wrap(self._threads_page(has_next=False))],
+        )
+        review = _make_review(gh_runner, ScriptedGit())
+        review.resolve_pr()
+
+        threads = review.review_threads()
+
+        self.assertEqual([c["body"] for c in threads[0]["comments"]], ["first"])
+        self.assertEqual(len(_graphql_queries(gh_runner)), 1)
+
+    def test_thread_url_still_comes_from_the_first_comment(self):
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[
+                _wrap(self._threads_page(has_next=True)),
+                self._comment_page("bob", "second", False),
+            ],
+        )
+        review = _make_review(gh_runner, ScriptedGit())
+        review.resolve_pr()
+
+        self.assertEqual(review.review_threads()[0]["url"], "u1")
+
+
 class BaseBlobTest(unittest.TestCase):
     def test_base_blob(self):
         cases = {
@@ -564,6 +679,152 @@ class LoadPendingTest(unittest.TestCase):
 
         self.assertEqual(review.drafts(), [])
 
+    def test_paginates_the_pending_reviews_comments(self):
+        # A pending review with more than 100 comments used to lose the overflow from the
+        # mirror while it stayed live on GitHub, so discard/edit could not reach it.
+        pending = _wrap(
+            {
+                "repository": {
+                    "pullRequest": {
+                        "id": "PR1",
+                        "reviews": {
+                            "pageInfo": {"hasNextPage": False, "endCursor": None},
+                            "nodes": [
+                                {
+                                    "id": "REV1",
+                                    "viewerDidAuthor": True,
+                                    "comments": {
+                                        "pageInfo": {
+                                            "hasNextPage": True,
+                                            "endCursor": "RC1",
+                                        },
+                                        "nodes": [
+                                            {
+                                                "id": "C1",
+                                                "path": "foo.py",
+                                                "line": 5,
+                                                "startLine": None,
+                                                "body": "one",
+                                            }
+                                        ],
+                                    },
+                                }
+                            ],
+                        },
+                    }
+                }
+            }
+        )
+        overflow = _wrap(
+            {
+                "node": {
+                    "comments": {
+                        "pageInfo": {"hasNextPage": False, "endCursor": None},
+                        "nodes": [
+                            {
+                                "id": "C2",
+                                "path": "bar.py",
+                                "line": 9,
+                                "startLine": None,
+                                "body": "two",
+                            }
+                        ],
+                    }
+                }
+            }
+        )
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW), graphql_pages=[pending, overflow]
+        )
+        review = _loaded_review(gh_runner)
+
+        drafts = review.drafts()
+
+        self.assertEqual([d["comment_id"] for d in drafts], ["C1", "C2"])
+        # uids stay unique and monotonic across pages, since edit/discard key on them.
+        self.assertEqual([d["uid"] for d in drafts], [0, 1])
+
+    def test_paginates_the_reviews_connection(self):
+        # The viewer's pending review can sit past the first page of reviews.
+        def page(nodes, has_next, cursor=None):
+            return _wrap(
+                {
+                    "repository": {
+                        "pullRequest": {
+                            "id": "PR1",
+                            "reviews": {
+                                "pageInfo": {
+                                    "hasNextPage": has_next,
+                                    "endCursor": cursor,
+                                },
+                                "nodes": nodes,
+                            },
+                        }
+                    }
+                }
+            )
+
+        others = [{"id": "REVX", "viewerDidAuthor": False, "comments": {"nodes": []}}]
+        mine = [
+            {
+                "id": "REV1",
+                "viewerDidAuthor": True,
+                "comments": {
+                    "nodes": [
+                        {
+                            "id": "C9",
+                            "path": "foo.py",
+                            "line": 2,
+                            "startLine": None,
+                            "body": "mine",
+                        }
+                    ]
+                },
+            }
+        ]
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[page(others, True, "RV1"), page(mine, False)],
+        )
+        review = _loaded_review(gh_runner)
+
+        self.assertEqual([d["comment_id"] for d in review.drafts()], ["C9"])
+        cursors = [
+            arg
+            for call in gh_runner.calls
+            for arg in call["args"]
+            if arg.startswith("cursor=")
+        ]
+        self.assertEqual(cursors, ["cursor=RV1"])
+
+    def test_stops_at_the_first_viewer_authored_review(self):
+        # Only one pending review per viewer exists, so the walk must not keep paging (nor
+        # append a second review's comments) once it has found it.
+        pending = _wrap(
+            {
+                "repository": {
+                    "pullRequest": {
+                        "id": "PR1",
+                        "reviews": {
+                            "pageInfo": {"hasNextPage": True, "endCursor": "RV1"},
+                            "nodes": [
+                                {
+                                    "id": "REV1",
+                                    "viewerDidAuthor": True,
+                                    "comments": {"nodes": []},
+                                }
+                            ],
+                        },
+                    }
+                }
+            }
+        )
+        gh_runner = ScriptedGH(pr_view=json.dumps(_PR_VIEW), graphql_pages=[pending])
+        review = _loaded_review(gh_runner)
+
+        self.assertEqual(review.drafts(), [])
+        self.assertEqual(len(_graphql_queries(gh_runner)), 1)
+
 
 class DraftQueueTest(unittest.TestCase):
     def test_queue_creates_review_then_thread(self):
@@ -655,6 +916,25 @@ class DraftQueueTest(unittest.TestCase):
                 for q in _graphql_queries(gh_runner)
             )
         )
+
+    def test_unknown_uid_is_a_no_op(self):
+        # A popup can outlive the draft it was rendered for (discarded from elsewhere, or
+        # a forged action link), so both mutations must ignore a uid they cannot find
+        # rather than touch the queue or call GitHub.
+        gh_runner = ScriptedGH(
+            pr_view=json.dumps(_PR_VIEW),
+            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _add_thread("C1")],
+        )
+        review = _loaded_review(gh_runner)
+        review.queue_comment("a.py", {"side": "RIGHT", "line": 1}, "kept")
+
+        before = len(_graphql_queries(gh_runner))
+
+        review.discard_draft(999)
+        review.edit_draft(999, "ignored")
+
+        self.assertEqual([d["body"] for d in review.drafts()], ["kept"])
+        self.assertEqual(len(_graphql_queries(gh_runner)), before)
 
     def test_discard_last_deletes_review(self):
         gh_runner = ScriptedGH(
@@ -838,8 +1118,7 @@ class RefusedCommentTest(unittest.TestCase):
         transiently, so it waits to be flushed on submit."""
         gh_runner = ScriptedGH(
             pr_view=json.dumps(_PR_VIEW),
-            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _GRAPHQL_ERROR]
-            + list(later_pages),
+            graphql_pages=[_PENDING_EMPTY, _ADD_REVIEW, _GRAPHQL_ERROR, *later_pages],
         )
         review = _loaded_review(gh_runner)
 

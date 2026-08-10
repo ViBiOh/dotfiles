@@ -99,6 +99,34 @@ class LineMapTest(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertEqual(self.line_map.anchor_to_row(side, line), expected)
 
+    def test_a_left_line_can_anchor_away_from_line_minus_one(self):
+        """A LEFT-side line is numbered on the BASE side, so `line - 1` is NOT its head
+        row in general. Anything placing a LEFT thread (the gutter icons, and
+        plugin._apply_suggestion, which used to take that shortcut and wrote suggestions
+        to an unrelated row) has to go through anchor_to_row.
+
+        Base line 2 is the proof: the two answers coincide for some lines, so a single
+        agreeing example would not have caught it."""
+        self.assertEqual(self.line_map.anchor_to_row("LEFT", 2), 2)
+        self.assertNotEqual(self.line_map.anchor_to_row("LEFT", 2), 2 - 1)
+
+    def test_first_deletion_wins_for_a_repeated_base_line(self):
+        # The lookup table replaced a linear scan, which returned the first match; a
+        # malformed diff repeating a base line must not change which one is used.
+        hunk = SimpleNamespace(
+            lines=[
+                _line(" ", 1, 1, "a"),
+                _line("-", 2, None, "first"),
+                _line(" ", 3, 2, "b"),
+                _line("-", 2, None, "duplicate"),
+                _line(" ", 4, 9, "c"),
+            ]
+        )
+
+        self.assertEqual(
+            LineMap(SimpleNamespace(hunks=[hunk])).anchor_to_row("LEFT", 2), 1
+        )
+
     def test_comment_range(self):
         cases = {
             "single_row": (

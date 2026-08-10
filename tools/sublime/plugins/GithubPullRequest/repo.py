@@ -35,7 +35,7 @@ def run_git(root: str, args: List[str]) -> Tuple[int, str]:
     (1, "") on any failure, so callers only branch on the code."""
     try:
         proc = subprocess.run(
-            ["git"] + args, cwd=root, capture_output=True, text=True, timeout=_TIMEOUT
+            ["git", *args], cwd=root, capture_output=True, text=True, timeout=_TIMEOUT
         )
     except (OSError, subprocess.SubprocessError):
         return 1, ""

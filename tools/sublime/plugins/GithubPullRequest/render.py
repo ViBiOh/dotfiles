@@ -32,13 +32,17 @@ def popup(sections: List[str]) -> str:
     return build_style() + _stack(sections)
 
 
-_FENCE_RE = re.compile(r"```([^\n`]*)\n?(.*?)```", re.DOTALL)
+# A fence's info string runs to the END of the fence line, so the newline is REQUIRED in
+# both patterns below. With it optional, _SUGGESTION_RE swallowed the rest of the line into
+# the body and read "```suggestion js" as a suggestion, while _FENCE_RE read it as a plain
+# `suggestion js` fence.
+_FENCE_RE = re.compile(r"```([^\n`]*)\n(.*?)```", re.DOTALL)
 _INLINE_CODE_RE = re.compile(r"`([^`]+)`")
-# Deliberately as permissive as the `lang == "suggestion"` branch of _FENCE_RE (same
-# optional newline, same tolerance for trailing spaces on the fence line). The two must
-# agree on how many suggestions a body holds, or the Nth Apply link would apply the
-# wrong block.
-_SUGGESTION_RE = re.compile(r"```suggestion[^\S\n]*\n?(.*?)```", re.DOTALL)
+# Must agree with the `lang == "suggestion"` test in _render_body on how many suggestions a
+# body holds, or the Nth Apply link applies the wrong block, or none at all. So: the
+# newline above, and `rstrip` rather than `strip` there, since this anchors "suggestion"
+# directly against the fence and "``` suggestion" is therefore NOT one.
+_SUGGESTION_RE = re.compile(r"```suggestion[^\S\n]*\n(.*?)```", re.DOTALL)
 
 # GitHub returns comment bodies as rendered HTML (bodyHTML). minihtml only speaks a
 # small subset of HTML, so we down-convert: keep the tags below (remapping a few to
@@ -81,6 +85,22 @@ def suggestions_in(body: str) -> List[str]:
     return _SUGGESTION_RE.findall(body or "")
 
 
+def _safe_anchor(href: str) -> str:
+    """An opening ``<a>`` for a link taken from a comment body, keeping the href only
+    when it is http(s).
+
+    Bodies come from anyone who can comment on the PR, and the plugin's own popup actions
+    travel as ``subl:githubpullrequest?...`` hrefs. A body carrying one of those would be
+    dispatched by ``plugin._handle_action`` ahead of any browser check, so a click could
+    fire a real discard / resolve / edit. Every genuine action link is built locally by
+    ``encode_action`` and never parsed out of a body, so dropping the href here costs
+    nothing and closes that door. The text stays; only the link goes."""
+    if not href.startswith(("http://", "https://")):
+        return "<a>"
+
+    return f'<a href="{html.escape(href, quote=True)}">'
+
+
 class _MiniHTMLSanitizer(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
@@ -113,8 +133,7 @@ class _MiniHTMLSanitizer(HTMLParser):
         if mapped == "pre":
             self._pre += 1
         if mapped == "a":
-            href = html.escape(attributes.get("href", ""), quote=True)
-            self._out.append(f'<a href="{href}">')
+            self._out.append(_safe_anchor(attributes.get("href", "")))
             return
 
         self._out.append(f"<{mapped}>")
@@ -164,7 +183,6 @@ def build_style() -> str:
     return (
         "<style>"
         ".author { font-weight: bold; color: var(--bluish); }"
-        ".time { color: var(--foreground); }"
         ".body { color: var(--foreground); }"
         ".tag-resolved { color: var(--greenish); }"
         ".tag-outdated { color: var(--yellowish); }"
@@ -210,7 +228,9 @@ def _render_body(body: str, thread_id: str, sug_counter: List[int]) -> str:
         if before:
             segments.append(_render_text(before))
 
-        lang = match.group(1).strip()
+        # rstrip only: leading whitespace ("``` suggestion") makes it a plain fence, which
+        # is what _SUGGESTION_RE says too. See its comment.
+        lang = match.group(1).rstrip()
         code = match.group(2)
         if code.endswith("\n"):
             code = code[:-1]
@@ -245,9 +265,7 @@ def thread_popup_html(thread: Dict) -> str:
     for comment in thread.get("comments", []):
         author = html.escape(comment.get("author") or "")
         created = html.escape(comment.get("created_at") or "")
-        block = [
-            f'<span class="author">{author}</span> <span class="time">{created}</span>'
-        ]
+        block = [f'<span class="author">{author}</span> <span>{created}</span>']
 
         body_html = comment.get("body_html")
         if body_html:
@@ -340,3 +358,18 @@ def decode_action(href: str) -> Optional[Dict]:
         return None
 
     return result
+
+
+def action_int(action: Dict, key: str, default: Optional[int] = None) -> Optional[int]:
+    """An action parameter as an int, or None when it is absent or not a number.
+
+    Action hrefs are decoded from popup HTML, so a forged one can carry anything; a bare
+    ``int()`` on it would raise inside the popup's link callback."""
+    raw = action.get(key)
+    if raw is None:
+        return default
+
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return None

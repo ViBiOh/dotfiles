@@ -4,11 +4,9 @@ from types import SimpleNamespace
 
 try:
     from . import repo
-    from .labels import DEFAULT_COMMENT_LABELS, label_tag
     from .state import SESSION
 except ImportError:
     import repo
-    from labels import DEFAULT_COMMENT_LABELS, label_tag
     from state import SESSION
 
 
@@ -65,28 +63,6 @@ class RunGitTest(unittest.TestCase):
 
     def test_git_root_outside_a_repo(self):
         self.assertIsNone(repo.git_root(os.sep))
-
-
-class LabelTagTest(unittest.TestCase):
-    def test_tag(self):
-        cases = {
-            "with_emoji": ({"emoji": "💡", "label": "suggestion"}, "💡 suggestion"),
-            "without_emoji": ({"label": "suggestion"}, "suggestion"),
-            "empty_emoji": ({"emoji": "", "label": "note"}, "note"),
-        }
-
-        for name, (entry, expected) in cases.items():
-            with self.subTest(name):
-                self.assertEqual(label_tag(entry), expected)
-
-    def test_defaults_are_well_formed(self):
-        self.assertTrue(DEFAULT_COMMENT_LABELS)
-
-        for entry in DEFAULT_COMMENT_LABELS:
-            with self.subTest(entry.get("label")):
-                self.assertIn("label", entry)
-                self.assertIn("description", entry)
-                self.assertTrue(label_tag(entry))
 
 
 if __name__ == "__main__":

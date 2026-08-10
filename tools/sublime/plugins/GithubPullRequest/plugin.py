@@ -30,9 +30,10 @@ try:
         selection_to_head,
         thread_row,
         thread_rows,
+        warm_opcodes,
     )
     from .gh import GH, GHError
-    from .labels import DEFAULT_COMMENT_LABELS, label_tag
+    from .labels import label_tag
     from .layout import split_below_layout
     from .mapper import (
         LineMap,
@@ -57,9 +58,10 @@ except ImportError:
         selection_to_head,
         thread_row,
         thread_rows,
+        warm_opcodes,
     )
     from gh import GH, GHError
-    from labels import DEFAULT_COMMENT_LABELS, label_tag
+    from labels import label_tag
     from layout import split_below_layout
     from mapper import (
         LineMap,
@@ -79,15 +81,6 @@ SETTINGS_FILE = "GithubPullRequest.sublime-settings"
 REGION_KEY = "githubpullrequest.threads"
 DRAFT_REGION_KEY = "githubpullrequest.drafts"
 STATUS_KEY = "githubpullrequest.status"
-
-
-# Prompt appended to the agent command in the tmux review pane. `{base}` is the base branch.
-_DEFAULT_REVIEW_PROMPT = (
-    "Do a thorough code review of the changes on the current branch compared to "
-    "origin/{base}. Start by running `git diff origin/{base}...HEAD` to see the full "
-    "diff. Review correctness first, then design and maintainability. Present each "
-    "finding in Conventional Comments style (e.g. 'suggestion:', 'issue:', 'nitpick:')."
-)
 
 
 # --------------------------------------------------------------------------- #
@@ -165,14 +158,31 @@ def _launch_agent_review(root):
         _main(lambda: _error("no tmux session found — start/attach tmux first"))
         return
 
-    agent = _settings().get("agent_command") or ["claude"]
-    template = _settings().get("agent_review_prompt", _DEFAULT_REVIEW_PROMPT)
-    prompt = template.format(base=base)
+    # Both defaults live in GithubPullRequest.sublime-settings, which load_settings merges
+    # under any User override, so there is no second copy of them here to drift.
+    agent = _settings().get("agent_command")
+    template = _settings().get("agent_review_prompt")
+    if not agent or not template:
+        _main(lambda: _error("agent_command / agent_review_prompt are not configured"))
+        return
+
+    if isinstance(agent, str):
+        # A bare string is the natural thing to type, so split it the way a shell would
+        # rather than iterating it into one argument per character.
+        agent = shlex.split(agent)
+
+    try:
+        prompt = template.format(base=base)
+    except (IndexError, KeyError) as err:
+        # A custom prompt is free text, so a stray brace reaches str.format as a
+        # placeholder. Say which one rather than dying silently in the worker.
+        _main(lambda name=str(err): _error(f"agent_review_prompt: unknown {name}"))
+        return
 
     # Build "<agent...> <prompt>" as one shell-quoted command string so tmux runs it
     # via the shell with the prompt as a single last argument (multiline / special
     # characters are safe). The agent + args are user-configurable.
-    inner = " ".join(shlex.quote(part) for part in (list(agent) + [prompt]))
+    inner = " ".join(shlex.quote(part) for part in [*agent, prompt])
     args = ["tmux", "split-window", "-h", "-t", session, "-c", root, inner]
 
     try:
@@ -215,6 +225,23 @@ def _window_root(window):
 # --------------------------------------------------------------------------- #
 # decoration (diff reference doc, thread + draft gutter icons)
 # --------------------------------------------------------------------------- #
+def _pr_views():
+    """Every open view holding one of the PR's changed files, across all windows."""
+    views = []
+    for window in sublime.windows():
+        for view in window.views():
+            # rel_path is None for unsaved buffers, files outside the repo, and whenever
+            # no review is loaded, none of which can be in files_by_path.
+            if rel_path(view) in SESSION.files_by_path:
+                views.append(view)
+
+    return views
+
+
+def _views_for_path(path):
+    return [view for view in _pr_views() if rel_path(view) == path]
+
+
 def _decorate_view(view):
     if not SESSION.active:
         return
@@ -239,6 +266,13 @@ def _apply_reference_document(view, path):
             view.set_reference_document(base)
         return
 
+    if path in SESSION.base_blob_pending:
+        # A worker is already fetching this blob (this view activating twice, or a clone
+        # in another group); a second `git show` would only race it. Its `apply` decorates
+        # every view on the path, so this one is covered.
+        return
+
+    SESSION.base_blob_pending.add(path)
     is_new = bool(entry and entry["file_diff"].is_new)
 
     def worker():
@@ -254,9 +288,15 @@ def _apply_reference_document(view, path):
             base = ""
 
         def apply():
+            SESSION.base_blob_pending.discard(path)
             SESSION.base_blob_cache[path] = base
-            if base is not None and view.is_valid():
-                view.set_reference_document(base)
+            if base is None:
+                return
+
+            # Every view on the path, not just the one that triggered the fetch: a clone
+            # shares the blob and would otherwise wait for its next activate.
+            for target in _views_for_path(path):
+                target.set_reference_document(base)
 
         _main(apply)
 
@@ -291,13 +331,12 @@ def _apply_thread_icons(view, path):
 
     view.erase_regions(REGION_KEY)
     if regions:
-        view.add_regions(
-            REGION_KEY,
-            regions,
-            "region.bluish",
-            icon,
-            sublime.HIDDEN | sublime.PERSISTENT,
-        )
+        # HIDDEN (icon only, no highlight) and deliberately NOT PERSISTENT: persistent
+        # regions are saved into the workspace, so quitting with a review loaded would
+        # restore the icons on the next start with no session behind them and no way to
+        # erase them (End review needs an active one). Every path that shows a PR file
+        # redecorates it, so there is nothing to persist.
+        view.add_regions(REGION_KEY, regions, "region.bluish", icon, sublime.HIDDEN)
 
 
 def _apply_draft_icons(view, path):
@@ -316,12 +355,9 @@ def _apply_draft_icons(view, path):
 
     view.erase_regions(DRAFT_REGION_KEY)
     if regions:
+        # Not PERSISTENT, for the reason spelled out in _apply_thread_icons.
         view.add_regions(
-            DRAFT_REGION_KEY,
-            regions,
-            "region.purplish",
-            icon,
-            sublime.HIDDEN | sublime.PERSISTENT,
+            DRAFT_REGION_KEY, regions, "region.purplish", icon, sublime.HIDDEN
         )
 
 
@@ -410,33 +446,52 @@ def _clear_view(view):
 
 
 def _decorate_all_views():
-    for window in sublime.windows():
-        for view in window.views():
-            _decorate_view(view)
+    for view in _pr_views():
+        _decorate_view(view)
 
     _update_status()
 
 
+def _redraw_all(window=None, done_message=None):
+    """Redraw every surface that reads the head-to-buffer mapping.
+
+    WORKER THREAD ONLY. That mapping costs a `git show` plus a full diff PER open PR file,
+    so it is warmed here and the drawing — which has to happen on the main thread — then
+    only reads the cache. Calling `_decorate_all_views` straight from a `_main` callback is
+    what blocks the UI once per file."""
+    warm_opcodes(_pr_views())
+
+    def apply():
+        _decorate_all_views()
+        _refresh_files_panel(window or sublime.active_window())
+        if done_message:
+            _status(done_message)
+
+    _main(apply)
+
+
 # Editing shifts every head-commit line relative to the buffer, so both the gutter icons
-# and the panel's nav lines go stale as you type. Recomputing costs a `git show HEAD` plus
-# a full diff of the buffer, so redraws wait for a pause instead of running per keystroke.
+# and the panel's nav lines go stale as you type. Recomputing costs a `git show` plus a
+# full diff of the buffer, so redraws wait for a pause instead of running per keystroke.
 _REDRAW_DELAY_MS = 400
 
 
 def _redraw_when_settled(view):
     """Re-place a view's icons and the panel's nav lines once edits stop arriving. Every
     keystroke schedules a check; only the last one still matches `change_count`, so the
-    expensive part runs once per pause rather than once per character."""
+    expensive part runs once per pause rather than once per character.
+
+    The timer is the ASYNC one, so the recomputation lands on a worker thread and only the
+    drawing goes back to the main one."""
     stamp = view.change_count()
 
     def settled():
         if not view.is_valid() or view.change_count() != stamp:
             return  # more edits landed (or the view is gone); a later timer will run
 
-        _decorate_view(view)
-        _refresh_files_panel(view.window())
+        _redraw_all(view.window())
 
-    sublime.set_timeout(settled, _REDRAW_DELAY_MS)
+    sublime.set_timeout_async(settled, _REDRAW_DELAY_MS)
 
 
 def _update_status():
@@ -525,25 +580,33 @@ def _open_external(url):
 
 
 def _handle_action(view, href):
+    """Dispatch a popup link. Every action link is built locally by `render.encode_action`,
+    but the popup also carries comment HTML, so each parameter is validated rather than
+    trusted: a missing id or a non-numeric uid must be a no-op, not an exception raised
+    inside Sublime's link callback."""
     action = render.decode_action(href)
     if action is None:
         _open_external(href)
         return
 
     kind = action.get("action")
+    node_id = action.get("id")
+    uid = render.action_int(action, "uid")
 
     if kind == "open":
         _open_external(action.get("url", ""))
-    elif kind == "reply":
-        _open_compose(view, "", {"mode": "reply", "thread_id": action["id"]})
-    elif kind in ("resolve", "unresolve"):
-        _set_resolved(action["id"], kind == "resolve")
-    elif kind == "discard":
-        _discard_draft(int(action["uid"]))
-    elif kind == "edit":
-        _edit_draft(view, int(action["uid"]))
-    elif kind == "apply_suggestion":
-        _apply_suggestion(view, action["id"], int(action.get("sug", 0)))
+    elif kind == "reply" and node_id:
+        _open_compose(view, "", {"mode": "reply", "thread_id": node_id})
+    elif kind in ("resolve", "unresolve") and node_id:
+        _set_resolved(node_id, kind == "resolve")
+    elif kind == "discard" and uid is not None:
+        _discard_draft(uid)
+    elif kind == "edit" and uid is not None:
+        _edit_draft(view, uid)
+    elif kind == "apply_suggestion" and node_id:
+        index = render.action_int(action, "sug", 0)
+        if index is not None:
+            _apply_suggestion(view, node_id, index)
 
 
 def _edit_draft(view, uid):
@@ -566,13 +629,7 @@ def _mutate_then_refresh(action, done_message, window=None):
             _main(lambda message=str(err): _error(message))
             return
 
-        def apply():
-            _decorate_all_views()
-            _refresh_files_panel(window or sublime.active_window())
-            _status(done_message)
-            _update_status()
-
-        _main(apply)
+        _redraw_all(window, done_message)
 
     _async(worker)
 
@@ -618,15 +675,25 @@ def _apply_suggestion(view, thread_id, index):
     # An outdated thread can lose both its current and original line, leaving no head
     # row to write the suggestion over.
     span = thread_span(thread)
-    if span is None:
+    line_map = SESSION.line_maps.get(thread["path"])
+    if span is None or line_map is None:
         _status("cannot locate the suggestion's lines in this buffer")
         return
 
-    start_row = remap_head_row(view, span[0] - 1)
-    end_row = remap_head_row(view, span[1] - 1)
+    # A thread's span is numbered on its OWN side, so a LEFT-side (deleted-line) thread
+    # has to reach a head row through the line map — exactly as the gutter icons do
+    # (anchors._compute_thread_rows). Treating `line - 1` as the head row here wrote the
+    # suggestion to an unrelated row for those threads.
+    side = thread.get("side") or "RIGHT"
+    start_row = remap_head_row(view, line_map.anchor_to_row(side, span[0]))
+    end_row = remap_head_row(view, line_map.anchor_to_row(side, span[1]))
     if start_row is None or end_row is None:
         _status("cannot locate the suggestion's lines in this buffer")
         return
+
+    if start_row > end_row:
+        # LEFT-side ends can both anchor to the same hunk boundary, in either order.
+        start_row, end_row = end_row, start_row
 
     view.run_command(
         "github_pull_request_replace_lines",
@@ -677,18 +744,16 @@ def _index_threads(threads):
 
 
 def _reload_threads():
+    """Refetch the threads and redraw. Worker thread only: indexing is pure state, so it
+    happens here, which lets `_redraw_all` warm the mapping for the new lines too."""
     try:
         threads = SESSION.review.review_threads()
     except GHError as err:
         _main(lambda message=str(err): _error(message))
         return
 
-    def apply():
-        _index_threads(threads)
-        _decorate_all_views()
-        _refresh_files_panel(sublime.active_window())
-
-    _main(apply)
+    _index_threads(threads)
+    _redraw_all()
 
 
 def _load(window):
@@ -726,8 +791,15 @@ def _load(window):
 
     owners = codeowners_map(root, [entry["path"] for entry in files])
 
+    # Building the session is pure state, so it happens on this worker thread. That is
+    # what lets the head-to-buffer mapping be warmed here too: it is needed by both the
+    # gutter icons and the panel's nav lines, and `_build_session` has just dropped every
+    # cached entry, so drawing them from the main thread would otherwise pay for a
+    # `git show` plus a full diff per open file before anything appeared.
+    _build_session(root, pr, review, files, threads, owners)
+    warm_opcodes(_pr_views())
+
     def apply():
-        _build_session(root, pr, review, files, threads, owners)
         _decorate_all_views()
         _status(f"loaded PR #{pr['number']} ({len(files)} files)")
         window.run_command("github_pull_request_files_panel")
@@ -907,7 +979,15 @@ class GithubPullRequestFilesPanelCommand(sublime_plugin.WindowCommand):
         return SESSION.active
 
     def run(self):
-        _show_files_panel(self.window)
+        window = self.window
+
+        # Building the body translates every nav line through the head-to-buffer mapping,
+        # so warm it on a worker first rather than stalling the UI while the panel opens.
+        def worker():
+            warm_opcodes(_pr_views())
+            _main(lambda: _show_files_panel(window))
+
+        _async(worker)
 
 
 class GithubPullRequestListCommentsCommand(sublime_plugin.WindowCommand):
@@ -957,16 +1037,20 @@ class GithubPullRequestListCommentsCommand(sublime_plugin.WindowCommand):
 
 
 def _show_when_ready(view, thread, attempts=20):
+    """Wait for a freshly opened file to load, then pop its thread open. Stays on the
+    worker thread (async timer) because locating the row needs the head-to-buffer mapping,
+    which a just-opened file has not cached yet; only the popup goes back to the main one."""
     if view.is_loading() and attempts > 0:
-        sublime.set_timeout(lambda: _show_when_ready(view, thread, attempts - 1), 50)
+        sublime.set_timeout_async(
+            lambda: _show_when_ready(view, thread, attempts - 1), 50
+        )
         return
 
     row = thread_row(view, thread)
     if row is None:
         return
 
-    point = view.text_point(row, 0)
-    _show_threads_popup(view, row, point)
+    _main(lambda: _show_threads_popup(view, row, view.text_point(row, 0)))
 
 
 class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
@@ -991,9 +1075,9 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         # The buffer may carry the reviewer's own local edits, which shift buffer rows
         # away from the PR head-commit line numbers GitHub anchors comments to. Map the
         # selection back onto head rows so the comment (and any ```suggestion``` it
-        # carries) targets the right lines and can be applied as-is. has_diff tells us
+        # carries) targets the right lines and can be applied as-is. has_edit tells us
         # whether the selection is locally edited (so a suggestion is worth prefilling).
-        head_start, head_end, has_diff = selection_to_head(view, start_row, end_row)
+        head_start, head_end, has_edit = selection_to_head(view, start_row, end_row)
 
         if head_start is None:
             # Every selected row is a line you added locally, so it does not exist in the
@@ -1013,11 +1097,22 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         # Say so, and put the final range in the compose tab title: silently posting a
         # single-line comment for a multi-line selection is the surprise we avoid here.
         target = payload_range_label(payload)
-        if payload_span(payload) != (head_start + 1, head_end + 1):
-            _status(f"selection narrowed to {target} (the rest is outside the PR diff)")
+        narrowed = payload_span(payload) != (head_start + 1, head_end + 1)
 
-        # Suggestion content is the reviewer's LOCAL version of the selected lines
-        # (from the buffer), which GitHub applies over the head lines above.
+        # A suggestion block replaces exactly the lines the comment is anchored to. Its
+        # content is the reviewer's LOCAL version of the selection, so it is only
+        # equivalent while the payload still covers the whole selection: once narrowed,
+        # GitHub would apply the full selection over the smaller range. Prefill nothing
+        # in that case rather than a block that changes lines the comment does not cover.
+        suggest = has_edit and not narrowed
+
+        if narrowed:
+            dropped = ", suggestion not prefilled" if has_edit else ""
+            _status(
+                f"selection narrowed to {target} "
+                f"(the rest is outside the PR diff){dropped}"
+            )
+
         content = "\n".join(
             view.substr(view.line(view.text_point(row, 0)))
             for row in range(start_row, end_row + 1)
@@ -1027,7 +1122,7 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         def compose(tag):
             # Full comment body prefill. On a locally-changed line the suggestion block
             # goes on its own line (so the ``` fence stays valid after the label).
-            if has_diff:
+            if suggest:
                 head = f"{tag}: \n\n" if tag else ""
 
                 return head + suggestion_block
@@ -1035,10 +1130,12 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
             return f"{tag}: " if tag else ""
 
         # Conventional Comments: pick a label (fuzzy) then compose. The picker is
-        # skippable via its first entry and can be disabled in settings.
+        # skippable via its first entry and can be disabled in settings. The label set
+        # lives only in GithubPullRequest.sublime-settings, so there is no second copy
+        # here to drift from it.
         labels = []
         if _settings().get("conventional_comments", True):
-            labels = _settings().get("comment_labels", DEFAULT_COMMENT_LABELS)
+            labels = _settings().get("comment_labels") or []
 
         new_context = {"mode": "new", "path": path, "payload": payload}
 
@@ -1122,16 +1219,14 @@ class GithubPullRequestSubmitCommentCommand(sublime_plugin.TextCommand):
                 _main(lambda: _status("reply posted"))
                 return
 
-            def apply():
-                _decorate_all_views()
-                _refresh_files_panel(window)
-                if mode == "edit":
-                    _status("comment updated")
-                elif not local:
-                    _status("comment queued (submit the review to post)")
-                _update_status()
+            if mode == "edit":
+                done = "comment updated"
+            elif local:
+                done = None  # the failure was already reported in a dialog
+            else:
+                done = "comment queued (submit the review to post)"
 
-            _main(apply)
+            _redraw_all(window, done)
 
         _async(worker)
         self.view.close()  # triggers on_pre_close -> layout is restored
@@ -1328,6 +1423,10 @@ class GithubPullRequestEndReviewCommand(sublime_plugin.WindowCommand):
 # --------------------------------------------------------------------------- #
 class GithubPullRequestListener(sublime_plugin.EventListener):
     def on_load_async(self, view):
+        # Decorate FIRST: it warms this view's head-to-buffer mapping, which the panel
+        # refresh below then reads. Both are on the async thread, so paying for the
+        # `git show` here is fine; swapping the order would not change that, but the
+        # panel would be translating lines for a file it has no opcodes for yet.
         _decorate_view(view)
 
         # The tab set changed, so the panel's "already open" markers are stale.
@@ -1338,8 +1437,9 @@ class GithubPullRequestListener(sublime_plugin.EventListener):
 
         window = view.window()
 
-        # Fires BEFORE the view goes away, so it is still in window.views().
-        # Refresh on the next tick, once the tab is really gone.
+        # Fires BEFORE the view goes away, so it is still in window.views(). Refresh on
+        # the next tick, once the tab is really gone. Main thread is fine here: every
+        # REMAINING view is already decorated, so the refresh is all cache hits.
         sublime.set_timeout(lambda: _refresh_files_panel(window), 0)
 
         # A compose buffer closing (via submit or cancel) restores the pre-split

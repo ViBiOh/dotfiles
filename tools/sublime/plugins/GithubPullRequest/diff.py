@@ -17,11 +17,10 @@ class DiffLine:
 
 @dataclass
 class Hunk:
-    old_start: int
-    old_count: int
+    # Head-side start line only: the base-side start and both counts are needed while
+    # parsing, but no consumer reads them back, and on a large PR every retained field is
+    # multiplied by the number of hunks in the session.
     new_start: int
-    new_count: int
-    header: str
     lines: List[DiffLine] = field(default_factory=list)
 
 
@@ -31,8 +30,6 @@ class FileDiff:
     old_path: Optional[str]
     new_path: Optional[str]
     is_new: bool
-    is_deleted: bool
-    is_rename: bool
     is_binary: bool
     additions: int
     deletions: int
@@ -44,8 +41,6 @@ def _new_file_state() -> dict:
         "old_path": None,
         "new_path": None,
         "is_new": False,
-        "is_deleted": False,
-        "is_rename": False,
         "is_binary": False,
         "additions": 0,
         "deletions": 0,
@@ -85,8 +80,6 @@ def _build_file_diff(state: dict) -> FileDiff:
         old_path=old_path,
         new_path=new_path,
         is_new=state["is_new"],
-        is_deleted=state["is_deleted"],
-        is_rename=state["is_rename"],
         is_binary=state["is_binary"],
         additions=state["additions"],
         deletions=state["deletions"],
@@ -165,25 +158,18 @@ def parse_unified_diff(text: str) -> List[FileDiff]:
 
         hunk_match = _HUNK_RE.match(line)
         if hunk_match:
-            old_start = int(hunk_match.group(1))
-            old_count = int(hunk_match.group(2)) if hunk_match.group(2) else 1
             new_start = int(hunk_match.group(3))
-            new_count = int(hunk_match.group(4)) if hunk_match.group(4) else 1
 
-            hunk = Hunk(
-                old_start=old_start,
-                old_count=old_count,
-                new_start=new_start,
-                new_count=new_count,
-                header=line,
-                lines=[],
-            )
+            hunk = Hunk(new_start=new_start, lines=[])
             state["hunks"].append(hunk)
 
-            old_ln = old_start
+            # An omitted count means 1 ("@@ -5 +5 @@"). The counts drive how many
+            # following lines belong to the hunk, which is how the parser knows where
+            # the body ends and the next file's headers begin.
+            old_ln = int(hunk_match.group(1))
             new_ln = new_start
-            rem_old = old_count
-            rem_new = new_count
+            rem_old = int(hunk_match.group(2)) if hunk_match.group(2) else 1
+            rem_new = int(hunk_match.group(4)) if hunk_match.group(4) else 1
             continue
 
         if line.startswith("\\"):
@@ -191,13 +177,9 @@ def parse_unified_diff(text: str) -> List[FileDiff]:
 
         if line.startswith("new file mode"):
             state["is_new"] = True
-        elif line.startswith("deleted file mode"):
-            state["is_deleted"] = True
         elif line.startswith("rename from "):
-            state["is_rename"] = True
             state["old_path"] = line[len("rename from ") :].strip()
         elif line.startswith("rename to "):
-            state["is_rename"] = True
             state["new_path"] = line[len("rename to ") :].strip()
         elif line.startswith("--- "):
             state["old_path"] = _strip_prefix(line[len("--- ") :])

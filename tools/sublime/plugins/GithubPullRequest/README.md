@@ -37,7 +37,7 @@ Select a line or a range, hit _Comment on line or selection_, and a compose buff
 **Save submits. Close cancels.** Just like a git commit editor.
 
 - 🏷️ **Conventional Comments built in.** A fuzzy label picker (`💡 suggestion`, `⚠️ issue`, `💅 nitpick`, `❓ question`, …) prefills the body. Fully configurable, or skippable, or off.
-- ✍️ **Automatic suggestions.** If the lines you are commenting on carry your own uncommitted edits, the compose buffer is prefilled with a ready-to-post ` ```suggestion ` block containing your version. Fix it, then propose the fix, in one gesture. Removing lines works too.
+- ✍️ **Automatic suggestions.** If the lines you are commenting on carry your own uncommitted edits, the compose buffer is prefilled with a ready-to-post ` ```suggestion ` block containing your version. Fix it, then propose the fix, in one gesture. Removing lines works too. (If your selection reached outside the PR diff and had to be narrowed, the block is skipped rather than proposing a replacement wider than the lines the comment covers.)
 - 📍 **Edit-proof anchoring.** Your local edits shift buffer rows; the plugin maps them back to the PR's head lines, so comments, icons, and suggestions all land on the right code even after you have been typing.
 
 ### 📦 Batched reviews, stored on GitHub
@@ -143,12 +143,12 @@ Override any of these in `Packages/User/GithubPullRequest.sublime-settings`.
 
 ## 🛠️ Hacking
 
-The core (`urls`, `diff`, `mapper`, `render`, `gh`, `review`) never imports `sublime`, so it is unit-tested headlessly. Only `plugin.py` and `state.py` touch the editor API.
+Only `plugin.py` and `anchors.py` import `sublime`. Everything else (`urls`, `diff`, `mapper`, `render`, `gh`, `review`, `state`, `repo`, `owners`, `layout`, `labels`, `panel`) stays free of it, so it is unit-tested headlessly; those two get a syntax check instead.
 
 ```sh
 python3 -m unittest discover -p '*_test.py'
 ruff check . && ruff format .
-python3 -m py_compile plugin.py state.py
+python3 -m py_compile plugin.py anchors.py
 ```
 
 See `AGENTS.md` for the architecture tour and `DESIGN.md` for the interface contracts.

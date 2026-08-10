@@ -1,8 +1,22 @@
 target-version = "py38"
 
-extend-exclude = ["*.md"]
-
 [lint]
+# Explicit, because ruff's default is only E4/E7/E9/F: without this the two ignores below
+# would be muting rules that were never enabled, and the package would be linted far more
+# thinly than the checks in AGENTS.md claim.
+select = [
+    "E",   # pycodestyle
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # import order
+    "B",   # bugbear
+    "SIM", # simplify
+    "UP",  # pyupgrade (bounded by target-version above)
+    "PL",  # pylint
+    "FA",  # future annotations
+    "RUF",
+]
+
 extend-ignore = [
     # Every subprocess call here inspects the return code by hand (a non-zero exit is
     # a normal, recoverable outcome), so an implicit check=False is intentional.
@@ -10,4 +24,19 @@ extend-ignore = [
     # `from __future__ import annotations` would allow builtin generics, but the
     # explicit typing.List/Optional style is the documented convention here.
     "FA100",
+    # `ruff format` owns line length for code and cannot rewrap comments or docstrings,
+    # which is all this flags here. Leaving it on would only mean hand-wrapping prose.
+    "E501",
+    # Size metrics, not defects: the diff parser is one state machine (splitting it would
+    # thread five cursors through helpers) and the sanitizer is one tag dispatch.
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    # anchors._THREADS_STAMP is module state invalidated from plugin.py, and `global`
+    # cannot cross modules, hence bump_threads_stamp.
+    "PLW0603",
+    # Comparisons against small literals (a 2-field split, an exit code) read better
+    # inline than behind a name.
+    "PLR2004",
 ]

@@ -122,7 +122,7 @@ def head_anchor(
 def head_row_to_buffer_row(opcodes, head_row: int) -> Optional[int]:
     """Where a 0-based head-commit row currently sits in the buffer, following the
     reviewer's local edits. A changed/removed head line anchors to its block start."""
-    for tag, i1, i2, j1, j2 in opcodes:
+    for tag, i1, i2, j1, _ in opcodes:
         if i1 <= head_row < i2:
             if tag == "equal":
                 return j1 + (head_row - i1)
@@ -135,12 +135,16 @@ def head_row_to_buffer_row(opcodes, head_row: int) -> Optional[int]:
 class LineMap:
     """Map between Sublime buffer rows (holding the PR head file) and GitHub review
     coordinates. Duck-typed on ``file_diff``: reads ``.hunks``, each hunk's ``.lines``,
-    and each line's ``.origin`` / ``.old_lineno`` / ``.new_lineno`` / ``.content``.
-    Does NOT import diff.py."""
+    and each line's ``.origin`` / ``.old_lineno`` / ``.new_lineno``. Does NOT import
+    diff.py."""
 
     def __init__(self, file_diff) -> None:
         self._lines = []
         self._commentable = set()
+        # Base-side line number of a deleted line -> its index in ``_lines``, so a LEFT
+        # anchor is a lookup instead of a scan. It is resolved once per line of a thread's
+        # range, which made the scan O(range x lines of the file).
+        self._deleted_at = {}
 
         max_new = None
 
@@ -156,6 +160,12 @@ class LineMap:
 
                 if origin in ("+", " ") and new_lineno is not None:
                     self._commentable.add(new_lineno)
+
+                if origin == "-":
+                    old_lineno = getattr(line, "old_lineno", None)
+                    # First wins, matching the scan this replaced.
+                    if old_lineno is not None and old_lineno not in self._deleted_at:
+                        self._deleted_at[old_lineno] = len(self._lines) - 1
 
         self._last_head_row = (max_new - 1) if max_new is not None else None
 
@@ -225,11 +235,8 @@ class LineMap:
         return self._last_head_row if self._last_head_row is not None else 0
 
     def _left_row(self, line: int) -> Optional[int]:
-        for index, current in enumerate(self._lines):
-            if (
-                getattr(current, "origin", "") == "-"
-                and getattr(current, "old_lineno", None) == line
-            ):
-                return self._anchor_after(index + 1)
+        index = self._deleted_at.get(line)
+        if index is None:
+            return None
 
-        return None
+        return self._anchor_after(index + 1)

@@ -103,6 +103,18 @@ def view_opcodes(view):
     return opcodes
 
 
+def warm_opcodes(views):
+    """Populate the opcode cache for these views.
+
+    Call this from a WORKER thread before redrawing anything: `view_opcodes` costs a
+    `git show` plus a full diff of the buffer, and the surfaces that need it (gutter
+    icons, the panel's nav lines) are all drawn on the UI thread. Paying for it here
+    turns those redraws into cache hits instead of one blocking subprocess per file."""
+    for view in views:
+        if view.is_valid():
+            view_opcodes(view)
+
+
 def selection_to_head(view, start_row, end_row):
     """Buffer-row selection -> the head-commit rows GitHub can anchor to, plus whether
     the selection carries the reviewer's local (uncommitted) edits. Returns the buffer

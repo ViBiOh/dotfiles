@@ -11,52 +11,51 @@ class ParsePrUrlTest(unittest.TestCase):
         cases = {
             "plain": (
                 "https://github.com/o/r/pull/42",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 42},
+                {"owner": "o", "repo": "r", "number": 42},
             ),
             "files_tab": (
                 "https://github.com/o/r/pull/42/files",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 42},
+                {"owner": "o", "repo": "r", "number": 42},
             ),
             "commits_tab": (
                 "https://github.com/o/r/pull/42/commits",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 42},
+                {"owner": "o", "repo": "r", "number": 42},
             ),
             "trailing_slash": (
                 "https://github.com/o/r/pull/42/",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 42},
+                {"owner": "o", "repo": "r", "number": 42},
             ),
             "fragment": (
                 "https://github.com/o/r/pull/42#discussion_r1",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 42},
+                {"owner": "o", "repo": "r", "number": 42},
             ),
             "files_fragment": (
                 "https://github.com/o/r/pull/42/files#diff-abc123",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 42},
+                {"owner": "o", "repo": "r", "number": 42},
             ),
             "query_string": (
                 "https://github.com/o/r/pull/42?w=1",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 42},
+                {"owner": "o", "repo": "r", "number": 42},
             ),
             "query_and_fragment": (
                 "https://github.com/o/r/pull/42/files?w=1#diff-abc",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 42},
+                {"owner": "o", "repo": "r", "number": 42},
             ),
             "http_scheme": (
                 "http://github.com/o/r/pull/42",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 42},
+                {"owner": "o", "repo": "r", "number": 42},
             ),
             "surrounding_whitespace": (
                 "  https://github.com/o/r/pull/42  ",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 42},
+                {"owner": "o", "repo": "r", "number": 42},
             ),
             "large_number": (
                 "https://github.com/o/r/pull/1234567",
-                {"host": "github.com", "owner": "o", "repo": "r", "number": 1234567},
+                {"owner": "o", "repo": "r", "number": 1234567},
             ),
             "dotted_repo": (
                 "https://github.com/my-org/my.repo/pull/9",
                 {
-                    "host": "github.com",
                     "owner": "my-org",
                     "repo": "my.repo",
                     "number": 9,
@@ -64,12 +63,11 @@ class ParsePrUrlTest(unittest.TestCase):
             ),
             "enterprise": (
                 "https://github.mycorp.com/o/r/pull/7",
-                {"host": "github.mycorp.com", "owner": "o", "repo": "r", "number": 7},
+                {"owner": "o", "repo": "r", "number": 7},
             ),
             "enterprise_deep_host": (
                 "https://git.internal.example.co.uk/team/proj/pull/3/files",
                 {
-                    "host": "git.internal.example.co.uk",
                     "owner": "team",
                     "repo": "proj",
                     "number": 3,

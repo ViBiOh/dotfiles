@@ -69,6 +69,106 @@ class EncodeDecodeTest(unittest.TestCase):
                 self.assertIsNone(render.decode_action(href))
 
 
+class ActionIntTest(unittest.TestCase):
+    """Action params are decoded from popup HTML, so a forged link can carry anything.
+    `int()` on that raised inside Sublime's link callback; these must be no-ops instead."""
+
+    def test_cases(self):
+        cases = {
+            "plain": ({"uid": "3"}, "uid", None, 3),
+            "zero": ({"uid": "0"}, "uid", None, 0),
+            "negative": ({"uid": "-2"}, "uid", None, -2),
+            "not_a_number": ({"uid": "abc"}, "uid", None, None),
+            "empty": ({"uid": ""}, "uid", None, None),
+            "float_text": ({"uid": "1.5"}, "uid", None, None),
+            "injected_expression": ({"uid": "0; rm -rf /"}, "uid", None, None),
+            "missing_no_default": ({}, "uid", None, None),
+            "missing_with_default": ({}, "sug", 0, 0),
+            "present_beats_default": ({"sug": "4"}, "sug", 0, 4),
+            "garbage_beats_default": ({"sug": "x"}, "sug", 0, None),
+        }
+
+        for name, (action, key, default, expected) in cases.items():
+            with self.subTest(name):
+                self.assertEqual(render.action_int(action, key, default), expected)
+
+
+class AnchorHrefTest(unittest.TestCase):
+    """A comment body can carry any href. A `subl:githubpullrequest?...` one would reach
+    plugin._handle_action ahead of the browser check, so a click could fire a real
+    discard / resolve. Only http(s) keeps its href; the text always survives."""
+
+    def test_scheme_filtering(self):
+        cases = {
+            "https": ('<a href="https://x/y">t</a>', True),
+            "http": ('<a href="http://x/y">t</a>', True),
+            "forged_action": (
+                '<a href="subl:githubpullrequest?action=discard&uid=0">t</a>',
+                False,
+            ),
+            "forged_resolve": (
+                '<a href="subl:githubpullrequest?action=resolve&id=T1">t</a>',
+                False,
+            ),
+            "javascript": ('<a href="javascript:alert(1)">t</a>', False),
+            "file": ('<a href="file:///etc/passwd">t</a>', False),
+            "mailto": ('<a href="mailto:a@b.c">t</a>', False),
+            "protocol_relative": ('<a href="//evil.example">t</a>', False),
+            "scheme_case_trick": ('<a href="SUBL:githubpullrequest?a=1">t</a>', False),
+            "no_href": ("<a>t</a>", False),
+        }
+
+        for name, (body_html, keeps_href) in cases.items():
+            with self.subTest(name):
+                out = render.html_to_minihtml(body_html)
+
+                self.assertIn("t", out, "link text must survive")
+                self.assertEqual('href="' in out, keeps_href, out)
+                if not keeps_href:
+                    self.assertNotIn("githubpullrequest", out)
+
+    def test_a_tags_stay_balanced_when_the_href_is_dropped(self):
+        out = render.html_to_minihtml('<a href="javascript:x">click</a>')
+
+        self.assertEqual(out, "<a>click</a>")
+
+
+class SuggestionCountAgreementTest(unittest.TestCase):
+    """`suggestions_in` (used for the Apply indices and by plugin._apply_suggestion) and
+    the fence scan in `_render_body` must count the same blocks, or the Nth Apply link
+    applies the wrong one, or nothing at all."""
+
+    def test_agreement(self):
+        cases = {
+            "plain": "```suggestion\nfoo\n```",
+            "trailing_space_on_fence": "```suggestion  \nfoo\n```",
+            "trailing_tab_on_fence": "```suggestion\t\nfoo\n```",
+            "leading_space_is_not_one": "``` suggestion\nfoo\n```",
+            "other_lang_is_not_one": "```python\nfoo\n```",
+            "suffixed_lang_is_not_one": "```suggestion js\nfoo\n```",
+            "two_of_them": "```suggestion\na\n```\ntext\n```suggestion\nb\n```",
+            "mixed_with_a_plain_fence": "```py\nx\n```\n```suggestion\ny\n```",
+            "no_fence_at_all": "just prose",
+            "unclosed_fence": "```suggestion\nfoo",
+            "empty_body": "",
+        }
+
+        for name, body in cases.items():
+            with self.subTest(name):
+                rendered = render._render_body(body, "T1", [0])
+                links = rendered.count("action=apply_suggestion")
+
+                self.assertEqual(links, len(render.suggestions_in(body)), rendered)
+
+    def test_indices_are_sequential_across_the_body(self):
+        body = "```suggestion\na\n```\nmid\n```suggestion\nb\n```"
+
+        rendered = render._render_body(body, "T1", [0])
+
+        self.assertIn("sug=0", rendered)
+        self.assertIn("sug=1", rendered)
+
+
 class ThreadPopupTest(unittest.TestCase):
     def _thread(self, **overrides):
         thread = {
