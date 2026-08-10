@@ -176,6 +176,11 @@ class Review:
             # Kept verbatim rather than rebuilt from owner/repo/number: only this carries
             # the host, so it stays correct on GitHub Enterprise.
             "url": view["url"],
+            # The commit the PR's line numbers are relative to. The buffer must be diffed
+            # against THIS, not local HEAD: a branch commit the PR does not have would
+            # shift every mapped line and make in-diff lines look uncommentable.
+            "head_oid": view.get("headRefOid"),
+            "body": view.get("body") or "",
         }
 
         return self._pr

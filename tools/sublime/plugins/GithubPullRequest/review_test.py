@@ -17,6 +17,7 @@ _PR_VIEW = {
     "headRefOid": "deadbeef",
     "url": "https://github.com/octo/repo/pull/42",
     "state": "OPEN",
+    "body": "Adds the thing.\r\n\r\nFixes #7.\n",
 }
 
 _DIFF = (
@@ -188,6 +189,10 @@ class ResolvePRTest(unittest.TestCase):
                 self.assertEqual(result["state"], "OPEN")
                 # kept verbatim so the host survives (GitHub Enterprise)
                 self.assertEqual(result["url"], "https://github.com/octo/repo/pull/42")
+                # the revision every line mapping is computed against
+                self.assertEqual(result["head_oid"], "deadbeef")
+                # stored raw; the panel is what normalises CRLF and trailing blanks
+                self.assertEqual(result["body"], "Adds the thing.\r\n\r\nFixes #7.\n")
 
 
 class MergeBaseTest(unittest.TestCase):

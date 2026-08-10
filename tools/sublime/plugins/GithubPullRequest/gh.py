@@ -10,6 +10,11 @@ _PR_VIEW_FIELDS = [
     "baseRefName",
     "url",
     "state",
+    # The commit GitHub's line numbers refer to. Every buffer<->PR line mapping is
+    # computed against it, so it is NOT optional (see anchors._base_rev).
+    "headRefOid",
+    # Shown under the changed files in the panel.
+    "body",
 ]
 
 

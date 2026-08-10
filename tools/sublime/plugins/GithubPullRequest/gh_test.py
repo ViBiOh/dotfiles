@@ -145,7 +145,7 @@ class GHTest(unittest.TestCase):
                     "pr",
                     "view",
                     "--json",
-                    "number,title,baseRefName,url,state",
+                    "number,title,baseRefName,url,state,headRefOid,body",
                 ],
                 "expected_return": {"number": 42, "title": "T"},
             },

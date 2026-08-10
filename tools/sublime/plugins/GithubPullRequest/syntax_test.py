@@ -61,9 +61,10 @@ class SyntaxTest(unittest.TestCase):
         glyph = panel._OPEN_MARKER.strip()
 
         self.assertTrue(glyph, "the open marker needs a glyph for the syntax to match")
-        self.assertIn(
-            f"'^{glyph}'",
+        # A trailing lookahead is allowed (it keeps prose bullets out), the anchor is not.
+        self.assertRegex(
             self.syntax,
+            r"- match: '\^" + re.escape(glyph) + r"(\(\?=[^']*\))?'",
             "the syntax no longer anchors on panel._OPEN_MARKER, so open rows lose "
             "their grey silently",
         )

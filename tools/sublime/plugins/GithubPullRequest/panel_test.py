@@ -41,11 +41,13 @@ def _header(text):
     return text.splitlines()[0]
 
 
-def _load_session(entries, threads_by_path=None, drafts=None, owners=None, title="T"):
+def _load_session(
+    entries, threads_by_path=None, drafts=None, owners=None, title="T", body=""
+):
     SESSION.reset()
     SESSION.active = True
     SESSION.root = "/repo"
-    SESSION.pr = {"number": 42, "title": title}
+    SESSION.pr = {"number": 42, "title": title, "body": body}
     SESSION.files = entries
     SESSION.files_by_path = {entry["path"]: entry for entry in entries}
     SESSION.threads_by_path = threads_by_path or {}
@@ -210,6 +212,64 @@ class OpenTabMarkerTest(unittest.TestCase):
         self.assertIsNotNone(match)
         self.assertEqual(match.group(1), "a.py")
         self.assertEqual(match.group(2), "1")
+
+
+class DescriptionTest(unittest.TestCase):
+    """The PR body trails the file rows after a blank line. It is informational, so it
+    must never disturb the rows above it."""
+
+    def tearDown(self):
+        SESSION.reset()
+
+    def test_absent_when_the_pr_has_no_body(self):
+        _load_session([_entry("a.py")])
+
+        self.assertEqual(
+            _rows(panel.files_panel_text()), ["  +1 -0".ljust(36) + "a.py:1"]
+        )
+
+    def test_one_blank_line_then_the_body(self):
+        _load_session([_entry("a.py")], body="Adds the thing.\n\nFixes #7.")
+
+        rows = _rows(panel.files_panel_text())
+
+        self.assertIn("a.py:1", rows[0])
+        self.assertEqual(rows[1], "")
+        self.assertEqual(rows[2:], ["Adds the thing.", "", "Fixes #7."])
+
+    def test_normalisation(self):
+        cases = {
+            "crlf_becomes_lf": ("one\r\ntwo", ["one", "two"]),
+            "lone_cr_becomes_lf": ("one\rtwo", ["one", "two"]),
+            "trailing_blanks_dropped": ("one\n\n\n\n", ["one"]),
+            "trailing_spaces_dropped": ("one\n   \n", ["one"]),
+            "only_whitespace_is_no_body": ("\n\n   \n", None),
+            "internal_blanks_kept": ("a\n\nb", ["a", "", "b"]),
+        }
+
+        for name, (body, expected) in cases.items():
+            with self.subTest(name):
+                _load_session([_entry("a.py")], body=body)
+                rows = _rows(panel.files_panel_text())
+
+                if expected is None:
+                    self.assertEqual(len(rows), 1, rows)  # just the file row
+                else:
+                    self.assertEqual(rows[1], "")
+                    self.assertEqual(rows[2:], expected)
+
+    def test_body_does_not_shift_the_file_rows(self):
+        for name, body in {"none": "", "some": "line one\nline two"}.items():
+            with self.subTest(name):
+                _load_session(
+                    [_entry("a.py")],
+                    {"a.py": [{"id": "T1", "line": 5, "is_resolved": False}]},
+                    body=body,
+                )
+                rows = _rows(panel.files_panel_text())
+
+                self.assertIn("a.py:1", rows[0])
+                self.assertIn("(1 unresolved)", rows[1])
 
 
 class NavLineTranslationTest(unittest.TestCase):

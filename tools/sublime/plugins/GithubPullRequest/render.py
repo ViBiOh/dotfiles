@@ -6,6 +6,32 @@ from typing import Dict, List, Optional, Tuple
 
 ACTION_PREFIX = "subl:githubpullrequest?"
 
+
+def _stack(blocks: List[str]) -> str:
+    """Join popup blocks with a rule between them: the comments of a thread, the queued
+    drafts, or the sections when several land on one line.
+
+    The rule is a `border-top` hung on the FOLLOWING block, never a standalone empty
+    <div>. minihtml supports border-top-{width,style,color} but has no `height`, so an
+    empty element has no box to draw a border on; putting it on a block that already has
+    content sidesteps that. (`<hr>` is not an option at all: minihtml drops it silently.)
+    """
+    if not blocks:
+        return ""
+
+    return blocks[0] + "".join(
+        f'<div class="rule">{block}</div>' for block in blocks[1:]
+    )
+
+
+def popup(sections: List[str]) -> str:
+    """A full popup document: the stylesheet once, then the sections ruled apart.
+
+    The style must NOT be repeated inside each section, both because it is wasteful and
+    because stacking would then nest a <style> element inside a <div>."""
+    return build_style() + _stack(sections)
+
+
 _FENCE_RE = re.compile(r"```([^\n`]*)\n?(.*?)```", re.DOTALL)
 _INLINE_CODE_RE = re.compile(r"`([^`]+)`")
 # Deliberately as permissive as the `lang == "suggestion"` branch of _FENCE_RE (same
@@ -145,6 +171,9 @@ def build_style() -> str:
         ".actions { color: var(--bluish); }"
         ".suggestion { background-color: var(--background); color: var(--greenish); }"
         ".pending-tag { font-weight: bold; color: var(--purplish); }"
+        ".rule { border-top-width: 1px; border-top-style: solid;"
+        " border-top-color: color(var(--foreground) alpha(0.3));"
+        " margin-top: 0.4rem; padding-top: 0.4rem; }"
         "</style>"
     )
 
@@ -202,7 +231,7 @@ def _render_body(body: str, thread_id: str, sug_counter: List[int]) -> str:
 
 
 def thread_popup_html(thread: Dict) -> str:
-    parts = [build_style()]
+    parts = []
 
     if thread.get("is_resolved"):
         parts.append('<span class="tag-resolved">resolved</span>')
@@ -212,25 +241,31 @@ def thread_popup_html(thread: Dict) -> str:
     thread_id = thread.get("id")
     sug_counter = [0]
 
+    blocks = []
     for comment in thread.get("comments", []):
         author = html.escape(comment.get("author") or "")
         created = html.escape(comment.get("created_at") or "")
-        parts.append(
+        block = [
             f'<span class="author">{author}</span> <span class="time">{created}</span>'
-        )
+        ]
 
         body_html = comment.get("body_html")
         if body_html:
             # Real GitHub data: render the server-rendered HTML, then attach an Apply
             # link per suggestion (extracted from the raw markdown, kept in order).
-            parts.append(f'<div class="body">{html_to_minihtml(body_html)}</div>')
+            block.append(f'<div class="body">{html_to_minihtml(body_html)}</div>')
             for code in suggestions_in(comment.get("body") or ""):
-                parts.append(_render_suggestion(code, thread_id, sug_counter[0]))
+                block.append(_render_suggestion(code, thread_id, sug_counter[0]))
                 sug_counter[0] += 1
         else:
-            parts.append(
+            block.append(
                 _render_body(comment.get("body") or "", thread_id, sug_counter)
             )
+
+        blocks.append("".join(block))
+
+    # A reply is a separate comment, so rule them apart instead of running them together.
+    parts.append(_stack(blocks))
 
     reply_href = encode_action("reply", id=thread_id)
     if thread.get("is_resolved"):
@@ -255,20 +290,20 @@ def thread_popup_html(thread: Dict) -> str:
 def pending_html(drafts: List[Tuple[int, Dict]]) -> str:
     """Popup for locally-queued (not yet posted) review comments. Each item is a
     ``(uid, draft)`` pair; the stable uid drives its Edit / Discard action links."""
-    parts = [build_style(), '<div class="pending-tag">pending review comment</div>']
-
+    blocks = []
     for uid, draft in drafts:
-        parts.append(_render_text(draft.get("body") or ""))
         edit_href = html.escape(encode_action("edit", uid=uid))
         discard_href = html.escape(encode_action("discard", uid=uid))
-        parts.append(
-            '<div class="actions">'
-            f'<a href="{edit_href}">Edit</a> '
-            f'<a href="{discard_href}">Discard</a>'
-            "</div>"
+        blocks.append(
+            _render_text(draft.get("body") or "")
+            + '<div class="actions">'
+            + f'<a href="{edit_href}">Edit</a> '
+            + f'<a href="{discard_href}">Discard</a>'
+            + "</div>"
         )
 
-    return "".join(parts)
+    # Each draft owns its Edit/Discard pair, so they must not run together visually.
+    return '<div class="pending-tag">pending review comment</div>' + _stack(blocks)
 
 
 def draft_badge(count: int) -> str:

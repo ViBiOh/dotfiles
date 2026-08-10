@@ -1,10 +1,18 @@
 %YAML 1.2
 ---
-# Colors the GithubPullRequest "changed files" bottom panel: the PR header yellow, additions
-# green, deletions red, unresolved-comment count yellow, pending (queued) count dimmed,
-# CODEOWNERS blue, and both the marker and path of a file already open as a tab greyed out.
-# Uses foreground-only scopes (diff markup / comment / entity.name.*) so there is no
-# background fill (unlike region.*ish). Every row begins with a fixed-width marker slot
+# Colors the GithubPullRequest "changed files" bottom panel. Every hue below is DISTINCT in
+# Mariana (the scheme this is tuned for), so nothing reads as a duplicate:
+#   PR header          entity.name.class  orange  hsl(32,93%,66%)
+#   +N additions       markup.inserted    green   hsl(114,31%,68%)
+#   -M deletions       markup.deleted     red     hsl(357,79%,65%)
+#   (K unresolved)     support.type       blue    hsl(210,50%,60%)
+#   (P pending)        comment            grey    hsl(221,12%,69%)
+#   CODEOWNERS         support.constant   mauve   hsl(300,30%,68%)
+#   visited row        comment.open-file  grey    (dimmed by inheritance, see below)
+# Mariana has no further distinct hue reachable by a scope: `orange3` is a true yellow but
+# no rule maps to it. All of the above are foreground-only, so there is no background fill
+# (unlike region.*ish, and unlike `invalid` / `markup.raw` / `diff.inserted`, which DO set
+# one — never use those here). Every row begins with a fixed-width marker slot
 # ("● " when open, two spaces when not; see panel._OPEN_MARKER) — a syntax can only assign
 # scopes by matching TEXT, so a real character is needed. The `+N -M` rule is therefore not
 # `^`-anchored and instead requires the whole pair plus a trailing space, so hyphens inside
@@ -13,9 +21,9 @@ hidden: true
 scope: source.githubpullrequest-files
 contexts:
   main:
-    # The PR header. Yellow (`entity.name.class` is #fac863 in Mariana), which is distinct
-    # from the greyed rows below it and from the blue CODEOWNERS handles.
-    - match: '^PR #.*$'
+    # Anchored on the real header shape (`PR #<n> ·`), not a bare "PR #", so a
+    # description line that happens to mention another PR is not painted as a header.
+    - match: '^PR #\d+ ·.*$'
       scope: entity.name.class.githubpullrequest-files
     # Rows for a file that is open as a tab, detected by the leading marker. Pushing a
     # context is what lets the row's `path:line` token go grey too, while the shared token
@@ -23,7 +31,9 @@ contexts:
     # `comment.` — every color scheme renders that dimmed — so a file already visited
     # recedes instead of competing with the colors that carry the real signal. No
     # color-scheme override is needed.
-    - match: '^●'
+    # The lookahead keeps a description line that merely starts with a bullet from being
+    # treated as a row: a real row always continues with " +" (file) or "  " (counts).
+    - match: '^●(?= [+ ])'
       scope: comment.open-file.githubpullrequest-files
       push: open_row
     - include: row_tokens
@@ -43,9 +53,9 @@ contexts:
         1: markup.inserted.githubpullrequest-files
         2: markup.deleted.githubpullrequest-files
     - match: '\(\d+ unresolved\)'
-      scope: markup.changed.githubpullrequest-files
+      scope: support.type.githubpullrequest-files
     - match: '\(\d+ pending\)'
       scope: comment.githubpullrequest-files
-    # CODEOWNERS handles / emails (the only @-bearing tokens on a row) -> blue.
+    # CODEOWNERS handles / emails (the only @-bearing tokens on a row) -> mauve.
     - match: '\S*@\S+'
-      scope: entity.name.function.githubpullrequest-files
+      scope: support.constant.githubpullrequest-files

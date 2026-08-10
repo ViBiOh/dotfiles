@@ -3,7 +3,7 @@
 Three coordinate spaces meet here:
 
 * **buffer rows** of the live view, which carry the reviewer's own uncommitted edits,
-* **head-commit rows** (``git show HEAD:<path>``), which is what GitHub anchors to,
+* **head-commit rows** (``git show <pr head oid>:<path>``), which is what GitHub anchors to,
 * the **PR diff**, which decides what is commentable (``mapper.LineMap``).
 
 Local edits shift buffer rows away from head rows, so both directions are needed:
@@ -27,8 +27,8 @@ except ImportError:
     from repo import rel_path, run_git
     from state import SESSION
 
-# Opcodes (committed HEAD vs live buffer) per view, keyed by the view's change_count so
-# a `git show HEAD` is paid only when the buffer actually changed.
+# Opcodes (the PR head commit vs the live buffer) per view, keyed by the view's
+# change_count so a `git show` is paid only when the buffer actually changed.
 _OPCODE_CACHE = {}
 
 # Covered rows per thread, per view. `on_hover` hit-tests every thread on every mouse
@@ -56,10 +56,24 @@ def clear_caches():
     _THREAD_ROWS_CACHE.clear()
 
 
+def _base_rev():
+    """The revision the buffer is compared against: the PR's head commit.
+
+    It must NOT be local HEAD. `LineMap` decides what is commentable from `gh pr diff`,
+    whose line numbers are relative to the PR head, so any commit on the branch that the
+    PR does not have (an unpushed commit, an amend, a fix made after opening the PR)
+    would shift every mapped line and make lines that ARE in the diff look uncommentable.
+    Falls back to HEAD when the oid is unknown (no session, or an older cached PR)."""
+    pr = SESSION.pr or {}
+
+    return pr.get("head_oid") or "HEAD"
+
+
 def _head_opcodes(root, rel, view):
-    """difflib opcodes (committed HEAD as ``a``, live buffer as ``b``) for the file, or
-    None when HEAD has no such path. The buffer is read live, so unsaved edits count."""
-    rc, committed = run_git(root, ["show", f"HEAD:{rel}"])
+    """difflib opcodes (the PR head version as ``a``, live buffer as ``b``) for the file,
+    or None when that revision has no such path. The buffer is read live, so unsaved
+    edits count."""
+    rc, committed = run_git(root, ["show", f"{_base_rev()}:{rel}"])
     if rc != 0:
         return None
 
@@ -92,7 +106,7 @@ def view_opcodes(view):
 def selection_to_head(view, start_row, end_row):
     """Buffer-row selection -> the head-commit rows GitHub can anchor to, plus whether
     the selection carries the reviewer's local (uncommitted) edits. Returns the buffer
-    rows unchanged when HEAD is unavailable; see `mapper.head_anchor` for the mapping."""
+    rows unchanged when the PR head version is unavailable; see `mapper.head_anchor`."""
     opcodes = view_opcodes(view)
     if opcodes is None:
         return start_row, end_row, False
@@ -101,8 +115,8 @@ def selection_to_head(view, start_row, end_row):
 
 
 def remap_head_row(view, head_row):
-    """Head-commit row -> current buffer row (identity when the buffer matches HEAD or
-    HEAD is unavailable). Keeps gutter icons, popups and navigation on the right line
+    """Head-commit row -> current buffer row (identity when the buffer matches the PR
+    head, or that revision is unavailable). Keeps gutter icons, popups and navigation
     even after local edits shift the buffer away from the PR head."""
     if head_row is None:
         return None

@@ -117,6 +117,18 @@ def _notes_row(entry: Dict, marker: str, to_buffer_line) -> Optional[str]:
     return f"{marker}{indented}{path}:{line}"
 
 
+def _description_lines() -> List[str]:
+    """The PR description as panel lines, or empty when it has none.
+
+    GitHub bodies arrive with CRLF, which would show as stray `^M`, and usually with
+    trailing blank lines, which would pad the panel; both are normalised here so the
+    caller can just append what it gets."""
+    body = (SESSION.pr or {}).get("body") or ""
+    body = body.replace("\r\n", "\n").replace("\r", "\n").rstrip()
+
+    return body.split("\n") if body else []
+
+
 def files_panel_text(
     open_paths: FrozenSet[str] = frozenset(),
     to_buffer_line=_identity_line,
@@ -125,7 +137,8 @@ def files_panel_text(
 
     Two lines per file so each gets its own result_file_regex click target: the file
     row jumps to the first hunk, the comment sub-row (only when the file has comments)
-    jumps to the first comment. A blank line separates the header from the rows.
+    jumps to the first comment. A blank line separates the header from the rows, and
+    another separates the rows from the PR description when it has one.
     `open_paths` are the repo-relative paths currently open as a tab; their rows get the
     `_OPEN_MARKER` the syntax file greys.
 
@@ -147,6 +160,13 @@ def files_panel_text(
         notes = _notes_row(entry, marker, to_buffer_line)
         if notes:
             lines.append(notes)
+
+    # The description trails the actionable list, separated by a blank line, so it never
+    # pushes the files out of view (the panel is only a few lines tall).
+    description = _description_lines()
+    if description:
+        lines.append("")
+        lines.extend(description)
 
     pending = sum(entry.get("pending", 0) for entry in entries)
 

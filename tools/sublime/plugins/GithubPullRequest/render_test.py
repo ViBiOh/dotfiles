@@ -104,10 +104,12 @@ class ThreadPopupTest(unittest.TestCase):
         self.assertNotIn("<b>bob</b>", html_doc)
         self.assertIn("&lt;b&gt;bob", html_doc)
 
-    def test_starts_with_style_and_has_actions(self):
+    def test_has_actions_but_no_embedded_stylesheet(self):
         html_doc = render.thread_popup_html(self._thread())
 
-        self.assertTrue(html_doc.startswith(render.build_style()))
+        # Sections must be style-free: popup() emits it once, and stacking a section
+        # would otherwise nest <style> inside a <div>.
+        self.assertNotIn("<style>", html_doc)
         self.assertIn("alice", html_doc)
         self.assertIn(">Reply<", html_doc)
         self.assertIn(">Resolve<", html_doc)
@@ -312,6 +314,101 @@ class PendingHtmlTest(unittest.TestCase):
 
         self.assertNotIn("<script>", html_doc)
         self.assertIn("&lt;script&gt;", html_doc)
+
+
+RULE = '<div class="rule"'
+
+
+class SeparatorTest(unittest.TestCase):
+    """A thread's comments, and stacked drafts, must read as distinct items rather than
+    running together. The rule is text, since minihtml drops <hr> without drawing it."""
+
+    def _thread(self, count):
+        return {
+            "id": "T1",
+            "url": "u",
+            "is_resolved": False,
+            "is_outdated": False,
+            "comments": [
+                {"author": f"a{i}", "created_at": "t", "body": f"body {i}"}
+                for i in range(count)
+            ],
+        }
+
+    def test_one_rule_between_each_comment(self):
+        cases = {"one": (1, 0), "two": (2, 1), "five": (5, 4)}
+
+        for name, (comments, expected) in cases.items():
+            with self.subTest(name):
+                html_doc = render.thread_popup_html(self._thread(comments))
+
+                self.assertEqual(html_doc.count(RULE), expected)
+
+    def test_no_rule_before_the_first_or_after_the_last_comment(self):
+        html_doc = render.thread_popup_html(self._thread(2))
+
+        first = html_doc.index("body 0")
+        second = html_doc.index("body 1")
+        rule = html_doc.index(RULE)
+
+        self.assertLess(first, rule, "no rule before the first comment")
+        self.assertLess(rule, second, "the rule sits between the two comments")
+        # the actions block closes the popup, so the last rule is not trailing
+        self.assertLess(html_doc.rindex(RULE), html_doc.index(">Reply<"))
+
+    def test_empty_thread_has_no_rule(self):
+        html_doc = render.thread_popup_html(self._thread(0))
+
+        self.assertNotIn(RULE, html_doc)
+
+    def test_rule_between_stacked_drafts(self):
+        cases = {"one": (1, 0), "three": (3, 2)}
+
+        for name, (count, expected) in cases.items():
+            with self.subTest(name):
+                drafts = [(i, {"body": f"draft {i}"}) for i in range(count)]
+                html_doc = render.pending_html(drafts)
+
+                self.assertEqual(html_doc.count(RULE), expected)
+                # every draft keeps its own pair of action links
+                self.assertEqual(html_doc.count(">Edit</a>"), count)
+
+    def test_rule_uses_a_documented_border_and_never_an_hr(self):
+        style = render.build_style()
+
+        # minihtml drops <hr>; border-top-* is documented as supported.
+        self.assertNotIn("<hr", render.thread_popup_html(self._thread(2)))
+        self.assertIn(".rule {", style)
+        for prop in ("border-top-width", "border-top-style", "border-top-color"):
+            with self.subTest(prop):
+                self.assertIn(prop, style)
+
+    def test_rule_hangs_on_a_block_with_content(self):
+        # An empty <div class="rule"></div> would have no box to draw a border on,
+        # since minihtml has no height property.
+        html_doc = render.thread_popup_html(self._thread(2))
+
+        self.assertNotIn(f"{RULE}></div>", html_doc)
+        self.assertIn(f'{RULE}><span class="author">', html_doc)
+
+    def test_popup_emits_the_stylesheet_once_and_rules_sections_apart(self):
+        sections = ["<div>one</div>", "<div>two</div>", "<div>three</div>"]
+
+        doc = render.popup(sections)
+
+        self.assertTrue(doc.startswith(render.build_style()))
+        self.assertEqual(doc.count("<style>"), 1)
+        self.assertEqual(doc.count(RULE), len(sections) - 1)
+        # the stylesheet must not end up inside a ruled wrapper
+        self.assertLess(doc.index("<style>"), doc.index(RULE))
+
+    def test_popup_of_one_section_has_no_rule(self):
+        doc = render.popup(["<div>only</div>"])
+
+        self.assertNotIn(RULE, doc)
+
+    def test_popup_of_nothing(self):
+        self.assertEqual(render.popup([]), render.build_style())
 
 
 class DraftBadgeTest(unittest.TestCase):

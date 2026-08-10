@@ -502,7 +502,9 @@ def _show_threads_popup(view, row, point):
         parts.append(render.pending_html(drafts))
 
     view.show_popup(
-        "".join(parts),
+        # One document: the stylesheet once, then the sections ruled apart. A line can
+        # carry several threads plus the queued drafts.
+        render.popup(parts),
         sublime.HIDE_ON_MOUSE_MOVE_AWAY,
         point,
         800,
@@ -642,6 +644,9 @@ def _apply_suggestion(view, thread_id, index):
 # --------------------------------------------------------------------------- #
 def _build_session(root, pr, review, files, threads, owners):
     SESSION.reset()
+    # The opcode/row caches are keyed on a view's change_count, which does NOT change
+    # when a PR is loaded, so a stale entry would survive into the new review.
+    clear_caches()
     SESSION.active = True
     SESSION.root = root
     SESSION.pr = pr
@@ -990,11 +995,17 @@ class GithubPullRequestAddCommentCommand(sublime_plugin.TextCommand):
         # whether the selection is locally edited (so a suggestion is worth prefilling).
         head_start, head_end, has_diff = selection_to_head(view, start_row, end_row)
 
-        payload = None
-        if head_start is not None:
-            payload = line_map.comment_range(head_start, head_end)
+        if head_start is None:
+            # Every selected row is a line you added locally, so it does not exist in the
+            # PR head and GitHub has nothing to anchor a comment to.
+            _status("these lines are not in the pull request (added locally)")
+            return
+
+        payload = line_map.comment_range(head_start, head_end)
         if payload is None:
-            _status("no commentable line in the selection")
+            # The lines exist in the PR head but sit outside every hunk, and GitHub only
+            # accepts comments inside the diff.
+            _status("the pull request does not change these lines")
             return
 
         # GitHub only anchors comments to lines the PR diff actually carries, so a

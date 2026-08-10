@@ -110,7 +110,7 @@ All entries are prefixed `GithubPullRequest:` in the command palette.
 | --- | --- |
 | **Load pull-request** | Infer the PR from the current branch, fetch files and threads, open the changed-files panel. Only open/draft PRs load. |
 | **Open pull-request in browser** | Open this branch's PR on GitHub. Works with or without a loaded review. |
-| **Show changed files** | The bottom panel of changed files, stats, comment counts, and owners. |
+| **Show changed files** | The bottom panel of changed files, stats, comment counts, and owners, with the PR description underneath. |
 | **List all comments** | Quick-panel of every thread across the PR; jumps to file and line. |
 | **Comment on line or selection** | Queue a review comment on the cursor line or the selected range. |
 | **Next comment** / **Previous comment** | Walk the commented lines in the current file. |
