@@ -364,8 +364,6 @@ def _apply_draft_icons(view, path):
 # --------------------------------------------------------------------------- #
 # comment compose split (write a comment below the file; save to submit)
 # --------------------------------------------------------------------------- #
-
-
 def _open_compose(source_view, prefill, context, target=""):
     """Open a scratch compose buffer in a split below the file. Save submits it
     (see the keymap / GithubPullRequestSubmitCommentCommand); closing cancels.
