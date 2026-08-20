@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-//go:generate go tool golang.org/x/tools/cmd/stringer -type=${1:EnumName}
+//go:generate go tool "golang.org/x/tools/cmd/stringer" -type=${1:EnumName}
 
 type ${1:EnumName} int
 
