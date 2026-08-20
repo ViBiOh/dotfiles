@@ -91,6 +91,7 @@ main() {
 
   if command -v go >/dev/null 2>&1; then
     go install "golang.org/x/tools/gopls@latest"
+    go install "github.com/hmarr/codeowners/cmd/codeowners@latest"
   fi
 
   if command -v npm >/dev/null 2>&1; then
