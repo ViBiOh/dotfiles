@@ -83,7 +83,10 @@ main() {
   install_plugin "${TEXT_PKG}" "SublimeLayout"
   install_plugin "${TEXT_PKG}" "SublimeMakefile"
   install_plugin "${TEXT_PKG}" "SublimeMarkdown"
-  install_plugin "${TEXT_PKG}" "GithubPullRequest"
+
+  # Manual symlink to the repository GitHubPullRequest
+  rm -rf "${TEXT_PKG}/GitHubPullRequest"
+  ln -s "${HOME}/code/sublime-GitHubPullRequest" "${TEXT_PKG}/GitHubPullRequest"
 
   if command -v brew >/dev/null 2>&1; then
     brew install pandoc gh
@@ -108,4 +111,4 @@ main() {
   install_shfmt
 }
 
-main "${@}"
+main "${@:-}"
