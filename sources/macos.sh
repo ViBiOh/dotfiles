@@ -10,8 +10,13 @@ fix_spotlight() {
   sudo mdutil -X "/System/Volumes/Data"
 }
 
+fix_profile() {
+  rm -rf "${HOME}/.profile" "${HOME}/.zprofile" "${HOME}/.zshrc"
+}
+
 macos_start() {
   fix_spotlight
+  fix_profile
 
   if [[ ${DOTFILES_DNS:-} == "true" ]]; then
     dns_set "127.0.0.1"
