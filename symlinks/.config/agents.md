@@ -26,6 +26,14 @@ I primarily use AI agents for:
 - After completing work, I'll handle all git operations myself
 - When comparing changes on the current branch against the default branch, always use `origin/<default_branch>` (e.g. `git diff origin/main...HEAD`) instead of the local `<default_branch>` ref to avoid picking up unrelated local commits as noise
 
+## Docker
+
+**CRITICAL**: Never perform any mutable docker operation, no run, build, pull, push, exec, start, stop, rm, rmi, prune, compose up/down, or any command that changes container, image, volume, or network state. Same for `podman`, `nerdctl`, `docker-compose`, and `colima`.
+
+- Read-only docker commands are fine (`docker ps`, `docker images`, `docker logs`, `docker inspect`, `docker version`, etc.)
+- After completing work, I'll handle all docker operations myself
+- If a task needs a container built or started, give me the exact command and let me run it
+
 ## Testing
 
 **Automatic test execution**: Always run relevant tests after making code changes

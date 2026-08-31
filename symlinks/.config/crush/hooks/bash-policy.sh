@@ -23,7 +23,11 @@ DENY_PATTERNS=(
   '^gh '
 
   # Git mutations
-  '^git (add|checkout|clone|commit|init|merge|pull|push|rebase|rm|switch|tag|worktree)'
+  '^git (add|am|apply|branch|checkout|cherry-pick|clone|commit|config|filter-branch|gc|init|merge|mv|prune|pull|push|rebase|remote|reset|restore|revert|rm|stash|submodule|switch|tag|update-ref|worktree)'
+
+  # Docker mutations (and the compatible CLIs / VM manager)
+  '^docker (build|commit|compose|container|cp|create|exec|export|image|import|kill|load|login|network|pause|pull|push|restart|rm|rmi|run|save|start|stop|system|tag|unpause|update|volume)'
+  '^(docker-compose|podman|nerdctl|colima)'
 
   # Package installs
   '^(go install|npm install|pip install)'
