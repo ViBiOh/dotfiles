@@ -14,6 +14,24 @@ fix_profile() {
   rm -rf "${HOME}/.profile" "${HOME}/.zprofile" "${HOME}/.zshrc"
 }
 
+unmodifiable() {
+  if [[ ${#} -ne 1 ]]; then
+    var_red "Usage: unmodifiable FILE_PATH"
+    return 1
+  fi
+
+  sudo chflags schg "${1}"
+}
+
+modifiable() {
+  if [[ ${#} -ne 1 ]]; then
+    var_red "Usage: modifiable FILE_PATH"
+    return 1
+  fi
+
+  sudo chflags noschg "${1}"
+}
+
 macos_start() {
   fix_spotlight
   fix_profile
