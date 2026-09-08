@@ -41,7 +41,7 @@ qrcode_wifi() {
 
 loop() {
   local STOP_ON_SUCCESS=0
-  if [[ "${1}" == "-s" || "${1}" == "--stop-on-success" ]]; then
+  if [[ ${1} == "-s" || ${1} == "--stop-on-success" ]]; then
     STOP_ON_SUCCESS=1
     shift
   fi
@@ -289,12 +289,13 @@ if command -v systemctl >/dev/null 2>&1; then
     sudo systemctl status "${@}"
   }
 
-  restart() {
-    sudo systemctl restart "${@}"
+  logs() {
+    sudo journalctl -f -u "${@}"
   }
 
-  logs() {
-    sudo journalctl -u "${@}"
+  restart() {
+    sudo systemctl restart "${@}"
+    logs "${@}"
   }
 fi
 
