@@ -18,6 +18,5 @@ if command -v brew >/dev/null 2>&1; then
   add_to_path "${BREW_PREFIX}/opt/make/libexec/gnubin"
   add_to_path "${BREW_PREFIX}/opt/grep/libexec/gnubin"
   add_to_path "${BREW_PREFIX}/opt/openssl/bin"
-  add_to_path "${BREW_PREFIX}/opt/ruby/bin"
   add_to_path "${BREW_PREFIX}/opt/libpq/bin"
 fi
