@@ -2,7 +2,7 @@
 
 gh_switch_pr() {
   local PULL_REQUESTS
-  PULL_REQUESTS="$(gh pr list --search "is:open is:pr review-requested:@me" --json 'additions,deletions,author,headRefName,title,updatedAt')"
+  PULL_REQUESTS="$(gh pr list --search "is:open is:pr review-requested:@me review:required" --json 'additions,deletions,author,headRefName,title,updatedAt')"
 
   if [[ ${PULL_REQUESTS:-} == "[]" ]]; then
     var_warning "No pull request waiting for review"
@@ -23,9 +23,14 @@ gh_switch_pr() {
     --arg yellow "${COLOR_YELLOW}" \
     --arg purple "${COLOR_PURPLE}" \
     --arg reset "${COLOR_RESET}" \
-    'sort_by(.updatedAt) | reverse | .[] | [
+    'sort_by(.updatedAt) | reverse
+      | map(. + {user: "@\(.author.login)"})
+      | (map(.headRefName | length) | max) as $branchWidth
+      | (map(.title | length) | max) as $titleWidth
+      | (map(.user | length) | max) as $userWidth
+      | .[] | [
       .headRefName,
-      "\($green)+\(.additions)\($reset) \($red)-\(.deletions)\($reset) \($yellow)\(.headRefName)\($reset) \($purple)\(.author.login)\($reset) \(.title)"
+      "\($yellow)\(.headRefName | . + (" " * ($branchWidth - length)))\($reset)  \(.title | . + (" " * ($titleWidth - length)))  \($purple)\(.user | . + (" " * ($userWidth - length)))\($reset)  \($green)+\(.additions)\($reset) \($red)-\(.deletions)\($reset)"
     ] | @tsv' <<<"${PULL_REQUESTS}" |
     fzf --ansi --reverse --height=20 --delimiter='\t' --with-nth='2..' |
     cut -f 1)"
@@ -35,4 +40,5 @@ gh_switch_pr() {
   fi
 
   git checkout "${BRANCH}"
+  git pull
 }
