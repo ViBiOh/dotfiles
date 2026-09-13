@@ -2,6 +2,21 @@ import os
 import signal
 import subprocess
 import threading
+from typing import Any, Dict
+
+
+def no_window_kwargs() -> Dict[str, Any]:
+    """Extra subprocess kwargs that keep the child's console window hidden. Empty on
+    POSIX, where CREATE_NO_WINDOW does not exist and there is no window to hide."""
+    creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    if not creationflags:
+        return {}
+
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    startupinfo.wShowWindow = subprocess.SW_HIDE
+
+    return {"creationflags": creationflags, "startupinfo": startupinfo}
 
 
 class AsyncTask:
@@ -23,6 +38,7 @@ class AsyncTask:
                 cwd=cwd,
                 env=env,
                 start_new_session=True,
+                **no_window_kwargs(),
             )
 
             threading.Thread(target=self.read, args=(self.proc.stdout,)).start()

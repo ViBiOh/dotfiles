@@ -15,6 +15,20 @@ def plugin_loaded() -> None:
     _settings_obj = loaded_settings_obj
 
 
+def no_window_kwargs() -> Dict[str, Any]:
+    """Extra subprocess kwargs that keep the child's console window hidden. Empty on
+    POSIX, where CREATE_NO_WINDOW does not exist and there is no window to hide."""
+    creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    if not creationflags:
+        return {}
+
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    startupinfo.wShowWindow = subprocess.SW_HIDE
+
+    return {"creationflags": creationflags, "startupinfo": startupinfo}
+
+
 def format(view, region, working_dir, commands):
     value = view.substr(region)
 
@@ -29,6 +43,7 @@ def format(view, region, working_dir, commands):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 cwd=working_dir,
+                **no_window_kwargs(),
             )
         except FileNotFoundError as err:
             print("unable to run {}: {}".format(command[0], err))
