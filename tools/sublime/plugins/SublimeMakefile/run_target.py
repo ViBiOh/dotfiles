@@ -102,4 +102,4 @@ class MakefileRun(sublime_plugin.WindowCommand):
         sublime.set_timeout(lambda: self.do_write(text), 1)
 
     def do_write(self, text):
-        self.panel.run_command("append", {"characters": text})
+        self.panel.run_command("append", {"characters": text, "scroll_to_end": True})

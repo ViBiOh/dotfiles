@@ -30,4 +30,6 @@ class GoTestDebug(sublime_plugin.WindowCommand):
 
     def do_write(self, text):
         with self.panel_lock:
-            self.panel.run_command("append", {"characters": text})
+            self.panel.run_command(
+                "append", {"characters": text, "scroll_to_end": True}
+            )

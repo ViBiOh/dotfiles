@@ -22,8 +22,16 @@ def no_window_kwargs() -> Dict[str, Any]:
 class AsyncTask:
     encoding = "utf-8"
 
-    def __init__(self, command=["printf", "Hello"], cwd=None, env=None, output=print):
+    def __init__(
+        self,
+        command=["printf", "Hello"],
+        cwd=None,
+        env=None,
+        output=print,
+        on_finished=None,
+    ):
         self.output = output
+        self.on_finished = on_finished
         self.killed = False
         self.proc = None
 
@@ -41,7 +49,9 @@ class AsyncTask:
                 **no_window_kwargs(),
             )
 
-            threading.Thread(target=self.read, args=(self.proc.stdout,)).start()
+            threading.Thread(
+                target=self.read, args=(self.proc.stdout, self.proc)
+            ).start()
 
         except Exception as e:
             self.write("[exception]\n" + repr(e))
@@ -82,21 +92,24 @@ class AsyncTask:
             except subprocess.TimeoutExpired:
                 print("unable to kill process group {}".format(pgid))
 
-    def read(self, reader):
+    def read(self, reader, proc):
         for line in reader:
             try:
                 self.write(line.decode(self.encoding))
             except UnicodeDecodeError:
                 self.write(line.hex() + "\n")
 
-        if self.killed:
-            msg = "Cancelled"
-        else:
-            msg = "Finished"
-
-        self.write("\n[%s]" % msg)
-
         reader.close()
+
+        if self.killed:
+            self.write("\n[Cancelled]")
+            return
+
+        exit_code = proc.wait()
+        self.write("\n[Finished]")
+
+        if self.on_finished:
+            self.on_finished(exit_code)
 
     def write(self, text):
         self.output(text)

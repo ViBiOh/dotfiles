@@ -77,6 +77,7 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
         settings = self.panel.settings()
         settings.set("result_file_regex", r"([^\s[]+?):(\d+)")
         settings.set("result_base_dir", working_dir)
+        self.panel.erase_phantoms("exit_status")
         window.run_command("show_panel", {"panel": "output.gotest"})
 
         if self.task:
@@ -98,10 +99,26 @@ class GoFunctionTest(sublime_plugin.WindowCommand):
             output=self.queue_write,
             cwd=working_dir,
             env=load_git_root_env(working_dir),
+            on_finished=self.queue_finished,
         )
 
     def queue_write(self, text):
         sublime.set_timeout(lambda: self.do_write(text), 1)
 
     def do_write(self, text):
-        self.panel.run_command("append", {"characters": text})
+        self.panel.run_command("append", {"characters": text, "scroll_to_end": True})
+
+    def queue_finished(self, exit_code):
+        sublime.set_timeout(lambda: self.do_finished(exit_code), 1)
+
+    def do_finished(self, exit_code):
+        color = "var(--greenish)" if exit_code == 0 else "var(--redish)"
+        label = "PASS" if exit_code == 0 else "FAIL"
+        panel = self.panel
+        panel.add_phantom(
+            "exit_status",
+            sublime.Region(panel.size(), panel.size()),
+            '<span style="color: {}">  {}</span>'.format(color, label),
+            sublime.LAYOUT_INLINE,
+        )
+        panel.show(panel.size())
