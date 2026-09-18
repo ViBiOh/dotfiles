@@ -8,6 +8,6 @@ install() {
   fi
 
   if command -v op >/dev/null 2>&1; then
-    op completion bash >"${HOME}/opt/completions/op-completion.sh"
+    op completion bash >"${HOME}/opt/completions/op.bash"
   fi
 }

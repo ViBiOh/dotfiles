@@ -15,14 +15,14 @@ install() {
   KUBERNETES_VERSION="$(curl --disable --silent --show-error --location --max-time 30 "https://storage.googleapis.com/kubernetes-release/release/stable.txt")"
 
   curl_to_binary "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/$(normalized_os)/$(normalized_arch "amd64" "arm" "arm64")/kubectl" "kubectl"
-  kubectl completion bash >"${HOME}/opt/completions/kubectl-completion.sh"
+  kubectl completion bash >"${HOME}/opt/completions/kubectl.bash"
 
   # renovate: datasource=github-releases depName=helm/helm
   local HELM_VERSION="v4.3.0"
 
   archive_to_binary "https://get.helm.sh/helm-${HELM_VERSION}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64").tar.gz" "$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64")/helm"
   if command -v helm >/dev/null 2>&1; then
-    helm completion bash >"${HOME}/opt/completions/helm-completion.sh"
+    helm completion bash >"${HOME}/opt/completions/helm.bash"
   else
     var_error "helm was not found in path. Please run 'helm completion bash >'${HOME}/opt/completions/helm-completion'"
   fi
@@ -30,7 +30,7 @@ install() {
   # renovate: datasource=github-releases depName=fluxcd/flux2
   local FLUX_VERSION="v2.9.5"
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION#v}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").tar.gz" "flux"
-  flux completion bash >"${HOME}/opt/completions/flux-completion.sh"
+  flux completion bash >"${HOME}/opt/completions/flux.bash"
 
   # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
   local KUBESEAL_VERSION="v0.40.0"
@@ -39,7 +39,7 @@ install() {
   # renovate: datasource=github-releases depName=ViBiOh/kmux
   local KMUX_VERSION="v0.16.0"
   archive_to_binary "https://github.com/ViBiOh/kmux/releases/download/${KMUX_VERSION}/kmux_$(normalized_os)_$(normalized_arch "" "arm" "arm64").tar.gz" "kmux"
-  kmux completion bash >"${HOME}/opt/completions/kmux-completion.sh"
+  kmux completion bash >"${HOME}/opt/completions/kmux.bash"
 }
 
 credentials() {

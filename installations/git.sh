@@ -25,7 +25,7 @@ install() {
     return
   fi
 
-  curl --disable --silent --show-error --location --max-time 30 --output "${HOME}/opt/completions/git" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{printf("%s", $3)}')/contrib/completion/git-completion.bash"
+  curl --disable --silent --show-error --location --max-time 30 --output "${HOME}/opt/completions/git.bash" "https://raw.githubusercontent.com/git/git/v$(git --version | awk '{printf("%s", $3)}')/contrib/completion/git-completion.bash"
 
   (
     cd "${DOTFILES_DIR}/"
