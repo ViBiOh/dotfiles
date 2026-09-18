@@ -19,14 +19,9 @@ install() {
 
   source "${DOTFILES_DIR}/sources/_python.sh"
 
-  if ! command -v pip >/dev/null 2>&1; then
-    var_error "pip is required"
-    exit
-  fi
-
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install "pgcli"
-  elif command -v apt-get >/dev/null 2>&1; then
+  elif package_exists "libpq-dev" && command -v pip >/dev/null 2>&1; then
     packages_install "libpq-dev"
     pip install "pgcli"
   fi

@@ -30,7 +30,7 @@ DENY_PATTERNS=(
   '^(docker-compose|podman|nerdctl|colima)'
 
   # Package installs
-  '^(go install|npm install|pip install)'
+  '^(go install|npm install|pip install|uv pip install|uv tool install)'
 
   # Terraform (running or installing it)
   '^terraform'

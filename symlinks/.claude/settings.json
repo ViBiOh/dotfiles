@@ -131,7 +131,9 @@
       "Bash(pip install*)",
       "Bash(podman*)",
       "Bash(terraform*)",
-      "Bash(tfenv*)"
+      "Bash(tfenv*)",
+      "Bash(uv pip install*)",
+      "Bash(uv tool install*)"
     ]
   },
   "statusLine": {
