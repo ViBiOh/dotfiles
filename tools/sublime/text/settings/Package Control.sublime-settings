@@ -6,6 +6,7 @@
 		"A File Icon",
 		"Debugger",
 		"EditorConfig",
+		"GitHubPullRequest",
 		"LSP",
 		"LSP-gopls",
 		"LSP-json",

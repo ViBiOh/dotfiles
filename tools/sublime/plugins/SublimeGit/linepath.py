@@ -22,6 +22,6 @@ class SublimeGitLinepath(sublime_plugin.WindowCommand):
 
         relative_file = os.path.relpath(file, folder)
 
-        url = "{}:{}".format(relative_file, line_number)
+        url = f"{relative_file}:{line_number}"
 
         sublime.set_clipboard(url)

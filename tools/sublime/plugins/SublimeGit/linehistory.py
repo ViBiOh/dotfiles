@@ -55,7 +55,7 @@ class SublimeGitLineHistory(sublime_plugin.WindowCommand):
                 "log-pretty",
                 "--no-color",
                 "-L",
-                "{},{}:{}".format(start_line, end_line, relative_file),
+                f"{start_line},{end_line}:{relative_file}",
             ],
             output=self.queue_write,
             cwd=folder,

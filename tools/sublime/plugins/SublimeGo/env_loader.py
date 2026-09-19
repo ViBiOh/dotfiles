@@ -151,7 +151,7 @@ def load_env_file(cwd, name):
         with open(env_file, encoding="utf-8") as handle:
             return parse_env(handle.read())
     except OSError as err:
-        print("unable to read {}: {}".format(name, err))
+        print(f"unable to read {name}: {err}")
         return {}
 
 
@@ -167,7 +167,7 @@ def load_git_root_env(cwd):
             timeout=5,
         )
     except (FileNotFoundError, subprocess.TimeoutExpired) as err:
-        print("unable to check git: {}".format(err))
+        print(f"unable to check git: {err}")
         return env
 
     if is_git != 0:
@@ -181,7 +181,7 @@ def load_git_root_env(cwd):
             timeout=5,
         )
     except (FileNotFoundError, subprocess.TimeoutExpired) as err:
-        print("unable to get root path: {}".format(err))
+        print(f"unable to get root path: {err}")
         return env
     except subprocess.CalledProcessError as e:
         print("unable to get root path: {}".format(e.output.decode("utf8")))

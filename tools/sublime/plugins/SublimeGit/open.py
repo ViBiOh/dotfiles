@@ -18,7 +18,7 @@ def get_file_line_url(cwd, ref, file, line):
 
 
 def build_line_url(url, ref, file, line):
-    return "{}/blob/{}/{}#L{}".format(url, ref, file, line)
+    return f"{url}/blob/{ref}/{file}#L{line}"
 
 
 class SublimeGitType(sublime_plugin.ListInputHandler):
@@ -74,7 +74,7 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
                     .rstrip()
                 )
             except (FileNotFoundError, subprocess.TimeoutExpired) as err:
-                print("unable to get SHA: {}".format(err))
+                print(f"unable to get SHA: {err}")
                 return
             except subprocess.CalledProcessError as e:
                 print("unable to get SHA: {}".format(e.output.decode("utf8")))
@@ -107,7 +107,7 @@ class SublimeGitWeb(sublime_plugin.WindowCommand):
                 if git_type == "Default branch":
                     ref = remove_prefix(ref, "origin/")
             except (FileNotFoundError, subprocess.TimeoutExpired) as err:
-                print("unable to get branch: {}".format(err))
+                print(f"unable to get branch: {err}")
                 return
             except subprocess.CalledProcessError as e:
                 print("unable to get branch: {}".format(e.output.decode("utf8")))

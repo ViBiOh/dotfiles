@@ -15,7 +15,7 @@ indent_size = 4
 indent_style = tab
 
 [*.sublime-settings]
-indent_style = space
+indent_style = tab
 
 [*.sublime-snippet]
 indent_style = tab

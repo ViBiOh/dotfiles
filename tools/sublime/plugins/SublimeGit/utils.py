@@ -24,7 +24,7 @@ def git_path(file_name):
             timeout=5,
         )
     except (FileNotFoundError, subprocess.TimeoutExpired) as err:
-        print("unable to check git: {}".format(err))
+        print(f"unable to check git: {err}")
         return
 
     if is_git != 0:
@@ -42,7 +42,7 @@ def git_path(file_name):
             .rstrip()
         )
     except (FileNotFoundError, subprocess.TimeoutExpired) as err:
-        print("unable to get root path: {}".format(err))
+        print(f"unable to get root path: {err}")
         return
     except subprocess.CalledProcessError as err:
         print("unable to get root path: {}".format(err.output.decode("utf8")))
@@ -67,7 +67,7 @@ def git_remote(cwd):
             .rstrip()
         )
     except (FileNotFoundError, subprocess.TimeoutExpired) as err:
-        print("unable to get remote push url: {}".format(err))
+        print(f"unable to get remote push url: {err}")
         return ""
     except subprocess.CalledProcessError as err:
         print("unable to get remote push url: {}".format(err.output.decode("utf8")))

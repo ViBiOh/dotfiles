@@ -65,7 +65,7 @@ class GoTest(sublime_plugin.WindowCommand):
         panel.add_phantom(
             "exit_status",
             sublime.Region(panel.size(), panel.size()),
-            '<span style="color: {}">  {}</span>'.format(color, label),
+            f'<span style="color: {color}">  {label}</span>',
             sublime.LAYOUT_INLINE,
         )
         panel.show(panel.size())

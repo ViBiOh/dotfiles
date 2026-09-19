@@ -20,9 +20,7 @@ class GoTestDebug(sublime_plugin.WindowCommand):
             self.window.run_command("show_panel", {"panel": "output.gotestdebug"})
 
         self.queue_write(
-            "For debugging golang test, run the following command\n\n\tcd {} && dlv test -- && cd -".format(
-                working_dir
-            )
+            f"For debugging golang test, run the following command\n\n\tcd {working_dir} && dlv test -- && cd -"
         )
 
     def queue_write(self, text):
