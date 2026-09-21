@@ -140,5 +140,7 @@
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   },
-  "teammateMode": "tmux"
+  "teammateMode": "tmux",
+  "autoCompactEnabled": false,
+  "tui": "fullscreen"
 }

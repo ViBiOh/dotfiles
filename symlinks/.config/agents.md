@@ -56,7 +56,7 @@ I primarily use AI agents for:
 - Always use the native tooling equivalent instead
 - Go: `go build`, `go test`, `go run`
 - Java/Kotlin: `gradle`, `maven`
-- Python: `pip`, `pytest`
+- Python: `uv`, `uv run pytest`
 - JavaScript/TypeScript: `npm`, `yarn`, `pnpm`
 - Rust: `cargo build`, `cargo test`
 - If unsure of the native equivalent, ask before running anything

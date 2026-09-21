@@ -24,7 +24,7 @@ install() {
   if command -v helm >/dev/null 2>&1; then
     helm completion bash >"${HOME}/opt/completions/helm.bash"
   else
-    var_error "helm was not found in path. Please run 'helm completion bash >'${HOME}/opt/completions/helm-completion'"
+    var_error "helm was not found in path. Please run 'helm completion bash >~/opt/completions/helm.bash'"
   fi
 
   # renovate: datasource=github-releases depName=fluxcd/flux2

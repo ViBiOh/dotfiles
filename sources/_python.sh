@@ -5,5 +5,6 @@ if command -v brew >/dev/null 2>&1; then
 fi
 
 if [[ -d "${HOME}/opt/python" ]]; then
+  export VIRTUAL_ENV="${HOME}/opt/python/venv"
   add_to_path "${HOME}/opt/python/venv/bin"
 fi

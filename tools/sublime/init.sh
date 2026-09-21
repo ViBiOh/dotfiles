@@ -101,8 +101,8 @@ main() {
     npm install --ignore-scripts --global "prettier" "eslint" "typescript-language-server" "typescript" "yaml-language-server"
   fi
 
-  if command -v pip >/dev/null 2>&1; then
-    pip install "python-lsp-server" "ruff" "isort" "pycodestyle" "sqlparse"
+  if command -v uv >/dev/null 2>&1; then
+    uv pip install "python-lsp-server" "ruff" "isort" "pycodestyle" "sqlparse"
 
     rm -rf "${HOME}/.config/pycodestyle"
     ln -s "${SCRIPT_DIR}/../../symlinks/.config/pycodestyle" "${HOME}/.config/pycodestyle"

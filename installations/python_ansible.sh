@@ -19,10 +19,10 @@ install() {
 
   source "${DOTFILES_DIR}/sources/_python.sh"
 
-  if ! command -v pip >/dev/null 2>&1; then
-    var_error "pip is required"
+  if ! command -v uv >/dev/null 2>&1; then
+    var_error "uv is required"
     exit
   fi
 
-  pip install "ansible" "passlib" "ansible-lint" "jmespath" "yamllint"
+  uv pip install "ansible" "passlib" "ansible-lint" "jmespath" "yamllint"
 }
