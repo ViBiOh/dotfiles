@@ -81,6 +81,12 @@ I primarily use AI agents for:
 - **Links**: Never put backticks inside markdown link text (e.g. ``[`foo`](url)``). Jira does not render that syntax. Use plain text instead: `[foo](url)`.
 - **Prose wrapping**: Never manually hard-wrap prose lines. Write paragraphs as single continuous lines and let the editor or renderer handle wrapping.
 
+## Comments
+
+- Comments must describe current behavior only, never compare to, reference, or argue with a previous version of the code
+- No "before/after", "previously", "used to", "now we", "instead of", "removed X" style comments, git history covers that
+- Only add a comment when the WHY of the current code is non-obvious
+
 ## Code Quality Preferences
 
 - Variables must have at least 3 characters; exceptions: `a`, `b` when identity is irrelevant (e.g. swap), `i`, `j`, `k` for index-based loops, and single-letter names established by language convention (e.g. `t` for `*testing.T` in Go, `r`/`w` for request/response in HTTP handlers)

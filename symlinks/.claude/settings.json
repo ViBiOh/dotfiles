@@ -136,11 +136,12 @@
       "Bash(uv tool install*)"
     ]
   },
+  "model": "sonnet[1m]",
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   },
-  "teammateMode": "tmux",
-  "autoCompactEnabled": false,
-  "tui": "fullscreen"
+  "tui": "fullscreen",
+  "autoCompactEnabled": true,
+  "teammateMode": "tmux"
 }
