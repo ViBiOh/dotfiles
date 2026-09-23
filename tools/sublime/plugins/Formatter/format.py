@@ -5,6 +5,8 @@ import threading
 import sublime
 import sublime_plugin
 
+from .async_task import no_window_kwargs
+
 PLUGIN_NAME = "Formatter"
 PLUGIN_SETTINGS = "{}.sublime-settings".format(PLUGIN_NAME)
 
@@ -15,18 +17,12 @@ def plugin_loaded() -> None:
     _settings_obj = loaded_settings_obj
 
 
-def no_window_kwargs() -> Dict[str, Any]:
-    """Extra subprocess kwargs that keep the child's console window hidden. Empty on
-    POSIX, where CREATE_NO_WINDOW does not exist and there is no window to hide."""
-    creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
-    if not creationflags:
-        return {}
-
-    startupinfo = subprocess.STARTUPINFO()
-    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-    startupinfo.wShowWindow = subprocess.SW_HIDE
-
-    return {"creationflags": creationflags, "startupinfo": startupinfo}
+def terminate(process):
+    process.terminate()
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        process.kill()
 
 
 def format(view, region, working_dir, commands):
@@ -49,7 +45,7 @@ def format(view, region, working_dir, commands):
             print("unable to run {}: {}".format(command[0], err))
             return value
 
-        timeout = threading.Timer(interval=5, function=process.terminate)
+        timeout = threading.Timer(interval=5, function=lambda: terminate(process))
         timeout.start()
 
         try:
@@ -124,7 +120,9 @@ class command(sublime_plugin.TextCommand):
         working_dir = variables.get("file_path")
 
         for region in get_regions(view, file):
-            view.replace(edit, region, self.format(view, file, region, working_dir))
+            formatted = self.format(view, file, region, working_dir)
+            if formatted != view.substr(region):
+                view.replace(edit, region, formatted)
 
 
 class Formatter(command):

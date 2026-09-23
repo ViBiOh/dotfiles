@@ -2,6 +2,7 @@ import hashlib
 import html
 import re
 import subprocess
+import threading
 from datetime import datetime
 
 import sublime
@@ -122,7 +123,9 @@ def parse_git_blame(blame):
 class SublimeGitDisableBlame(sublime_plugin.WindowCommand):
     def run(self):
         _settings_obj.set("show_blame", False)
-        self.window.active_view().erase_regions("git_blame")
+        for window in sublime.windows():
+            for view in window.views():
+                view.erase_regions(SublimeGitBlame._status_key)
 
 
 class SublimeGitEnableBlame(sublime_plugin.WindowCommand):
@@ -133,12 +136,17 @@ class SublimeGitEnableBlame(sublime_plugin.WindowCommand):
 class SublimeGitBlame(sublime_plugin.EventListener):
     _status_key = "git_blame"
 
-    _git_info = {}
-    _git_blame = None
-    _git_remote = ""
+    def __init__(self):
+        super().__init__()
 
-    _file_name = ""
-    _line_number = 0
+        self._lock = threading.Lock()
+
+        self._git_info = {}
+        self._git_blame = None
+        self._git_remote = ""
+
+        self._file_name = ""
+        self._line_number = 0
 
     def clear_status(self, view):
         view.erase_regions(self._status_key)
@@ -165,25 +173,27 @@ class SublimeGitBlame(sublime_plugin.EventListener):
     def refresh_file(self, view, force):
         file_name = view.file_name()
         if not file_name or len(file_name) == 0:
-            self._file_name = ""
-            self._git_blame = None
+            with self._lock:
+                self._file_name = ""
+                self._git_blame = None
             return
 
-        if not force and self._file_name == file_name:
-            return
-
-        self._file_name = file_name
-        self._line_number = 0
+        with self._lock:
+            if not force and self._file_name == file_name:
+                return
 
         git_info = git_path(file_name)
         if not git_info:
+            with self._lock:
+                self._file_name = file_name
+                self._line_number = 0
+                self._git_blame = None
             return
 
-        self._git_info = git_info
-        self._git_remote = git_remote(git_info["root"])
+        git_remote_url = git_remote(git_info["root"])
 
         try:
-            git_blame = subprocess.check_output(
+            git_blame_output = subprocess.check_output(
                 [
                     "git",
                     "blame",
@@ -196,18 +206,23 @@ class SublimeGitBlame(sublime_plugin.EventListener):
                 timeout=10,
             )
 
-            self._git_blame = parse_git_blame(git_blame.decode("utf8"))
+            git_blame = parse_git_blame(git_blame_output.decode("utf8"))
         except (FileNotFoundError, subprocess.TimeoutExpired) as err:
-            self._git_blame = None
+            git_blame = None
             print("unable to run git blame: {}".format(err))
-            return
         except subprocess.CalledProcessError as e:
-            self._git_blame = None
+            git_blame = None
 
             err = e.output.decode("utf8")
             if not (new_file_regex.match(err) or not_git_regex.match(err)):
                 print(err, end="")
-                return
+
+        with self._lock:
+            self._file_name = file_name
+            self._line_number = 0
+            self._git_info = git_info
+            self._git_remote = git_remote_url
+            self._git_blame = git_blame
 
     def _is_enabled(self):
         return _settings_obj.get("show_blame", False)
@@ -217,11 +232,16 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             return
 
         self.refresh_file(view, True)
+        self.render_current_line(view)
 
     def on_selection_modified_async(self, view):
         if not self._is_enabled():
             return
 
+        self.refresh_file(view, False)
+        self.render_current_line(view)
+
+    def render_current_line(self, view):
         selections = view.sel()
         if len(selections) != 1:
             self.clear_status(view)
@@ -229,39 +249,46 @@ class SublimeGitBlame(sublime_plugin.EventListener):
 
         selection = selections[0]
 
-        self.refresh_file(view, False)
-        if self._git_blame is None:
+        with self._lock:
+            git_blame = self._git_blame
+            git_remote_url = self._git_remote
+            file_name = self._file_name
+
+        if view.file_name() != file_name:
+            # blame for another view was refreshed concurrently, this view's
+            # own selection event will fire again once its refresh completes
+            return
+
+        if git_blame is None:
             self.clear_status(view)
             return
 
         current_point = selection.begin()
         line_number = view.rowcol(current_point)[0] + 1  # index start at 0
 
-        if line_number == self._line_number:
-            return
+        with self._lock:
+            if line_number == self._line_number:
+                return
+            self._line_number = line_number
 
         if line_number != view.rowcol(selection.end())[0] + 1:
             self.clear_status(view)
             return
 
-        self._line_number = line_number
-
         if current_point == view.size():
             self.clear_status(view)
             return
 
-        sha = self._git_blame.get("lines").get(self._line_number)
+        sha = git_blame.get("lines").get(line_number)
         if sha == "0000000000000000000000000000000000000000":
             self.clear_status(view)
             return
 
-        original_line_number = self._git_blame.get("original_lines").get(
-            self._line_number
-        )
+        original_line_number = git_blame.get("original_lines").get(line_number)
         if not original_line_number:
-            original_line_number = self._line_number
+            original_line_number = line_number
 
-        commit = self._git_blame.get("commits").get(sha)
+        commit = git_blame.get("commits").get(sha)
         if not commit:
             return
 
@@ -278,7 +305,7 @@ class SublimeGitBlame(sublime_plugin.EventListener):
             moment,
             commit.get("summary"),
             "{}/commit/{}#diff-{}R{}".format(
-                self._git_remote,
+                git_remote_url,
                 sha,
                 hashlib.sha256(filename.encode("utf8")).hexdigest(),
                 original_line_number,
@@ -289,7 +316,9 @@ class SublimeGitBlame(sublime_plugin.EventListener):
 class SublimeGitDisableCodeowners(sublime_plugin.WindowCommand):
     def run(self):
         _settings_obj.set("show_codeowners", False)
-        self.window.active_view().erase_status("git_codeowners")
+        for window in sublime.windows():
+            for view in window.views():
+                view.erase_status(SublimeGitCodeowners._status_key)
 
 
 class SublimeGitEnableCodeowners(sublime_plugin.WindowCommand):
@@ -300,8 +329,12 @@ class SublimeGitEnableCodeowners(sublime_plugin.WindowCommand):
 class SublimeGitCodeowners(sublime_plugin.EventListener):
     _status_key = "git_codeowners"
 
-    _file_name = ""
-    _git_info = {}
+    def __init__(self):
+        super().__init__()
+
+        self._lock = threading.Lock()
+        self._file_name = ""
+        self._git_info = {}
 
     def clear_status(self, view):
         view.erase_status(self._status_key)
@@ -320,31 +353,33 @@ class SublimeGitCodeowners(sublime_plugin.EventListener):
         if not file_name or len(file_name) == 0:
             return
 
-        if file_name == self._file_name:
+        with self._lock:
+            if file_name == self._file_name:
+                return
+
+        git_info = git_path(file_name)
+        if not git_info:
             return
 
-        _git_info = git_path(file_name)
-        if not _git_info:
-            return
-
-        self._file_name = file_name
-        self._git_info = _git_info
+        with self._lock:
+            self._file_name = file_name
+            self._git_info = git_info
 
         try:
             owners = subprocess.check_output(
                 [
                     "codeowners",
                     "--",
-                    self._git_info["path"],
+                    git_info["path"],
                 ],
                 stderr=subprocess.STDOUT,
-                cwd=self._git_info["root"],
+                cwd=git_info["root"],
                 timeout=5,
             )
 
             decoded = owners.decode("utf8").strip()
-            if decoded.startswith(self._git_info["path"]):
-                decoded = decoded[len(self._git_info["path"]) :].strip()
+            if decoded.startswith(git_info["path"]):
+                decoded = decoded[len(git_info["path"]) :].strip()
 
             self.print_status(view, decoded)
         except (FileNotFoundError, subprocess.TimeoutExpired) as err:
