@@ -32,6 +32,10 @@ DENY_PATTERNS=(
   # Package installs
   '^(go install|npm install|pip install|uv pip install|uv tool install)'
 
+  # Kubernetes mutations
+  '^kmux (restart|scale)'
+  '^kubectl (annotate|apply|attach|autoscale|cordon|cp|create|delete|drain|edit|exec|expose|label|patch|replace|rollout|run|scale|set|taint|uncordon)'
+
   # Terraform (running or installing it)
   '^terraform'
   '^tfenv'
