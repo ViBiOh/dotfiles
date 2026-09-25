@@ -13,7 +13,12 @@ clean() {
 install() {
   symlink
 
-  if package_exists "alacritty"; then
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    # renovate: datasource=github-releases depName=alacritty/alacritty
+    local ALACRITTY_VERSION="v0.17.0"
+
+    dmg_to_app "https://github.com/alacritty/alacritty/releases/download/${ALACRITTY_VERSION}/Alacritty-${ALACRITTY_VERSION}.dmg"
+  elif package_exists "alacritty"; then
     packages_install_desktop "alacritty"
   fi
 }

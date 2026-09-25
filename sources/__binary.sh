@@ -98,6 +98,37 @@ curl_to_binary() {
   chmod +x "${BINARY_DESTINATION}/${BINARY_NAME}"
 }
 
+dmg_to_app() {
+  if [[ ${#} -lt 1 ]]; then
+    var_red "Usage: dmg_to_app DMG_URL [APP_DESTINATION=/Applications]"
+    return 1
+  fi
+
+  local DMG_URL="${1}"
+  shift
+  local APP_DESTINATION="${1:-/Applications}"
+  shift || true
+
+  local TEMP_FOLDER
+  TEMP_FOLDER="$(mktemp -d)"
+  local DMG_PATH
+  DMG_PATH="${TEMP_FOLDER}/$(basename "${DMG_URL}")"
+
+  curl --disable --silent --show-error --location --max-time 300 --output "${DMG_PATH}" -- "${DMG_URL}"
+
+  local MOUNT_POINT="${TEMP_FOLDER}/mount"
+  hdiutil attach "${DMG_PATH}" -nobrowse -quiet -mountpoint "${MOUNT_POINT}"
+
+  local APP_NAME
+  APP_NAME="$(basename "$(find "${MOUNT_POINT}" -maxdepth 1 -name "*.app")")"
+
+  rm -rf "${APP_DESTINATION:?}/${APP_NAME}"
+  cp -R "${MOUNT_POINT}/${APP_NAME}" "${APP_DESTINATION}/"
+
+  hdiutil detach "${MOUNT_POINT}" -quiet
+  rm -rf "${TEMP_FOLDER}"
+}
+
 normalized_os() {
   local OS_NAME
   OS_NAME="$(uname -s | tr "[:upper:]" "[:lower:]")"
