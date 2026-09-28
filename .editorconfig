@@ -20,5 +20,5 @@ indent_style = tab
 [*.sublime-snippet]
 indent_style = tab
 
-[sublime/text/settings/*]
+[tools/sublime/text/settings/*]
 indent_style = tab

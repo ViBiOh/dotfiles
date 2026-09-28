@@ -5,13 +5,13 @@
   ],
   "python": {
     "ignorePaths": [
-      "^sublime/plugins/"
+      "^tools/sublime/plugins/"
     ]
   },
   "regexManagers": [
     {
       "fileMatch": [
-        "^(installations|sublime)/"
+        "^(installations|tools/sublime)/"
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>[^\\s]+?)(?: (lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[a-z-0-9]+?))?\\s.+?_VERSION=\"?(?<currentValue>.+?)\"?\\s"
