@@ -56,7 +56,7 @@ _jira() {
   case ${ACTION} in
   "branch")
     local JIRA_ISSUE
-    JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
+    JIRA_ISSUE="$(_jira_get_issue "${1-}")"
 
     if [[ -z ${JIRA_ISSUE} ]]; then
       return
@@ -196,7 +196,7 @@ _jira() {
 
   "open")
     local JIRA_ISSUE
-    JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
+    JIRA_ISSUE="$(_jira_get_issue "${1-}")"
 
     if [[ -z ${JIRA_ISSUE} ]]; then
       return
@@ -207,7 +207,7 @@ _jira() {
 
   "print")
     local JIRA_ISSUE
-    JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
+    JIRA_ISSUE="$(_jira_get_issue "${1-}")"
 
     if [[ -z ${JIRA_ISSUE} ]]; then
       return
@@ -218,7 +218,7 @@ _jira() {
 
   "summary")
     local JIRA_ISSUE
-    JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
+    JIRA_ISSUE="$(_jira_get_issue "${1-}")"
 
     if [[ -z ${JIRA_ISSUE} ]]; then
       return
@@ -229,7 +229,7 @@ _jira() {
 
   "transition")
     local JIRA_ISSUE
-    JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
+    JIRA_ISSUE="$(_jira_get_issue "${1-}")"
 
     if [[ -z ${JIRA_ISSUE} ]]; then
       return
@@ -240,7 +240,7 @@ _jira() {
 
   "url")
     local JIRA_ISSUE
-    JIRA_ISSUE="$(_jira_issue "${scope}" "${1-}")"
+    JIRA_ISSUE="$(_jira_get_issue "${1-}")"
 
     if [[ -z ${JIRA_ISSUE} ]]; then
       return
@@ -344,6 +344,22 @@ _jira_warning() {
 
 _jira_error() {
   printf -- "%b%b %b\n" "${RED}" "${*}" "${RESET}" 1>&2
+}
+
+_jira_get_issue() {
+  if _jira_is_ticket_number "${1:-}"; then
+    printf "%s" "${1:-}"
+  else
+    printf "%s" "$(_jira_issue "${scope}" "${1-}")"
+  fi
+}
+
+_jira_is_ticket_number() {
+  if [[ ${1:-} =~ ^[A-Za-z]{3,4}-[0-9]{1,5}$ ]]; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 _jira_read() {
