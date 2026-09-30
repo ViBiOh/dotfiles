@@ -3,11 +3,10 @@ scrollback-limit = 10000000
 background = "#000000"
 
 macos-titlebar-style = "hidden"
-macos-auto-secure-input = true
 
 quit-after-last-window-closed = true
 
 font-size = 12
 
-alpha-blending = linear
+alpha-blending = linear-corrected
 window-colorspace = "display-p3"
