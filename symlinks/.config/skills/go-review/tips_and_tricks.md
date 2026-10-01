@@ -55,10 +55,10 @@ Idiomatic Go: always prefer `var s *MyStruct` for declaration, and `s := &MyStru
 
 Cheat sheet for using slices, maps, and channels. More detailed information follows.
 
-| **How to Instantiate ->** | **Unknown Size**                                                                  | **Known Size**                                      | **Known Values**          |
-| ------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------- |
-| Slices                    | Don't instantiate. Nil slices are usable for `range`, `len`, `cap`, and `append`. | `make([]int, 0, 10)` Length 0, starting capacity 10 | `[]int{1, 2, 3}`          |
-| Maps                      | `make(map[int]int)`                                                               | `make(map[int]int, 10)`                             | `map[int]int{1: 2, 3: 4}` |
+| **How to Instantiate ->** | **Unknown Size** | **Known Size** | **Known Values** |
+| --- | --- | --- | --- |
+| Slices | Don't instantiate. Nil slices are usable for `range`, `len`, `cap`, and `append`. | `make([]int, 0, 10)` Length 0, starting capacity 10 | `[]int{1, 2, 3}` |
+| Maps | `make(map[int]int)` | `make(map[int]int, 10)` | `map[int]int{1: 2, 3: 4}` |
 
 Slices, maps and channels are all created using the builtin `make` like in the following example:
 
@@ -608,8 +608,7 @@ The race detector works by guarding every variable read or write and check that 
 
 # Code coverage
 
-You may not know that Go can also measure and precisely show your code coverage line per line.
-To see this in action, run the following command (`c.out` is quite a standard name, so it should be added to your `.gitignore`):
+You may not know that Go can also measure and precisely show your code coverage line per line. To see this in action, run the following command (`c.out` is quite a standard name, so it should be added to your `.gitignore`):
 
 ```
 go test -coverprofile=c.out ./... && go tool cover -html="c.out"

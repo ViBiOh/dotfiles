@@ -252,19 +252,18 @@ One of the Go [mantras](https://go.dev/blog/codelab-share) is
 
 > _Don't communicate by sharing, share by communicating_
 
-Sharing a data structure directly between two goroutines to "communicate" should be avoided. Channels exist precisely to pass data safely and to coordinate execution.
-For example, instead of letting several goroutines read and write a map concurrently, you can run a single dedicated goroutine that owns the map and expose a request channel. All other goroutines send their operations through that channel and receive the results back (see the example below).
+Sharing a data structure directly between two goroutines to "communicate" should be avoided. Channels exist precisely to pass data safely and to coordinate execution. For example, instead of letting several goroutines read and write a map concurrently, you can run a single dedicated goroutine that owns the map and expose a request channel. All other goroutines send their operations through that channel and receive the results back (see the example below).
 
 ### The `sync` package – when to reach for it
 
 The standard library's `sync` package offers primitives for cases where channels alone are not enough.
 
-| Primitive     | Typical use-case                                                                          | Caveats                                                                               |
-| ------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| **Mutex**     | Protecting a small amount of shared state or a cache.                                     | Over-use leads to lock contention; often a channel-based design can replace it.       |
-| **sync.Map**  | Concurrent read-heavy maps where keys are stable and writes are rare.                     | Limited API; not a drop-in replacement for a normal map.                              |
-| **WaitGroup** | Waiting for a set of goroutines to finish before proceeding.                              | Must call `Add` before spawning the goroutines and `Done` exactly once per goroutine. |
-| **Once**      | Ensuring an initialization routine runs exactly once, even if many goroutines request it. | Useful for lazy loading of configuration, singleton objects, etc.                     |
+| Primitive | Typical use-case | Caveats |
+| --- | --- | --- |
+| **Mutex** | Protecting a small amount of shared state or a cache. | Over-use leads to lock contention; often a channel-based design can replace it. |
+| **sync.Map** | Concurrent read-heavy maps where keys are stable and writes are rare. | Limited API; not a drop-in replacement for a normal map. |
+| **WaitGroup** | Waiting for a set of goroutines to finish before proceeding. | Must call `Add` before spawning the goroutines and `Done` exactly once per goroutine. |
+| **Once** | Ensuring an initialization routine runs exactly once, even if many goroutines request it. | Useful for lazy loading of configuration, singleton objects, etc. |
 
 The "easy-looking" solutions (a global mutex or a `sync.Map`) can be tempting, but they often hide subtle race conditions. Channels may be a bit more verbose, but they give you explicit communication pathways and avoid hidden shared state.
 
@@ -957,8 +956,7 @@ A race car pit stop has to replace four tyres. The work can be broken into a ser
 
 #### Concurrency (interleaved work)
 
-If a single crew member performs _all_ of those steps sequentially, the stop is long because the person can only do one thing at a time.
-If several crew members are assigned _different_ steps, e.g., one person lifts the car while another unscrews the bolts on a different wheel, they can **interleave** their activities. The overall process proceeds faster, but at any instant only a subset of the crew is actually doing work; the rest may be waiting for a prerequisite step. This interleaving of independent tasks is **concurrency**: the plan lets multiple actions overlap, but they are not necessarily happening simultaneously.
+If a single crew member performs _all_ of those steps sequentially, the stop is long because the person can only do one thing at a time. If several crew members are assigned _different_ steps, e.g., one person lifts the car while another unscrews the bolts on a different wheel, they can **interleave** their activities. The overall process proceeds faster, but at any instant only a subset of the crew is actually doing work; the rest may be waiting for a prerequisite step. This interleaving of independent tasks is **concurrency**: the plan lets multiple actions overlap, but they are not necessarily happening simultaneously.
 
 #### Parallelism (true simultaneous work)
 

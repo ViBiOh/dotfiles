@@ -63,7 +63,7 @@ I primarily use AI agents for:
 
 ## Go Conventions
 
-- **Guidelines**: When writing or reviewing Go, read `~/.config/go/concurrency.md` and `~/.config/go/tips_and_tricks.md` and follow them.
+- **Guidelines**: When writing or reviewing Go, read `~/.config/skills/go-review/concurrency.md` and `~/.config/skills/go-review/tips_and_tricks.md` and follow them.
 - **Tests**: Prefer table-driven tests using a `map[string]struct{}` (not a slice) for test cases
 - **Tests**: Use `testify` (`assert`/`require`) for assertions, never use testify's suite
 - **Tests**: Use `t.Parallel()` whenever possible (both at the top-level test and subtests)

@@ -9,10 +9,10 @@ Review Go code for correctness and adherence to the personal Go guidelines.
 
 ## Guidelines source of truth
 
-Read both files before reviewing and treat them as the standard:
+Read both files in the same folder before reviewing and treat them as the standard:
 
-- `~/.config/go/concurrency.md` (goroutine lifecycle, channels, close responsibility, bounded parallelism, data races, `sync`)
-- `~/.config/go/tips_and_tricks.md` (declaration idioms, argument order, package layout, interfaces, errors, mutexes, tooling)
+- `concurrency.md` (goroutine lifecycle, channels, close responsibility, bounded parallelism, data races, `sync`)
+- `tips_and_tricks.md` (declaration idioms, argument order, package layout, interfaces, errors, mutexes, tooling)
 
 Also apply the Go rules already in `~/.config/AGENTS.md` (table-driven tests, `testify`, `t.Parallel()`, error wrapping style, `gofumpt -extra`, `golangci-lint`).
 
