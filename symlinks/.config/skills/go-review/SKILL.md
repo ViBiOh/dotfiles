@@ -20,7 +20,7 @@ Also apply the Go rules already in `~/.config/AGENTS.md` (table-driven tests, `t
 
 Default to the current working changes only. Determine the diff read-only:
 
-- `git diff origin/main...HEAD` for committed work on the branch
+- `git diff origin/<default_branch>...HEAD` for committed work on the branch
 - `git diff` and `git status` for uncommitted work
 
 Never run any mutable git command. If a target is given as an argument (a path, package, or ref), review that instead.
