@@ -55,7 +55,10 @@
     }
   },
   "options": {
-    "disable_metrics": true
+    "disable_metrics": true,
+    "skills_paths": [
+      "~/.config/skills/"
+    ]
   },
   "permissions": {
     "allowed_tools": [

@@ -164,6 +164,5 @@
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   },
-  "tui": "fullscreen",
-  "teammateMode": "tmux"
+  "tui": "fullscreen"
 }
