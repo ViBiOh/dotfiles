@@ -1,6 +1,7 @@
-scrollback-limit = 10000000
+scrollback-limit = 1000000
 
 background = "#000000"
+split-divider-color = "#444444"
 
 macos-titlebar-style = "hidden"
 
