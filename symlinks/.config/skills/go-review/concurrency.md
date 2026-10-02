@@ -260,12 +260,12 @@ The standard library's `sync` package offers primitives for cases where channels
 
 | Primitive | Typical use-case | Caveats |
 | --- | --- | --- |
-| **Mutex** | Protecting a small amount of shared state or a cache. | Over-use leads to lock contention; often a channel-based design can replace it. |
+| **Mutex** | Protecting a small amount of shared state or a cache. | Over-use leads to lock contention; keep critical sections short and use a channel instead when the goal is to transfer ownership or coordinate goroutines. |
 | **sync.Map** | Concurrent read-heavy maps where keys are stable and writes are rare. | Limited API; not a drop-in replacement for a normal map. |
-| **WaitGroup** | Waiting for a set of goroutines to finish before proceeding. | Must call `Add` before spawning the goroutines and `Done` exactly once per goroutine. |
+| **WaitGroup** | Waiting for a set of goroutines to finish before proceeding. | Only waits for goroutines to finish: no sugar for context, errors or a concurrency limit. Before Go 1.25 (no `wg.Go`), call `Add` before launching the goroutine and ensure `Done` is called in a `defer`. |
 | **Once** | Ensuring an initialization routine runs exactly once, even if many goroutines request it. | Useful for lazy loading of configuration, singleton objects, etc. |
 
-The "easy-looking" solutions (a global mutex or a `sync.Map`) can be tempting, but they often hide subtle race conditions. Channels may be a bit more verbose, but they give you explicit communication pathways and avoid hidden shared state.
+The "easy-looking" solutions (a global mutex or a `sync.Map`) can be tempting, but a global lock or a map shared across the whole program hides ownership and makes races easy to introduce. Prefer a mutex scoped to the struct that owns the state, and channels when ownership or coordination is the point (see the mutex section of the tips and tricks page).
 
 Whenever you suspect a data race, run your code with the race detector:
 
@@ -486,16 +486,16 @@ func BenchmarkSequence(b *testing.B) {
 }
 ```
 
-The result of the above code shows that the "worker" approach is 3 times faster with ~98% less memory consumption.
+The result of the above code shows that the "worker" approach is about 3 times faster with ~97% less memory and ~98% fewer allocations.
 
 ```
 BenchmarkSequence/spawn-10                  3375            308853 ns/op           40165 B/op       2001 allocs/op
 BenchmarkSequence/worker-10                 9984            112209 ns/op            1050 B/op         34 allocs/op
 ```
 
-Both `spawn` and `worker` are concurrent; the difference is that `worker` reuses a fixed pool of goroutines instead of creating one per item. That reuse makes it roughly **3× faster** (~112 ns/op vs ~309 ns/op for the whole 1 000-item run) with about **98% less memory**. The takeaway is narrow: **when you do go concurrent, a bounded worker pool beats spawning one goroutine per item.**
+Both `spawn` and `worker` are concurrent; the difference is that `worker` reuses a fixed pool of goroutines instead of creating one per item. That reuse makes it roughly **3× faster** (~112 µs/op vs ~309 µs/op for the whole 1 000-item run) with about **97% less memory**. The takeaway is narrow: **when you do go concurrent, a bounded worker pool beats spawning one goroutine per item.**
 
-Be careful not to over-read this benchmark. The `square` operation is deliberately adversarial: it is so tiny and purely CPU-bound that a plain serial loop (not benchmarked here) would beat both concurrent versions, because the compiler can inline `operation` and the cost of goroutine scheduling, channel communication, and synchronization dwarfs the work itself. The worker pool's real advantage shows up with I/O-bound work, where each task spends most of its time waiting (see the webhook fan-out example later). For cheap CPU-bound work, don't go concurrent at all.
+Be careful not to over-read this benchmark. The `operation` function is deliberately adversarial: it is so tiny and purely CPU-bound that a plain serial loop (not benchmarked here) would beat both concurrent versions, because the compiler can inline `operation` and the cost of goroutine scheduling, channel communication, and synchronization dwarfs the work itself. The worker pool's real advantage shows up with I/O-bound work, where each task spends most of its time waiting (see the webhook fan-out example later). For cheap CPU-bound work, don't go concurrent at all.
 
 # Usage and example
 
@@ -583,18 +583,23 @@ func concurrentFibonacci(number int) {
   // We want to process at most 4 items concurrently
   limiter := make(chan struct{}, 4)
 
+  var wg sync.WaitGroup
+
   for i := range number {
     // Enqueue to the limiter, this is a blocking call
     // If the chan is full, it waits
     limiter <- struct{}{}
 
-    go func() {
+    wg.Go(func() {
       // Dequeue from limiter when exiting, to leave one room
       defer func() { <-limiter }()
 
       fibonacci(i)
-    }()
+    })
   }
+
+  // Wait for the last goroutines, otherwise the function returns while they still run
+  wg.Wait()
 }
 ```
 
@@ -700,7 +705,7 @@ For production-ready behavior, the above scenario would be better suited with a 
 
 In an HTTP API, we first try to serve a request from the cache and fall back to the database if the cache misses. When we retrieve a value from the database that isn't already cached, we want to populate the cache so that subsequent requests are faster.
 
-Updating the cache, however, is not on the critical path, the client is already waiting for the response that comes from the database. Therefore we off-load the cache-write to a background goroutine. The request handler returns the data immediately, while the goroutine silently inserts the fresh value into the cache (optionally with a timeout or cancellation context to avoid runaway work). This keeps latency low for the user while still keeping the cache warm for future calls.
+Updating the cache, however, is not on the critical path, the client is already waiting for the response that comes from the database. Therefore we off-load the cache-write to a background goroutine. The request handler returns the data immediately, while the goroutine silently inserts the fresh value into the cache (optionally with a timeout or cancellation context to avoid runaway work). Because the goroutine is started by the function itself, it is also that function's responsibility to `recover` inside it. This keeps latency low for the user while still keeping the cache warm for future calls.
 
 ```go
 func (s *Service) Get(ctx context.Context, id int) (any, error) {
@@ -790,7 +795,7 @@ Goroutines communicate with channels, and to avoid errors, start your goroutines
 
 At the end, wait and close in the "natural" order from producer to consumer.
 
-Error management is temporarily ignored in the following snippet and will be dealt with right after.
+Error management is deliberately left out of the following snippet (every `// handle your error` is a placeholder). Note that returning early on an error while the fetchers still wait on `identifierCh` would leak them: close the channels (or cancel the context) on every exit path.
 
 ```go
 const concurrency = 4
@@ -863,7 +868,7 @@ func crawl(ctx context.Context) int {
 }
 
 // This function ensure a safe send into a chan, guarded by the cancel of a Context
-func safeSender[T any](ctx context.Context, ch chan T, instance T) error {
+func safeSender[T any](ctx context.Context, ch chan<- T, instance T) error {
   select {
   case <-ctx.Done():
     return ctx.Err()
@@ -879,7 +884,7 @@ func safeSender[T any](ctx context.Context, ch chan T, instance T) error {
 }
 ```
 
-## Race condition by printing time every 5s until we receive SIGINT
+## Printing time every 5s until we receive SIGINT
 
 A simple example where a ticker will print the time until the end of the program, materialized by a `SIGINT` [signal](https://pkg.go.dev/os/signal#Notify) (in a [terminal](https://www.fosslinux.com/121761/the-abcs-of-linux-signals-sigint-sigterm-and-sigkill-explained.htm)).
 

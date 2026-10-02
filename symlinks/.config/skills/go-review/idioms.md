@@ -69,7 +69,7 @@ var m map[string]string
 var c chan string // pretty rare to declare a zero chan
 
 // Initialization (reusing the variables declared above, hence `=` not `:=`)
-// DON'T! s = make([]string) or s = []string{}
+// DON'T! s = make([]string, 0) or s = []string{}
 m = make(map[string]string) // or m = map[string]string{}
 c = make(chan string) // unbuffered
 
