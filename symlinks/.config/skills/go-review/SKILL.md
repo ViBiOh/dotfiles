@@ -1,6 +1,6 @@
 ---
 name: go-review
-description: Review Go code against the personal Go guidelines (concurrency and idioms). Use when asked to review, audit, or critique Go changes, or with /go-review.
+description: Review Go code against the personal Go guidelines (concurrency and idioms). Use when asked to review, audit, or critique Go changes, or when invoked by name (go-review).
 ---
 
 # Go review
@@ -9,7 +9,7 @@ Review Go code for correctness and adherence to the personal Go guidelines.
 
 ## Guidelines source of truth
 
-Read both files in the same folder before reviewing and treat them as the standard:
+Read both files located in the same folder as this SKILL.md before reviewing and treat them as the standard:
 
 - `concurrency.md` (goroutine lifecycle, channels, close responsibility, bounded parallelism, data races, `sync`)
 - `tips_and_tricks.md` (declaration idioms, argument order, package layout, interfaces, errors, mutexes, tooling)
@@ -20,7 +20,7 @@ Also apply the Go rules already in `~/.config/AGENTS.md` (table-driven tests, `t
 
 Default to the current working changes only. Determine the diff read-only:
 
-- `git diff origin/<default_branch>...HEAD` for committed work on the branch
+- `git diff <default_branch>...HEAD` for committed work on the branch (find the default branch with `git rev-parse --abbrev-ref origin/HEAD`, always compare against origin)
 - `git diff` and `git status` for uncommitted work
 
 Never run any mutable git command. If a target is given as an argument (a path, package, or ref), review that instead.

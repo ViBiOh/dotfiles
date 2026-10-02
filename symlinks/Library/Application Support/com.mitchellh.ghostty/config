@@ -10,5 +10,5 @@ quit-after-last-window-closed = true
 
 font-size = 12
 
-alpha-blending = linear-corrected
+alpha-blending = linear
 window-colorspace = "display-p3"
