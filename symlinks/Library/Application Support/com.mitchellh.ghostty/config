@@ -1,4 +1,4 @@
-scrollback-limit = 1000000
+scrollback-limit = 10000000
 
 background = "#000000"
 unfocused-split-opacity = 1
