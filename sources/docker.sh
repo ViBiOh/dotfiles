@@ -15,6 +15,8 @@ if command -v container >/dev/null 2>&1; then
   container_override_dns() {
     container exec buildkit /bin/sh -c 'echo "nameserver 1.1.1.1" > /etc/resolv.conf'
   }
+
+  alias docker=container
 fi
 
 if command -v docker >/dev/null 2>&1; then
