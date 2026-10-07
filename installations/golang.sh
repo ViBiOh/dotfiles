@@ -19,7 +19,23 @@ clean() {
 }
 
 install() {
-  packages_install "go" "golangci-lint" "graphviz" "go-size-analyzer"
+  if package_exists "go"; then
+    packages_install "go"
+  elif package_exists "golang-go"; then
+    packages_install "golang-go"
+  fi
+
+  if package_exists "golangci-lint"; then
+    packages_install "golangci-lint"
+  fi
+
+  if package_exists "graphviz"; then
+    packages_install "graphviz"
+  fi
+
+  if package_exists "go-size-analyzer"; then
+    packages_install "go-size-analyzer"
+  fi
 
   source "${DOTFILES_DIR}/sources/_golang.sh"
   mkdir -p "${GOPATH}"
