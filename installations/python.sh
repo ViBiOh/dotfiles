@@ -18,9 +18,7 @@ clean() {
 install() {
   if package_exists "python"; then
     packages_install "python"
-  fi
-
-  if package_exists "python-debian"; then
+  elif package_exists "python-debian"; then
     packages_install "python-debian"
   fi
 
