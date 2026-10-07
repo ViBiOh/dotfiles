@@ -17,7 +17,11 @@ clean() {
 install() {
   symlink
 
-  packages_install "gnupg" "ykman"
+  packages_install "gnupg"
+
+  if package_exists "ykman"; then
+    packages_install "ykman"
+  fi
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install "pinentry-mac"
