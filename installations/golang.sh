@@ -35,5 +35,7 @@ install() {
     go install "mvdan.cc/gofumpt@latest"
   fi
 
-  golangci-lint completion bash >"${HOME}/opt/completions/golangci-lint.bash"
+  if command -v golangci-lint >/dev/null 2>&1; then
+    golangci-lint completion bash >"${HOME}/opt/completions/golangci-lint.bash"
+  fi
 }

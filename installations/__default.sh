@@ -34,7 +34,9 @@ install() {
   mkdir -p "${HOME}/opt/completions"
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
+    PACKAGES+=("awk")
     PACKAGES+=("bash-completion@2")
+    PACKAGES+=("openssh")
     PACKAGES+=("pstree")
 
     if ! command -v brew >/dev/null 2>&1; then
@@ -43,7 +45,7 @@ install() {
     fi
 
     packages_update
-    packages_install "${PACKAGES[@]}" "awk"
+    packages_install "${PACKAGES[@]}"
 
     if [[ $(grep --count "${BREW_PREFIX}" "/etc/shells") -eq 0 ]]; then
       printf -- "+-------------------------+\n"
@@ -55,9 +57,12 @@ install() {
     fi
   elif command -v apt-get >/dev/null 2>&1; then
     PACKAGES+=("bash-completion")
+    PACKAGES+=("dnsutils")
+    PACKAGES+=("jdupes")
+    PACKAGES+=("ssh")
 
     packages_update
     packages_install "apt-transport-https"
-    packages_install "${PACKAGES[@]}" "dnsutils" "jdupes"
+    packages_install "${PACKAGES[@]}"
   fi
 }
