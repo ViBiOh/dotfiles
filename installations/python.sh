@@ -39,6 +39,5 @@ install() {
   mkdir -p "${HOME}/opt/python"
   uv venv "${HOME}/opt/python/venv"
 
-  source "${DOTFILES_DIR}/sources/__binary.sh"
   source "${DOTFILES_DIR}/sources/_python.sh"
 }

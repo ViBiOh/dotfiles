@@ -23,10 +23,6 @@ install() {
     packages_install "ykman"
   fi
 
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    packages_install "pinentry-mac"
-  fi
-
   if ! command -v gpg >/dev/null 2>&1; then
     return
   fi
@@ -37,7 +33,15 @@ install() {
   echo "enable-ssh-support
 default-cache-ttl 3600
 max-cache-ttl 3600
-pinentry-program ${BREW_PREFIX}/bin/pinentry-mac" >"${HOME}/.gnupg/gpg-agent.conf"
+" >"${HOME}/.gnupg/gpg-agent.conf"
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    packages_install "pinentry-mac"
+
+    echo "pinentry-program ${BREW_PREFIX}/bin/pinentry-mac
+" >>"${HOME}/.gnupg/gpg-agent.conf"
+  fi
+
 }
 
 credentials() {
