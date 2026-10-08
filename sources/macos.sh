@@ -37,10 +37,8 @@ macos_start() {
   fix_profile
 
   if [[ ${DOTFILES_DNS:-} == "true" ]]; then
-    dns_set "127.0.0.1"
+    dns_set "127.0.0.1" "::1"
   fi
-
-  dns_flush
 
   defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
   defaults write NSGlobalDomain com.apple.mouse.scaling -int 2
