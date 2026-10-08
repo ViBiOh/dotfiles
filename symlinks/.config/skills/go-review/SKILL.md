@@ -18,12 +18,17 @@ Also apply the Go rules already in `~/.config/AGENTS.md` (table-driven tests, `t
 
 ## Scope
 
-Default to the current working changes only. Determine the diff read-only:
+Pick the scope in this order:
 
-- `git diff <default_branch>...HEAD` for committed work on the branch (find the default branch with `git rev-parse --abbrev-ref origin/HEAD`, always compare against origin)
-- `git diff` and `git status` for uncommitted work
+1. **Explicit target**: if the prompt or argument names a folder, review all non-generated `.go` files in that folder (recursively, including `_test.go`). If it names a file, package, or ref, review that instead.
+2. **Working changes**: otherwise review the current working changes only. Determine the diff read-only:
+   - `git diff <default_branch>...HEAD` for committed work on the branch (find the default branch with `git rev-parse --abbrev-ref origin/HEAD`, always compare against origin)
+   - `git diff` and `git status` for uncommitted work
+3. **Current folder fallback**: if there is no explicit target and the diff is empty (or git is unavailable), review all non-generated `.go` files in the current working directory, recursively. Say so in the output so the user knows no diff was found.
 
-Never run any mutable git command. If a target is given as an argument (a path, package, or ref), review that instead.
+For folder reviews there is no diff to anchor on, so read each file in full. If the folder is large, review package by package and report per package.
+
+Never run any mutable git command.
 
 ## What to check
 
