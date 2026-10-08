@@ -15,32 +15,20 @@ default_route() {
 }
 
 dns_flush() {
-  if command -v unbound-control >/dev/null 2>&1; then
-    if [[ ${UNBOUND_CONTROL-} == "no" ]]; then
+  if command -v unbound >/dev/null 2>&1; then
+    if [[ ${OSTYPE} =~ ^darwin ]] && command -v brew >/dev/null 2>&1; then
+      sudo brew services restart "unbound"
+    elif command -v systemctl >/dev/null 2>&1; then
       sudo systemctl enable "unbound.service"
       sudo systemctl restart "unbound.service"
-    else
-      local UNBOUND_CONF_FOLDER="${BREW_PREFIX-}/etc/unbound"
-      local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
-      local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
-
-      sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
-      sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop 2>/dev/null || true
-
-      printf -- "Waiting 1 second before starting again...\n"
-      sleep 1
-
-      sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
     fi
   fi
 
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     sudo dscacheutil -flushcache
     sudo killall -HUP mDNSResponder
-  else
-    if [[ $(systemctl list-units systemd-resolve* | wc -l) -gt 2 ]]; then
-      sudo systemd-resolve --flush-caches
-    fi
+  elif command -v systemctl >/dev/null 2>&1 && [[ $(systemctl list-units systemd-resolve* | wc -l) -gt 2 ]]; then
+    sudo systemd-resolve --flush-caches
   fi
 }
 

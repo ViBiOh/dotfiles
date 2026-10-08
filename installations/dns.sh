@@ -15,7 +15,6 @@ install() {
   local UNBOUND_DNSSEC_CERT="${UNBOUND_CONF_FOLDER}/root.key"
   local UNBOUND_BLOCKLIST="${UNBOUND_BLOCKLIST:-${HOME}/.unbound-blocklist}"
   local UNBOUND_PORT="${UNBOUND_PORT:-53}"
-  local UNBOUND_CONTROL="${UNBOUND_CONTROL:-yes}"
 
   local UNBOUND_INTERFACE_IPV4="127.0.0.1"
   local UNBOUND_INTERFACE_IPV6="::1"
@@ -77,13 +76,7 @@ install() {
 
   include: \"${UNBOUND_BLOCKLIST}\"
 ${UNBOUND_EXTRA_SERVER_CONF-}
-remote-control:
-  control-enable: ${UNBOUND_CONTROL}
-  control-interface: 127.0.0.1
-  server-key-file: \"${UNBOUND_CONF_FOLDER}/unbound_server.key\"
-  server-cert-file: \"${UNBOUND_CONF_FOLDER}/unbound_server.pem\"
-  control-key-file: \"${UNBOUND_CONF_FOLDER}/unbound_control.key\"
-  control-cert-file: \"${UNBOUND_CONF_FOLDER}/unbound_control.pem\"
+
 ${UNBOUND_EXTRA_DNS_CONF-}
 forward-zone:
   name: \".\"
@@ -93,35 +86,23 @@ forward-zone:
 
   sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
 
-  if [[ ${UNBOUND_CONTROL} == "yes" ]]; then
-    if ! [[ -e "${UNBOUND_CONF_FOLDER}/unbound_server.key" ]]; then
-      sudo unbound-control-setup -d "${UNBOUND_CONF_FOLDER}"
-    fi
-
-    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q stop || true
-
-    printf -- "Waiting 1 second before starting unbound...\n"
-    sleep 1
-
-    sudo unbound-control -c "${UNBOUND_CONF_FILE}" -q start
-  fi
-
-  if [[ ${UNBOUND_PORT} -eq 53 ]]; then
-    echo "nameserver 127.0.0.1" | sudo tee "/etc/resolv.conf" >/dev/null
-  else
+  if [[ ${UNBOUND_PORT} -ne 53 ]] && command -v systemctl >/dev/null 2>&1; then
     if [[ $(systemctl list-unit-files | grep -c unbound-resolvconf) -ne 0 ]]; then
       sudo systemctl disable unbound-resolvconf.service
       sudo systemctl stop unbound-resolvconf.service
     fi
   fi
 
-  if [[ ${UNBOUND_PORT} -eq 53 ]]; then
-    dns_set "127.0.0.1" "::1"
-  fi
-
-  if command -v systemctl >/dev/null 2>&1; then
+  if [[ ${OSTYPE} =~ ^darwin ]] && command -v brew >/dev/null 2>&1; then
+    sudo brew services restart "unbound"
+  elif command -v systemctl >/dev/null 2>&1; then
     sudo systemctl enable "unbound.service"
     sudo systemctl restart "unbound.service"
+  fi
+
+  if [[ ${UNBOUND_PORT} -eq 53 ]]; then
+    echo "nameserver 127.0.0.1" | sudo tee "/etc/resolv.conf" >/dev/null
+    dns_set "127.0.0.1" "::1"
   fi
 
   if command -v resolvconf >/dev/null 2>&1; then
