@@ -40,7 +40,6 @@ install() {
   echo "server:
   verbosity: 1
   username: root
-  chroot: \"\"
 
   interface: ${UNBOUND_INTERFACE_IPV4}
   interface: ${UNBOUND_INTERFACE_IPV6}
@@ -71,7 +70,7 @@ install() {
   auto-trust-anchor-file: \"${UNBOUND_DNSSEC_CERT}\"
 
   use-syslog: no
-  logfile: /var/log/unbound.log
+  logfile: ${UNBOUND_CONF_FOLDER}/unbound.log
   log-queries: no
 
   include: \"${UNBOUND_BLOCKLIST}\"
