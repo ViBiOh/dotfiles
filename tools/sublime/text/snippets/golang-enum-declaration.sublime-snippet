@@ -45,10 +45,10 @@ func (e ${1:EnumName}) MarshalJSON() ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-func (e *${1:EnumName}) UnmarshalJSON(b []byte) error {
+func (e *${1:EnumName}) UnmarshalJSON(payload []byte) error {
 	var strValue string
 
-	if err := json.Unmarshal(b, &strValue); err != nil {
+	if err := json.Unmarshal(payload, &strValue); err != nil {
 		return fmt.Errorf("unmarshal ${1:EnumName}: %w", err)
 	}
 
