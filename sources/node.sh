@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if command -v n >/dev/null 2>&1; then
+  export N_PREFIX="${HOME}/opt"
+fi
+
 if ! command -v node >/dev/null 2>&1; then
   return
 fi

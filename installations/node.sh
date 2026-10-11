@@ -27,7 +27,9 @@ clean() {
 install() {
   symlink
 
-  if package_exists "node"; then
+  if package_exists "n"; then
+    packages_install "n"
+  elif package_exists "node"; then
     packages_install "node"
   elif package_exists "nodejs"; then
     packages_install "nodejs"
@@ -36,9 +38,13 @@ install() {
   mkdir -p "${HOME}/opt/node/lib"
   source "${DOTFILES_DIR}/sources/node.sh"
 
-  if ! command -v npm >/dev/null 2>&1; then
-    return
+  if command -v n >/dev/null 2>&1; then
+    n latest
   fi
 
-  npm install --ignore-scripts --global "npm"
+  source "${DOTFILES_DIR}/sources/node.sh"
+
+  if ! command -v n >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+    npm install --ignore-scripts --global "npm"
+  fi
 }
