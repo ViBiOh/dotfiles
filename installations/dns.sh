@@ -7,7 +7,13 @@ clean() {
 }
 
 install() {
-  packages_install "unbound"
+  if package_exists "unbound"; then
+    packages_install "unbound"
+  fi
+
+  if package_exists "unbound-anchor"; then
+    packages_install "unbound-anchor"
+  fi
 
   local UNBOUND_CONF_FOLDER="${BREW_PREFIX-}/etc/unbound"
   local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
