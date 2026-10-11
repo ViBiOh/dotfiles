@@ -7,13 +7,7 @@ clean() {
 }
 
 install() {
-  if package_exists "unbound"; then
-    packages_install "unbound"
-  fi
-
-  if package_exists "unbound-anchor"; then
-    packages_install "unbound-anchor"
-  fi
+  packages_install "unbound"
 
   local UNBOUND_CONF_FOLDER="${BREW_PREFIX-}/etc/unbound"
   local UNBOUND_CONF_FILE="${UNBOUND_CONF_FOLDER}/unbound.conf"
@@ -89,7 +83,9 @@ forward-zone:
 
   dns_block "${UNBOUND_BLOCKLIST}"
 
-  sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
+  if command -v unbound-anchor >/dev/null 2>&1; then
+    sudo unbound-anchor -a "${UNBOUND_DNSSEC_CERT}"
+  fi
 
   if [[ ${UNBOUND_PORT} -ne 53 ]] && command -v systemctl >/dev/null 2>&1; then
     if [[ $(systemctl list-unit-files | grep -c unbound-resolvconf) -ne 0 ]]; then
