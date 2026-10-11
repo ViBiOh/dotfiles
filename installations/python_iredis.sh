@@ -9,9 +9,7 @@ clean() {
 install() {
   source "${DOTFILES_DIR}/sources/_python.sh"
 
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    packages_install "iredis"
-  elif command -v uv >/dev/null 2>&1; then
-    uv pip install "iredis"
+  if command -v uv >/dev/null 2>&1; then
+    uv tool install --managed-python --upgrade "iredis"
   fi
 }

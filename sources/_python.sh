@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-if command -v brew >/dev/null 2>&1; then
-  add_to_path "${BREW_PREFIX:-}/opt/python/libexec/bin"
-fi
+export UV_TOOL_DIR="${HOME}/opt/python/tools"
+export UV_TOOL_BIN_DIR="${HOME}/opt/python/bin"
+add_to_path "${UV_TOOL_BIN_DIR}"
 
 if [[ -d "${HOME}/opt/python" ]]; then
   export VIRTUAL_ENV="${HOME}/opt/python/venv"

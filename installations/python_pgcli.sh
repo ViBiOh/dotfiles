@@ -19,11 +19,8 @@ install() {
 
   source "${DOTFILES_DIR}/sources/_python.sh"
 
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    packages_install "pgcli"
-  elif package_exists "libpq-dev" && command -v uv >/dev/null 2>&1; then
-    packages_install "libpq-dev"
-    uv pip install "pgcli"
+  if command -v uv >/dev/null 2>&1; then
+    uv tool install --managed-python --python 3.14 --upgrade --with "psycopg[binary]" "pgcli"
   fi
 }
 
