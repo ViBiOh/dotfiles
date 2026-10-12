@@ -3,12 +3,13 @@
 set -o nounset -o pipefail -o errexit
 
 symlink() {
+  symlink_home ".config/AGENTS.md"
+  symlink_home ".config/skills" ".claude/skills"
+
   symlink_home ".claude/CLAUDE.md"
   symlink_home ".claude/settings.json"
   symlink_home ".claude/statusline-command.sh"
-
   symlink_home ".claude/agents"
-  symlink_home ".config/skills" ".claude/skills"
 }
 
 clean() {
