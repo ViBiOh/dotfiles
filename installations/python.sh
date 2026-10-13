@@ -25,7 +25,7 @@ install() {
   fi
 
   mkdir -p "${HOME}/opt/python"
-  uv venv --clear --managed-python "${HOME}/opt/python/venv"
+  uv venv --clear --python "3.14" "${HOME}/opt/python/venv"
 
   source "${DOTFILES_DIR}/sources/_python.sh"
 }
