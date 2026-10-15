@@ -60,6 +60,8 @@ _kube_namespace_query() {
 
   RESOURCE_NAMESPACE="$("${KUBECTL_COMMAND[@]}" get namespaces '--output=jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | grep -v "${CURRENT_CONTEXT_NAMESPACE}" | awk "BEGIN{print \"${CURRENT_CONTEXT_NAMESPACE}\nall\"}1" | fzf --prompt="Namespace: ")"
 
+  _kube_info "Namespace: ${RESOURCE_NAMESPACE:-}"
+
   if [[ ${RESOURCE_NAMESPACE:-} == "all" ]]; then
     RESOURCE_NAMESPACE_QUERY="--all-namespaces"
   elif [[ -n ${RESOURCE_NAMESPACE:-} ]]; then
@@ -90,6 +92,8 @@ _kube_resources() {
 
   local KUBE_RESOURCE
   KUBE_RESOURCE="$("${KUBECTL_COMMAND[@]}" get ${RESOURCE_NAMESPACE_QUERY} "${RESOURCE}" "--output=jsonpath=${JSONPATH_QUERY}" | fzf --select-1 --query="${QUERY}")"
+
+  _kube_info "Resource: ${KUBE_RESOURCE:-}"
 
   RESOURCE_TYPE="$(printf '%s' "${KUBE_RESOURCE}" | tr '[:upper:]' '[:lower:]' | awk -F '/' '{ print $1 }')"
   RESOURCE_NAMESPACE="$(printf '%s' "${KUBE_RESOURCE}" | awk -F '/' '{ print $2 }')"
@@ -218,6 +222,8 @@ kube() {
 
     local CONTEXTS
     CONTEXTS="$(yq eval ".contexts[].name | select(. != \"${CURRENT_CONTEXT}\")" "${KUBECONFIG:-${HOME}/.kube/config}" | awk "BEGIN{print \"${CURRENT_CONTEXT}\"}1" | fzf --prompt="Contexts: " --multi)"
+
+    _kube_info "Contexts: ${CONTEXTS}"
 
     while IFS= read -r context; do
       KUBECTL_CONTEXTS+=("--context=${context}")
@@ -666,7 +672,7 @@ _fzf_complete_kube() {
     NAMESPACE_SCOPE="--namespace=${KUBE_NS}"
   fi
 
-  case ${COMP_WORDS[COMP_CWORD-1]} in
+  case ${COMP_WORDS[COMP_CWORD - 1]} in
   "context" | "--context")
     FZF_COMPLETION_TRIGGER="" _fzf_complete --select-1 "${@}" < <(
       kubectl config get-contexts --output name 2>/dev/null
