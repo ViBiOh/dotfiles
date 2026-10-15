@@ -369,6 +369,8 @@ github_clean_subscription() {
     rm "${HTTP_OUTPUT}"
 
     for THREAD in "${THREADS[@]}"; do
+      var_info "Cleaning subscription ${THREAD}..."
+
       http_request --request DELETE "${THREAD}/subscription"
       if [[ ${HTTP_STATUS} != "204" ]]; then
         http_handle_error "Unable to delete subscription for thread ${THREAD}"
