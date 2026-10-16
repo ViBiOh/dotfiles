@@ -52,7 +52,7 @@ golang_check() {
       fi
 
       goimports -w "${file}"
-      gofumpt -w "${file}"
+      gofumpt -w -extra "${file}"
     done
   else
     var_warning "cannot format Golang files: goimports or gofumpt not found. Skipping."

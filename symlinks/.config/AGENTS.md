@@ -86,6 +86,7 @@ I primarily use AI agents for:
 - Comments must describe current behavior only, never compare to, reference, or argue with a previous version of the code
 - No "before/after", "previously", "used to", "now we", "instead of", "removed X" style comments, git history covers that
 - Only add a comment when the WHY of the current code is non-obvious
+- Never write a package level doc comment (e.g. `// Package foo ...` above `package foo` in Go, or a module docstring at the top of a file in other languages). The code must be self-describing
 
 ## Code Quality Preferences
 
