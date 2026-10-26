@@ -4,7 +4,14 @@
   ],
   "settings": {
     "manageGoplsBinary": false,
-    "gopls.expandWorkspaceToModule": false
+    "gopls.expandWorkspaceToModule": false,
+    "gopls.directoryFilters": [
+      "-**/node_modules",
+      "-**/bazel-bin",
+      "-**/bazel-dd-source",
+      "-**/bazel-out",
+      "-**/bazel-testlogs"
+    ]
   },
   "gopls.templateExtensions": [
     "tmpl"
