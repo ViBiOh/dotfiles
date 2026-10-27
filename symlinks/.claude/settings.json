@@ -158,8 +158,17 @@
       "Bash(terraform*)",
       "Bash(tfenv*)",
       "Bash(uv pip install*)",
-      "Bash(uv tool install*)"
+      "Bash(uv tool install*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)"
     ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false,
+    "filesystem": {
+      "denyRead": ["**/.env", "**/.env.*"]
+    }
   },
   "statusLine": {
     "type": "command",

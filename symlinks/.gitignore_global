@@ -99,4 +99,6 @@ __debug_bin*
 #---------#
 
 **/.claude/settings.local.json
+**/.claude/.cc-writes/
 .crush/
+

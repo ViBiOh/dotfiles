@@ -39,6 +39,9 @@ DENY_PATTERNS=(
   # Terraform (running or installing it)
   '^terraform'
   '^tfenv'
+
+  # Dotenv files (.env, .env.local, ...), wherever they appear in the command
+  '(^|[ /=:"'\''])\.env(\.[A-Za-z0-9_.-]+)?($|[ /;|&<>)"'\''])'
 )
 
 for pattern in "${DENY_PATTERNS[@]}"; do

@@ -8,6 +8,7 @@ symlink() {
 
   symlink_home ".config/crush/crush.json"
   symlink_home ".config/crush/hooks/bash-policy.sh"
+  symlink_home ".config/crush/hooks/file-policy.sh"
 }
 
 clean() {

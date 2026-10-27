@@ -59,6 +59,10 @@
       {
         "matcher": "^bash$",
         "command": "${HOME}/.config/crush/hooks/bash-policy.sh"
+      },
+      {
+        "matcher": "^(view|edit|multiedit|write)$",
+        "command": "${HOME}/.config/crush/hooks/file-policy.sh"
       }
     ]
   }
