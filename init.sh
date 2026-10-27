@@ -72,6 +72,18 @@ source_dotfilesrc() {
 }
 
 create_dotfilesrc() {
+  if var_confirm "Use pre-configured profile"; then
+    local DOTFILES_PROFILE
+    DOTFILES_PROFILE="$(find "${DOTFILES_DIR}/profiles" -type f | LC_ALL=C sort --zero-terminated | fzf)"
+
+    if [[ -n ${DOTFILES_PROFILE:-} ]]; then
+      rm -rf "${HOME}/.dotfilesrc"
+      ln -s "${DOTFILES_PROFILE}" "${HOME}/.dotfilesrc"
+
+      return 0
+    fi
+  fi
+
   printf -- "Select files to install\n"
 
   source_dotfilesrc

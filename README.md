@@ -22,19 +22,6 @@ You can set following environment variables for customizing installation behavio
 
 - `DOTFILES_NODE="true"` will perform install of `installations/node` file (replace `NODE` by any uppercase filename in `installations/` dir)
 
-```bash
-#!/usr/bin/env bash
-
-# Dotfiles configuration example for a server
-
-export DOTFILES__SCRIPTS="true"
-export DOTFILES_GIT="true"
-export DOTFILES_RIPGREP="true"
-export DOTFILES_TMUX="true"
-export DOTFILES_VIM="true"
-export DOTFILES_YQ="true"
-```
-
 ## SSH
 
 ```bash
