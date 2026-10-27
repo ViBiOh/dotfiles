@@ -34,6 +34,14 @@ I primarily use AI agents for:
 - After completing work, I'll handle all docker operations myself
 - If a task needs a container built or started, give me the exact command and let me run it
 
+## Kubernetes
+
+**CRITICAL**: Never perform any mutable Kubernetes operation, no apply, create, delete, patch, edit, replace, scale, rollout, drain, cordon, taint, label, annotate, exec, cp, port-forward, or any command that changes cluster state. Same for `helm`, `kustomize` with apply, `k9s`, and `kubectx`/`kubectl config use-context`.
+
+- Read-only commands are fine (`kubectl get`, `describe`, `logs`, `top`, `explain`, `diff`, `helm list`, `helm template`, etc.)
+- After completing work, I'll handle all cluster operations myself
+- If a task needs a change applied to a cluster, give me the exact command and let me run it
+
 ## Testing
 
 **Automatic test execution**: Always run relevant tests after making code changes
