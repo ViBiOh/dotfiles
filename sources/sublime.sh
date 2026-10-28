@@ -32,3 +32,14 @@ sublime_add_project() {
   jq --compact-output --null-input --arg path "${currentDir}" '{folders: [{path: $path}]}' >"${fileName}"
   subl --project "${fileName}"
 }
+
+sublime_local_githubpullrequest() {
+  local TEXT_PKG="${HOME}/.config/sublime-text/Packages"
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    local TEXT_PKG="${HOME}/Library/Application Support/Sublime Text/Packages"
+  fi
+
+  rm -rf "${TEXT_PKG}/GitHubPullRequest"
+  ln -s "${HOME}/code/sublime-GitHubPullRequest" "${TEXT_PKG}/GitHubPullRequest"
+}
