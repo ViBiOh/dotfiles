@@ -66,7 +66,7 @@ do_mandatory_actions() {
 }
 
 source_dotfilesrc() {
-  if [[ -e "${HOME}/.dotfilesrc" ]]; then
+  if [[ -r "${HOME}/.dotfilesrc" ]]; then
     source "${HOME}/.dotfilesrc"
   fi
 }
