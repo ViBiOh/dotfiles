@@ -410,7 +410,8 @@ github_create_release() {
     --arg target "$(git rev-parse "${VERSION_REF}")" \
     --arg name "${RELEASE_NAME}" \
     --arg body "${CHANGELOG}" \
-    '{tag_name: $tag, target_commitish: $target, name: $name, body: $body}')"
+    --argjson draft "true" \
+    '{tag_name: $tag, target_commitish: $target, name: $name,  draft: $draft, body: $body}')"
 
   http_request --request "POST" "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" --data "${PAYLOAD}"
   if [[ ${HTTP_STATUS} != "201" ]]; then
