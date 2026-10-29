@@ -37,7 +37,8 @@ These rules apply when writing Go and are checked when reviewing it.
 ### Readability
 
 - Add blank lines to separate logical groups of statements (e.g. after variable declarations, before return statements, between distinct steps of a function, around loops and conditionals). Never write dense walls of code. Vertical whitespace is mandatory for human readability.
-- Variables must have at least 3 characters; exceptions: `a`, `b` when identity is irrelevant (e.g. swap), `i`, `j`, `k` for index-based loops, and single-letter names established by language convention (e.g. `t` for `*testing.T`, `r`/`w` for the request/response of an HTTP handler). Receivers and other parameters, including a `*rapid.Context`, need at least 3 characters.
+- Variables must have at least 3 characters; exceptions: `a`, `b` when identity is irrelevant (e.g. swap), `i`, `j`, `k` for index-based loops, and single-letter names established by language convention (e.g. `t` for `*testing.T`, `r`/`w` for the request/response of an HTTP handler). Other parameters need at least 3 characters.
+- Receivers are the exception to the 3 characters rule: letters made of the first letter of each word of the type name in camelCase/PascalCase (e.g. `Pool` is `p`, `forwardSet` is `fs`, `Logger` is `l`). Never flag a short receiver, flag one that does not follow the initials of its type.
 
 ### Comments
 
