@@ -111,6 +111,10 @@ git_release() {
     var_warning "${REPOSITORY}"
   fi
 
+  var_info "Creating tag ${GIT_TAG} on ${VERSION_REF}..."
+  git tag -m "${GIT_TAG}" "${GIT_TAG}"
+  git push origin "${GIT_TAG}"
+
   unset REPOSITORY_NAME
   unset RELEASE_NAME
 }
