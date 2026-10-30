@@ -39,7 +39,10 @@ install() {
   source "${DOTFILES_DIR}/sources/node.sh"
 
   if command -v n >/dev/null 2>&1; then
-    n latest
+    # renovate: datasource=node-version
+    local NODE_VERSION="26"
+
+    n "${NODE_VERSION}"
   fi
 
   source "${DOTFILES_DIR}/sources/node.sh"
