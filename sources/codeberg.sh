@@ -214,7 +214,7 @@ codeberg_create_release() {
     --arg name "${RELEASE_NAME}" \
     --arg body "${CHANGELOG}" \
     --argjson draft "true" \
-    '{tag_name: $tag, target_commitish: $target, name: $name draft: $draft, body: $body}')"
+    '{tag_name: $tag, target_commitish: $target, name: $name, draft: $draft, body: $body}')"
 
   http_request --request "POST" "https://codeberg.org/api/v1/repos/${CODEBERG_REPOSITORY}/releases" --header "Content-Type: application/json" --data "${PAYLOAD}"
   if [[ ${HTTP_STATUS} != "201" ]]; then
