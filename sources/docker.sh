@@ -97,3 +97,7 @@ EOF
       --host-port=0.0.0.0:8085
   }
 fi
+
+if command -v socktainer >/dev/null 2>&1; then
+  export DOCKER_HOST=unix:///opt/homebrew/var/run/socktainer/.socktainer/container.sock
+fi
