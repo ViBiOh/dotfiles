@@ -163,16 +163,20 @@
       "Read(**/.env.*)"
     ]
   },
-  "sandbox": {
-    "enabled": true,
-    "autoAllowBashIfSandboxed": false,
-    "filesystem": {
-      "denyRead": ["**/.env", "**/.env.*"]
-    }
-  },
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   },
-  "tui": "fullscreen"
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false,
+    "filesystem": {
+      "denyRead": [
+        "**/.env",
+        "**/.env.*"
+      ]
+    }
+  },
+  "tui": "fullscreen",
+  "awaySummaryEnabled": false
 }
