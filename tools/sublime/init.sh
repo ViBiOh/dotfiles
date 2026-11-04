@@ -99,7 +99,12 @@ main() {
   fi
 
   if command -v uv >/dev/null 2>&1; then
-    uv pip install "python-lsp-server" "ruff" "isort" "pycodestyle" "sqlparse"
+    source "${SCRIPT_DIR}/../../sources/_python.sh"
+
+    uv tool install --upgrade --with "pycodestyle" "python-lsp-server"
+    uv tool install --upgrade "ruff"
+    uv tool install --upgrade "isort"
+    uv tool install --upgrade "sqlparse"
 
     rm -rf "${HOME}/.config/pycodestyle"
     ln -s "${SCRIPT_DIR}/../../symlinks/.config/pycodestyle" "${HOME}/.config/pycodestyle"

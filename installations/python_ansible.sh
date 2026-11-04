@@ -24,5 +24,7 @@ install() {
     exit
   fi
 
-  uv pip install "ansible" "passlib" "ansible-lint" "jmespath" "yamllint"
+  uv tool install --upgrade --with "passlib" --with "jmespath" --with-executables-from "ansible-core" "ansible"
+  uv tool install --upgrade "ansible-lint"
+  uv tool install --upgrade "yamllint"
 }
