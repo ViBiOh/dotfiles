@@ -99,5 +99,5 @@ EOF
 fi
 
 if command -v socktainer >/dev/null 2>&1; then
-  export DOCKER_HOST=unix:///opt/homebrew/var/run/socktainer/.socktainer/container.sock
+  export DOCKER_HOST=unix://${HOME}/.socktainer/container.sock
 fi
