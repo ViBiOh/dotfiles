@@ -32,9 +32,9 @@ install() {
   archive_to_binary "https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION#v}_$(normalized_os)_$(normalized_arch "amd64" "arm" "arm64").tar.gz" "flux"
   flux completion bash >"${HOME}/opt/completions/flux.bash"
 
-  # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
+  # renovate: datasource=github-releases depName=bitnami/sealed-secrets
   local KUBESEAL_VERSION="v0.41.2"
-  archive_to_binary "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64").tar.gz" "kubeseal"
+  archive_to_binary "https://github.com/bitnami/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64").tar.gz" "kubeseal"
 
   # renovate: datasource=github-releases depName=ViBiOh/kmux
   local KMUX_VERSION="v0.16.5"
