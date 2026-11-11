@@ -7,4 +7,5 @@ fi
 
 export UV_TOOL_DIR="${HOME}/opt/python/tools"
 export UV_TOOL_BIN_DIR="${HOME}/opt/python/bin"
+export UV_PYTHON_INSTALL_DIR="${HOME}/opt/python/bin"
 add_to_path "${UV_TOOL_BIN_DIR}"
