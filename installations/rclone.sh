@@ -9,6 +9,10 @@ clean() {
 install() {
   if [[ ${OSTYPE} =~ ^darwin ]]; then
     packages_install "rclone"
+  else
+    # renovate: datasource=github-releases depName=rclone/rclone
+    local RCLONE_VERSION="v1.76.0"
+    archive_to_binary "https://github.com/rclone/rclone/releases/download/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64").zip" "rclone-${RCLONE_VERSION}-$(normalized_os)-$(normalized_arch "amd64" "arm" "arm64")/rclone"
   fi
 }
 

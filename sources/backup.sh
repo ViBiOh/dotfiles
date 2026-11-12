@@ -41,7 +41,9 @@ backup_rclone() {
     return
   fi
 
-  if var_confirm "Backup current folder to ${REMOTE_NAME}"; then
+  local CURRENT_FOLDER="${PWD}"
+
+  if var_confirm "Backup ${CURRENT_FOLDER} folder to ${REMOTE_NAME}"; then
     rclone sync \
       --password-command 'pass infra/rclone' \
       --progress \
@@ -49,6 +51,33 @@ backup_rclone() {
       --delete-excluded \
       --exclude ".stfolder/**" \
       --exclude ".fibr/*/**" \
-      "." "${REMOTE_NAME}:"
+      "${CURRENT_FOLDER}" "${REMOTE_NAME}:"
+  fi
+}
+
+backup_rclone_over_sftp() {
+  local SOURCE_NAME
+  SOURCE_NAME="$(rclone config dump --password-command 'pass infra/rclone' | jq -r 'keys[]' | fzf --height=20 --ansi --reverse --prompt "Source: ")"
+
+  if [[ -z ${SOURCE_NAME} ]]; then
+    return
+  fi
+
+  local REMOTE_NAME
+  REMOTE_NAME="$(rclone config dump --password-command 'pass infra/rclone' | jq -r 'keys[]' | fzf --height=20 --ansi --reverse --prompt "Remote: ")"
+
+  if [[ -z ${REMOTE_NAME} ]]; then
+    return
+  fi
+
+  var_read CURRENT_FOLDER "${PWD}"
+
+  if var_confirm "Backup ${SOURCE_NAME}:${CURRENT_FOLDER} folder to ${REMOTE_NAME}"; then
+    rclone sync \
+      --password-command 'pass infra/rclone' \
+      --progress \
+      --multi-thread-streams "8" \
+      --delete-excluded \
+      "${SOURCE_NAME}:${CURRENT_FOLDER}" "${REMOTE_NAME}:"
   fi
 }
