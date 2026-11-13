@@ -93,6 +93,7 @@ GitHub.sublime-settings
 #----#
 
 __debug_bin*
+profile.out
 
 #---------#
 # Agentic #
@@ -101,4 +102,3 @@ __debug_bin*
 **/.claude/settings.local.json
 **/.claude/.cc-writes/
 .crush/
-
