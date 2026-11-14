@@ -160,6 +160,11 @@ dns_unblock() {
     done
   done
 
+  if [[ ${#GREP_PIPELINE} -eq 0 ]]; then
+    var_warning "Nothing to remove in ${*}"
+    return
+  fi
+
   local UNBOUND_BLOCKLIST
   UNBOUND_BLOCKLIST=$(mktemp)
 
