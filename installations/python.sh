@@ -28,4 +28,6 @@ install() {
   uv venv --clear --python "3.14" "${HOME}/opt/python/venv"
 
   source "${DOTFILES_DIR}/sources/_python.sh"
+
+  uv tool install --upgrade "yamllint"
 }

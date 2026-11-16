@@ -177,6 +177,7 @@
       ]
     }
   },
+  "awaySummaryEnabled": false,
   "tui": "fullscreen",
-  "awaySummaryEnabled": false
+  "theme": "dark"
 }

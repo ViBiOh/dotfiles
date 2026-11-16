@@ -57,6 +57,13 @@ I primarily use AI agents for:
 - Look at existing patterns/modules in the codebase first. Prefer shared modules over inline implementations.
 - Never hardcode values that should be configurable. Never duplicate paths or logic.
 
+## Clipboard
+
+**CRITICAL**: Never use `pbcopy`/`pbpaste` (or `xclip`, `wl-copy`, etc.) to pass data between agents, subagents, or processes. The clipboard is reserved for the human user.
+
+- To pass data between agents, subagents, or processes, write it to a temp file (e.g. under `$TMPDIR`)
+- Always delete the temp file once it has been consumed
+
 ## Build & Run
 
 **CRITICAL**: Never use Bazel commands (bazel build, bazel test, bazel run, etc.)

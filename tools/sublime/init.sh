@@ -98,9 +98,8 @@ main() {
     npm install --ignore-scripts --global "prettier" "eslint" "typescript-language-server" "typescript" "yaml-language-server"
   fi
 
+  source "${SCRIPT_DIR}/../../sources/_python.sh"
   if command -v uv >/dev/null 2>&1; then
-    source "${SCRIPT_DIR}/../../sources/_python.sh"
-
     uv tool install --upgrade --with "pycodestyle" "python-lsp-server"
     uv tool install --upgrade "ruff"
     uv tool install --upgrade "isort"

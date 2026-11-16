@@ -26,5 +26,4 @@ install() {
 
   uv tool install --python 3.14 --upgrade --with "passlib" --with "jmespath" --with-executables-from "ansible-core" "ansible"
   uv tool install --python 3.14 --upgrade "ansible-lint"
-  uv tool install --upgrade "yamllint"
 }
