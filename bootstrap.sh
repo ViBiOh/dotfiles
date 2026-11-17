@@ -20,7 +20,11 @@ main() {
 
   (
     cd "${INSTALL_PATH}/${REPOSITORY_NAME}"
-    "./init.sh" -d -a
+    if [[ $# -eq 0 ]]; then
+      set -- -d -a
+    fi
+
+    "./init.sh" "${@}"
 
     if command -v git >/dev/null 2>&1; then
       git init
@@ -31,4 +35,4 @@ main() {
   )
 }
 
-main
+main "${@}"

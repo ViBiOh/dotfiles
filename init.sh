@@ -15,7 +15,7 @@ usage() {
   printf -- "Usage: %s [flags]\n" "${0}"
   printf -- "  -a\tRun all stages: clean, install and passwords\n"
   printf -- "  -c\tClean install and temporary files\n"
-  printf -- "  -d\tRecreate dotfilesrc\n"
+  printf -- "  -d\tRecreate dotfilesrc, interactively or headless with a profile name (e.g. -d macbook)\n"
   printf -- "  -i\tInstall and configure softwares\n"
   printf -- "  -l\tLimiting execution to given filename\n"
   printf -- "  -p\tRetrieve and write credentials\n"
@@ -72,7 +72,24 @@ source_dotfilesrc() {
   fi
 }
 
+link_profile() {
+  local PROFILE_FILE="${DOTFILES_DIR}/profiles/${1%.sh}.sh"
+
+  if [[ ! -f ${PROFILE_FILE} ]]; then
+    printf -- "profile %s not found in %s\n" "${1}" "${DOTFILES_DIR}/profiles" >&2
+    return 1
+  fi
+
+  rm -rf "${HOME}/.dotfilesrc"
+  ln -s "${PROFILE_FILE}" "${HOME}/.dotfilesrc"
+}
+
 create_dotfilesrc() {
+  if [[ -n ${1:-} ]]; then
+    link_profile "${1}"
+    return
+  fi
+
   if var_confirm "Use pre-configured profile"; then
     local DOTFILES_PROFILE
     DOTFILES_PROFILE="$(find "${DOTFILES_DIR}/profiles" -type f | LC_ALL=C sort --zero-terminated | fzf)"
@@ -184,6 +201,22 @@ main() {
   local RUN_CLEAN=0
   local RUN_INSTALL=0
   local RUN_PASSWORDS=0
+  local PROFILE_NAME=""
+  local ARGS=()
+
+  while [[ $# -gt 0 ]]; do
+    if [[ ${1} == "-d" ]] && [[ -n ${2:-} ]] && [[ ${2} != -* ]]; then
+      PROFILE_NAME="${2}"
+      ARGS+=("-d")
+      shift 2
+      continue
+    fi
+
+    ARGS+=("${1}")
+    shift
+  done
+
+  set -- ${ARGS[@]+"${ARGS[@]}"}
 
   OPTIND=0
   while getopts ":l:r:acdhip" option; do
@@ -252,7 +285,7 @@ main() {
     fi
 
     source_bashrc
-    create_dotfilesrc
+    create_dotfilesrc "${PROFILE_NAME}"
   fi
 
   source_dotfilesrc

@@ -10,6 +10,12 @@ Please have a look at my article [here](https://dev.to/vibioh/dotfiles-5695)
 curl "https://dotfiles.vibioh.fr/bootstrap.sh" | bash
 ```
 
+Arguments are forwarded to `init.sh` (default is `-d -a`). For a headless install with a given profile:
+
+```bash
+curl "https://dotfiles.vibioh.fr/bootstrap.sh" | bash -s -- -d macbook -i
+```
+
 ## Update
 
 ```bash
