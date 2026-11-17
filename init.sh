@@ -63,6 +63,7 @@ do_action() {
 do_mandatory_actions() {
   do_action "__default.sh" "${@}"
   do_action "__fzf.sh" "${@}"
+  do_action "__scripts.sh" "${@}"
 }
 
 source_dotfilesrc() {
@@ -246,7 +247,7 @@ main() {
   source_bashrc
 
   if [[ ${DOTFILES_RC} -eq 1 ]]; then
-    if ! command -v fzf >/dev/null 2>&1; then
+    if ! command -v fzf >/dev/null 2>&1 || ! command -v var_confirm >/dev/null 2>&1; then
       do_mandatory_actions "${ACTIONS[@]}"
     fi
 

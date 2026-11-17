@@ -75,7 +75,6 @@ install() {
 
   include: \"${UNBOUND_BLOCKLIST}\"
 ${UNBOUND_EXTRA_SERVER_CONF-}
-
 ${UNBOUND_EXTRA_DNS_CONF-}
 forward-zone:
   name: \".\"
