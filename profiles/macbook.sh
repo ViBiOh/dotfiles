@@ -3,7 +3,6 @@
 export DOTFILES__HOSTS="true"
 export DOTFILES__MACOS="true"
 export DOTFILES__PASS="true"
-export DOTFILES__SCRIPTS="true"
 export DOTFILES__SSH="true"
 export DOTFILES_APPLE="true"
 export DOTFILES_CRUSH="true"
