@@ -1,5 +1,49 @@
 #!/usr/bin/env bash
 
+pass_get() {
+  if [[ ${#} -lt 2 ]]; then
+    var_red "Usage: passget PASS_NAME PASS_FIELD"
+    return 1
+  fi
+
+  local PASS_NAME="${1}"
+  shift
+
+  local PASS_FIELD="${1}"
+  shift
+
+  if command -v op >/dev/null 2>&1 && [[ ${PASS_NAME} =~ ^[^\/]*$ ]] && op item get --vault Private "${PASS_NAME}" --field "${PASS_FIELD}" >/dev/null 2>&1; then
+    op item get --vault Private "${PASS_NAME}" --field "${PASS_FIELD}" --reveal
+
+    return
+  fi
+
+  local BROKER_SOCKET="${OP_BROKER_SOCKET:-${HOME}/.local/state/op_broker/op.sock}"
+  if ! command -v op >/dev/null 2>&1 && [[ -S ${BROKER_SOCKET} ]] && command -v nc >/dev/null 2>&1; then
+    local BROKER_VALUE
+    BROKER_VALUE="$(printf -- '%s|%s\n' "${PASS_NAME}" "${PASS_FIELD}" | nc -U -w 60 "${BROKER_SOCKET}")"
+
+    if [[ -n ${BROKER_VALUE} ]]; then
+      printf -- '%s' "${BROKER_VALUE}"
+
+      return
+    fi
+  fi
+
+  if command -v pass >/dev/null 2>&1 && [[ -e "${PASSWORD_STORE_DIR:-${HOME}/.password-store}/${PASS_NAME}.gpg" ]]; then
+    if [[ ${PASS_FIELD} == "password" ]]; then
+      pass show "${PASS_NAME}" | awk 'NR==1 {printf("%s", $1)}'
+    else
+      pass show "${PASS_NAME}" | awk -v "field=${PASS_FIELD}" -F': ' '$1 == field {printf("%s", $2)}'
+    fi
+
+    return
+  fi
+
+  var_red "No password manager found"
+  return 1
+}
+
 if ! command -v pass >/dev/null 2>&1 || ! command -v fzf >/dev/null 2>&1; then
   return
 fi
@@ -22,38 +66,6 @@ _pass_clear_clipboard() {
       fi
     ) >/dev/null 2>&1 &
   )
-}
-
-pass_get() {
-  if [[ ${#} -lt 2 ]]; then
-    var_red "Usage: passget PASS_NAME PASS_FIELD"
-    return 1
-  fi
-
-  local PASS_NAME="${1}"
-  shift
-
-  local PASS_FIELD="${1}"
-  shift
-
-  if command -v op >/dev/null 2>&1 && [[ ${PASS_NAME} =~ ^[^\/]*$ ]] && op item get --vault Private "${PASS_NAME}" --field "${PASS_FIELD}" >/dev/null 2>&1; then
-    op item get --vault Private "${PASS_NAME}" --field "${PASS_FIELD}" --reveal
-
-    return
-  fi
-
-  if command -v pass >/dev/null 2>&1 && [[ -e "${PASSWORD_STORE_DIR:-${HOME}/.password-store}/${PASS_NAME}.gpg" ]]; then
-    if [[ ${PASS_FIELD} == "password" ]]; then
-      pass show "${PASS_NAME}" | awk 'NR==1 {printf("%s", $1)}'
-    else
-      pass show "${PASS_NAME}" | awk -v "field=${PASS_FIELD}" -F': ' '$1 == field {printf("%s", $2)}'
-    fi
-
-    return
-  fi
-
-  var_red "No password manager found"
-  return 1
 }
 
 _fzf_complete_pass() {

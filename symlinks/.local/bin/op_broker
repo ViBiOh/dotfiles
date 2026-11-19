@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+readonly ALLOWED_FILE="${OP_BROKER_ALLOWED:-${HOME}/.config/op_broker/allowed}"
+readonly VAULT="${OP_BROKER_VAULT:-Private}"
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
+
+IFS='|' read -r -t 5 -n 1024 ITEM FIELD || exit 1
+
+if [[ ! -r ${ALLOWED_FILE} ]] || ! grep --quiet --fixed-strings --line-regexp -- "${ITEM}|${FIELD}" "${ALLOWED_FILE}"; then
+  logger -t op_broker "denied: ${ITEM} ${FIELD}"
+  exit 1
+fi
+
+logger -t op_broker "serving: ${ITEM} ${FIELD}"
+op item get --vault "${VAULT}" "${ITEM}" --field "${FIELD}" --reveal
