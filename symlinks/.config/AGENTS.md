@@ -80,6 +80,10 @@ I primarily use AI agents for:
 
 All Go rules live in `~/.config/skills/go-review/SKILL.md`. When writing, modifying, or reviewing Go, read it first and follow it exactly.
 
+## Bash
+
+- **Conditions**: Code is made to be readable. Never write one line conditions (`[[ ... ]] && cmd`, `[[ ... ]] || return 1`, `test ... && ...`). Always use a proper `if ...; then ... fi` block, even for a single statement.
+
 ## Markdown
 
 - **Formatting**: After writing or modifying any `.md` file, always run `prettier --prose-wrap=never --write` on it
