@@ -25,7 +25,7 @@ gpg_agent_stop() {
   gpgconf --kill gpg-agent
 }
 
-if [[ -d ${HOME}/.gnupg ]]; then
+if [[ -z ${SSH_CONNECTION:-} ]] && [[ -d ${HOME}/.gnupg ]]; then
   gpg_agent_start
 fi
 
