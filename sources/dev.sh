@@ -9,10 +9,6 @@ alias fuck='sudo $(history -p \!\!)'
 export EDITOR='vim'
 export TERM='xterm-256color'
 
-if command -v xdg-open >/dev/null 2>&1 && ! command -v open >/dev/null 2>&1; then
-  alias open='xdg-open'
-fi
-
 figmoji() {
   figlet -f banner "${1:-Hello}" | sed '$d' | sed -e"s|#|:${2:-wave}:|g" | sed -e's| |:empty:|g' | pbcopy
 }
@@ -278,7 +274,7 @@ if command -v vegeta >/dev/null 2>&1; then
     shift
 
     var_info "Attacking '${URL}' during 30 seconds..."
-    printf -- "GET %s" "${URL}" | vegeta attack -duration=30s "${@}" | vegeta plot >vegeta.html && open vegeta.html
+    printf -- "GET %s" "${URL}" | vegeta attack -duration=30s "${@}" | vegeta plot >vegeta.html && xdg-open vegeta.html
     sleep 5
     rm vegeta.html
   }

@@ -65,4 +65,9 @@ install() {
     packages_install "apt-transport-https"
     packages_install "${PACKAGES[@]}"
   fi
+
+  if ! command -v xdg-open >/dev/null 2>&1 && command -v open >/dev/null 2>&1; then
+    printf -- '#!/usr/bin/env bash\n\nexec open "${@}"\n' >"${HOME}/opt/bin/xdg-open"
+    chmod +x "${HOME}/opt/bin/xdg-open"
+  fi
 }

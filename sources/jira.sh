@@ -175,7 +175,7 @@ _jira() {
         _jira_info "Issue ${JIRA_ISSUE} created"
 
         if _jira_confirm "Open in browser" "true"; then
-          open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
+          xdg-open "${JIRA_DOMAIN}/browse/${JIRA_ISSUE}"
         fi
 
         if _jira_confirm "Change status" "true"; then
@@ -202,7 +202,7 @@ _jira() {
       return
     fi
 
-    open "$(_jira_url "${JIRA_ISSUE}")"
+    xdg-open "$(_jira_url "${JIRA_ISSUE}")"
     ;;
 
   "print")
