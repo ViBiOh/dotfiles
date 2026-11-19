@@ -19,7 +19,7 @@ pass_get() {
   fi
 
   local BROKER_SOCKET="${OP_BROKER_SOCKET:-${HOME}/.local/state/op_broker/op.sock}"
-  if ! command -v op >/dev/null 2>&1 && [[ -S ${BROKER_SOCKET} ]] && command -v nc >/dev/null 2>&1; then
+  if [[ -S ${BROKER_SOCKET} ]] && command -v nc >/dev/null 2>&1; then
     local BROKER_VALUE
     BROKER_VALUE="$(printf -- '%s|%s\n' "${PASS_NAME}" "${PASS_FIELD}" | nc -U -w 60 "${BROKER_SOCKET}")"
 
