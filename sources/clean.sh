@@ -57,6 +57,32 @@ macos_clean() {
   sudo defaults delete com.apple.Bluetooth SCOAudioDevices
 }
 
+unmodifiable() {
+  if [[ ${#} -ne 1 ]]; then
+    var_red "Usage: unmodifiable FILE_PATH"
+    return 1
+  fi
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    sudo chflags schg "${1}"
+  else
+    sudo chattr +i "$(readlink -f "${1}")"
+  fi
+}
+
+modifiable() {
+  if [[ ${#} -ne 1 ]]; then
+    var_red "Usage: modifiable FILE_PATH"
+    return 1
+  fi
+
+  if [[ ${OSTYPE} =~ ^darwin ]]; then
+    sudo chflags noschg "${1}"
+  else
+    sudo chattr -i "$(readlink -f "${1}")"
+  fi
+}
+
 clear_folder_and_lock() {
   rm -rfv "${@}"
   chmod -R 000 "${@}"
