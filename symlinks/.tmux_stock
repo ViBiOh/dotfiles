@@ -36,7 +36,7 @@ stock() {
     fi
 
     local EVOLUTION_PERCENT
-    EVOLUTION_PERCENT="$(printf -- "scale = 4; 100 * ((%s / %s) - 1)" "${_EVOLUTION_CURRENT}" "${_EVOLUTION_PREVIOUS}" | bc)"
+    EVOLUTION_PERCENT="$(printf -- "scale = 4; 100 * ((%s / %s) - 1)\n" "${_EVOLUTION_CURRENT}" "${_EVOLUTION_PREVIOUS}" | bc)"
 
     if [[ ${EVOLUTION_PERCENT} == 0 ]]; then
       return
