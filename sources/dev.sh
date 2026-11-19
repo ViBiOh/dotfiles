@@ -308,6 +308,50 @@ aziz() {
     "${HUE_API}/api/groups/${HUE_GROUP}" --data state=on --data method=PATCH >/dev/null
 }
 
+if [[ ${OSTYPE} =~ ^darwin ]]; then
+  slack2md() {
+    if ! command -v pandoc >/dev/null 2>&1; then
+      var_red "pandoc is required"
+      return 1
+    fi
+
+    local SELECTION_SCRIPT
+    SELECTION_SCRIPT="(function() {
+      var sel = window.getSelection();
+      var box = document.createElement('div');
+      for (var i = 0; i < sel.rangeCount; i++) {
+        box.appendChild(sel.getRangeAt(i).cloneContents());
+      }
+      box.querySelectorAll('.c-mrkdwn__br').forEach(function(node) {
+        node.replaceWith(document.createElement('br'), document.createElement('br'));
+      });
+      box.querySelectorAll('img[data-stringify-emoji]').forEach(function(node) {
+        node.replaceWith(document.createTextNode(node.alt));
+      });
+      return box.innerHTML;
+    })()"
+
+    local SELECTION_HTML
+    SELECTION_HTML="$(osascript \
+      -e 'on run argv' \
+      -e 'tell application "Google Chrome" to execute active tab of front window javascript (item 1 of argv)' \
+      -e 'end run' \
+      "${SELECTION_SCRIPT}")"
+
+    if [[ -z ${SELECTION_HTML} ]]; then
+      var_red "Nothing selected in the active Chrome tab (Chrome: View > Developer > Allow JavaScript from Apple Events)"
+      return 1
+    fi
+
+    local MARKDOWN
+    MARKDOWN="$(printf -- "%s" "${SELECTION_HTML}" | pandoc --from html --to gfm-raw_html --wrap=none | sed 's/\\$//')"
+
+    printf -- "%s" "${MARKDOWN}" | pbcopy
+    printf -- "%s\n" "${MARKDOWN}"
+    var_info "Markdown copied to the clipboard"
+  }
+fi
+
 json() {
   jq --null-input --compact-output "${@}"
 }
