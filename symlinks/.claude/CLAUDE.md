@@ -6,7 +6,14 @@ When asked to review, audit, or critique Go code (or when "go-review" is mention
 
 ## Go code changes
 
-After writing or modifying Go code, and before reporting the task as done, delegate a review to the go-reviewer subagent, passing the list of changed files. Fix blocking and should-fix findings, then report.
+**CRITICAL**: The Go guidelines are mandatory, not advisory. The user wrote them with care, and every violation costs the user review time. Never skip a step below, and never report Go work as done without completing all of them.
+
+1. **Before any Go edit**: your first Go action in a task, before planning the code, before the first Edit or Write on a `.go` file (tests and mocks included), is to read `~/.claude/skills/go-review/SKILL.md` and the two guideline files next to it. Reading it after writing the code does not count. If it was already read earlier in this conversation, re-read it after any context summary.
+2. **While writing**: apply every rule in the skill on the first draft: comments only for a non obvious WHY, no doc comment restating a name, map based parallel tests, generated mocks only, initials receivers, blank lines between logical groups, errors wrapped with the action.
+3. **Tooling**: run everything in the skill's Tooling section (`go fix`, `gofumpt -extra`, `golangci-lint`) and `go test -race`. Never use `bin/*` wrappers that start Bazel. If a tool is unavailable, say so explicitly in the report, never skip it silently.
+4. **Review**: delegate a review to the go-reviewer subagent, passing only the list of changed files. Never narrow its scope or severity (no "blocking only", no "should fix only"), never describe the change as intended or correct, and never tell it what to skip.
+5. **Findings**: fix every finding at every severity, nits included, unless it contradicts the user's explicit instruction. If a finding is not fixed, say which one and why.
+6. **Report**: state which guideline steps were done, which tools ran, and any rule you could not follow.
 
 ## Advisor
 

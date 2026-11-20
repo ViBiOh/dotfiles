@@ -78,7 +78,12 @@ I primarily use AI agents for:
 
 ## Go Conventions
 
-All Go rules live in `~/.config/skills/go-review/SKILL.md`. When writing, modifying, or reviewing Go, read it first and follow it exactly.
+All Go rules live in `~/.config/skills/go-review/SKILL.md`. These rules are mandatory and apply on the first draft, not as a cleanup pass.
+
+- **Read first**: before the first edit of any `.go` file (tests and mocks included), read the skill and the two guideline files next to it. Reading it after writing the code does not count.
+- **Follow exactly**: every rule in the skill, including comments (only a non obvious WHY, never restate a name), tests (map based, `t.Parallel()`, `-race`), generated mocks, receivers, vertical whitespace, and the tooling list.
+- **Review without filters**: when delegating a review, pass only the changed files. Never restrict severity or scope, and never tell the reviewer what to skip. Fix every finding, nits included.
+- **Report honestly**: say which tools ran and which rule could not be followed.
 
 ## Bash
 

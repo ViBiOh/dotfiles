@@ -179,5 +179,21 @@
   },
   "awaySummaryEnabled": false,
   "tui": "fullscreen",
-  "theme": "dark"
+  "theme": "dark",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat)\nfile=$(printf '%s' \"$input\" | jq -r '.tool_input.file_path // empty')\n\ncase \"$file\" in\n  *.go) ;;\n  *) exit 0 ;;\nesac\n\ntranscript=$(printf '%s' \"$input\" | jq -r '.transcript_path // empty')\n\nif [ -n \"$transcript\" ] && [ -r \"$transcript\" ]; then\n  if jq -e -s '[.[] | (.message.content? // []) | if type == \"array\" then .[] else empty end | select(.type == \"tool_use\" and .name == \"Read\") | (.input.file_path // \"\")] as $paths | [\"SKILL\\\\.md\", \"concurrency\\\\.md\", \"idioms\\\\.md\"] | all(.[]; . as $name | any($paths[]; test(\"go-review/\" + $name + \"$\")))' \"$transcript\" >/dev/null 2>&1; then\n    exit 0\n  fi\nfi\n\necho \"BLOCKED: read ~/.claude/skills/go-review/SKILL.md, concurrency.md and idioms.md before editing any .go file. Reading them after writing the code does not count. Read all three now, then retry the edit.\" >&2\nexit 2\n",
+            "timeout": 30,
+            "onFailure": "block",
+            "statusMessage": "Checking go-review guidelines were read"
+          }
+        ]
+      }
+    ]
+  }
 }
