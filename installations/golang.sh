@@ -21,7 +21,7 @@ clean() {
 install() {
   if package_exists "go"; then
     packages_install "go"
-  elif package_exists "golang-go"; then
+  elif [[ ${OSTYPE} =~ ^linux ]]; then
     local GO_VERSION
     GO_VERSION=$(curl --disable --silent --show-error --location --max-time 30 'https://go.dev/VERSION?m=text' | head -1)
 
