@@ -22,7 +22,16 @@ install() {
   if package_exists "go"; then
     packages_install "go"
   elif package_exists "golang-go"; then
-    packages_install "golang-go"
+    local GO_VERSION
+    GO_VERSION=$(curl --disable --silent --show-error --location --max-time 30 'https://go.dev/VERSION?m=text' | head -1)
+
+    local ARCH
+    ARCH=$(dpkg --print-architecture)
+
+    curl --disable --silent --show-error --location --max-time 300 --output "go.tar.gz" "https://go.dev/dl/${GO_VERSION}.linux-${ARCH}.tar.gz"
+    sudo rm -rf /usr/local/go
+    sudo tar -xzf "go.tar.gz" -C /usr/local
+    rm "go.tar.gz"
   fi
 
   if package_exists "golangci-lint"; then
