@@ -10,8 +10,8 @@ install() {
   defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
   defaults write NSGlobalDomain AppleFontSmoothing -int 1
   defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
-  defaults write NSGlobalDomain AppleLanguages -array "en-US"
-  defaults write NSGlobalDomain AppleLocale -string "en_US@currency=eur;rg=frzzzz"
+  defaults write NSGlobalDomain AppleLanguages -array "fr-FR"
+  defaults write NSGlobalDomain AppleLocale -string "fr_FR@currency=eur"
   defaults write NSGlobalDomain AppleMeasurementUnits -string "Centimeters"
   defaults write NSGlobalDomain AppleMetricUnits -bool true
   defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
