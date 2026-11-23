@@ -10,6 +10,7 @@ symlink() {
   symlink_home ".claude/settings.json"
   symlink_home ".claude/statusline-command.sh"
   symlink_home ".claude/agents"
+  symlink_home ".claude/hooks"
 }
 
 clean() {
