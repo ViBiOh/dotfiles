@@ -1,28 +1,7 @@
 #!/usr/bin/env bash
 
 SSH_ENV="${HOME}/.ssh/environment"
-SSH_FORWARDED_DIR="${HOME}/.ssh/agent"
-SSH_FORWARDED_LINK="${HOME}/.ssh/ssh_auth_sock"
-
-ssh_forwarded_link() {
-  local sock latest=""
-
-  for sock in "${SSH_FORWARDED_DIR}"/s.*; do
-    [[ -S ${sock} ]] || continue
-    if [[ -z ${latest} || ${sock} -nt ${latest} ]]; then
-      latest="${sock}"
-    fi
-  done
-
-  [[ -n ${latest} ]] || return 1
-
-  ln -sf "${latest}" "${SSH_FORWARDED_LINK}"
-  export SSH_AUTH_SOCK="${SSH_FORWARDED_LINK}"
-}
-
-if ! ssh_forwarded_link; then
-  unset SSH_AUTH_SOCK
-fi
+unset SSH_AUTH_SOCK
 
 # Loads the agent variables from SSH_ENV by parsing only the expected
 # assignments instead of sourcing the file, so a tampered environment file
@@ -133,12 +112,10 @@ ssh_agent_init() {
   fi
 }
 
-if [[ ${SSH_AUTH_SOCK-} != "${SSH_FORWARDED_LINK}" ]]; then
-  if [[ -f ${SSH_ENV-} ]]; then
-    _ssh_load_env
-  fi
+if [[ -f ${SSH_ENV-} ]]; then
+  _ssh_load_env
+fi
 
-  if ! ssh_agent_running && [[ $(type -t ssh_agent_init) == "function" ]]; then
-    ssh_agent_init
-  fi
+if ! ssh_agent_running && [[ $(type -t ssh_agent_init) == "function" ]]; then
+  ssh_agent_init
 fi
