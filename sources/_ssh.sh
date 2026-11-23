@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 SSH_ENV="${HOME}/.ssh/environment"
-unset SSH_AUTH_SOCK
+
+if [[ -z ${SSH_CONNECTION:-} ]]; then
+  unset SSH_AUTH_SOCK
+fi
 
 # Loads the agent variables from SSH_ENV by parsing only the expected
 # assignments instead of sourcing the file, so a tampered environment file
