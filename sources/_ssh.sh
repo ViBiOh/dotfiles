@@ -24,6 +24,23 @@ _ssh_unset_env() {
   unset SSH_AUTH_SOCK SSH_AGENT_PID
 }
 
+ssh_rebind_socket() {
+  local sock
+  local newest=""
+
+  for sock in "${HOME}/.ssh/agent"/s.*; do
+    if [[ -S ${sock} ]] && [[ -z ${newest} || ${sock} -nt ${newest} ]]; then
+      newest="${sock}"
+    fi
+  done
+
+  if [[ -z ${newest} ]]; then
+    return 1
+  fi
+
+  export SSH_AUTH_SOCK="${newest}"
+}
+
 ssh_forward_to_local() {
   meta_check "var"
 
