@@ -6,6 +6,16 @@ if [[ -z ${SSH_CONNECTION:-} ]]; then
   unset SSH_AUTH_SOCK
 fi
 
+ssh() {
+  local host="${!#}"
+  local idx=$(($(printf '%s' "$host" | cksum | cut -d' ' -f1) % 5))
+  local colors=("#1a2233" "#12282b" "#251c33" "#2b2517" "#16261a")
+
+  printf '\033]11;%s\007' "${colors[$idx]}"
+  command ssh "$@"
+  printf '\033]111\007'
+}
+
 # Loads the agent variables from SSH_ENV by parsing only the expected
 # assignments instead of sourcing the file, so a tampered environment file
 # cannot turn a read into arbitrary code execution.
