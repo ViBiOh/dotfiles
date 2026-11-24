@@ -12,3 +12,5 @@ font-size = 12
 
 alpha-blending = linear
 window-colorspace = "display-p3"
+
+shell-integration = none
