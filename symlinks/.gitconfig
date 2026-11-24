@@ -108,7 +108,7 @@
 
 	co = checkout
 	copr = "!f() { git fetch origin "pull/${1}/head:pr/${1}" && git switch "pr/${1}"; }; f"
-	fco = "!f() { local GIT_BRANCH="$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query="remotes/${1:-}" | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||')"; [[ -n "${GIT_BRANCH}" ]] && git switch "${GIT_BRANCH}"; }; f"
+	fco = "!f() { local GIT_BRANCH="$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query="remotes/${1:-}" | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||')"; [ -n "${GIT_BRANCH}" ] && git switch "${GIT_BRANCH}"; }; f"
 
 	log-pretty = log --color --date=local --pretty=format:'%C(red)%h%C(reset)%C(yellow)%d%C(reset) %s %C(green)(%cr) %C(magenta)(%cd) %C(bold blue)<%an>%C(reset)'
 	lg = log-pretty --graph
