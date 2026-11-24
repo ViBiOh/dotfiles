@@ -2,6 +2,52 @@
 
 export PROMPT_DIRTRIM="3"
 
+__osc7_last_cwd=""
+
+# Everything outside the RFC 3986 unreserved set is percent-encoded, which also neutralizes control bytes (ESC, BEL) that could end the sequence early and start another one (e.g. an OSC 52 clipboard write).
+__osc7_encode() {
+  local LC_ALL=C
+  local input="${1}"
+  local output=""
+  local char
+  local code
+  local hex
+  local i
+
+  for ((i = 0; i < ${#input}; i++)); do
+    char="${input:i:1}"
+
+    case "${char}" in
+    [a-zA-Z0-9/._~-])
+      output+="${char}"
+      ;;
+    *)
+      printf -v code '%d' "'${char}"
+      printf -v hex '%%%02X' "$((code & 255))"
+      output+="${hex}"
+      ;;
+    esac
+  done
+
+  printf -- '%s' "${output}"
+}
+
+__osc7_cwd() {
+  local exit="${?}"
+
+  if [[ ${__osc7_last_cwd} != "${PWD}" ]]; then
+    __osc7_last_cwd="${PWD}"
+    printf -- '\e]7;file://%s%s\a' "$(__osc7_encode "${HOSTNAME}")" "$(__osc7_encode "${PWD}")"
+  fi
+
+  return "${exit}"
+}
+
+# Ghostty ignores OSC 7 from a non local host, so it is pointless over SSH.
+if [[ -z ${SSH_CONNECTION:-} && ${PROMPT_COMMAND:-} != *__osc7_cwd* ]]; then
+  PROMPT_COMMAND="__osc7_cwd${PROMPT_COMMAND:+;${PROMPT_COMMAND}}"
+fi
+
 PS1=""
 
 # Show username if different than logname
