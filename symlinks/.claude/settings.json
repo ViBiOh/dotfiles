@@ -208,7 +208,7 @@
     }
   },
   "awaySummaryEnabled": false,
-  "tui": "fullscreen",
+  "tui": "default",
   "theme": "dark",
   "skipWorkflowUsageWarning": true
 }
