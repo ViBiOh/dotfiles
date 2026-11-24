@@ -66,9 +66,9 @@
 	autocorrect = prompt
 
 [alias]
-	web-url = "!bash -c 'if [[ \"$(git remote get-url --push $(git remote show | head -1))\" =~ ^.*@(.*)[:/](.*)/(.*)$ ]]; then printf -- \"https://%s/%s/%s\" \"${BASH_REMATCH[1]}\" \"${BASH_REMATCH[2]}\" \"${BASH_REMATCH[3]%.git}\"; fi'"
+	web-url = "!git remote get-url --push \"$(git remote show | head -1)\" | sed -nE 's|\\.git$||;s|^.*@(.*)[:/](.*)/(.*)$|https://\\1/\\2/\\3|p'"
 	web = ! xdg-open "$(git web-url)"
-	webcommit = "!f() { xdg-open "$(git web-url)/commit/${1:-}"; }; f"
+	webcommit = "!f() { xdg-open $(git web-url)/commit/${1:-}; }; f"
 	pr = ! xdg-open "$(git web-url)/compare/$(git default-branch)...$(git current-branch)?expand=1"
 
 	file-list = ! git ls-files | grep --invert-match package-lock.json | grep --extended-regexp --invert-match '.jpg$|.jpeg$|.png$|.gif$|.ico$|.lock$|.sum$|.jar$|.bat$|.otf$|.woff$|.svg$|.xml$'
@@ -80,8 +80,8 @@
 	adiws = ! git diff --no-color --ignore-all-space | git apply --cached
 	adibl = ! git diff --no-color --ignore-blank-lines | git apply --cached
 
-	up = "!f() { git pull --rebase origin "${1:-$(git default-branch)}"; }; f"
-	tidy = "!f() { git rebase --signoff --interactive "origin/${1:-$(git default-branch)}"; }; f"
+	up = "!f() { git pull --rebase origin ${1:-$(git default-branch)}; }; f"
+	tidy = "!f() { git rebase --signoff --interactive origin/${1:-$(git default-branch)}; }; f"
 	pp = ! git pull && git push
 	pushf = push --force-with-lease
 
@@ -96,19 +96,19 @@
 	last-tag = describe --tags --abbrev=0
 
 	unstage = reset HEAD --
-	undo = "!f() { cd "${GIT_PREFIX:-.}"; git reset "${2:-origin/$(git default-branch)}" -- "${1:-}"; git checkout -- "${1:-}"; git reset HEAD -- "${1:-}"; }; f"
+	undo = "!f() { cd ${GIT_PREFIX:-.}; git reset ${2:-origin/$(git default-branch)} -- ${1:-}; git checkout -- ${1:-}; git reset HEAD -- ${1:-}; }; f"
 	list-merged-stash = ! git fsck --unreachable --no-progress | grep commit | cut -d' ' -f3 | xargs git log --merges --no-walk --grep=WIP
 
 	set-head = remote set-head origin -a
 	default-branch = ! git config get --default $(git rev-parse --abbrev-ref origin/HEAD | sed 's|^origin/||') branch.overridden-default
-	force-default-branch = "!f() { git config set "branch.overridden-default" "${1}"; }; f"
+	force-default-branch = "!f() { git config set branch.overridden-default ${1}; }; f"
 	unforce-default-branch = config unset "branch.overridden-default"
 	current-branch = rev-parse --abbrev-ref HEAD
 	default = ! git switch "$(git default-branch)"
 
 	co = checkout
-	copr = "!f() { git fetch origin "pull/${1}/head:pr/${1}" && git switch "pr/${1}"; }; f"
-	fco = "!f() { local GIT_BRANCH="$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query="remotes/${1:-}" | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||')"; [ -n "${GIT_BRANCH}" ] && git switch "${GIT_BRANCH}"; }; f"
+	copr = "!f() { git fetch origin pull/${1}/head:pr/${1} && git switch pr/${1}; }; f"
+	fco = "!f() { GIT_BRANCH=$(git branch -vv --all | fzf --height 20 --ansi --select-1 --reverse --query=remotes/${1:-} | awk '{printf(\"%s\", $1)}' | sed 's|^remotes/origin/||'); [ -n \"${GIT_BRANCH}\" ] && git switch ${GIT_BRANCH}; }; f"
 
 	log-pretty = log --color --date=local --pretty=format:'%C(red)%h%C(reset)%C(yellow)%d%C(reset) %s %C(green)(%cr) %C(magenta)(%cd) %C(bold blue)<%an>%C(reset)'
 	lg = log-pretty --graph
