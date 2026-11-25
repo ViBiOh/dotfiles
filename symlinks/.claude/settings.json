@@ -155,6 +155,8 @@
       "Bash(npm install*)",
       "Bash(pip install*)",
       "Bash(podman*)",
+      "Bash(security*)",
+      "Bash(/usr/bin/security*)",
       "Bash(terraform*)",
       "Bash(tfenv*)",
       "Bash(uv pip install*)",

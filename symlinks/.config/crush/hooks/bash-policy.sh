@@ -36,6 +36,9 @@ DENY_PATTERNS=(
   '^kmux (restart|scale)'
   '^kubectl (annotate|apply|attach|autoscale|cordon|cp|create|delete|drain|edit|exec|expose|label|patch|replace|rollout|run|scale|set|taint|uncordon)'
 
+  # macOS keychain CLI, it can print stored secrets in plain text
+  '(^|[;|&(`]) ?((command|env|exec|sudo|xargs) )?(/usr/bin/)?security( |$)'
+
   # Terraform (running or installing it)
   '^terraform'
   '^tfenv'
