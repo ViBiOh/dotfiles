@@ -101,8 +101,6 @@ main() {
   source "${SCRIPT_DIR}/../../sources/_python.sh"
   if command -v uv >/dev/null 2>&1; then
     uv tool install --upgrade --with "pycodestyle" "python-lsp-server"
-    uv tool install --upgrade "ruff"
-    uv tool install --upgrade "isort"
     uv tool install --upgrade "sqlparse"
 
     rm -rf "${HOME}/.config/pycodestyle"
