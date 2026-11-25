@@ -48,7 +48,7 @@ I primarily use AI agents for:
 
 - Automatically verify changes don't break existing functionality
 - Run appropriate test commands based on project type (npm test, pytest, go test, etc.)
-- Report test results before considering work complete
+- Report only what is out of the ordinary in the test runs before considering work complete. Do not report passing runs
 - This helps catch issues early before I commit changes
 
 ## Design Approach
@@ -83,7 +83,7 @@ All Go rules live in `~/.config/skills/go-review/SKILL.md`. These rules are mand
 - **Read first**: before the first edit of any `.go` file (tests and mocks included), read the skill and the two guideline files next to it. Reading it after writing the code does not count.
 - **Follow exactly**: every rule in the skill, including comments (only a non obvious WHY, never restate a name), tests (map based, `t.Parallel()`, `-race`), generated mocks, receivers, vertical whitespace, and the tooling list.
 - **Review without filters**: when delegating a review, pass only the changed files. Never restrict severity or scope, and never tell the reviewer what to skip. Fix every finding, nits included.
-- **Report honestly**: say which tools ran and which rule could not be followed.
+- **Report what matters**: never list the mandatory tools, steps or reviews as done. Only report what is out of the ordinary, anything that deviates from the nominal behavior.
 
 ## Bash
 

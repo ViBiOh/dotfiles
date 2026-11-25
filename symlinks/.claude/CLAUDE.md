@@ -13,7 +13,7 @@ When asked to review, audit, or critique Go code (or when "go-review" is mention
 3. **Tooling**: run everything in the skill's Tooling section (`go fix`, `gofumpt -extra`, `golangci-lint`) and `go test -race`. Never use `bin/*` wrappers that start Bazel. If a tool is unavailable, say so explicitly in the report, never skip it silently.
 4. **Review**: delegate a review to the go-reviewer subagent, passing only the list of changed files. Never narrow its scope or severity (no "blocking only", no "should fix only"), never describe the change as intended or correct, and never tell it what to skip.
 5. **Findings**: fix every finding at every severity, nits included, unless it contradicts the user's explicit instruction. If a finding is not fixed, say which one and why.
-6. **Report**: state which guideline steps were done, which tools ran, and any rule you could not follow.
+6. **Report**: the steps above are mandatory, so never list them as done (no "checks", "guideline steps" or "tooling" section). Report only what is out of the ordinary, anything that deviates from the nominal behavior.
 
 ## Advisor
 

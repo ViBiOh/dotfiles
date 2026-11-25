@@ -29,6 +29,14 @@ main() {
   local transcript
   transcript="$(printf '%s' "${input}" | jq --raw-output '.transcript_path // empty')"
 
+  # Subagent Reads land in their own transcript, not in the main session one.
+  local agent_id
+  agent_id="$(printf '%s' "${input}" | jq --raw-output '.agent_id // empty')"
+
+  if [[ -n ${agent_id} ]]; then
+    transcript="${transcript%.jsonl}/subagents/agent-${agent_id}.jsonl"
+  fi
+
   if [[ -n ${transcript} ]] && [[ -r ${transcript} ]]; then
     if jq --exit-status --slurp "${READ_ALL_GUIDELINES}" "${transcript}" >/dev/null 2>&1; then
       exit 0

@@ -211,6 +211,6 @@
   },
   "awaySummaryEnabled": false,
   "tui": "default",
-  "theme": "dark",
-  "skipWorkflowUsageWarning": true
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark"
 }
