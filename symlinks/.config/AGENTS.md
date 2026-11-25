@@ -117,6 +117,14 @@ All Go rules live in `~/.config/skills/go-review/SKILL.md`. These rules are mand
 - Always use the Atlassian MCP server to fetch Jira tickets, never guess or rely on cached content
 - When looking at a ticket, always fetch the parent ticket as well to get full context
 
+## Reviewing Content
+
+When asked to review a pull request, a Confluence page, a Jira ticket, or any similar artifact, never load only the main content. Always fetch the associated comments and discussion too, to get the full context and decisions already made.
+
+- Pull requests: fetch the description, the review comments (inline and general), and the review threads, including resolved ones
+- Confluence pages: fetch the page body, the inline comments, and the footer comments
+- Jira tickets: fetch the description and all the comments, then load the parent ticket and fetch its description and all its comments as well
+
 ## Communication Style
 
 **CRITICAL** Never use the Em Dashes (—), En Dashes (–), Hyphens (-) or Double Hyphens (--) in answers
