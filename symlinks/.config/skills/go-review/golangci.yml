@@ -1,0 +1,90 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - contextcheck
+    - depguard
+    - errorlint
+    - gocritic
+    - ireturn
+    - modernize
+    - nakedret
+    - nlreturn
+    - noctx
+    - paralleltest
+    - revive
+    - testifylint
+    - tparallel
+    - varnamelen
+    - wsl_v5
+
+  settings:
+    depguard:
+      rules:
+        testify-suite:
+          deny:
+            - pkg: github.com/stretchr/testify/suite
+              desc: use map based table tests with t.Run, never testify suite
+
+    gocritic:
+      disable-all: true
+      enabled-checks:
+        - deferInLoop
+
+    nakedret:
+      max-func-lines: 0
+
+    revive:
+      rules:
+        - name: context-as-argument
+        - name: error-return
+        - name: receiver-naming
+        - name: string-format
+          arguments:
+            - - fmt.Errorf[0]
+              - '!/^(?i)(error|errors|failed|failure|unable|cannot|could not)\b/'
+              - state the action, e.g. "opening file", never "failed to" or "error while"
+            - - errors.New[0]
+              - '!/^(?i)(error|errors|failed|failure|unable|cannot|could not)\b/'
+              - state the action, never "failed to" or "error while"
+            - - panic[0]
+              - '!/^(?i)(error|errors|failed|failure|unable|cannot|could not)\b/'
+              - state the action, never "failed to" or "error while"
+
+    varnamelen:
+      min-name-length: 3
+      max-distance: 1
+      check-return: true
+      check-type-param: true
+      ignore-type-assert-ok: true
+      ignore-map-index-ok: true
+      ignore-chan-recv-ok: true
+      ignore-names:
+        - a
+        - b
+        - i
+        - j
+        - k
+        - ok
+      ignore-decls:
+        - t *testing.T
+        - b *testing.B
+        - f *testing.F
+        - tb testing.TB
+        - w http.ResponseWriter
+        - r *http.Request
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  uniq-by-line: false
+
+formatters:
+  enable:
+    - gofumpt
+  settings:
+    gofumpt:
+      extra:
+        group-params: true
+        clothe-returns: true

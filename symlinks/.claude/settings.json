@@ -166,6 +166,7 @@
     ]
   },
   "model": "opus",
+  "effortLevel": "xhigh",
   "hooks": {
     "PreToolUse": [
       {
@@ -190,6 +191,24 @@
             "command": "~/.claude/hooks/md-refs-check.py",
             "timeout": 60,
             "statusMessage": "Checking markdown guidelines"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/go-lint.sh",
+            "timeout": 180,
+            "statusMessage": "Linting Go with the go-review config"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/go-lint.sh",
+            "timeout": 600,
+            "statusMessage": "Linting edited Go packages"
           }
         ]
       }
