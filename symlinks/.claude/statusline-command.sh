@@ -12,7 +12,10 @@ BAR=""
 [[ $FILLED -gt 0 ]] && printf -v FILL "%${FILLED}s" && BAR="${FILL// /▓}"
 [[ $EMPTY -gt 0 ]] && printf -v PAD "%${EMPTY}s" && BAR="${BAR}${PAD// /░}"
 
-printf "\033[34m%s\033[0m %s \033[33m%s\033[0m" \
+CURRENT_DIR=$(printf "%s" "${input}" | jq -r '.workspace.current_dir // .cwd')
+
+printf "\033[32m%s\033[0m \033[34m%s\033[0m %s \033[33m%s\033[0m" \
+  "${CURRENT_DIR##*/}" \
   "$(printf "%s" "${input}" | jq -r '.model.display_name')" \
   "${BAR}" \
   "$(printf "%s" "${input}" | jq -r '(.cost.total_cost_usd // 0) | . * 10000 | round | . / 10000' | awk '{printf "$%.2f", $1}')"
