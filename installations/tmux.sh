@@ -4,7 +4,6 @@ set -o nounset -o pipefail -o errexit
 
 symlink() {
   symlink_home ".tmux.conf"
-  symlink_home ".tmux-osx.conf"
   symlink_home ".tmux_stock"
 }
 
@@ -16,8 +15,4 @@ install() {
   symlink
 
   packages_install "tmux"
-
-  if [[ ${OSTYPE} =~ ^darwin ]]; then
-    packages_install "reattach-to-user-namespace"
-  fi
 }
