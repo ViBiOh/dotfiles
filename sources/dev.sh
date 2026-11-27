@@ -88,37 +88,38 @@ meteo() {
 }
 
 stock() {
-  local HEADER_OUTPUT
-  HEADER_OUTPUT=$(mktemp)
+  local STOCK_TICKER="${1:-DDOG}"
 
-  local YAHOO_OUTPUT
-  YAHOO_OUTPUT="$(
-    curl \
-      --disable \
-      --silent \
-      --show-error \
-      --location \
-      --max-time 10 \
-      --header "User-Agent: Mozilla/5.0" \
-      --dump-header "${HEADER_OUTPUT}" \
-      --fail-with-body \
-      "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=true&interval=1h&range=1d"
-  )"
+  _stock_fetch() {
+    local HEADER_OUTPUT
+    HEADER_OUTPUT=$(mktemp)
 
-  if [[ ${?} -ne 0 ]]; then
-    cat "${HEADER_OUTPUT}" >/dev/stderr
-    printf -- "%s\n" "${YAHOO_OUTPUT}" >/dev/stderr
+    local FETCH_OUTPUT
+    if ! FETCH_OUTPUT="$(
+      curl \
+        --disable \
+        --silent \
+        --show-error \
+        --location \
+        --max-time 10 \
+        --header "User-Agent: Mozilla/5.0" \
+        --dump-header "${HEADER_OUTPUT}" \
+        --fail-with-body \
+        "https://query1.finance.yahoo.com/v8/finance/chart/${1}?${2}"
+    )"; then
+      cat "${HEADER_OUTPUT}" >/dev/stderr
+      printf -- "%s\n" "${FETCH_OUTPUT}" >/dev/stderr
+      rm -f "${HEADER_OUTPUT}"
+      return 1
+    fi
+
     rm -f "${HEADER_OUTPUT}"
-    return 1
-  fi
+    printf -- "%s" "${FETCH_OUTPUT}"
+  }
 
-  rm -f "${HEADER_OUTPUT}"
-
-  local STOCK_SYMBOL
-  STOCK_SYMBOL="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .symbol')"
-
-  local STOCK_CURRENCY
-  STOCK_CURRENCY="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .currency')"
+  _stock_meta() {
+    printf -- "%s" "${1}" | jq --raw-output ".chart.result[0].meta | .${2}"
+  }
 
   _stock_evolution() {
     local _EVOLUTION_PREVIOUS="${1}"
@@ -147,66 +148,64 @@ stock() {
     printf " %b%s%s%b" "${_EVOLUTION_COLOR}" "${_EVOLUTION_SIGN}" "${EVOLUTION_PERCENT%00}%" "${RESET}"
   }
 
+  _stock_quote() {
+    printf -- "%b%s%b %s %s" "${YELLOW}" "${2}" "${RESET}" "$(_stock_meta "${1}" "regularMarketPrice")" "$(_stock_meta "${1}" "currency")"
+    _stock_evolution "$(_stock_meta "${1}" "previousClose")" "$(_stock_meta "${1}" "regularMarketPrice")"
+  }
+
+  local YAHOO_OUTPUT
+  if ! YAHOO_OUTPUT="$(_stock_fetch "${STOCK_TICKER}" "includePrePost=true&interval=1h&range=1d")"; then
+    return 1
+  fi
+
   local CURRENT_PRICE
-  local PREVIOUS_PRICE
+  CURRENT_PRICE="$(_stock_meta "${YAHOO_OUTPUT}" "regularMarketPrice")"
 
-  CURRENT_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
-  PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .previousClose')"
-
-  printf -- "%b%s%b %s %s" "${YELLOW}" "${STOCK_SYMBOL}" "${RESET}" "${CURRENT_PRICE}" "${STOCK_CURRENCY}"
-  _stock_evolution "${PREVIOUS_PRICE}" "${CURRENT_PRICE}"
+  _stock_quote "${YAHOO_OUTPUT}" "$(_stock_meta "${YAHOO_OUTPUT}" "symbol")"
 
   local REGULAR_START
-  REGULAR_START=$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta.currentTradingPeriod.regular.start')
+  REGULAR_START="$(_stock_meta "${YAHOO_OUTPUT}" "currentTradingPeriod.regular.start")"
 
   local REGULAR_END
-  REGULAR_END=$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta.currentTradingPeriod.regular.end')
+  REGULAR_END="$(_stock_meta "${YAHOO_OUTPUT}" "currentTradingPeriod.regular.end")"
 
   local CURRENT_TIMESTAMP
   CURRENT_TIMESTAMP="$(date +%s)"
 
+  local PREMARKET_PRICE
   PREMARKET_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].indicators.quote[0].open[-1]')"
 
   if [[ ${CURRENT_TIMESTAMP} -lt ${REGULAR_START} ]] || [[ ${CURRENT_TIMESTAMP} -gt ${REGULAR_END} ]] && [[ ${PREMARKET_PRICE:-} != "null" ]]; then
-    PREVIOUS_PRICE="$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .regularMarketPrice')"
-
     printf -- " | Pre %s" "${PREMARKET_PRICE}"
     _stock_evolution "${CURRENT_PRICE}" "${PREMARKET_PRICE}"
   fi
 
   printf -- "\n"
 
-  if command -v spark >/dev/null 2>&1; then
-    YAHOO_OUTPUT="$(
-      curl \
-        --disable \
-        --silent \
-        --show-error \
-        --location \
-        --max-time 10 \
-        --header "User-Agent: Mozilla/5.0" \
-        --dump-header "${HEADER_OUTPUT}" \
-        --fail-with-body \
-        "https://query1.finance.yahoo.com/v8/finance/chart/${1:-DDOG}?&includePrePost=false&interval=1d&range=1mo"
-    )"
-
-    if [[ ${?} -ne 0 ]]; then
-      cat "${HEADER_OUTPUT}" >/dev/stderr
-      printf -- "%s\n" "${YAHOO_OUTPUT}" >/dev/stderr
-      rm -f "${HEADER_OUTPUT}"
+  if [[ $(_stock_meta "${YAHOO_OUTPUT}" "currency") == "USD" ]]; then
+    local CURRENCY_OUTPUT
+    if ! CURRENCY_OUTPUT="$(_stock_fetch "USDEUR=X" "includePrePost=false&interval=1h&range=1d")"; then
       return 1
     fi
 
-    rm -f "${HEADER_OUTPUT}"
-
-    printf -- "\n1mo"
-    _stock_evolution "$(printf -- "%s" "${YAHOO_OUTPUT}" | jq --raw-output '.chart.result[0].meta | .chartPreviousClose')" "${CURRENT_PRICE}"
+    _stock_quote "${CURRENCY_OUTPUT}" "USD -> EUR"
     printf -- "\n"
-
-    printf -- "%s" "${YAHOO_OUTPUT}" | jq -r '.chart.result[0].indicators.quote[0].open | join(",")' | spark
   fi
 
-  printf -- "\nSource: https://finance.yahoo.com/quote/%s\n" "${1:-DDOG}"
+  if command -v spark >/dev/null 2>&1; then
+    local MONTH_OUTPUT
+    if ! MONTH_OUTPUT="$(_stock_fetch "${STOCK_TICKER}" "includePrePost=false&interval=1d&range=1mo")"; then
+      return 1
+    fi
+
+    printf -- "\n1mo"
+    _stock_evolution "$(_stock_meta "${MONTH_OUTPUT}" "chartPreviousClose")" "${CURRENT_PRICE}"
+    printf -- "\n"
+
+    printf -- "%s" "${MONTH_OUTPUT}" | jq --raw-output '.chart.result[0].indicators.quote[0].open | join(",")' | spark
+  fi
+
+  printf -- "\nSource: https://finance.yahoo.com/quote/%s\n" "${STOCK_TICKER}"
 }
 
 date_in() {
