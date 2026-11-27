@@ -10,12 +10,8 @@ if [[ $(pgrep -a bash | wc -l) -eq 2 ]]; then
     gpg_agent_stop
   fi
 
-  if [[ $(type -t "op_broker_start") == "function" ]]; then
-    op_broker_start
-  fi
-
-  if [[ $(type -t "workspaces_daemon_stop") == "function" ]]; then
-    workspaces_daemon_stop
+  if [[ $(type -t "op_broker_stop") == "function" ]]; then
+    op_broker_stop
   fi
 
   if [[ $(type -t "kube_clean_contexts") == "function" ]]; then

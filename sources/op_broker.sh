@@ -51,7 +51,7 @@ op_broker_stop() {
   rm -f "${OP_BROKER_PID_FILE}" "${OP_BROKER_SOCKET}"
 }
 
-workspaces_daemon_restart() {
+op_broker_restart() {
   op_broker_stop
   op_broker_start
 }
