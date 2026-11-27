@@ -30,6 +30,8 @@ install() {
   source "${DOTFILES_DIR}/sources/_python.sh"
 
   if command -v git >/dev/null 2>&1; then
-    uv tool install --upgrade "ruff" "isort" "yamllint"
+    uv tool install --upgrade "ruff"
+    uv tool install --upgrade "isort"
+    uv tool install --upgrade "yamllint"
   fi
 }

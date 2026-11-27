@@ -19,6 +19,7 @@ usage() {
   printf -- "  -i\tInstall and configure softwares\n"
   printf -- "  -l\tLimiting execution to given filename\n"
   printf -- "  -p\tRetrieve and write credentials\n"
+  printf -- "  -r\tRestart from given filename\n"
   printf -- "  -h\tPrint this help\n"
 }
 
